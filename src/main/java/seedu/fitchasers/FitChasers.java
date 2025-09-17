@@ -1,8 +1,8 @@
-package seedu.duke;
+package seedu.fitchasers;
 
 import java.util.Scanner;
 
-public class Duke {
+public class FitChasers {
     /**
      * Main entry-point for the java.duke.Duke application.
      */
