@@ -13,7 +13,6 @@ public class Exercise {
      *
      * @param name The name of the exercise.
      * @param reps The number of repetitions for the exercise.
-     * initialises to one set
      */
     public Exercise(String name, Integer reps) {
         this.name = name;

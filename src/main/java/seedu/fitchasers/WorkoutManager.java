@@ -3,8 +3,7 @@ package seedu.fitchasers;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-public class WorkoutManager
-{
+public class WorkoutManager{
     private static final int ARRAY_OFFSET = 1;
     private final ArrayList<Workout> workouts =  new ArrayList<>();
     private Workout currentWorkout = null;
@@ -70,8 +69,7 @@ public class WorkoutManager
         workouts.add(new Workout(name.trim(), duration));
     }
 
-    public boolean removeWorkout(String name)
-    {
+    public boolean removeWorkout(String name){
         for( Workout w : workouts){
             if(w.getWorkoutName().equals(name)){
                 workouts.remove(w);
@@ -95,7 +93,9 @@ public class WorkoutManager
         int reps;
         try {
             reps = Integer.parseInt(repsStr);
-            if (reps <= 0) throw new NumberFormatException();
+            if (reps <= 0){
+                throw new NumberFormatException();
+            }
         } catch (NumberFormatException e) {
             System.out.println("REPS must be a positive integer. Example: /add_exercise n/Push_Up r/12");
             return;
