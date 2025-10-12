@@ -19,7 +19,7 @@ public class FitChasers {
 
         System.out.println("Hello welcome to fit chaser"); //Welcome Message @Starvou
 
-        while(sc.hasNextLine()) {
+        while (sc.hasNextLine()) {
             final String line = sc.nextLine().trim();
             if (line.isEmpty()) {
                 continue;
@@ -27,7 +27,7 @@ public class FitChasers {
 
             final String[] parts = line.split("\\s+", 2);
             command = parts[0];
-            if(parts.length > 1){
+            if (parts.length > 1) {
                 argumentStr = parts[1];
             }
             command = command.toLowerCase();

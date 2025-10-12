@@ -1,4 +1,5 @@
 package seedu.fitchasers;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -9,14 +10,14 @@ import java.util.List;
 import java.util.Scanner;
 
 /**
- *  Handles the permanent storage of the data
- *  Can store and retrieve data stored under data folder -> save.txt
- *  if folder doesnt exist it will create it in order for safe relative path
- *
- *  save.txt is rewritten every time it saves and not appended, save format follows how
- *  the file should be typed into CMT
- *
- *  for example if a todo task was present it will save it as
+ * Handles the permanent storage of the data
+ * Can store and retrieve data stored under data folder -> save.txt
+ * if folder doesnt exist it will create it in order for safe relative path
+ * <p>
+ * save.txt is rewritten every time it saves and not appended, save format follows how
+ * the file should be typed into CMT
+ * <p>
+ * for example if a todo task was present it will save it as
  *  todo [Description]
  *  marked/unmarked [task position]
  */
@@ -28,6 +29,7 @@ public class FileHandler {
     /**
      * Ensures a directory relative to the save file is created
      * Creates the save file too
+     *
      * @throws IOException when handle method fails to create the file
      */
 
@@ -40,12 +42,13 @@ public class FileHandler {
 
     /**
      * main method that loads taskslists from the save.txt
+     *
      * @throws IOException when handle method fails to save the file
      */
-    public void loadFileContentArray(WorkoutManager workoutManager) throws IOException{
-        try{
-          ensureFile();
-        }catch(Exception e){
+    public void loadFileContentArray(WorkoutManager workoutManager) throws IOException {
+        try {
+            ensureFile();
+        } catch (Exception e) {
             System.out.println("Error in FileHandler");
         }
         File f = new File(FILE_PATH.toUri()); // create a File for the given file path
@@ -58,21 +61,22 @@ public class FileHandler {
 
     /**
      * Saves current tasklist into save.txt
+     *
      * @param workoutLists takes arraylist and populate with save data
      * @throws IOException when handle method fails to save the file
      */
-    public void saveFile(List<Workout> workoutLists) throws IOException{
-        try{
+    public void saveFile(List<Workout> workoutLists) throws IOException {
+        try {
             ensureFile();
-        }catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Error in FileHandler");
         }
         FileWriter fw = new FileWriter(FILE_PATH.toFile()); // create a File for the given file path
         int i = 0;
-         for (Workout workout : workoutLists) {
-             fw.write(workout.getWorkoutName() + " | " + workout.getDuration() + "\n");
-             i++;
-         }
-         fw.close();
+        for (Workout workout : workoutLists) {
+            fw.write(workout.getWorkoutName() + " | " + workout.getDuration() + "\n");
+            i++;
+        }
+        fw.close();
     }
 }
