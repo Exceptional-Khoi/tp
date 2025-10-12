@@ -38,6 +38,10 @@ public class WorkoutManager
         return text.substring(start, end);
     }
 
+    public ArrayList<Workout> getWorkouts() {
+        return workouts;
+    }
+
     public void loadWorkoutFromFile(String workout){
         String name = workout.substring(0, workout.indexOf("|"));
         int duration = 0;
