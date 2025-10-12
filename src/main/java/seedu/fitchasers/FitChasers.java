@@ -7,15 +7,58 @@ public class FitChasers {
      * Main entry-point for the java.duke.Duke application.
      */
     public static void main(String[] args) {
-        String logo = " ____        _        \n"
-                + "|  _ \\ _   _| | _____ \n"
-                + "| | | | | | | |/ / _ \\\n"
-                + "| |_| | |_| |   <  __/\n"
-                + "|____/ \\__,_|_|\\_\\___|\n";
-        System.out.println("Hello from\n" + logo);
-        System.out.println("What is your name?");
+        UI ui = new UI();
+        ui.showGreeting();
 
-        Scanner in = new Scanner(System.in);
-        System.out.println("Hello " + in.nextLine());
+        boolean isRunning = true;
+        while (isRunning) {
+            String command = ui.readCommand();
+
+            switch (command.toLowerCase()) {
+
+                case "/help":
+                    ui.showHelp();
+                    break;
+
+                case "/add_weight":
+                    ui.showMessage("Logging your weight... don’t lie to me!");
+                    // TODO: integrate weight-logging logic here
+                    break;
+
+                case "/create_workout":
+                    ui.showMessage("New workout sesh incoming!");
+                    // TODO: integrate workout creation logic
+                    break;
+
+                case "/add_exercise":
+                    ui.showMessage("Adding that spicy new exercise!");
+                    // TODO: integrate exercise addition logic
+                    break;
+
+                case "/end_workout":
+                    ui.showMessage("Workout wrapped! Time to refuel!");
+                    // TODO: integrate workout end logic
+                    break;
+
+                case "/view_log":
+                    ui.showMessage("Here’s your workout glow-up history!");
+                    // TODO: integrate log viewing logic
+                    break;
+
+                case "/del_workout":
+                    ui.showMessage("Deleting that workout? T.T Are you sure, bestie?");
+                    // TODO: integrate workout deletion logic
+                    break;
+
+                case "/exit":
+                    ui.showExitMessage();
+                    isRunning = false;
+                    break;
+
+                // --- Fallback for unknown commands ---
+                default:
+                    ui.showError("That’s not a thing, bestie. Try /help for the real moves!");
+            }
+        }
     }
 }
