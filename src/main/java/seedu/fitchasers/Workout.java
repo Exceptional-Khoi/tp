@@ -1,14 +1,22 @@
 package seedu.fitchasers;
 
-public class Workout {
+import java.time.LocalDateTime;
+
+public class Workout{
     private String workoutName;
-    private int duration;
+    private int duration = 0;
+    private LocalDateTime workoutStartDateTime;
+    private LocalDateTime workoutEndDateTime;
 
     public Workout(String workoutName, int duration) {
         this.workoutName = workoutName;
         this.duration = duration;
     }
 
+    public Workout(String workoutName, LocalDateTime workoutStartDateTime) {
+        this.workoutName = workoutName;
+        this.workoutStartDateTime = workoutStartDateTime;
+    }
     public String getWorkoutName() {
         return workoutName;
     }
