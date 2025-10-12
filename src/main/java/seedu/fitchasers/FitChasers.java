@@ -19,7 +19,7 @@ public class FitChasers {
 
         System.out.println("Hello welcome to fit chaser"); //Welcome Message @Starvou
 
-        while(sc.hasNextLine()) {
+        while (sc.hasNextLine()) {
             final String line = sc.nextLine().trim();
             if (line.isEmpty()) {
                 continue;
@@ -27,7 +27,7 @@ public class FitChasers {
 
             final String[] parts = line.split("\\s+", 2);
             command = parts[0];
-            if(parts.length > 1){
+            if (parts.length > 1) {
                 argumentStr = parts[1];
             }
             command = command.toLowerCase();
@@ -47,7 +47,7 @@ public class FitChasers {
                 // Format: /view_log
                 workoutManager.viewWorkouts();
                 break;
-/*
+                /*
             case "/add_weight":
                 // Format: /add_weight w/WEIGHT d/DATE   e.g., /add_weight w/81.5 d/19/10/25
                 // Delegate full args string; WorkoutManager should parse flags.
@@ -97,7 +97,7 @@ public class FitChasers {
 
 
 
-*/
+            */
 
             case "/exit":
                 fileHandler.saveFile(workoutManager.getWorkouts());
