@@ -5,6 +5,7 @@ package seedu.fitchasers;
  */
 public class Exercise {
     private final String name;
+    private final int sets;
     private final int reps;
 
     /**
@@ -12,10 +13,12 @@ public class Exercise {
      *
      * @param name The name of the exercise.
      * @param reps The number of repetitions for the exercise.
+     * initialises to one set
      */
     public Exercise(String name, Integer reps) {
         this.name = name;
         this.reps = reps;
+        this.sets = 1;
     }
 
     /**
@@ -37,11 +40,20 @@ public class Exercise {
     }
 
     /**
+     * Returns the number of sets for the exercise.
+     *
+     * @return The number of sets.
+     */
+    public int getSets() {
+        return sets;
+    }
+
+    /**
      * Returns a string representation of the exercise.
      * @return A string describing the exercise.
      */
     @Override
     public String toString() {
-        return (reps == 0) ? name : name + " (" + reps + " reps)";
+        return name + " " + sets + "x" + reps;
     }
 }
