@@ -13,7 +13,7 @@ public class WorkoutManager
     public boolean removeWorkout(String name)
     {
         for( Workout w : workouts){
-            if(w.getName().equals(name)){
+            if(w.getWorkoutName().equals(name)){
                 workouts.remove(w);
                 return true;
             }
