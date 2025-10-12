@@ -3,10 +3,11 @@ package seedu.fitchasers;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-public class WorkoutManager
-{
+public class WorkoutManager{
     private static final int ARRAY_OFFSET = 1;
     private final ArrayList<Workout> workouts =  new ArrayList<>();
+    private Workout currentWorkout = null;
+
 
     public void addWorkout(String command) {
         // Extract each argument
@@ -22,7 +23,10 @@ public class WorkoutManager
         LocalDateTime workoutDateTime = LocalDateTime.parse(dateTimeStr, formatter);
 
         // Assuming Workout(String name, LocalDateTime dateTime)
-        workouts.add(new Workout(workoutName, workoutDateTime));
+        Workout newWorkout = new Workout(workoutName, workoutDateTime);
+        workouts.add(newWorkout);
+        currentWorkout = newWorkout;
+
         System.out.println("Added workout " + workoutName); //Starvou please update this
     }
 
@@ -36,6 +40,17 @@ public class WorkoutManager
             return "";
         }
         return text.substring(start, end);
+    }
+
+    /**
+     * Extracts the substring that appears after the given token.
+     */
+    private String extractAfter(String text, String token) {
+        int index = text.indexOf(token);
+        if (index == -1) {
+            return ""; // token not found
+        }
+        return text.substring(index + token.length()).trim();
     }
 
     public ArrayList<Workout> getWorkouts() {
@@ -54,8 +69,7 @@ public class WorkoutManager
         workouts.add(new Workout(name.trim(), duration));
     }
 
-    public boolean removeWorkout(String name)
-    {
+    public boolean removeWorkout(String name){
         for( Workout w : workouts){
             if(w.getWorkoutName().equals(name)){
                 workouts.remove(w);
@@ -65,11 +79,48 @@ public class WorkoutManager
         return false;
     }
 
-    public void viewWorkouts(){
-        for(int i = 0; i < workouts.size(); i++){
+    public void addExercise(String args) {
+        if (currentWorkout == null) {
+            System.out.println("No active workout. Use /create_workout first.");
+            return;
+        }
+        String name = extractBetween(args, "n/", "r/").trim();
+        String repsStr = extractAfter(args, "r/").trim();
+        if (name.isEmpty() || repsStr.isEmpty()) {
+            System.out.println("Usage: /add_exercise n/NAME r/REPS");
+            return;
+        }
+        int reps;
+        try {
+            reps = Integer.parseInt(repsStr);
+            if (reps <= 0){
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("REPS must be a positive integer. Example: /add_exercise n/Push_Up r/12");
+            return;
+        }
+
+        Exercise exercise = new Exercise(name, reps);
+        currentWorkout.addExercise(exercise);
+        System.out.println("Added exercise to current workout: " + exercise);
+    }
+
+    public void viewWorkouts() {
+        for (int i = 0; i < workouts.size(); i++) {
+            Workout w = workouts.get(i);
             System.out.println("=============================================================");
             System.out.print("[" + (i + ARRAY_OFFSET) + "]: ");
-            System.out.println(workouts.get(i).getWorkoutName() + " | " + workouts.get(i).getDuration());
+            System.out.println(w.getWorkoutName() + " | " + w.getDuration());
+
+            // Print exercises with numbering
+            if (w.getExercises().isEmpty()) {
+                System.out.println("     No exercises added yet.");
+            } else {
+                for (int j = 0; j < w.getExercises().size(); j++) {
+                    System.out.println("     Exercise " + (j + 1) + ". " + w.getExercises().get(j));
+                }
+            }
             System.out.println("=============================================================");
         }
     }
