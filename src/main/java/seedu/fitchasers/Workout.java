@@ -46,6 +46,10 @@ public class Workout{
         lastAddedExercise = exercise;
     }
 
+    public java.util.List<Exercise> getExercises() {
+        return exercises;
+    }
+
     @Override
     public String toString() {
         return "Workout Name: " + workoutName + ", Duration: " + duration + " has been created and saved.";

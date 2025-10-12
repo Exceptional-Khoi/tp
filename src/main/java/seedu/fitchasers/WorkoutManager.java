@@ -86,8 +86,8 @@ public class WorkoutManager
             System.out.println("No active workout. Use /create_workout first.");
             return;
         }
-        String name    = extractBetween(args, "n/", "r/");
-        String repsStr = extractAfter(args, "r/");
+        String name = extractBetween(args, "n/", "r/").trim();
+        String repsStr = extractAfter(args, "r/").trim();
         if (name.isEmpty() || repsStr.isEmpty()) {
             System.out.println("Usage: /add_exercise n/NAME r/REPS");
             return;
@@ -106,11 +106,21 @@ public class WorkoutManager
         System.out.println("Added exercise to current workout: " + exercise);
     }
 
-    public void viewWorkouts(){
-        for(int i = 0; i < workouts.size(); i++){
+    public void viewWorkouts() {
+        for (int i = 0; i < workouts.size(); i++) {
+            Workout w = workouts.get(i);
             System.out.println("=============================================================");
             System.out.print("[" + (i + ARRAY_OFFSET) + "]: ");
-            System.out.println(workouts.get(i).getWorkoutName() + " | " + workouts.get(i).getDuration());
+            System.out.println(w.getWorkoutName() + " | " + w.getDuration());
+
+            // Print exercises with numbering
+            if (w.getExercises().isEmpty()) {
+                System.out.println("     No exercises added yet.");
+            } else {
+                for (int j = 0; j < w.getExercises().size(); j++) {
+                    System.out.println("     Exercise " + (j + 1) + ". " + w.getExercises().get(j));
+                }
+            }
             System.out.println("=============================================================");
         }
     }

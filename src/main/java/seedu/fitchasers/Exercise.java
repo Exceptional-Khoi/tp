@@ -54,6 +54,6 @@ public class Exercise {
      */
     @Override
     public String toString() {
-        return name + " " + sets + "x" + reps;
+        return name + " [" + sets + " x " + reps + "]";
     }
 }

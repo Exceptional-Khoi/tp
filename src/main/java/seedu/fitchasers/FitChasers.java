@@ -5,7 +5,7 @@ import java.util.Scanner;
 
 public class FitChasers {
     /**
-     * Main entry-point for the java.duke.Duke application.
+     * Main entry-point for the FitChasers application.
      */
     public static void main(String[] args) throws IOException {
         WorkoutManager workoutManager = new WorkoutManager();
@@ -47,17 +47,17 @@ public class FitChasers {
                 // Format: /view_log
                 workoutManager.viewWorkouts();
                 break;
+
+            case "/add_exercise":
+                // Format: /add_exercise n/NAME r/REPS   e.g., /add_exercise n/Push_Up r/10
+                workoutManager.addExercise(argumentStr);
+                break;
                 /*
             case "/add_weight":
                 // Format: /add_weight w/WEIGHT d/DATE   e.g., /add_weight w/81.5 d/19/10/25
                 // Delegate full args string; WorkoutManager should parse flags.
                 // Nary
                 workoutManager.addWeight(argumentStr);
-                break;
-
-            case "/add_exercise":
-                // Format: /add_exercise EXERCISE_NAME   e.g., /add_exercise Push_Up
-                workoutManager.addExercise(argumentStr);
                 break;
 
             case "/add_sets":
