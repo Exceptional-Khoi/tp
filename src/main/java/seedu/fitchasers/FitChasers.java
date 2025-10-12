@@ -55,7 +55,6 @@ public class FitChasers {
                     isRunning = false;
                     break;
 
-                // --- Fallback for unknown commands ---
                 default:
                     ui.showError("That’s not a thing, bestie. Try /help for the real moves!");
             }
