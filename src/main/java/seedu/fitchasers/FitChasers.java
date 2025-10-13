@@ -98,11 +98,6 @@ public class FitChasers {
                     // Format: /view_duration WORKOUT_NAME
                     workoutManager.viewDuration(argumentStr);
                     break;
-
-                case "/del_workout":
-                    // Format: /del_workout WORKOUT_NAME
-                    workoutManager.deleteWorkout(argumentStr);
-                    break;
                 */
 
                 case "/end_workout":
@@ -119,6 +114,7 @@ public class FitChasers {
                 case "/del_workout":
                     ui.showMessage("🗑 Deleting that workout? 😭 Are you sure, bestie?");
                     // Format: /del_workout WORKOUT_NAME
+                    workoutManager.deleteWorkout(argumentStr);
                     break;
 
                 case "/exit":

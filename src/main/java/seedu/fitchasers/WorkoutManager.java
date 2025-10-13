@@ -82,11 +82,11 @@ public class WorkoutManager {
     }
 
 
-    public boolean removeWorkout(String name) {
+    public boolean deleteWorkout(String name) {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
                 workouts.remove(w);
-                ui.showMessage("Removed workout: " + name);
+                ui.showMessage("Deleted workout: " + name);
                 return true;
             }
         }
