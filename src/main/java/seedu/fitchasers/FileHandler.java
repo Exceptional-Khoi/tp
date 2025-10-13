@@ -8,90 +8,119 @@ import java.nio.file.Paths;
 import java.util.List;
 
 /**
- * Handles the permanent storage of the data
- * Can store and retrieve data stored under data folder -> save.txt
- * if folder doesnt exist it will create it in order for safe relative path
- * <p>
- * save.txt is rewritten every time it saves and not appended, save format follows how
- * the file should be typed into CMT
- * <p>
- * for example if a todo task was present it will save it as
- *  todo [Description]
- *  marked/unmarked [task position]
+ * Handles the permanent storage of workout and exercise data.
+ * Saves to and loads from: data/save.txt
+ *
+ * If the "data" folder does not exist, it will be created automatically.
+ *
+ * File format:
+ * Each workout starts with "WORKOUT" and ends with "END_WORKOUT".
+ * Exercises are listed between, with all set repetitions joined by commas.
+ *
+ * Example:
+ * WORKOUT | Chest Day | 45
+ * EXERCISE | Push Ups | 15,15,12
+ * EXERCISE | Bench Press | 12,10,8
+ * END_WORKOUT
  */
-
 public class FileHandler {
 
     private static final Path FILE_PATH = Paths.get("data", "save.txt");
+    private final UI ui;
+
 
     /**
-     * Ensures a directory relative to the save file is created
-     * Creates the save file too
-     *
-     * @throws IOException when handle method fails to create the file
+     * Constructs a FileHandler with a reference to the UI for user feedback.
      */
+    public FileHandler(UI ui) {
+        this.ui = ui;
+    }
 
+
+    /**
+     * Ensures that the save file and its parent directory exist.
+     *
+     * @throws IOException if directory or file creation fails
+     */
     private static void ensureFile() throws IOException {
         Files.createDirectories(FILE_PATH.getParent());
         if (Files.notExists(FILE_PATH)) {
-            Files.createFile(FILE_PATH); // empty file
+            Files.createFile(FILE_PATH); // Create empty save file
         }
     }
 
+
     /**
-     * Loads workouts and exercises from the save file into the given WorkoutManager.
-     * Each workout starts with "WORKOUT" and ends with "END_WORKOUT".
-     * Exercises include all sets joined by commas.
+     * Loads all workout and exercise data from save.txt into the given WorkoutManager.
      *
-     * @param workoutManager WorkoutManager to populate.
-     * @throws IOException if reading the file fails.
+     * Expected format:
+     * WORKOUT | Name | Duration
+     * EXERCISE | Name | reps,reps,reps
+     * END_WORKOUT
+     *
+     * @param workoutManager the WorkoutManager to populate
+     * @throws IOException if reading the save file fails
      */
     public void loadFileContentArray(WorkoutManager workoutManager) throws IOException {
         ensureFile();
         List<String> lines = Files.readAllLines(FILE_PATH);
-
         Workout currentWorkout = null;
+
 
         for (String line : lines) {
             if (line.startsWith("WORKOUT")) {
-                String[] parts = line.split("\\|");
-                String name = parts[1].trim();
-                int duration = Integer.parseInt(parts[2].trim());
-                currentWorkout = new Workout(name, duration);
-                workoutManager.getWorkouts().add(currentWorkout);
-            } else if (line.startsWith("EXERCISE") && currentWorkout != null) {
-                String[] parts = line.split("\\|");
-                String exName = parts[1].trim();
-                String[] repsList = parts[2].trim().split(",");
-                Exercise exercise = new Exercise(exName, Integer.parseInt(repsList[0]));
-                // add additional sets if any
-                for (int i = 1; i < repsList.length; i++) {
-                    exercise.addSet(Integer.parseInt(repsList[i]));
+                try {
+                    String[] parts = line.split("\\|");
+                    String name = parts[1].trim();
+                    int duration = Integer.parseInt(parts[2].trim());
+                    currentWorkout = new Workout(name, duration);
+                    workoutManager.getWorkouts().add(currentWorkout);
+                } catch (Exception e) {
+                    ui.showMessage("Skipping malformed workout entry: " + line);
                 }
-                currentWorkout.addExercise(exercise);
+
+
+            } else if (line.startsWith("EXERCISE") && currentWorkout != null) {
+                try {
+                    String[] parts = line.split("\\|");
+                    String exName = parts[1].trim();
+                    String[] repsList = parts[2].trim().split(",");
+
+
+                    Exercise exercise = new Exercise(exName, Integer.parseInt(repsList[0]));
+                    for (int i = 1; i < repsList.length; i++) {
+                        exercise.addSet(Integer.parseInt(repsList[i]));
+                    }
+                    currentWorkout.addExercise(exercise);
+                } catch (Exception e) {
+                    ui.showMessage("Skipping malformed exercise entry: " + line);
+                }
+
+
             } else if (line.startsWith("END_WORKOUT")) {
                 currentWorkout = null;
             }
         }
+        ui.showMessage("Loaded " + workoutManager.getWorkouts().size() + " workout(s) from file.");
     }
 
 
     /**
-     * Saves all workout data to the save file in the specified format.
-     * Each workout entry is written with its name and duration, followed by
-     * all exercises and their corresponding sets (joined by commas).
-     * The file is rewritten entirely each time this method is called.
+     * Saves all workout data to save.txt in the specified format.
      *
-     * @param workouts List of Workout objects to be saved.
-     * @throws IOException if an I/O error occurs while creating or writing to the file.
+     * Each save overwrites the entire file.
+     *
+     * @param workouts list of workouts to be saved
+     * @throws IOException if writing fails
      */
     public void saveFile(List<Workout> workouts) throws IOException {
         ensureFile();
         try (FileWriter fw = new FileWriter(FILE_PATH.toFile())) {
             for (Workout w : workouts) {
                 fw.write("WORKOUT | " + w.getWorkoutName() + " | " + w.getDuration() + "\n");
+
+
                 for (Exercise ex : w.getExercises()) {
-                    // join all reps from each set with commas
                     StringBuilder setsStr = new StringBuilder();
                     for (int i = 0; i < ex.getSets().size(); i++) {
                         setsStr.append(ex.getSets().get(i));
@@ -101,9 +130,11 @@ public class FileHandler {
                     }
                     fw.write("EXERCISE | " + ex.getName() + " | " + setsStr + "\n");
                 }
+
+
                 fw.write("END_WORKOUT\n");
             }
         }
+        ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
     }
 }
-

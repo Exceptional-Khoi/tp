@@ -1,114 +1,141 @@
 package seedu.fitchasers;
 
 import java.io.IOException;
-import java.util.Scanner;
 
+
+/**
+ * Main entry point for the FitChasers application.
+ *
+ * Handles user input commands, delegates operations to WorkoutManager,
+ * and persists data through FileHandler.
+ */
 public class FitChasers {
-    /**
-     * Main entry-point for the FitChasers application.
-     */
-    public static void main(String[] args) throws IOException {
-        WorkoutManager workoutManager = new WorkoutManager();
-        FileHandler fileHandler = new FileHandler();
-        Scanner sc = new Scanner(System.in);
-        String command;
-        String argumentStr = "";
+    public static void main(String[] args) {
+        UI ui = new UI();
+        WorkoutManager workoutManager = new WorkoutManager(ui);
+        FileHandler fileHandler = new FileHandler(ui);
+        Person person = new Person("Default User");
+        WeightManager weightManager = new WeightManager(person);
 
-        //Load Persistant data if any
-        fileHandler.loadFileContentArray(workoutManager);
+        // Attempt to load persistent data
+        try {
+            fileHandler.loadFileContentArray(workoutManager);
+        } catch (IOException e) {
+            ui.showError("Could not load saved data. Starting fresh!");
+        }
 
-        System.out.println("Hello welcome to fit chaser"); //Welcome Message @Starvou
+        ui.showGreeting();
 
-        while (sc.hasNextLine()) {
-            final String line = sc.nextLine().trim();
-            if (line.isEmpty()) {
+        boolean isRunning = true;
+
+        while (isRunning) {
+            String input = ui.readCommand();
+            if (input == null || input.trim().isEmpty()) {
                 continue;
             }
 
-            final String[] parts = line.split("\\s+", 2);
-            command = parts[0];
-            if (parts.length > 1) {
-                argumentStr = parts[1];
-            }
-            command = command.toLowerCase();
+            String[] parts = input.trim().split("\\s+", 2);
+            String command = parts[0].toLowerCase();
+            String argumentStr = (parts.length > 1) ? parts[1] : "";
 
-            switch (command) {
-            case "/help":
-                System.out.println("Helppp"); //Starvou
-                break;
+            try {
+                switch (command) {
+                case "/help":
+                    ui.showHelp();
+                    break;
 
-            case "/create_workout":
-                // Format: /create_workout n/NAME d/DD/MM/YY t/HHmm
-                // e.g., /create_workout n/Morning_Workout d/25/10/25 t/1400
-                workoutManager.addWorkout(argumentStr);
-                break;
+                case "/add_weight":
+                    ui.showMessage("Logging your weight... don’t lie to me!");
+                    weightManager.addWeight(argumentStr);
+                    // Format: /add_weight w/WEIGHT d/DATE
+                    break;
 
-            case "/view_log":
-                // Format: /view_log
-                workoutManager.viewWorkouts();
-                break;
+                case "/view_weight":
+                    ui.showMessage("Here’s your weight, you’ve been killin’ it lately!");
+                    weightManager.viewWeights();
+                    break;
 
-            case "/add_exercise":
-                // Format: /add_exercise n/NAME r/REPS   e.g., /add_exercise n/Push_Up r/10
-                workoutManager.addExercise(argumentStr);
-                break;
+                case "/create_workout":
+                    ui.showMessage("New workout sesh incoming!");
+                    // Format: /create_workout n/NAME d/DD/MM/YY t/HHmm
+                    workoutManager.addWorkout(argumentStr);
+                    break;
 
-            case "/add_set":
-                // Format: /add_sets r/REPS  e.g., /add_sets r/12
-                workoutManager.addSet(argumentStr);
-                break;
+                case "/add_exercise":
+                    ui.showMessage("Adding that spicy new exercise!");
+                    // Format: /add_exercise n/NAME r/REPS
+                    workoutManager.addExercise(argumentStr);
+                    break;
+
+                case "/add_set":
+                    ui.showMessage("Adding a new set to your exercise!");
+                    // Format: /add_set r/REPS
+                    workoutManager.addSet(argumentStr);
+                    break;
 
                 /*
-            case "/add_weight":
-                // Format: /add_weight w/WEIGHT d/DATE   e.g., /add_weight w/81.5 d/19/10/25
-                // Delegate full args string; WorkoutManager should parse flags.
-                // Nary
-                workoutManager.addWeight(argumentStr);
-                break;
+                case "/add_reps":
+                    // Format: /add_reps e/EXERCISE_NAME i/SET_INDEX r/REPS  e.g., /add_reps e/Push_Up i/2 r/12
+                    workoutManager.addReps(argumentStr);
+                    break;
 
-            case "/add_reps":
-                // Format: /add_reps e/EXERCISE_NAME i/SET_INDEX r/REPS  e.g., /add_reps e/Push_Up i/2 r/12
-                workoutManager.addReps(argumentStr);
-                break;
+                case "/del_sets":
+                    // Format: /del_sets e/EXERCISE_NAME i/SET_INDEX  e.g., /del_sets e/Push_Up i/2
+                    workoutManager.deleteSets(argumentStr);
+                    break;
 
-            case "/del_sets":
-                // Format: /del_sets e/EXERCISE_NAME i/SET_INDEX  e.g., /del_sets e/Push_Up i/2
-                workoutManager.deleteSets(argumentStr);
-                break;
+                case "/del_exercise":
+                    // Format: /del_exercise EXERCISE_NAME  e.g., /del_exercise Push_Up
+                    workoutManager.deleteExercise(argumentStr);
+                    break;
 
-            case "/del_exercise":
-                // Format: /del_exercise EXERCISE_NAME  e.g., /del_exercise Push_Up
-                workoutManager.deleteExercise(argumentStr);
-                break;
+                case "/end_workout":
+                    // Format: /end_workout d/DD/MM/YY t/HHmm  e.g., /end_workout d/25/10/25 t/1800
+                    workoutManager.endWorkout(argumentStr);
+                    break;
 
-            case "/end_workout":
-                // Format: /end_workout d/DD/MM/YY t/HHmm  e.g., /end_workout d/25/10/25 t/1800
-                workoutManager.endWorkout(argumentStr);
-                break;
+                case "/view_duration":
+                    // Format: /view_duration WORKOUT_NAME
+                    workoutManager.viewDuration(argumentStr);
+                    break;
+                */
 
-            case "/view_duration":
-                // Format: /view_duration WORKOUT_NAME
-                workoutManager.viewDuration(argumentStr);
-                break;
+                case "/end_workout":
+                    ui.showMessage("Workout wrapped! Time to refuel!");
+                    // Format: /end_workout d/DD/MM/YY t/HHmm
+                    workoutManager.endWorkout(argumentStr);
+                    break;
 
-            case "/del_workout":
-                // Format: /del_workout WORKOUT_NAME
-                workoutManager.deleteWorkout(argumentStr);
-                break;
-            */
+                case "/view_log":
+                    ui.showMessage("Here’s your workout glow-up history!");
+                    workoutManager.viewWorkouts();
+                    break;
 
-            case "/end_workout":
-                // Format: /end_workout d/DD/MM/YY t/HHmm, e.g. /end_workout d/25/10/25 t/1800
-                workoutManager.endWorkout(argumentStr);
-                break;
+                case "/del_workout":
+                    ui.showMessage("🗑 Deleting that workout? 😭 Are you sure, bestie?");
+                    // Format: /del_workout WORKOUT_NAME
+                    workoutManager.deleteWorkout(argumentStr);
+                    break;
 
-            case "/exit":
-                fileHandler.saveFile(workoutManager.getWorkouts());
-                return;
-            default:
-                System.out.println("Unknown command. Type /help for the list of commands.");
+                case "/exit":
+                    ui.showMessage("Saving your progress...");
+                    try {
+                        fileHandler.saveFile(workoutManager.getWorkouts());
+                        ui.showExitMessage();
+                    } catch (IOException e) {
+                        ui.showError("Failed to save workouts before exit.");
+                    }
+                    isRunning = false;
+                    break;
+
+                default:
+                    ui.showError("That’s not a thing, bestie. Try /help for the real moves!");
+                    break;
+                }
+            } catch (Exception e) {
+                ui.showError("Something went wrong: " + e.getMessage());
             }
         }
-
     }
 }
+
