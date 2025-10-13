@@ -8,37 +8,32 @@ public class WorkoutManager {
     private static final int ARRAY_OFFSET = 1;
     private final ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
-    private final UI ui;
 
-    public WorkoutManager(UI ui) {
-        this.ui = ui;
-    }
 
-    // ===============================
-    // ADD WORKOUT
-    // ===============================
     public void addWorkout(String command) {
+        // Extract each argument
         String workoutName = extractBetween(command, "n/", "d/").trim();
         String dateStr = extractBetween(command, "d/", "t/").trim();
         String timeStr = command.substring(command.indexOf("t/") + 2).trim();
 
+        // Combine date and time into one string
         String dateTimeStr = dateStr + " " + timeStr;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
 
-        try {
-            LocalDateTime workoutDateTime = LocalDateTime.parse(dateTimeStr, formatter);
-            Workout newWorkout = new Workout(workoutName, workoutDateTime);
-            workouts.add(newWorkout);
-            currentWorkout = newWorkout;
-            ui.showMessage("Added workout: " + workoutName);
-        } catch (Exception e) {
-            ui.showMessage("Invalid date/time format. Use: d/DD/MM/YY t/HHmm");
-        }
+        // Parse the combined string into LocalDateTime
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
+        LocalDateTime workoutDateTime = LocalDateTime.parse(dateTimeStr, formatter);
+
+        // Assuming Workout(String name, LocalDateTime dateTime)
+        Workout newWorkout = new Workout(workoutName, workoutDateTime);
+        workouts.add(newWorkout);
+        currentWorkout = newWorkout;
+
+        System.out.println("Added workout " + workoutName); //Starvou please update this
     }
 
-    // ===============================
-    // HELPER METHODS
-    // ===============================
+    /**
+     * Helper method to extract a substring between two tokens.
+     */
     private String extractBetween(String text, String startToken, String endToken) {
         int start = text.indexOf(startToken) + startToken.length();
         int end = text.indexOf(endToken);
@@ -48,170 +43,171 @@ public class WorkoutManager {
         return text.substring(start, end);
     }
 
+    /**
+     * Extracts the substring that appears after the given token.
+     */
     private String extractAfter(String text, String token) {
         int index = text.indexOf(token);
         if (index == -1) {
-            return "";
+            return ""; // token not found
         }
         return text.substring(index + token.length()).trim();
     }
 
-    // ===============================
-    // WORKOUT MANAGEMENT
-    // ===============================
     public ArrayList<Workout> getWorkouts() {
         return workouts;
     }
 
     public void loadWorkoutFromFile(String workout) {
         String name = workout.substring(0, workout.indexOf("|"));
+        int duration = 0;
         try {
-            int duration = Integer.parseInt(workout.substring(workout.indexOf("|") + 1).trim());
-            workouts.add(new Workout(name.trim(), duration));
+            Integer.parseInt(workout.substring(workout.indexOf("|") + 1).trim());
         } catch (NumberFormatException e) {
-            ui.showMessage("Invalid workout format, file might be corrupted.");
+            System.out.println("Invalid workout format, file might be corrupted");
+            return;
         }
+        workouts.add(new Workout(name.trim(), duration));
     }
 
     public boolean removeWorkout(String name) {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
                 workouts.remove(w);
-                ui.showMessage("🗑 Removed workout: " + name);
                 return true;
             }
         }
-        ui.showMessage("Workout not found: " + name);
         return false;
     }
 
-    // ===============================
-    // ADD EXERCISE
-    // ===============================
     public void addExercise(String args) {
         if (currentWorkout == null) {
-            ui.showMessage("No active workout. Use /create_workout first.");
+            System.out.println("No active workout. Use /create_workout first.");
             return;
         }
-
         String name = extractBetween(args, "n/", "r/").trim();
         String repsStr = extractAfter(args, "r/").trim();
-
         if (name.isEmpty() || repsStr.isEmpty()) {
-            ui.showMessage("Usage: /add_exercise n/NAME r/REPS");
+            System.out.println("Usage: /add_exercise n/NAME r/REPS");
+            return;
+        }
+        int reps;
+        try {
+            reps = Integer.parseInt(repsStr);
+            if (reps <= 0) {
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("REPS must be a positive integer. Example: /add_exercise n/Push_Up r/12");
             return;
         }
 
-        try {
-            int reps = Integer.parseInt(repsStr);
-            if (reps <= 0) throw new NumberFormatException();
-
-            Exercise exercise = new Exercise(name, reps);
-            currentWorkout.addExercise(exercise);
-            ui.showMessage("Added exercise:\n" + exercise.toDetailedString());
-        } catch (NumberFormatException e) {
-            ui.showMessage("REPS must be a positive integer. Example: /add_exercise n/Push_Up r/12");
-        }
+        Exercise exercise = new Exercise(name, reps);
+        currentWorkout.addExercise(exercise);
+        System.out.println("Added exercise to current workout:");
+        System.out.println("=======================");
+        System.out.print(exercise.toDetailedString());
     }
 
-    // ===============================
-    // ADD SET
-    // ===============================
     public void addSet(String args) {
         if (currentWorkout == null) {
-            ui.showMessage("No active workout. Use /create_workout first.");
+            System.out.println("No active workout. Use /create_workout first.");
             return;
         }
 
         Exercise currentExercise = currentWorkout.getCurrentExercise();
         if (currentExercise == null) {
-            ui.showMessage("No exercise found. Use /add_exercise first.");
+            System.out.println("No exercise found. Use /add_exercise first.");
             return;
         }
 
         String repsStr = extractAfter(args, "r/");
         if (repsStr.isEmpty()) {
-            ui.showMessage("Usage: /add_set r/REPS");
+            System.out.println("Usage: /add_set r/REPS");
             return;
         }
 
         try {
             int reps = Integer.parseInt(repsStr);
-            if (reps <= 0) throw new NumberFormatException();
+            if (reps <= 0) {
+                throw new NumberFormatException();
+            }
 
             currentExercise.addSet(reps);
-            ui.showMessage("Added set to exercise:\n" + currentExercise.toDetailedString());
+
+            System.out.println("Added a set to current exercise:");
+            System.out.println("=======================");
+            System.out.print(currentExercise.toDetailedString());
         } catch (NumberFormatException e) {
-            ui.showMessage("REPS must be a positive integer. Example: /add_set r/15");
+            System.out.println("REPS must be a positive integer. Example: /add_set r/15");
         }
     }
 
-    // ===============================
-    // VIEW WORKOUTS
-    // ===============================
-    public void viewWorkouts() {
-        if (workouts.isEmpty()) {
-            ui.showMessage("No workouts recorded yet!");
-            return;
-        }
 
+    public void viewWorkouts() {
         for (int i = 0; i < workouts.size(); i++) {
             Workout w = workouts.get(i);
-            ui.showMessage("------------------------------------------------");
-            ui.showMessage("[" + (i + ARRAY_OFFSET) + "]: " + w.getWorkoutName() + " | " + w.getDuration() + " Min");
+            System.out.println("=============================================================");
+            System.out.print("[" + (i + ARRAY_OFFSET) + "]: ");
+            System.out.println(w.getWorkoutName() + " | " + w.getDuration() + " Min");
 
             if (w.getExercises().isEmpty()) {
-                ui.showMessage("     No exercises added yet.");
+                System.out.println("     No exercises added yet.");
             } else {
                 for (int j = 0; j < w.getExercises().size(); j++) {
                     Exercise ex = w.getExercises().get(j);
-                    ui.showMessage("     Exercise " + (j + 1) + ". " + ex);
+                    System.out.println("     Exercise " + (j + 1) + ". " + ex);
+
+                    // print all sets for this exercise
                     for (int k = 0; k < ex.getSets().size(); k++) {
-                        ui.showMessage("         Set " + (k + 1) + " -> Reps: " + ex.getSets().get(k));
+                        System.out.println("                      Set: " + (k + 1)
+                                + " -> Reps: " + ex.getSets().get(k));
                     }
                 }
             }
+
+            System.out.println("=============================================================");
         }
     }
 
-    // ===============================
-    // END WORKOUT
-    // ===============================
     public void endWorkout(String args) {
         if (currentWorkout == null) {
-            ui.showMessage("No active workout.");
+            System.out.println("No active workout.");
             return;
         }
-
         String dateStr = extractBetween(args, "d/", "t/").trim();
         String timeStr = extractAfter(args, "t/").trim();
 
+        // Check if date/time is given
         if (dateStr.isEmpty() || timeStr.isEmpty()) {
-            ui.showMessage("Please provide an end date and time in format: d/DD/MM/YY t/HHmm");
+            System.out.println("Please provide an end date and time in the format: d/DD/MM/YY t/HHmm");
             return;
         }
 
         String dateTimeStr = dateStr + " " + timeStr;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
-
+        LocalDateTime endDateTime;
         try {
-            LocalDateTime endDateTime = LocalDateTime.parse(dateTimeStr, formatter);
-
-            if (currentWorkout.getWorkoutStartDateTime() == null ||
-                    !endDateTime.isAfter(currentWorkout.getWorkoutStartDateTime())) {
-                ui.showMessage("End time must be after the start time of the workout!");
-                return;
-            }
-
-            currentWorkout.setWorkoutEndDateTime(endDateTime);
-            int duration = currentWorkout.calculateDuration();
-            currentWorkout.setDuration(duration);
-
-            ui.showMessage(String.format("Workout '%s' ended. Duration: %d minute(s).",
-                    currentWorkout.getWorkoutName(), duration));
-            currentWorkout = null;
+            endDateTime = LocalDateTime.parse(dateTimeStr, formatter);
         } catch (Exception e) {
-            ui.showMessage("Invalid date/time format. Use: d/DD/MM/YY t/HHmm");
+            System.out.println("Invalid date or time. Please use format: d/DD/MM/YY t/HHmm");
+            return;
         }
+
+        // Check that end is after start
+        if (currentWorkout.getWorkoutStartDateTime() == null ||
+                !endDateTime.isAfter(currentWorkout.getWorkoutStartDateTime())) {
+            System.out.println("End time must be after the start time of the workout!");
+            return;
+        }
+
+        currentWorkout.setWorkoutEndDateTime(endDateTime);
+        int calculatedDuration = currentWorkout.calculateDuration();
+        currentWorkout.setDuration(calculatedDuration); // store duration
+
+        System.out.printf("Workout '%s' ended. Duration: %d minute(s).\n", currentWorkout.getWorkoutName()
+                , calculatedDuration);
+        currentWorkout = null; // Optionally close out the session
     }
+
 }
