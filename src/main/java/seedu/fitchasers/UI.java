@@ -79,6 +79,7 @@ public class UI {
         showDivider();
     }
 
+
     //5. User-friendly CLI interface
     public void showDivider() {
         System.out.println(WHITE_BOLD + "--------------------------------------------------" + RESET);
