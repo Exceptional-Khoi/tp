@@ -12,7 +12,7 @@ import java.io.IOException;
 public class FitChasers {
     public static void main(String[] args) {
         UI ui = new UI();
-        WorkoutManager workoutManager = new WorkoutManager(ui);
+        WorkoutManager workoutManager = new WorkoutManager();
         FileHandler fileHandler = new FileHandler(ui);
         Person person = new Person("Default User");
         WeightManager weightManager = new WeightManager(person);

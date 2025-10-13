@@ -9,11 +9,10 @@ public class WorkoutManager {
     private static final int ARRAY_OFFSET = 1;
     private final ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
-    private final UI ui;
+    private final UI ui = new UI();
 
 
-    public WorkoutManager(UI ui) {
-        this.ui = ui;
+    public WorkoutManager() {
     }
 
 
@@ -71,27 +70,15 @@ public class WorkoutManager {
     }
 
 
-    public void loadWorkoutFromFile(String workout) {
-        String name = workout.substring(0, workout.indexOf("|"));
-        try {
-            int duration = Integer.parseInt(workout.substring(workout.indexOf("|") + 1).trim());
-            workouts.add(new Workout(name.trim(), duration));
-        } catch (NumberFormatException e) {
-            ui.showMessage("Invalid workout format, file might be corrupted.");
-        }
-    }
-
-
-    public boolean deleteWorkout(String name) {
+    public void deleteWorkout(String name) {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
                 workouts.remove(w);
                 ui.showMessage("Deleted workout: " + name);
-                return true;
+                return;
             }
         }
         ui.showMessage("Workout not found: " + name);
-        return false;
     }
 
 
