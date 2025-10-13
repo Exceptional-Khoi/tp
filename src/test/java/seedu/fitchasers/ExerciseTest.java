@@ -39,5 +39,5 @@ class ExerciseTest {
         assertTrue(output.contains("Set 1 -> Reps: 8"));
         assertTrue(output.contains("Set 2 -> Reps: 10"));
     }
-    
+
 }
