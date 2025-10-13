@@ -39,4 +39,5 @@ class WorkoutManagerTest {
         assertEquals(2, ex.getNumSets());
         assertEquals(15, ex.getSets().get(1));
     }
+
 }
