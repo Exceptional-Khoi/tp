@@ -3,9 +3,10 @@ package seedu.fitchasers;
 import java.util.Scanner;
 
 public class UI {
-    private final Scanner scanner;
 
-    // ANSI escape codes for color
+    // =============================
+    // 1. Static constants (color codes)
+    // =============================
     private static final String RESET = "\u001B[0m";
     private static final String BLUE_BOLD = "\u001B[1;34m";
     private static final String CYAN = "\u001B[36m";
@@ -13,17 +14,29 @@ public class UI {
     private static final String MAGENTA = "\u001B[35m";
     private static final String WHITE_BOLD = "\u001B[1;37m";
 
+    // =============================
+    // 2. Instance variables
+    // =============================
+    private final Scanner scanner;
+
+    // =============================
+    // 3. Constructor
+    // =============================
     public UI() {
         this.scanner = new Scanner(System.in);
     }
 
-    //1. Input: Read user commands
+    // =============================
+    // 4. Input Handling
+    // =============================
     public String readCommand() {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
         return scanner.nextLine().trim();
     }
 
-    //2. Output: Display messages and command results
+    // =============================
+    // 5. Output Methods
+    // =============================
     public void showMessage(String message) {
         System.out.println(GREEN + message + RESET);
         showDivider();
@@ -34,37 +47,43 @@ public class UI {
         showDivider();
     }
 
-    //3. Greeting messages
+    // =============================
+    // 6. Greeting Messages
+    // =============================
     public void showGreeting() {
+        showDivider();
+
+        System.out.println(BLUE_BOLD
+                + " _______  __  .___________.  ______  __    __       ___           _______. _______ .______      \n"
+                + "|   ____||  | |           | /      ||  |  |  |     /   \\         /       ||   ____||   _  \\     \n"
+                + "|  |__   |  | `---|  |----`|  ,----'|  |__|  |    /  ^  \\       |   (----`|  |__   |  |_)  |    \n"
+                + "|   __|  |  |     |  |     |  |     |   __   |   /  /_\\  \\       \\   \\    |   __|  |      /     \n"
+                + "|  |     |  |     |  |     |  `----.|  |  |  |  /  _____  \\  .----)   |   |  |____ |  |\\  \\----.\n"
+                + "|__|     |__|     |__|      \\______||__|  |__| /__/     \\__\\ |_______/    |_______|| _| `._____|\n"
+                + RESET);
+
+        System.out.println(CYAN
+                + "Your virtual gym buddy’s clocked in and ready to make you strong!"
+                + RESET);
 
         showDivider();
 
-        System.out.println(BLUE_BOLD +
-                " _______  __  .___________.  ______  __    __       ___           _______. _______ .______      \n" +
-                "|   ____||  | |           | /      ||  |  |  |     /   \\         /       ||   ____||   _  \\     \n" +
-                "|  |__   |  | `---|  |----`|  ,----'|  |__|  |    /  ^  \\       |   (----`|  |__   |  |_)  |    \n" +
-                "|   __|  |  |     |  |     |  |     |   __   |   /  /_\\  \\       \\   \\    |   __|  |      /     \n" +
-                "|  |     |  |     |  |     |  `----.|  |  |  |  /  _____  \\  .----)   |   |  |____ |  |\\  \\----.\n" +
-                "|__|     |__|     |__|      \\______||__|  |__| /__/     \\__\\ |_______/    |_______|| _| `._____|\n" +
-                RESET);
-
-        System.out.println(CYAN + "Your virtual gym buddy’s clocked in and ready to make you strong!" + RESET);
-
-        showDivider();
-
-        System.out.println(CYAN + "Type " + WHITE_BOLD + "/help" + CYAN + " to explore all available commands!" + RESET);
+        System.out.println(CYAN + "Type " + WHITE_BOLD + "/help" + CYAN
+                + " to explore all available commands!" + RESET);
         System.out.println(CYAN + "Let's crush your fitness goals together!" + RESET);
 
         showDivider();
     }
 
     public void showExitMessage() {
-        System.out.println(CYAN + "Catch you next time, champ — don’t ghost your gains!" + RESET);
-
+        System.out.println(CYAN
+                + "Catch you next time, champ — don’t ghost your gains!" + RESET);
         showDivider();
     }
 
-    //4. /help command
+    // =============================
+    // 7. Help Command
+    // =============================
     public void showHelp() {
         System.out.println("\n" + CYAN + "Available Commands:" + RESET);
         System.out.println("/help                        - View all commands");
@@ -79,9 +98,11 @@ public class UI {
         showDivider();
     }
 
-
-    //5. User-friendly CLI interface
+    // =============================
+    // 8. UI Utilities
+    // =============================
     public void showDivider() {
-        System.out.println(WHITE_BOLD + "--------------------------------------------------" + RESET);
+        System.out.println(WHITE_BOLD
+                + "--------------------------------------------------" + RESET);
     }
 }
