@@ -9,7 +9,7 @@ public class UI {
     private static final String RESET = "\u001B[0m";
     private static final String BLUE_BOLD = "\u001B[1;34m";
     private static final String CYAN = "\u001B[36m";
-    private static final String GREEN = "\u001B[32m";
+    private static final String GREEN = "\u001B[92m";
     private static final String MAGENTA = "\u001B[35m";
     private static final String WHITE_BOLD = "\u001B[1;37m";
 
@@ -25,13 +25,11 @@ public class UI {
 
     //2. Output: Display messages and command results
     public void showMessage(String message) {
-        showDivider();
         System.out.println(GREEN + message + RESET);
         showDivider();
     }
 
     public void showError(String error) {
-        showDivider();
         System.out.println(MAGENTA + "[Oops!] " + RESET + error);
         showDivider();
     }
@@ -61,8 +59,6 @@ public class UI {
     }
 
     public void showExitMessage() {
-        showDivider();
-
         System.out.println(CYAN + "Catch you next time, champ — don’t ghost your gains!" + RESET);
 
         showDivider();
@@ -70,8 +66,6 @@ public class UI {
 
     //4. /help command
     public void showHelp() {
-        showDivider();
-
         System.out.println("\n" + CYAN + "Available Commands:" + RESET);
         System.out.println("/help                        - View all commands");
         System.out.println("/add_weight w/WEIGHT d/DATE  - Record your current weight");

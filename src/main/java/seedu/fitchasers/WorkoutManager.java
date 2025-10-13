@@ -1,0 +1,170 @@
+package seedu.fitchasers;
+
+import java.util.ArrayList;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+public class WorkoutManager{
+    private static final int ARRAY_OFFSET = 1;
+    private final ArrayList<Workout> workouts =  new ArrayList<>();
+    private Workout currentWorkout = null;
+    private final UI ui;
+
+    public WorkoutManager(UI ui) {
+        this.ui = ui;
+    }
+
+    public void addWorkout(String command) {
+        // Extract each argument
+        String workoutName = extractBetween(command, "n/", "d/").trim();
+        String dateStr = extractBetween(command, "d/", "t/").trim();
+        String timeStr = command.substring(command.indexOf("t/") + 2).trim();
+
+        // Combine date and time into one string
+        String dateTimeStr = dateStr + " " + timeStr;
+
+        // Parse the combined string into LocalDateTime
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
+        LocalDateTime workoutDateTime = LocalDateTime.parse(dateTimeStr, formatter);
+
+        // Assuming Workout(String name, LocalDateTime dateTime)
+        Workout newWorkout = new Workout(workoutName, workoutDateTime);
+        workouts.add(newWorkout);
+        currentWorkout = newWorkout;
+
+        ui.showMessage("Added workout " + workoutName);
+    }
+
+    /**
+     * Helper method to extract a substring between two tokens.
+     */
+    private String extractBetween(String text, String startToken, String endToken) {
+        int start = text.indexOf(startToken) + startToken.length();
+        int end = text.indexOf(endToken);
+        if (start < startToken.length() || end == -1) {
+            return "";
+        }
+        return text.substring(start, end);
+    }
+
+    /**
+     * Extracts the substring that appears after the given token.
+     */
+    private String extractAfter(String text, String token) {
+        int index = text.indexOf(token);
+        if (index == -1) {
+            return ""; // token not found
+        }
+        return text.substring(index + token.length()).trim();
+    }
+
+    public ArrayList<Workout> getWorkouts() {
+        return workouts;
+    }
+
+    public void loadWorkoutFromFile(String workout){
+        String name = workout.substring(0, workout.indexOf("|"));
+        int duration = 0;
+        try{
+            Integer.parseInt(workout.substring(workout.indexOf("|")+1).trim());
+        }catch(NumberFormatException e){
+            ui.showMessage("Invalid workout format, file might be corrupted");
+            return;
+        }
+        workouts.add(new Workout(name.trim(), duration));
+    }
+
+    public boolean removeWorkout(String name){
+        for( Workout w : workouts){
+            if(w.getWorkoutName().equals(name)){
+                workouts.remove(w);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void addExercise(String args) {
+        if (currentWorkout == null) {
+            ui.showMessage("No active workout. Use /create_workout first.");
+            return;
+        }
+        String name = extractBetween(args, "n/", "r/").trim();
+        String repsStr = extractAfter(args, "r/").trim();
+        if (name.isEmpty() || repsStr.isEmpty()) {
+            ui.showMessage("Usage: /add_exercise n/NAME r/REPS");
+            return;
+        }
+        int reps;
+        try {
+            reps = Integer.parseInt(repsStr);
+            if (reps <= 0){
+                throw new NumberFormatException();
+            }
+        } catch (NumberFormatException e) {
+            ui.showMessage("REPS must be a positive integer. Example: /add_exercise n/Push_Up r/12");
+            return;
+        }
+
+        Exercise exercise = new Exercise(name, reps);
+        currentWorkout.addExercise(exercise);
+        ui.showMessage("Added exercise to current workout: " + exercise);
+    }
+
+    public void viewWorkouts() {
+        for (int i = 0; i < workouts.size(); i++) {
+            Workout w = workouts.get(i);
+            System.out.print("[" + (i + ARRAY_OFFSET) + "]: ");
+            ui.showMessage(w.getWorkoutName() + " | " + w.getDuration() + " Min");
+
+            // Print exercises with numbering
+            if (w.getExercises().isEmpty()) {
+                ui.showMessage("     No exercises added yet.");
+            } else {
+                for (int j = 0; j < w.getExercises().size(); j++) {
+                    ui.showMessage("     Exercise " + (j + 1) + ". " + w.getExercises().get(j));
+                }
+            }
+        }
+    }
+
+    public void endWorkout(String args) {
+        if (currentWorkout == null) {
+            ui.showMessage("No active workout.");
+            return;
+        }
+        String dateStr = extractBetween(args, "d/", "t/").trim();
+        String timeStr = extractAfter(args, "t/").trim();
+
+        // Check if date/time is given
+        if (dateStr.isEmpty() || timeStr.isEmpty()) {
+            ui.showMessage("Please provide an end date and time in the format: d/DD/MM/YY t/HHmm");
+            return;
+        }
+
+        String dateTimeStr = dateStr + " " + timeStr;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
+        LocalDateTime endDateTime;
+        try {
+            endDateTime = LocalDateTime.parse(dateTimeStr, formatter);
+        } catch (Exception e) {
+            ui.showMessage("Invalid date or time. Please use format: d/DD/MM/YY t/HHmm");
+            return;
+        }
+
+        // Check that end is after start
+        if (currentWorkout.getWorkoutStartDateTime() == null ||
+                !endDateTime.isAfter(currentWorkout.getWorkoutStartDateTime())) {
+            ui.showMessage("End time must be after the start time of the workout!");
+            return;
+        }
+
+        currentWorkout.setWorkoutEndDateTime(endDateTime);
+        int calculatedDuration = currentWorkout.calculateDuration();
+        currentWorkout.setDuration(calculatedDuration); // store duration
+
+        System.out.printf("Workout '%s' ended. Duration: %d minute(s).\n", currentWorkout.getWorkoutName()
+                , calculatedDuration);
+        currentWorkout = null; // Optionally close out the session
+    }
+
+}
