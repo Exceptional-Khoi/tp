@@ -73,37 +73,37 @@ public class FitChasers {
                     workoutManager.addSet(argumentStr);
                     break;
 
-                  /*
-               case "/add_reps":
-                  // Format: /add_reps e/EXERCISE_NAME i/SET_INDEX r/REPS  e.g., /add_reps e/Push_Up i/2 r/12
-                  workoutManager.addReps(argumentStr);
-                  break;
+                /*
+                case "/add_reps":
+                    // Format: /add_reps e/EXERCISE_NAME i/SET_INDEX r/REPS  e.g., /add_reps e/Push_Up i/2 r/12
+                    workoutManager.addReps(argumentStr);
+                    break;
 
-               case "/del_sets":
-                  // Format: /del_sets e/EXERCISE_NAME i/SET_INDEX  e.g., /del_sets e/Push_Up i/2
-                  workoutManager.deleteSets(argumentStr);
-                  break;
+                case "/del_sets":
+                    // Format: /del_sets e/EXERCISE_NAME i/SET_INDEX  e.g., /del_sets e/Push_Up i/2
+                    workoutManager.deleteSets(argumentStr);
+                    break;
 
-               case "/del_exercise":
-                  // Format: /del_exercise EXERCISE_NAME  e.g., /del_exercise Push_Up
-                  workoutManager.deleteExercise(argumentStr);
-                  break;
+                case "/del_exercise":
+                    // Format: /del_exercise EXERCISE_NAME  e.g., /del_exercise Push_Up
+                    workoutManager.deleteExercise(argumentStr);
+                    break;
 
-               case "/end_workout":
-                  // Format: /end_workout d/DD/MM/YY t/HHmm  e.g., /end_workout d/25/10/25 t/1800
-                  workoutManager.endWorkout(argumentStr);
-                  break;
+                case "/end_workout":
+                    // Format: /end_workout d/DD/MM/YY t/HHmm  e.g., /end_workout d/25/10/25 t/1800
+                    workoutManager.endWorkout(argumentStr);
+                    break;
 
-               case "/view_duration":
-                  // Format: /view_duration WORKOUT_NAME
-                  workoutManager.viewDuration(argumentStr);
-                  break;
+                case "/view_duration":
+                    // Format: /view_duration WORKOUT_NAME
+                    workoutManager.viewDuration(argumentStr);
+                    break;
 
-               case "/del_workout":
-                  // Format: /del_workout WORKOUT_NAME
-                  workoutManager.deleteWorkout(argumentStr);
-                  break;
-               */
+                case "/del_workout":
+                    // Format: /del_workout WORKOUT_NAME
+                    workoutManager.deleteWorkout(argumentStr);
+                    break;
+                */
 
                 case "/end_workout":
                     ui.showMessage("Workout wrapped! Time to refuel!");
@@ -119,7 +119,6 @@ public class FitChasers {
                 case "/del_workout":
                     ui.showMessage("🗑 Deleting that workout? 😭 Are you sure, bestie?");
                     // Format: /del_workout WORKOUT_NAME
-                    // (Feature placeholder — can hook into workoutManager.removeWorkout())
                     break;
 
                 case "/exit":

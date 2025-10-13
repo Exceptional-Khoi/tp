@@ -117,8 +117,9 @@ public class WorkoutManager {
 
         try {
             int reps = Integer.parseInt(repsStr);
-            if (reps <= 0) throw new NumberFormatException();
-
+            if (reps <= 0) {
+                throw new NumberFormatException();
+            }
 
             Exercise exercise = new Exercise(name, reps);
             currentWorkout.addExercise(exercise);
@@ -138,13 +139,11 @@ public class WorkoutManager {
             return;
         }
 
-
         Exercise currentExercise = currentWorkout.getCurrentExercise();
         if (currentExercise == null) {
             ui.showMessage("No exercise found. Use /add_exercise first.");
             return;
         }
-
 
         String repsStr = extractAfter(args, "r/");
         if (repsStr.isEmpty()) {
@@ -152,11 +151,11 @@ public class WorkoutManager {
             return;
         }
 
-
         try {
             int reps = Integer.parseInt(repsStr);
-            if (reps <= 0) throw new NumberFormatException();
-
+            if (reps <= 0) {
+                throw new NumberFormatException();
+            }
 
             currentExercise.addSet(reps);
             ui.showMessage("Added set to exercise:\n" + currentExercise.toDetailedString());
