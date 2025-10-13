@@ -160,7 +160,8 @@ public class WorkoutManager{
         int calculatedDuration = currentWorkout.calculateDuration();
         currentWorkout.setDuration(calculatedDuration); // store duration
 
-        System.out.printf("Workout '%s' ended. Duration: %d minute(s).\n", currentWorkout.getWorkoutName(), calculatedDuration);
+        System.out.printf("Workout '%s' ended. Duration: %d minute(s).\n", currentWorkout.getWorkoutName()
+                , calculatedDuration);
         currentWorkout = null; // Optionally close out the session
     }
 

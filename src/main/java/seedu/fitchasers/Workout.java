@@ -25,6 +25,13 @@ public class Workout{
         this.workoutStartDateTime = workoutStartDateTime;
     }
 
+    public Workout(String workoutName, LocalDateTime workoutStartDateTime, LocalDateTime workoutEndDateTime) {
+        this.workoutName = workoutName;
+        this.workoutStartDateTime = workoutStartDateTime;
+        this.workoutEndDateTime = workoutEndDateTime;
+        this.duration = calculateDuration();
+    }
+
     public Exercise getLastAddedExercise() {
         return lastAddedExercise;
     }
@@ -75,13 +82,6 @@ public class Workout{
             return (int) Duration.between(workoutStartDateTime, workoutEndDateTime).toMinutes();
         }
         return 0;
-    }
-
-    public Workout(String workoutName, LocalDateTime workoutStartDateTime, LocalDateTime workoutEndDateTime) {
-        this.workoutName = workoutName;
-        this.workoutStartDateTime = workoutStartDateTime;
-        this.workoutEndDateTime = workoutEndDateTime;
-        this.duration = calculateDuration();
     }
 
     @Override
