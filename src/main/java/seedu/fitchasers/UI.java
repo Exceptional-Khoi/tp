@@ -4,8 +4,14 @@ import java.util.Scanner;
 
 public class UI {
     private final Scanner scanner;
-    private final String YELLOW = "\u001B[33m";
-    private final String RESET = "\u001B[0m";
+
+    // ANSI escape codes for color
+    private static final String RESET = "\u001B[0m";
+    private static final String BLUE_BOLD = "\u001B[1;34m";
+    private static final String CYAN = "\u001B[36m";
+    private static final String GREEN = "\u001B[32m";
+    private static final String MAGENTA = "\u001B[35m";
+    private static final String WHITE_BOLD = "\u001B[1;37m";
 
     public UI() {
         this.scanner = new Scanner(System.in);
@@ -13,29 +19,25 @@ public class UI {
 
     //1. Input: Read user commands
     public String readCommand() {
-        System.out.print("> ");
+        System.out.print(MAGENTA + "Enter command" + RESET + " > ");
         return scanner.nextLine().trim();
     }
 
     //2. Output: Display messages and command results
     public void showMessage(String message) {
         showDivider();
-        System.out.println(message);
+        System.out.println(GREEN + message + RESET);
         showDivider();
     }
 
     public void showError(String error) {
         showDivider();
-        System.out.println("[Oops!] " + error);
+        System.out.println(MAGENTA + "[Oops!] " + RESET + error);
         showDivider();
     }
 
     //3. Greeting messages
     public void showGreeting() {
-        // ANSI escape codes for color
-        final String BLUE_BOLD = "\u001B[1;34m";
-        final String CYAN = "\u001B[36m";
-        final String GREEN = "\u001B[32m";
 
         showDivider();
 
@@ -49,23 +51,28 @@ public class UI {
                 RESET);
 
         System.out.println(CYAN + "Your virtual gym buddy’s clocked in and ready to make you strong!" + RESET);
-        System.out.println(YELLOW + "--------------------------------------------------" + RESET);
 
-        System.out.println(CYAN + "Type " + YELLOW + "/help" + CYAN + " to explore all available commands!" + RESET);
+        showDivider();
+
+        System.out.println(CYAN + "Type " + WHITE_BOLD + "/help" + CYAN + " to explore all available commands!" + RESET);
         System.out.println(CYAN + "Let's crush your fitness goals together!" + RESET);
 
         showDivider();
     }
 
     public void showExitMessage() {
-        System.out.println("Catch you next time, champ — don’t ghost your gains!");
+        showDivider();
+
+        System.out.println(CYAN + "Catch you next time, champ — don’t ghost your gains!" + RESET);
+
+        showDivider();
     }
 
     //4. /help command
     public void showHelp() {
         showDivider();
 
-        System.out.println("\nAvailable Commands:");
+        System.out.println("\n" + CYAN + "Available Commands:" + RESET);
         System.out.println("/help                        - View all commands");
         System.out.println("/add_weight w/WEIGHT d/DATE  - Record your current weight");
         System.out.println("/create_workout n/NAME d/DATE t/TIME - Create new workout");
@@ -80,6 +87,6 @@ public class UI {
 
     //5. User-friendly CLI interface
     public void showDivider() {
-        System.out.println(YELLOW + "--------------------------------------------------" + RESET);
+        System.out.println(WHITE_BOLD + "--------------------------------------------------" + RESET);
     }
 }
