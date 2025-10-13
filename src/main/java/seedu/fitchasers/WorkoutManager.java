@@ -111,7 +111,7 @@ public class WorkoutManager{
             Workout w = workouts.get(i);
             System.out.println("=============================================================");
             System.out.print("[" + (i + ARRAY_OFFSET) + "]: ");
-            System.out.println(w.getWorkoutName() + " | " + w.getDuration());
+            System.out.println(w.getWorkoutName() + " | " + w.getDuration() + " Min");
 
             // Print exercises with numbering
             if (w.getExercises().isEmpty()) {
@@ -124,4 +124,45 @@ public class WorkoutManager{
             System.out.println("=============================================================");
         }
     }
+
+    public void endWorkout(String args) {
+        if (currentWorkout == null) {
+            System.out.println("No active workout.");
+            return;
+        }
+        String dateStr = extractBetween(args, "d/", "t/").trim();
+        String timeStr = extractAfter(args, "t/").trim();
+
+        // Check if date/time is given
+        if (dateStr.isEmpty() || timeStr.isEmpty()) {
+            System.out.println("Please provide an end date and time in the format: d/DD/MM/YY t/HHmm");
+            return;
+        }
+
+        String dateTimeStr = dateStr + " " + timeStr;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
+        LocalDateTime endDateTime;
+        try {
+            endDateTime = LocalDateTime.parse(dateTimeStr, formatter);
+        } catch (Exception e) {
+            System.out.println("Invalid date or time. Please use format: d/DD/MM/YY t/HHmm");
+            return;
+        }
+
+        // Check that end is after start
+        if (currentWorkout.getWorkoutStartDateTime() == null ||
+                !endDateTime.isAfter(currentWorkout.getWorkoutStartDateTime())) {
+            System.out.println("End time must be after the start time of the workout!");
+            return;
+        }
+
+        currentWorkout.setWorkoutEndDateTime(endDateTime);
+        int calculatedDuration = currentWorkout.calculateDuration();
+        currentWorkout.setDuration(calculatedDuration); // store duration
+
+        System.out.printf("Workout '%s' ended. Duration: %d minute(s).\n", currentWorkout.getWorkoutName()
+                , calculatedDuration);
+        currentWorkout = null; // Optionally close out the session
+    }
+
 }
