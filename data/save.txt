@@ -1,0 +1,9 @@
+WORKOUT | Chest_Day | 60
+EXERCISE | Bench_Press | 10
+END_WORKOUT
+WORKOUT | Chest_Day | 60
+EXERCISE | Bench_Press | 10
+END_WORKOUT
+WORKOUT | Chest_Day | 60
+EXERCISE | Bench_Press | 10
+END_WORKOUT
