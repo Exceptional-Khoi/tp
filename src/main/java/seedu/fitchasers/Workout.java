@@ -13,7 +13,7 @@ public class Workout{
     private LocalDateTime workoutStartDateTime;
     private LocalDateTime workoutEndDateTime;
     private final ArrayList<Exercise> exercises = new ArrayList<>();
-    private Exercise lastAddedExercise = null;
+    private Exercise currentExercise = null;
 
     public Workout(String workoutName, int duration) {
         this.workoutName = workoutName;
@@ -32,9 +32,6 @@ public class Workout{
         this.duration = calculateDuration();
     }
 
-    public Exercise getLastAddedExercise() {
-        return lastAddedExercise;
-    }
 
     public String getWorkoutName() {
         return workoutName;
@@ -52,13 +49,32 @@ public class Workout{
         this.duration = duration;
     }
 
+    /**
+     * Adds an exercise to this workout and sets it as the current exercise.
+     *
+     * @param exercise The exercise to add.
+     */
     public void addExercise(Exercise exercise) {
         exercises.add(exercise);
-        lastAddedExercise = exercise;
+        currentExercise = exercise;
     }
 
-    public java.util.List<Exercise> getExercises() {
+    /**
+     * Returns the list of exercises in this workout.
+     *
+     * @return List of exercises.
+     */
+    public ArrayList<Exercise> getExercises() {
         return exercises;
+    }
+
+    /**
+     * Returns the current (most recently added) exercise.
+     *
+     * @return The current exercise, or null if none exists.
+     */
+    public Exercise getCurrentExercise() {
+        return currentExercise;
     }
 
     public LocalDateTime getWorkoutStartDateTime() {
