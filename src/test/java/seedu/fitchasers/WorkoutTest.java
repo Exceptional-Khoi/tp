@@ -26,7 +26,7 @@ class WorkoutTest {
 
 
     @Test
-    void constructor_nameAndStartDate_sets_Fields_Correctly() {
+    void constructor_nameAndStartDate_setsFieldsCorrectly() {
         LocalDateTime start = LocalDateTime.of(2025, 10, 14, 12, 0);
         Workout w = new Workout("Cycling", start);
         assertEquals("Cycling", w.getWorkoutName());
@@ -35,7 +35,7 @@ class WorkoutTest {
     }
 
     @Test
-    void constructor_allFields_sets_Duration_And_End_Correctly() {
+    void constructor_allFields_setsDurationAndEndCorrectly() {
         LocalDateTime start = LocalDateTime.of(2025, 10, 14, 12, 0);
         LocalDateTime end = LocalDateTime.of(2025, 10, 14, 12, 30);
         Workout w = new Workout("Run", start, end);
