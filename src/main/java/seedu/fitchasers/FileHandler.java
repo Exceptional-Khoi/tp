@@ -1,13 +1,11 @@
 package seedu.fitchasers;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
-import java.util.Scanner;
 
 /**
  * Handles the permanent storage of the data
@@ -78,7 +76,6 @@ public class FileHandler {
     }
 
 
-
     /**
      * Saves all workout data to the save file in the specified format.
      * Each workout entry is written with its name and duration, followed by
@@ -98,7 +95,9 @@ public class FileHandler {
                     StringBuilder setsStr = new StringBuilder();
                     for (int i = 0; i < ex.getSets().size(); i++) {
                         setsStr.append(ex.getSets().get(i));
-                        if (i < ex.getSets().size() - 1) setsStr.append(",");
+                        if (i < ex.getSets().size() - 1) {
+                            setsStr.append(",");
+                        }
                     }
                     fw.write("EXERCISE | " + ex.getName() + " | " + setsStr + "\n");
                 }

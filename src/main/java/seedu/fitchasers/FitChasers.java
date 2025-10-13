@@ -95,9 +95,6 @@ public class FitChasers {
                 // Format: /del_workout WORKOUT_NAME
                 workoutManager.deleteWorkout(argumentStr);
                 break;
-
-
-
             */
 
             case "/end_workout":

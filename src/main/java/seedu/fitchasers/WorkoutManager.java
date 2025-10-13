@@ -3,9 +3,10 @@ package seedu.fitchasers;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-public class WorkoutManager{
+
+public class WorkoutManager {
     private static final int ARRAY_OFFSET = 1;
-    private final ArrayList<Workout> workouts =  new ArrayList<>();
+    private final ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
 
 
@@ -57,21 +58,21 @@ public class WorkoutManager{
         return workouts;
     }
 
-    public void loadWorkoutFromFile(String workout){
+    public void loadWorkoutFromFile(String workout) {
         String name = workout.substring(0, workout.indexOf("|"));
         int duration = 0;
-        try{
-            Integer.parseInt(workout.substring(workout.indexOf("|")+1).trim());
-        }catch(NumberFormatException e){
+        try {
+            Integer.parseInt(workout.substring(workout.indexOf("|") + 1).trim());
+        } catch (NumberFormatException e) {
             System.out.println("Invalid workout format, file might be corrupted");
             return;
         }
         workouts.add(new Workout(name.trim(), duration));
     }
 
-    public boolean removeWorkout(String name){
-        for( Workout w : workouts){
-            if(w.getWorkoutName().equals(name)){
+    public boolean removeWorkout(String name) {
+        for (Workout w : workouts) {
+            if (w.getWorkoutName().equals(name)) {
                 workouts.remove(w);
                 return true;
             }
@@ -93,7 +94,7 @@ public class WorkoutManager{
         int reps;
         try {
             reps = Integer.parseInt(repsStr);
-            if (reps <= 0){
+            if (reps <= 0) {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException e) {
@@ -128,7 +129,7 @@ public class WorkoutManager{
 
         try {
             int reps = Integer.parseInt(repsStr);
-            if (reps <= 0){
+            if (reps <= 0) {
                 throw new NumberFormatException();
             }
 
@@ -159,7 +160,8 @@ public class WorkoutManager{
 
                     // print all sets for this exercise
                     for (int k = 0; k < ex.getSets().size(); k++) {
-                        System.out.println("                      Set: " + (k + 1) + " -> Reps: " + ex.getSets().get(k));
+                        System.out.println("                      Set: " + (k + 1)
+                                + " -> Reps: " + ex.getSets().get(k));
                     }
                 }
             }

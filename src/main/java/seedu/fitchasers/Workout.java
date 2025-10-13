@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 /**
  * Represents a workout session containing a name, duration, start/end times, and a list of exercises.
  */
-public class Workout{
+public class Workout {
     private String workoutName;
     private int duration = 0;
     private LocalDateTime workoutStartDateTime;
