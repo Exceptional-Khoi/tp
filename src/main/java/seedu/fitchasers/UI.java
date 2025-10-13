@@ -53,6 +53,7 @@ public class UI {
     public void showGreeting() {
         showDivider();
 
+        // CHECKSTYLE:OFF
         System.out.println(BLUE_BOLD
                 + " _______  __  .___________.  ______  __    __       ___           _______. _______ .______      \n"
                 + "|   ____||  | |           | /      ||  |  |  |     /   \\         /       ||   ____||   _  \\     \n"
@@ -61,6 +62,7 @@ public class UI {
                 + "|  |     |  |     |  |     |  `----.|  |  |  |  /  _____  \\  .----)   |   |  |____ |  |\\  \\----.\n"
                 + "|__|     |__|     |__|      \\______||__|  |__| /__/     \\__\\ |_______/    |_______|| _| `._____|\n"
                 + RESET);
+        // CHECKSTYLE:ON
 
         System.out.println(CYAN
                 + "Your virtual gym buddy’s clocked in and ready to make you strong!"
