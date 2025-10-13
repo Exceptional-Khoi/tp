@@ -52,17 +52,18 @@ public class FitChasers {
                 // Format: /add_exercise n/NAME r/REPS   e.g., /add_exercise n/Push_Up r/10
                 workoutManager.addExercise(argumentStr);
                 break;
+
+            case "/add_set":
+                // Format: /add_sets r/REPS  e.g., /add_sets r/12
+                workoutManager.addSet(argumentStr);
+                break;
+
                 /*
             case "/add_weight":
                 // Format: /add_weight w/WEIGHT d/DATE   e.g., /add_weight w/81.5 d/19/10/25
                 // Delegate full args string; WorkoutManager should parse flags.
                 // Nary
                 workoutManager.addWeight(argumentStr);
-                break;
-
-            case "/add_sets":
-                // Format: /add_sets e/EXERCISE_NAME s/SETS  e.g., /add_sets e/Push_Up s/2
-                workoutManager.addSets(argumentStr);
                 break;
 
             case "/add_reps":
@@ -94,9 +95,6 @@ public class FitChasers {
                 // Format: /del_workout WORKOUT_NAME
                 workoutManager.deleteWorkout(argumentStr);
                 break;
-
-
-
             */
 
             case "/end_workout":

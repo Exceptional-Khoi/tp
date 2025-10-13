@@ -1,58 +1,73 @@
 package seedu.fitchasers;
 
+import java.util.ArrayList;
+
 /**
- * Represents an exercise with a name and a number of repetitions.
+ * Represents an exercise with a name and multiple sets, each having a number of reps.
  */
 public class Exercise {
     private final String name;
-    private final int sets;
-    private final int reps;
+    private final ArrayList<Integer> sets; // each element = reps for one set
 
     /**
-     * Constructs an Exercise instance with the specified name and repetitions.
+     * Constructs an Exercise with one initial set.
      *
      * @param name The name of the exercise.
-     * @param reps The number of repetitions for the exercise.
+     * @param reps The number of reps for the first set.
      */
-    public Exercise(String name, Integer reps) {
+    public Exercise(String name, int reps) {
         this.name = name;
-        this.reps = reps;
-        this.sets = 1;
+        this.sets = new ArrayList<>();
+        this.sets.add(reps);
     }
 
     /**
-     * Returns the name of the exercise.
+     * Adds a new set to this exercise.
      *
-     * @return The name of the exercise.
+     * @param reps The number of reps for the new set.
+     */
+    public void addSet(int reps) {
+        sets.add(reps);
+    }
+
+    /**
+     * Returns the exercise name.
      */
     public String getName() {
         return name;
     }
 
     /**
-     * Returns the number of repetitions for the exercise.
-     *
-     * @return The number of repetitions.
+     * Returns the total number of sets.
      */
-    public Integer getReps() {
-        return reps;
+    public int getNumSets() {
+        return sets.size();
     }
 
     /**
-     * Returns the number of sets for the exercise.
-     *
-     * @return The number of sets.
+     * Returns the list of reps for each set.
      */
-    public int getSets() {
+    public ArrayList<Integer> getSets() {
         return sets;
     }
 
     /**
-     * Returns a string representation of the exercise.
-     * @return A string describing the exercise.
+     * Returns a detailed multi-line description of this exercise.
+     */
+    public String toDetailedString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(name).append(":\n");
+        for (int i = 0; i < sets.size(); i++) {
+            sb.append("Set ").append(i + 1).append(" -> Reps: ").append(sets.get(i)).append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Returns a summary line like "Squat [3 sets]"
      */
     @Override
     public String toString() {
-        return name + " [" + sets + " x " + reps + "]";
+        return name + " [" + sets.size() + " sets]";
     }
 }

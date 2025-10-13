@@ -3,9 +3,10 @@ package seedu.fitchasers;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-public class WorkoutManager{
+
+public class WorkoutManager {
     private static final int ARRAY_OFFSET = 1;
-    private final ArrayList<Workout> workouts =  new ArrayList<>();
+    private final ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
 
 
@@ -57,21 +58,21 @@ public class WorkoutManager{
         return workouts;
     }
 
-    public void loadWorkoutFromFile(String workout){
+    public void loadWorkoutFromFile(String workout) {
         String name = workout.substring(0, workout.indexOf("|"));
         int duration = 0;
-        try{
-            Integer.parseInt(workout.substring(workout.indexOf("|")+1).trim());
-        }catch(NumberFormatException e){
+        try {
+            Integer.parseInt(workout.substring(workout.indexOf("|") + 1).trim());
+        } catch (NumberFormatException e) {
             System.out.println("Invalid workout format, file might be corrupted");
             return;
         }
         workouts.add(new Workout(name.trim(), duration));
     }
 
-    public boolean removeWorkout(String name){
-        for( Workout w : workouts){
-            if(w.getWorkoutName().equals(name)){
+    public boolean removeWorkout(String name) {
+        for (Workout w : workouts) {
+            if (w.getWorkoutName().equals(name)) {
                 workouts.remove(w);
                 return true;
             }
@@ -93,7 +94,7 @@ public class WorkoutManager{
         int reps;
         try {
             reps = Integer.parseInt(repsStr);
-            if (reps <= 0){
+            if (reps <= 0) {
                 throw new NumberFormatException();
             }
         } catch (NumberFormatException e) {
@@ -103,8 +104,45 @@ public class WorkoutManager{
 
         Exercise exercise = new Exercise(name, reps);
         currentWorkout.addExercise(exercise);
-        System.out.println("Added exercise to current workout: " + exercise);
+        System.out.println("Added exercise to current workout:");
+        System.out.println("=======================");
+        System.out.print(exercise.toDetailedString());
     }
+
+    public void addSet(String args) {
+        if (currentWorkout == null) {
+            System.out.println("No active workout. Use /create_workout first.");
+            return;
+        }
+
+        Exercise currentExercise = currentWorkout.getCurrentExercise();
+        if (currentExercise == null) {
+            System.out.println("No exercise found. Use /add_exercise first.");
+            return;
+        }
+
+        String repsStr = extractAfter(args, "r/");
+        if (repsStr.isEmpty()) {
+            System.out.println("Usage: /add_set r/REPS");
+            return;
+        }
+
+        try {
+            int reps = Integer.parseInt(repsStr);
+            if (reps <= 0) {
+                throw new NumberFormatException();
+            }
+
+            currentExercise.addSet(reps);
+
+            System.out.println("Added a set to current exercise:");
+            System.out.println("=======================");
+            System.out.print(currentExercise.toDetailedString());
+        } catch (NumberFormatException e) {
+            System.out.println("REPS must be a positive integer. Example: /add_set r/15");
+        }
+    }
+
 
     public void viewWorkouts() {
         for (int i = 0; i < workouts.size(); i++) {
@@ -113,14 +151,21 @@ public class WorkoutManager{
             System.out.print("[" + (i + ARRAY_OFFSET) + "]: ");
             System.out.println(w.getWorkoutName() + " | " + w.getDuration() + " Min");
 
-            // Print exercises with numbering
             if (w.getExercises().isEmpty()) {
                 System.out.println("     No exercises added yet.");
             } else {
                 for (int j = 0; j < w.getExercises().size(); j++) {
-                    System.out.println("     Exercise " + (j + 1) + ". " + w.getExercises().get(j));
+                    Exercise ex = w.getExercises().get(j);
+                    System.out.println("     Exercise " + (j + 1) + ". " + ex);
+
+                    // print all sets for this exercise
+                    for (int k = 0; k < ex.getSets().size(); k++) {
+                        System.out.println("                      Set: " + (k + 1)
+                                + " -> Reps: " + ex.getSets().get(k));
+                    }
                 }
             }
+
             System.out.println("=============================================================");
         }
     }
