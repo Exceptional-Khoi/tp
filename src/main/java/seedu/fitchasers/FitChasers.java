@@ -99,6 +99,11 @@ public class FitChasers {
 
             */
 
+            case "/end_workout":
+                // Format: /end_workout d/DD/MM/YY t/HHmm, e.g. /end_workout d/25/10/25 t/1800
+                workoutManager.endWorkout(argumentStr);
+                break;
+
             case "/exit":
                 fileHandler.saveFile(workoutManager.getWorkouts());
                 return;

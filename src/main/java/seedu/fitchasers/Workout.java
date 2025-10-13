@@ -1,8 +1,12 @@
 package seedu.fitchasers;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 
+/**
+ * Represents a workout session containing a name, duration, start/end times, and a list of exercises.
+ */
 public class Workout{
     private String workoutName;
     private int duration = 0;
@@ -48,6 +52,36 @@ public class Workout{
 
     public java.util.List<Exercise> getExercises() {
         return exercises;
+    }
+
+    public LocalDateTime getWorkoutStartDateTime() {
+        return workoutStartDateTime;
+    }
+
+    public void setWorkoutStartDateTime(LocalDateTime workoutStartDateTime) {
+        this.workoutStartDateTime = workoutStartDateTime;
+    }
+
+    public LocalDateTime getWorkoutEndDateTime() {
+        return workoutEndDateTime;
+    }
+
+    public void setWorkoutEndDateTime(LocalDateTime workoutEndDateTime) {
+        this.workoutEndDateTime = workoutEndDateTime;
+    }
+
+    public int calculateDuration() {
+        if (workoutStartDateTime != null && workoutEndDateTime != null) {
+            return (int) Duration.between(workoutStartDateTime, workoutEndDateTime).toMinutes();
+        }
+        return 0;
+    }
+
+    public Workout(String workoutName, LocalDateTime workoutStartDateTime, LocalDateTime workoutEndDateTime) {
+        this.workoutName = workoutName;
+        this.workoutStartDateTime = workoutStartDateTime;
+        this.workoutEndDateTime = workoutEndDateTime;
+        this.duration = calculateDuration();
     }
 
     @Override
