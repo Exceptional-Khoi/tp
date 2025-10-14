@@ -3,10 +3,15 @@ package seedu.fitchasers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WorkoutManagerTest {
-
+    //methodName_whatIsTheConditionYouAreTesting_Outcome(If 2 Paths Can Exclude)
     private WorkoutManager manager;
 
     @BeforeEach
@@ -40,4 +45,30 @@ class WorkoutManagerTest {
         assertEquals(15, ex.getSets().get(1));
     }
 
+    @Test
+    void addWorkout_validInput_addsWorkoutToCurrentSet() {
+        manager.addWorkout("n/run d/15/10/25 t/0730");
+        assertEquals(2, manager.getWorkouts().size());
+        assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
+    }
+
+    @Test
+    void deleteWorkout_aceessingDeletedWorkout_indexOutOfBoundsException() {
+        manager.deleteWorkout("run");
+        assertThrows(IndexOutOfBoundsException.class,
+                ()-> manager.getWorkouts().get(1));
+    }
+
+    @Test
+    void removeWorkout_nonExistingWorkout_printsWorkoutNotFound() {
+        ByteArrayOutputStream outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent));
+
+        manager.deleteWorkout("swim");
+
+        String output = outContent.toString().trim();
+        assertTrue(output.contains("Workout not found: swim"));
+
+        System.setOut(System.out); // reset stdout
+    }
 }
