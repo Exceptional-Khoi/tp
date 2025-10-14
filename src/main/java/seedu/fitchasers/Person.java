@@ -21,7 +21,11 @@ public class Person {
      * @param name The name of the person
      */
     public Person(String name) {
-        this.name = name;
+        if (name == null || name.trim().isEmpty()) {
+            this.name = "Nary";
+        } else {
+            this.name = name;
+        }
         this.weightHistory = new ArrayList<>();
     }
 
