@@ -134,4 +134,3 @@ public class FileHandler {
         ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
     }
 }
-

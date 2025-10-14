@@ -9,7 +9,6 @@ import java.util.Scanner;
  *
  */
 public class UI {
-
     private static final String RESET = "\u001B[0m";
     private static final String BLUE_BOLD = "\u001B[1;34m";
     private static final String CYAN = "\u001B[36m";
