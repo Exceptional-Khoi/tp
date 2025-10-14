@@ -59,7 +59,7 @@ public class FitChasers {
                     break;
 
                 case "/view_weight":
-                    ui.showMessage("Here’s your weight, you’ve been killin’ it lately!");
+                    ui.showMessage("Here's your weight, you’ve been killin’ it lately!");
                     weightManager.viewWeights();
                     ui.showDivider();
                     break;
@@ -93,7 +93,7 @@ public class FitChasers {
                     break;
 
                 case "/view_log":
-                    ui.showMessage("Here’s your workout glow-up history!");
+                    ui.showMessage("Here's your workout glow-up history!");
                     workoutManager.viewWorkouts();
                     ui.showDivider();
                     break;
@@ -117,7 +117,7 @@ public class FitChasers {
                     break;
 
                 default:
-                    ui.showError("That’s not a thing, bestie. Try /help for the real moves!");
+                    ui.showError("That's not a thing, bestie. Try /help for the real moves!");
                     ui.showDivider();
                     break;
                 }
