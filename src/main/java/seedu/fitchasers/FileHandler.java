@@ -23,6 +23,7 @@ import java.util.List;
  * EXERCISE | Bench Press | 12,10,8
  * END_WORKOUT
  */
+
 public class FileHandler {
 
     private static final Path FILE_PATH = Paths.get("data", "save.txt");
@@ -48,7 +49,6 @@ public class FileHandler {
         }
     }
 
-
     /**
      * Loads all workout and exercise data from save.txt into the given WorkoutManager.
      *
@@ -63,8 +63,8 @@ public class FileHandler {
     public void loadFileContentArray(WorkoutManager workoutManager) throws IOException {
         ensureFile();
         List<String> lines = Files.readAllLines(FILE_PATH);
-        Workout currentWorkout = null;
 
+        Workout currentWorkout = null;
 
         for (String line : lines) {
             if (line.startsWith("WORKOUT")) {
@@ -117,9 +117,8 @@ public class FileHandler {
         try (FileWriter fw = new FileWriter(FILE_PATH.toFile())) {
             for (Workout w : workouts) {
                 fw.write("WORKOUT | " + w.getWorkoutName() + " | " + w.getDuration() + "\n");
-
-
                 for (Exercise ex : w.getExercises()) {
+                    // join all reps from each set with commas
                     StringBuilder setsStr = new StringBuilder();
                     for (int i = 0; i < ex.getSets().size(); i++) {
                         setsStr.append(ex.getSets().get(i));
@@ -129,11 +128,10 @@ public class FileHandler {
                     }
                     fw.write("EXERCISE | " + ex.getName() + " | " + setsStr + "\n");
                 }
-
-
                 fw.write("END_WORKOUT\n");
             }
         }
         ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
     }
 }
+
