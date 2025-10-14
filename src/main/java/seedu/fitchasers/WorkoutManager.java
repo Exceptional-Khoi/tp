@@ -4,27 +4,30 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-
+/**
+ * Manages workout sessions for the FitChasers application.
+ *
+ * Handles creation, deletion, and viewing of workouts,
+ * as well as adding exercises and sets within each workout.
+ */
 public class WorkoutManager {
     private static final int ARRAY_OFFSET = 1;
     private final ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
 
-
+    /**
+     * Constructs a new WorkoutManager instance.
+     */
     public WorkoutManager() {
     }
 
     /**
-     * Parses workout details from a command string, validates the date/time,
-     * creates a new Workout, and adds it to the workouts list.
-     * Displays a success message using the UI, or an error message
-     * if the input is invalid.
+     * Creates and adds a new workout to the list.
      *
-     * Expected command format: n/WORKOUT_NAME d/DD/MM/YY t/HHmm
+     * Expected format: /create_workout n/NAME d/DD/MM/YY t/HHmm
      *
-     * @param command The user command containing workout name, date, and time.
-     *               Example: "n/PushUps d/14/10/25 t/1900"
+     * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
         String workoutName = extractBetween(command, "n/", "d/").trim();
@@ -33,7 +36,6 @@ public class WorkoutManager {
 
         String dateTimeStr = dateStr + " " + timeStr;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
-
 
         try {
             LocalDateTime workoutDateTime = LocalDateTime.parse(dateTimeStr, formatter);
@@ -47,16 +49,12 @@ public class WorkoutManager {
     }
 
     /**
-     * Extracts and returns the substring found between two specified tokens
-     * within the given text. If either token is not found, or the indices
-     * are invalid, returns an empty string.
+     * Extracts text between two tokens.
      *
-     * Example: extractBetween("n/Run d/15/10/25 t/0730", "n/", "d/") returns "Run"
-     *
-     * @param text The input string to search within.
-     * @param startToken The token marking the start of the desired substring.
-     * @param endToken The token marking the end of the desired substring.
-     * @return The substring between startToken and endToken, or an empty string if not found.
+     * @param text the full string to search
+     * @param startToken the start marker
+     * @param endToken the end marker
+     * @return the substring found between the tokens, or an empty string if not found
      */
     private String extractBetween(String text, String startToken, String endToken) {
         int start = text.indexOf(startToken) + startToken.length();
@@ -67,7 +65,13 @@ public class WorkoutManager {
         return text.substring(start, end);
     }
 
-
+    /**
+     * Extracts text after a specific token.
+     *
+     * @param text the full string to search
+     * @param token the token to find
+     * @return the text found after the token, or an empty string if not found
+     */
     private String extractAfter(String text, String token) {
         int index = text.indexOf(token);
         if (index == -1) {
@@ -76,11 +80,20 @@ public class WorkoutManager {
         return text.substring(index + token.length()).trim();
     }
 
+    /**
+     * Returns all workouts.
+     *
+     * @return the list of workouts
+     */
     public ArrayList<Workout> getWorkouts() {
         return workouts;
     }
 
-
+    /**
+     * Deletes a workout by name.
+     *
+     * @param name the name of the workout to delete
+     */
     public void deleteWorkout(String name) {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
@@ -93,14 +106,11 @@ public class WorkoutManager {
     }
 
     /**
-     * Parses exercise details from the given argument string, validates the input,
-     * and adds a new Exercise to the current workout if valid.
-     * Displays appropriate messages for success, missing/invalid input, or if no workout is active.
+     * Adds an exercise to the current workout.
      *
-     * Expected argument format: n/EXERCISE_NAME r/REPS
+     * Expected format: /add_exercise n/NAME r/REPS
      *
-     * @param args The user input containing exercise name and repetitions.
-     *             Example: "n/Push_Up r/12"
+     * @param args the user command arguments
      */
     public void addExercise(String args) {
         if (currentWorkout == null) {
@@ -108,16 +118,13 @@ public class WorkoutManager {
             return;
         }
 
-
         String name = extractBetween(args, "n/", "r/").trim();
         String repsStr = extractAfter(args, "r/").trim();
-
 
         if (name.isEmpty() || repsStr.isEmpty()) {
             ui.showMessage("Usage: /add_exercise n/NAME r/REPS");
             return;
         }
-
 
         try {
             int reps = Integer.parseInt(repsStr);
@@ -133,16 +140,12 @@ public class WorkoutManager {
         }
     }
 
-
     /**
-     * Parses the number of repetitions from the given argument string and adds a new set
-     * to the current exercise in the active workout, if valid.
-     * Displays appropriate messages for success, missing/invalid input, or if no workout/exercise is active.
+     * Adds a new set to the current exercise.
      *
-     * Expected argument format: r/REPS
+     * Expected format: /add_set r/REPS
      *
-     * @param args The user input containing the number of repetitions for the set.
-     *             Example: "r/15"
+     * @param args the user command arguments
      */
     public void addSet(String args) {
         if (currentWorkout == null) {
@@ -175,14 +178,8 @@ public class WorkoutManager {
         }
     }
 
-
     /**
-     * Displays a detailed summary of all recorded workouts, including their names,
-     * durations, exercises, and sets. If no workouts exist, shows a message indicating
-     * that no workouts have been recorded.
-     *
-     * Each workout is listed with its index, name, and duration. For each workout,
-     * all exercises and their sets (with repetitions) are displayed in a structured format.
+     * Displays all workouts and their exercises in a formatted list.
      */
     public void viewWorkouts() {
         if (workouts.isEmpty()) {
@@ -190,12 +187,10 @@ public class WorkoutManager {
             return;
         }
 
-
         for (int i = 0; i < workouts.size(); i++) {
             Workout w = workouts.get(i);
             ui.showMessage("------------------------------------------------");
             ui.showMessage("[" + (i + ARRAY_OFFSET) + "]: " + w.getWorkoutName() + " | " + w.getDuration() + " Min");
-
 
             if (w.getExercises().isEmpty()) {
                 ui.showMessage("     No exercises added yet.");
@@ -212,14 +207,11 @@ public class WorkoutManager {
     }
 
     /**
-     * Ends the current workout session by parsing the end date and time from the given argument string,
-     * validating the input, and updating the workout's end time and duration.
-     * Displays appropriate messages for success, missing/invalid input, or if no workout is active.
+     * Ends the current workout session by recording the end time and calculating duration.
      *
-     * Expected argument format: d/DD/MM/YY t/HHmm
+     * Expected format: /end_workout d/DD/MM/YY t/HHmm
      *
-     * @param args The user input containing the end date and time for the workout.
-     *             Example: "d/14/10/25 t/2100"
+     * @param args the user command arguments
      */
     public void endWorkout(String args) {
         if (currentWorkout == null) {
@@ -227,24 +219,19 @@ public class WorkoutManager {
             return;
         }
 
-
         String dateStr = extractBetween(args, "d/", "t/").trim();
         String timeStr = extractAfter(args, "t/").trim();
-
 
         if (dateStr.isEmpty() || timeStr.isEmpty()) {
             ui.showMessage("Please provide an end date and time in format: d/DD/MM/YY t/HHmm");
             return;
         }
 
-
         String dateTimeStr = dateStr + " " + timeStr;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
 
-
         try {
             LocalDateTime endDateTime = LocalDateTime.parse(dateTimeStr, formatter);
-
 
             if (currentWorkout.getWorkoutStartDateTime() == null ||
                     !endDateTime.isAfter(currentWorkout.getWorkoutStartDateTime())) {
@@ -252,14 +239,14 @@ public class WorkoutManager {
                 return;
             }
 
-
             currentWorkout.setWorkoutEndDateTime(endDateTime);
             int duration = currentWorkout.calculateDuration();
             currentWorkout.setDuration(duration);
 
-
-            ui.showMessage(String.format("🏁 Workout '%s' ended. Duration: %d minute(s).",
-                    currentWorkout.getWorkoutName(), duration));
+            ui.showMessage(String.format(
+                    "Workout '%s' ended. Duration: %d minute(s).",
+                    currentWorkout.getWorkoutName(), duration
+            ));
             currentWorkout = null;
         } catch (Exception e) {
             ui.showMessage("Invalid date/time format. Use: d/DD/MM/YY t/HHmm");

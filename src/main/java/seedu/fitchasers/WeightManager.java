@@ -11,6 +11,7 @@ public class WeightManager {
 
     /** The person whose weight records are being managed */
     private final Person person;
+    private final UI ui = new UI();
 
     /**
      * Constructs a WeightManager for the given person.
@@ -39,9 +40,9 @@ public class WeightManager {
 
             WeightRecord record = new WeightRecord(weight, date);
             person.addWeightRecord(record);
-            System.out.println("Recorded new weight: " + record);
+            ui.showMessage("Recorded new weight: " + record);
         } catch (Exception e) {
-            System.out.println("Invalid format. Example: /add_weight w/81.5 d/19/10/25");
+            ui.showMessage("Invalid format. Example: /add_weight w/81.5 d/19/10/25");
         }
     }
 
