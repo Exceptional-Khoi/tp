@@ -4,19 +4,31 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+/**
+ * Manages workout sessions for the FitChasers application.
+ *
+ * Handles creation, deletion, and viewing of workouts,
+ * as well as adding exercises and sets within each workout.
+ */
 public class WorkoutManager {
     private static final int ARRAY_OFFSET = 1;
     private final ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
-    private final UI ui;
+    private final UI ui = new UI();
 
-    public WorkoutManager(UI ui) {
-        this.ui = ui;
+    /**
+     * Constructs a new WorkoutManager instance.
+     */
+    public WorkoutManager() {
     }
 
-    // ===============================
-    // ADD WORKOUT
-    // ===============================
+    /**
+     * Creates and adds a new workout to the list.
+     *
+     * Expected format: /create_workout n/NAME d/DD/MM/YY t/HHmm
+     *
+     * @param command the full user command containing workout details
+     */
     public void addWorkout(String command) {
         String workoutName = extractBetween(command, "n/", "d/").trim();
         String dateStr = extractBetween(command, "d/", "t/").trim();
@@ -36,9 +48,14 @@ public class WorkoutManager {
         }
     }
 
-    // ===============================
-    // HELPER METHODS
-    // ===============================
+    /**
+     * Extracts text between two tokens.
+     *
+     * @param text the full string to search
+     * @param startToken the start marker
+     * @param endToken the end marker
+     * @return the substring found between the tokens, or an empty string if not found
+     */
     private String extractBetween(String text, String startToken, String endToken) {
         int start = text.indexOf(startToken) + startToken.length();
         int end = text.indexOf(endToken);
@@ -48,6 +65,13 @@ public class WorkoutManager {
         return text.substring(start, end);
     }
 
+    /**
+     * Extracts text after a specific token.
+     *
+     * @param text the full string to search
+     * @param token the token to find
+     * @return the text found after the token, or an empty string if not found
+     */
     private String extractAfter(String text, String token) {
         int index = text.indexOf(token);
         if (index == -1) {
@@ -56,38 +80,38 @@ public class WorkoutManager {
         return text.substring(index + token.length()).trim();
     }
 
-    // ===============================
-    // WORKOUT MANAGEMENT
-    // ===============================
+    /**
+     * Returns all workouts.
+     *
+     * @return the list of workouts
+     */
     public ArrayList<Workout> getWorkouts() {
         return workouts;
     }
 
-    public void loadWorkoutFromFile(String workout) {
-        String name = workout.substring(0, workout.indexOf("|"));
-        try {
-            int duration = Integer.parseInt(workout.substring(workout.indexOf("|") + 1).trim());
-            workouts.add(new Workout(name.trim(), duration));
-        } catch (NumberFormatException e) {
-            ui.showMessage("Invalid workout format, file might be corrupted.");
-        }
-    }
-
-    public boolean removeWorkout(String name) {
+    /**
+     * Deletes a workout by name.
+     *
+     * @param name the name of the workout to delete
+     */
+    public void deleteWorkout(String name) {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
                 workouts.remove(w);
-                ui.showMessage("Removed workout: " + name);
-                return true;
+                ui.showMessage("Deleted workout: " + name);
+                return;
             }
         }
         ui.showMessage("Workout not found: " + name);
-        return false;
     }
 
-    // ===============================
-    // ADD EXERCISE
-    // ===============================
+    /**
+     * Adds an exercise to the current workout.
+     *
+     * Expected format: /add_exercise n/NAME r/REPS
+     *
+     * @param args the user command arguments
+     */
     public void addExercise(String args) {
         if (currentWorkout == null) {
             ui.showMessage("No active workout. Use /create_workout first.");
@@ -104,7 +128,9 @@ public class WorkoutManager {
 
         try {
             int reps = Integer.parseInt(repsStr);
-            if (reps <= 0) throw new NumberFormatException();
+            if (reps <= 0) {
+                throw new NumberFormatException();
+            }
 
             Exercise exercise = new Exercise(name, reps);
             currentWorkout.addExercise(exercise);
@@ -114,9 +140,13 @@ public class WorkoutManager {
         }
     }
 
-    // ===============================
-    // ADD SET
-    // ===============================
+    /**
+     * Adds a new set to the current exercise.
+     *
+     * Expected format: /add_set r/REPS
+     *
+     * @param args the user command arguments
+     */
     public void addSet(String args) {
         if (currentWorkout == null) {
             ui.showMessage("No active workout. Use /create_workout first.");
@@ -137,7 +167,9 @@ public class WorkoutManager {
 
         try {
             int reps = Integer.parseInt(repsStr);
-            if (reps <= 0) throw new NumberFormatException();
+            if (reps <= 0) {
+                throw new NumberFormatException();
+            }
 
             currentExercise.addSet(reps);
             ui.showMessage("Added set to exercise:\n" + currentExercise.toDetailedString());
@@ -146,9 +178,9 @@ public class WorkoutManager {
         }
     }
 
-    // ===============================
-    // VIEW WORKOUTS
-    // ===============================
+    /**
+     * Displays all workouts and their exercises in a formatted list.
+     */
     public void viewWorkouts() {
         if (workouts.isEmpty()) {
             ui.showMessage("No workouts recorded yet!");
@@ -174,9 +206,13 @@ public class WorkoutManager {
         }
     }
 
-    // ===============================
-    // END WORKOUT
-    // ===============================
+    /**
+     * Ends the current workout session by recording the end time and calculating duration.
+     *
+     * Expected format: /end_workout d/DD/MM/YY t/HHmm
+     *
+     * @param args the user command arguments
+     */
     public void endWorkout(String args) {
         if (currentWorkout == null) {
             ui.showMessage("No active workout.");
@@ -207,8 +243,10 @@ public class WorkoutManager {
             int duration = currentWorkout.calculateDuration();
             currentWorkout.setDuration(duration);
 
-            ui.showMessage(String.format("🏁 Workout '%s' ended. Duration: %d minute(s).",
-                    currentWorkout.getWorkoutName(), duration));
+            ui.showMessage(String.format(
+                    "Workout '%s' ended. Duration: %d minute(s).",
+                    currentWorkout.getWorkoutName(), duration
+            ));
             currentWorkout = null;
         } catch (Exception e) {
             ui.showMessage("Invalid date/time format. Use: d/DD/MM/YY t/HHmm");

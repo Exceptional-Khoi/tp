@@ -7,14 +7,11 @@ import java.util.Scanner;
  * It manages console input/output, provides formatted messages, and displays
  * helpful prompts to guide the user through commands.
  *
- * <p>This class focuses purely on user interface concerns — it does not perform
- * business logic or data management.</p>
  */
 public class UI {
     private static final String RESET = "\u001B[0m";
     private static final String BLUE_BOLD = "\u001B[1;34m";
     private static final String CYAN = "\u001B[36m";
-    private static final String GREEN = "\u001B[92m";
     private static final String MAGENTA = "\u001B[35m";
     private static final String WHITE_BOLD = "\u001B[1;37m";
 
@@ -46,8 +43,7 @@ public class UI {
      * @param message the message to display.
      */
     public void showMessage(String message) {
-        System.out.println(GREEN + message + RESET);
-        showDivider();
+        System.out.println(WHITE_BOLD + message + RESET);
     }
 
     /**
@@ -58,7 +54,6 @@ public class UI {
      */
     public void showError(String error) {
         System.out.println(MAGENTA + "[Oops!] " + RESET + error);
-        showDivider();
     }
 
     /**
@@ -66,17 +61,16 @@ public class UI {
      * It introduces the app and guides the user on how to get help.
      */
     public void showGreeting() {
-        showDivider();
 
-        System.out.println(BLUE_BOLD
-                + "FITCHASER"
-                + RESET);
+        System.out.println(BLUE_BOLD + """
+        +------------------------------------------------------+
+        |                      FITCHASER                       |
+        +------------------------------------------------------+
+        """ + RESET);
 
         System.out.println(CYAN
                 + "Your virtual gym buddy’s clocked in and ready to make you strong!"
                 + RESET);
-
-        showDivider();
 
         System.out.println(CYAN + "Type " + WHITE_BOLD + "/help" + CYAN
                 + " to explore all available commands!" + RESET);
@@ -91,6 +85,7 @@ public class UI {
     public void showExitMessage() {
         System.out.println(CYAN
                 + "Catch you next time, champ — don’t ghost your gains!" + RESET);
+
         showDivider();
     }
 
@@ -98,15 +93,15 @@ public class UI {
      * Displays all available commands and their usage.
      */
     public void showHelp() {
-        System.out.println("\n" + CYAN + "Available Commands:" + RESET);
-        System.out.println("/help                        - View all commands");
-        System.out.println("/add_weight w/WEIGHT d/DATE  - Record your current weight");
-        System.out.println("/create_workout n/NAME d/DATE t/TIME - Create new workout");
-        System.out.println("/add_exercise n/NAME r/REPS  - Add exercise to workout");
-        System.out.println("/end_workout d/DATE t/TIME   - End the workout session");
-        System.out.println("/view_log                    - View workout history");
-        System.out.println("/del_workout n/NAME          - Delete a workout");
-        System.out.println("/exit                        - Exit the app");
+        System.out.println("/help                              - View all commands");
+        System.out.println("/add_weight w/WEIGHT d/DATE        - Record your current weight (e.g. /add_weight w/81.5 d/19/10/25)");
+        System.out.println("/create_workout n/NAME d/DATE t/TIME - Create a new workout session (e.g. /create_workout n/PushDay d/20/10/25 t/1900)");
+        System.out.println("/add_exercise n/NAME r/REPS        - Add an exercise to the current workout (e.g. /add_exercise n/Squat r/12)");
+        System.out.println("/add_set r/REPS                    - Add a new set to the current exercise (e.g. /add_set r/10)");
+        System.out.println("/end_workout d/DATE t/TIME         - End the current workout (e.g. /end_workout d/20/10/25 t/2030)");
+        System.out.println("/view_log                          - View your workout history");
+        System.out.println("/del_workout n/NAME                - Delete a workout by name (e.g. /del_workout PushDay)");
+        System.out.println("/exit                              - Save progress and exit the app");
 
         showDivider();
     }

@@ -2,6 +2,7 @@ package seedu.fitchasers;
 
 import java.io.IOException;
 
+
 /**
  * Main entry point for the FitChasers application.
  *
@@ -9,11 +10,19 @@ import java.io.IOException;
  * and persists data through FileHandler.
  */
 public class FitChasers {
-
+    /**
+     * Starts the FitChasers program.
+     * Initializes all components, loads saved data if available,
+     * and processes user input until the user exits.
+     *
+     * @param args command line arguments (not used)
+     */
     public static void main(String[] args) {
         UI ui = new UI();
-        WorkoutManager workoutManager = new WorkoutManager(ui);
-        FileHandler fileHandler = new FileHandler(ui);
+        WorkoutManager workoutManager = new WorkoutManager();
+        FileHandler fileHandler = new FileHandler();
+        Person person = new Person("Default User");
+        WeightManager weightManager = new WeightManager(person);
 
         // Attempt to load persistent data
         try {
@@ -38,70 +47,112 @@ public class FitChasers {
 
             try {
                 switch (command) {
-                    case "/help":
-                        ui.showHelp();
+                case "/help":
+                    ui.showHelp();
+                    break;
+
+                case "/add_weight":
+                    ui.showMessage("Logging your weight... don’t lie to me!");
+                    weightManager.addWeight(argumentStr);
+                    // Format: /add_weight w/WEIGHT d/DATE
+                    ui.showDivider();
+                    break;
+
+                case "/view_weight":
+                    ui.showMessage("Here’s your weight, you’ve been killin’ it lately!");
+                    weightManager.viewWeights();
+                    ui.showDivider();
+                    break;
+
+                case "/create_workout":
+                    ui.showMessage("New workout sesh incoming!");
+                    // Format: /create_workout n/NAME d/DD/MM/YY t/HHmm
+                    workoutManager.addWorkout(argumentStr);
+                    ui.showDivider();
+                    break;
+
+                case "/add_exercise":
+                    ui.showMessage("Adding that spicy new exercise!");
+                    // Format: /add_exercise n/NAME r/REPS
+                    workoutManager.addExercise(argumentStr);
+                    ui.showDivider();
+                    break;
+
+                case "/add_set":
+                    ui.showMessage("Adding a new set to your exercise!");
+                    // Format: /add_set r/REPS
+                    workoutManager.addSet(argumentStr);
+                    ui.showDivider();
+                    break;
+
+                    /*
+                    case "/add_reps":
+                        // Format: /add_reps e/EXERCISE_NAME i/SET_INDEX r/REPS  e.g., /add_reps e/Push_Up i/2 r/12
+                        workoutManager.addReps(argumentStr);
                         break;
 
-                    case "/add_weight":
-                        ui.showMessage("Logging your weight... don’t lie to me!");
-                        // Format: /add_weight w/WEIGHT d/DATE
-                        // Example: /add_weight w/81.5 d/19/10/25
-                        // (Feature placeholder for future implementation)
+                    case "/del_sets":
+                        // Format: /del_sets e/EXERCISE_NAME i/SET_INDEX  e.g., /del_sets e/Push_Up i/2
+                        workoutManager.deleteSets(argumentStr);
                         break;
 
-                    case "/create_workout":
-                        ui.showMessage("New workout sesh incoming!");
-                        // Format: /create_workout n/NAME d/DD/MM/YY t/HHmm
-                        workoutManager.addWorkout(argumentStr);
-                        break;
-
-                    case "/add_exercise":
-                        ui.showMessage("Adding that spicy new exercise!");
-                        // Format: /add_exercise n/NAME r/REPS
-                        workoutManager.addExercise(argumentStr);
-                        break;
-
-                    case "/add_set":
-                        ui.showMessage("Adding a new set to your exercise!");
-                        // Format: /add_set r/REPS
-                        workoutManager.addSet(argumentStr);
+                    case "/del_exercise":
+                        // Format: /del_exercise EXERCISE_NAME  e.g., /del_exercise Push_Up
+                        workoutManager.deleteExercise(argumentStr);
                         break;
 
                     case "/end_workout":
-                        ui.showMessage("Workout wrapped! Time to refuel!");
-                        // Format: /end_workout d/DD/MM/YY t/HHmm
+                        // Format: /end_workout d/DD/MM/YY t/HHmm  e.g., /end_workout d/25/10/25 t/1800
                         workoutManager.endWorkout(argumentStr);
                         break;
 
-                    case "/view_log":
-                        ui.showMessage("Here’s your workout glow-up history!");
-                        workoutManager.viewWorkouts();
+                    case "/view_duration":
+                        // Format: /view_duration WORKOUT_NAME
+                        workoutManager.viewDuration(argumentStr);
                         break;
+                    */
 
-                    case "/del_workout":
-                        ui.showMessage("🗑 Deleting that workout? 😭 Are you sure, bestie?");
-                        // Format: /del_workout WORKOUT_NAME
-                        // (Feature placeholder — can hook into workoutManager.removeWorkout())
-                        break;
+                case "/end_workout":
+                    ui.showMessage("Workout wrapped! Time to refuel!");
+                    // Format: /end_workout d/DD/MM/YY t/HHmm
+                    workoutManager.endWorkout(argumentStr);
+                    ui.showDivider();
+                    break;
 
-                    case "/exit":
-                        ui.showMessage("Saving your progress...");
-                        try {
-                            fileHandler.saveFile(workoutManager.getWorkouts());
-                            ui.showExitMessage();
-                        } catch (IOException e) {
-                            ui.showError("Failed to save workouts before exit.");
-                        }
-                        isRunning = false;
-                        break;
+                case "/view_log":
+                    ui.showMessage("Here’s your workout glow-up history!");
+                    workoutManager.viewWorkouts();
+                    ui.showDivider();
+                    break;
 
-                    default:
-                        ui.showError("That’s not a thing, bestie. Try /help for the real moves!");
-                        break;
+                case "/del_workout":
+                    ui.showMessage("Deleting that workout? T.T Are you sure, bestie?");
+                    // Format: /del_workout WORKOUT_NAME
+                    workoutManager.deleteWorkout(argumentStr);
+                    ui.showDivider();
+                    break;
+
+                case "/exit":
+                    ui.showMessage("Saving your progress...");
+                    try {
+                        fileHandler.saveFile(workoutManager.getWorkouts());
+                        ui.showExitMessage();
+                    } catch (IOException e) {
+                        ui.showError("Failed to save workouts before exit.");
+                    }
+                    isRunning = false;
+                    break;
+
+                default:
+                    ui.showError("That’s not a thing, bestie. Try /help for the real moves!");
+                    ui.showDivider();
+                    break;
                 }
             } catch (Exception e) {
                 ui.showError("Something went wrong: " + e.getMessage());
+                ui.showDivider();
             }
         }
     }
 }
+

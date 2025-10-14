@@ -26,14 +26,15 @@ import java.util.List;
 public class FileHandler {
 
     private static final Path FILE_PATH = Paths.get("data", "save.txt");
-    private final UI ui;
+    private final UI ui = new UI();
+
 
     /**
      * Constructs a FileHandler with a reference to the UI for user feedback.
      */
-    public FileHandler(UI ui) {
-        this.ui = ui;
+    public FileHandler() {
     }
+
 
     /**
      * Ensures that the save file and its parent directory exist.
@@ -46,6 +47,7 @@ public class FileHandler {
             Files.createFile(FILE_PATH); // Create empty save file
         }
     }
+
 
     /**
      * Loads all workout and exercise data from save.txt into the given WorkoutManager.
@@ -63,6 +65,7 @@ public class FileHandler {
         List<String> lines = Files.readAllLines(FILE_PATH);
         Workout currentWorkout = null;
 
+
         for (String line : lines) {
             if (line.startsWith("WORKOUT")) {
                 try {
@@ -75,11 +78,13 @@ public class FileHandler {
                     ui.showMessage("Skipping malformed workout entry: " + line);
                 }
 
+
             } else if (line.startsWith("EXERCISE") && currentWorkout != null) {
                 try {
                     String[] parts = line.split("\\|");
                     String exName = parts[1].trim();
                     String[] repsList = parts[2].trim().split(",");
+
 
                     Exercise exercise = new Exercise(exName, Integer.parseInt(repsList[0]));
                     for (int i = 1; i < repsList.length; i++) {
@@ -90,13 +95,14 @@ public class FileHandler {
                     ui.showMessage("Skipping malformed exercise entry: " + line);
                 }
 
+
             } else if (line.startsWith("END_WORKOUT")) {
                 currentWorkout = null;
             }
         }
-
         ui.showMessage("Loaded " + workoutManager.getWorkouts().size() + " workout(s) from file.");
     }
+
 
     /**
      * Saves all workout data to save.txt in the specified format.
@@ -112,6 +118,7 @@ public class FileHandler {
             for (Workout w : workouts) {
                 fw.write("WORKOUT | " + w.getWorkoutName() + " | " + w.getDuration() + "\n");
 
+
                 for (Exercise ex : w.getExercises()) {
                     StringBuilder setsStr = new StringBuilder();
                     for (int i = 0; i < ex.getSets().size(); i++) {
@@ -123,10 +130,10 @@ public class FileHandler {
                     fw.write("EXERCISE | " + ex.getName() + " | " + setsStr + "\n");
                 }
 
+
                 fw.write("END_WORKOUT\n");
             }
         }
-
         ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
     }
 }
