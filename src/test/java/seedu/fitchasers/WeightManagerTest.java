@@ -4,10 +4,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.time.LocalDate;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ class WeightManagerTest {
         assertEquals(LocalDate.of(2025, 10, 19), record.getDate());
 
         // verify printed output contains confirmation message
-        String output = outContent.toString();
+        String output = outContent.toString().replace(",", ".");
         assertTrue(output.contains("Recorded new weight"));
         assertTrue(output.contains("81.5"));
     }
@@ -58,14 +58,14 @@ class WeightManagerTest {
     @Test
     void addWeight_invalidFormat_showsErrorMessage() {
         manager.addWeight("/add_weight wrong_format");
-        String output = outContent.toString();
+        String output = outContent.toString().replace(",", ".");
         assertTrue(output.contains("Invalid format"));
     }
 
     @Test
     void addWeight_missingDate_showsErrorMessage() {
         manager.addWeight("/add_weight w/80.0");
-        String output = outContent.toString();
+        String output = outContent.toString().replace(",", ".");
         assertTrue(output.contains("Invalid format"));
         assertEquals(0, person.getWeightHistory().size());
     }
@@ -76,7 +76,7 @@ class WeightManagerTest {
     @Test
     void viewWeights_noRecords_printsNoRecordMessage() {
         manager.viewWeights();
-        String output = outContent.toString();
+        String output = outContent.toString().replace(",", ".");
         assertTrue(output.contains("has no weight records yet."));
     }
 
@@ -86,7 +86,7 @@ class WeightManagerTest {
         person.addWeightRecord(new WeightRecord(71.2, LocalDate.of(2025, 10, 11)));
 
         manager.viewWeights();
-        String output = outContent.toString();
+        String output = outContent.toString().replace(",", ".");
 
         assertTrue(output.contains("Weight history for Alex"));
         assertTrue(output.contains("70.0"));
