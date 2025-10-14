@@ -86,7 +86,7 @@ public class UI {
      */
     public void showExitMessage() {
         System.out.println(CYAN
-                + "Catch you next time, champ — don't ghost your gains!" + RESET);
+                + "Catch you next time, champ - don't ghost your gains!" + RESET);
 
         showDivider();
     }
