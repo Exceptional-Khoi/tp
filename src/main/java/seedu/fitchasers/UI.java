@@ -93,15 +93,15 @@ public class UI {
      * Displays all available commands and their usage.
      */
     public void showHelp() {
-        System.out.println("/help                              - View all commands");
-        System.out.println("/add_weight w/WEIGHT d/DATE        - Record your current weight (e.g. /add_weight w/81.5 d/19/10/25)");
+        System.out.println("/help                                - View all commands");
+        System.out.println("/add_weight w/WEIGHT d/DATE          - Record your current weight (e.g. /add_weight w/81.5 d/19/10/25)");
         System.out.println("/create_workout n/NAME d/DATE t/TIME - Create a new workout session (e.g. /create_workout n/PushDay d/20/10/25 t/1900)");
-        System.out.println("/add_exercise n/NAME r/REPS        - Add an exercise to the current workout (e.g. /add_exercise n/Squat r/12)");
-        System.out.println("/add_set r/REPS                    - Add a new set to the current exercise (e.g. /add_set r/10)");
-        System.out.println("/end_workout d/DATE t/TIME         - End the current workout (e.g. /end_workout d/20/10/25 t/2030)");
-        System.out.println("/view_log                          - View your workout history");
-        System.out.println("/del_workout n/NAME                - Delete a workout by name (e.g. /del_workout PushDay)");
-        System.out.println("/exit                              - Save progress and exit the app");
+        System.out.println("/add_exercise n/NAME r/REPS          - Add an exercise to the current workout (e.g. /add_exercise n/Squat r/12)");
+        System.out.println("/add_set r/REPS                      - Add a new set to the current exercise (e.g. /add_set r/10)");
+        System.out.println("/end_workout d/DATE t/TIME           - End the current workout (e.g. /end_workout d/20/10/25 t/2030)");
+        System.out.println("/view_log                            - View your workout history");
+        System.out.println("/del_workout NAME                    - Delete a workout by name (e.g. /del_workout PushDay)");
+        System.out.println("/exit                                - Save progress and exit the app");
 
         showDivider();
     }
