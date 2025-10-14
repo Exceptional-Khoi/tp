@@ -71,7 +71,7 @@ public class UI {
                 """ + RESET);
 
         System.out.println(CYAN
-                + "Your virtual gym buddy’s clocked in and ready to make you strong!"
+                + "Your virtual gym buddy's clocked in and ready to make you strong!"
                 + RESET);
 
         System.out.println(CYAN + "Type " + WHITE_BOLD + "/help" + CYAN
@@ -86,7 +86,7 @@ public class UI {
      */
     public void showExitMessage() {
         System.out.println(CYAN
-                + "Catch you next time, champ — don’t ghost your gains!" + RESET);
+                + "Catch you next time, champ — don't ghost your gains!" + RESET);
 
         showDivider();
     }
