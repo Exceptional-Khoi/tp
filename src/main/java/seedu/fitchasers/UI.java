@@ -36,6 +36,12 @@ public class UI {
      */
     public String readCommand() {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
+
+        if (!scanner.hasNextLine()) {
+            System.out.println("\n[System] No input detected. Exiting gracefully...");
+            return "";
+        }
+
         return scanner.nextLine().trim();
     }
 
