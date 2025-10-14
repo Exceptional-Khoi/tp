@@ -9,7 +9,6 @@ import java.util.Scanner;
  *
  */
 public class UI {
-
     private static final String RESET = "\u001B[0m";
     private static final String BLUE_BOLD = "\u001B[1;34m";
     private static final String CYAN = "\u001B[36m";
@@ -36,12 +35,6 @@ public class UI {
      */
     public String readCommand() {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
-
-        if (!scanner.hasNextLine()) {
-            System.out.println("\n[System] No input detected. Exiting gracefully...");
-            return "";
-        }
-
         return scanner.nextLine().trim();
     }
 
@@ -78,7 +71,7 @@ public class UI {
                 """ + RESET);
 
         System.out.println(CYAN
-                + "Your virtual gym buddy's clocked in and ready to make you strong!"
+                + "Your virtual gym buddy’s clocked in and ready to make you strong!"
                 + RESET);
 
         System.out.println(CYAN + "Type " + WHITE_BOLD + "/help" + CYAN
@@ -93,7 +86,7 @@ public class UI {
      */
     public void showExitMessage() {
         System.out.println(CYAN
-                + "Catch you next time, champ — don't ghost your gains!" + RESET);
+                + "Catch you next time, champ — don’t ghost your gains!" + RESET);
 
         showDivider();
     }
