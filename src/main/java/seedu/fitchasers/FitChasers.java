@@ -1,6 +1,7 @@
 package seedu.fitchasers;
 
 import java.io.IOException;
+import java.util.Scanner;
 
 
 /**
@@ -23,6 +24,7 @@ public class FitChasers {
         FileHandler fileHandler = new FileHandler();
         Person person = new Person("Nary");
         WeightManager weightManager = new WeightManager(person);
+        Scanner scanner = new Scanner(System.in);
 
         // Attempt to load persistent data
         try {
@@ -88,7 +90,7 @@ public class FitChasers {
                 case "/end_workout":
                     ui.showMessage("Workout wrapped! Time to refuel!");
                     // Format: /end_workout d/DD/MM/YY t/HHmm
-                    workoutManager.endWorkout(argumentStr);
+                    workoutManager.endWorkout(scanner, argumentStr);
                     ui.showDivider();
                     break;
 
