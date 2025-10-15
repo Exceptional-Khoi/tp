@@ -216,7 +216,8 @@ public class WorkoutManager {
         for (int i = 0; i < workouts.size(); i++) {
             Workout w = workouts.get(i);
             ui.showMessage("------------------------------------------------");
-            ui.showMessage("[" + (i + ARRAY_OFFSET) + "]: " + w.getWorkoutName() + " | " + w.getDuration() + " Min");
+            ui.showMessage("[" + (i + ARRAY_OFFSET) + "]: " + w.getWorkoutName() +
+                    " | " + w.getDuration() + " Min");
 
             if (w.getExercises().isEmpty()) {
                 ui.showMessage("     No exercises added yet.");
@@ -267,7 +268,8 @@ public class WorkoutManager {
             String timeStr = extractAfter(args, "t/").trim();
 
             // If missing, use default values and notify user
-            boolean usedDefaultDate = false, usedDefaultTime = false;
+            boolean usedDefaultDate = false;
+            boolean usedDefaultTime = false;
             if (dateStr.isEmpty()) {
                 dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yy"));
                 ui.showMessage("You missed out the date! Using current date: " + dateStr);
@@ -284,7 +286,8 @@ public class WorkoutManager {
 
             try {
                 LocalDateTime endDateTime = LocalDateTime.parse(dateTimeStr, formatter);
-                LocalDateTime startTimeTruncated = currentWorkout.getWorkoutStartDateTime().truncatedTo(ChronoUnit.MINUTES);
+                LocalDateTime startTimeTruncated =
+                        currentWorkout.getWorkoutStartDateTime().truncatedTo(ChronoUnit.MINUTES);
                 LocalDateTime endTimeTruncated = endDateTime.truncatedTo(ChronoUnit.MINUTES);
 
                 // Check for invalid date
