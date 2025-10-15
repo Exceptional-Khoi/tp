@@ -1,5 +1,7 @@
 package seedu.fitchasers;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,9 +32,31 @@ public class WorkoutManager {
      * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
-        String workoutName = extractBetween(command, "n/", "d/").trim();
+        String workoutName;
+        if (command.contains("d/")) {
+            workoutName = extractBetween(command, "n/", "d/").trim();
+        } else if (command.contains("t/")) {
+            workoutName = extractBetween(command, "n/", "t/").trim();
+        } else {
+            // If neither d/ nor t/ found, take the rest of the string after n/
+            int nIndex = command.indexOf("n/");
+            workoutName = command.substring(nIndex + 2).trim();
+        }
+
         String dateStr = extractBetween(command, "d/", "t/").trim();
-        String timeStr = command.substring(command.indexOf("t/") + 2).trim();
+        String timeStr = "";
+        if (command.contains("t/")) {
+            timeStr = command.substring(command.indexOf("t/") + 2).trim();
+        }
+
+        if(dateStr.isEmpty()) {
+            dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yy"));
+            ui.showMessage("You missed out the date! Using current date: " + dateStr);
+        }
+        if(timeStr.isEmpty()) {
+            timeStr = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmm"));
+            ui.showMessage("You missed out the time! Using current time: " + timeStr);
+        }
 
         String dateTimeStr = dateStr + " " + timeStr;
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
@@ -222,9 +246,13 @@ public class WorkoutManager {
         String dateStr = extractBetween(args, "d/", "t/").trim();
         String timeStr = extractAfter(args, "t/").trim();
 
-        if (dateStr.isEmpty() || timeStr.isEmpty()) {
-            ui.showMessage("Please provide an end date and time in format: d/DD/MM/YY t/HHmm");
-            return;
+        if (dateStr.isEmpty()) {
+            dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yy"));
+            ui.showMessage("You missed out the date! Using current date: " + dateStr);
+        }
+        if (timeStr.isEmpty()) {
+            timeStr = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmm"));
+            ui.showMessage("You missed out the time! Using current time: " + timeStr);
         }
 
         String dateTimeStr = dateStr + " " + timeStr;
