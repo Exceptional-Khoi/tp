@@ -119,4 +119,9 @@ public class UI {
         System.out.println(WHITE_BOLD
                 + "--------------------------------------------------" + RESET);
     }
+
+    public boolean confirmationMessage() {
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+        return confirmation.equals("y") || confirmation.equals("yes");
+    }
 }

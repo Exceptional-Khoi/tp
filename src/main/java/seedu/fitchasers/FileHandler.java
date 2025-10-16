@@ -1,10 +1,17 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.Exceptions.FileNonexistent;
+
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,111 +33,65 @@ import java.util.List;
 
 public class FileHandler {
 
-    private static final Path FILE_PATH = Paths.get("data", "save.txt");
+    private static final Path DATA_DIR = Paths.get("data", "workouts");
     private final UI ui = new UI();
-
-
-    /**
-     * Constructs a FileHandler with a reference to the UI for user feedback.
-     */
-    public FileHandler() {
-    }
-
 
     /**
      * Ensures that the save file and its parent directory exist.
      *
      * @throws IOException if directory or file creation fails
      */
-    private static void ensureFile() throws IOException {
-        Files.createDirectories(FILE_PATH.getParent());
-        if (Files.notExists(FILE_PATH)) {
-            Files.createFile(FILE_PATH); // Create empty save file
+    private static void ensureDataDir() throws IOException {
+        Files.createDirectories(DATA_DIR);
+    }
+
+    /**
+     * Saves the given month's workout list into a serialized file inside /data/workouts/
+     *
+     * @param month the month of the workout list
+     * @param list  the list of workouts to save
+     * @throws IOException if saving fails
+     */
+    public void saveMonthList(YearMonth month, ArrayList<Workout> list) throws IOException {
+        try{
+            ensureDataDir();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+
+        String filename = String.format("workouts_%s.dat", month); // e.g., workouts_2025-06.dat
+        Path filePath = DATA_DIR.resolve(filename);
+
+        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
+            out.writeObject(list);
+            ui.showMessage("Saved " + list.size() + " workouts for " + month + ".");
         }
     }
 
     /**
-     * Loads all workout and exercise data from save.txt into the given WorkoutManager.
+     * Loads the given month's workout list from a serialized file inside /data/workouts/.
      *
-     * Expected format:
-     * WORKOUT | Name | Duration
-     * EXERCISE | Name | reps,reps,reps
-     * END_WORKOUT
-     *
-     * @param workoutManager the WorkoutManager to populate
-     * @throws IOException if reading the save file fails
+     * @param month the month of the workout list
+     * @return the loaded workout list (empty if not found)
+     * @throws IOException if loading fails
      */
-    public void loadFileContentArray(WorkoutManager workoutManager) throws IOException {
-        ensureFile();
-        List<String> lines = Files.readAllLines(FILE_PATH);
+    @SuppressWarnings("unchecked")
+    public ArrayList<Workout> loadMonthList(YearMonth month) throws IOException, FileNonexistent {
+        ensureDataDir();
 
-        Workout currentWorkout = null;
+        String filename = String.format("workouts_%s.dat", month);
+        Path filePath = DATA_DIR.resolve(filename);
 
-        for (String line : lines) {
-            if (line.startsWith("WORKOUT")) {
-                try {
-                    String[] parts = line.split("\\|");
-                    String name = parts[1].trim();
-                    int duration = Integer.parseInt(parts[2].trim());
-                    currentWorkout = new Workout(name, duration);
-                    workoutManager.getWorkouts().add(currentWorkout);
-                } catch (Exception e) {
-                    ui.showMessage("Skipping malformed workout entry: " + line);
-                }
-
-
-            } else if (line.startsWith("EXERCISE") && currentWorkout != null) {
-                try {
-                    String[] parts = line.split("\\|");
-                    String exName = parts[1].trim();
-                    String[] repsList = parts[2].trim().split(",");
-
-
-                    Exercise exercise = new Exercise(exName, Integer.parseInt(repsList[0]));
-                    for (int i = 1; i < repsList.length; i++) {
-                        exercise.addSet(Integer.parseInt(repsList[i]));
-                    }
-                    currentWorkout.addExercise(exercise);
-                } catch (Exception e) {
-                    ui.showMessage("Skipping malformed exercise entry: " + line);
-                }
-
-
-            } else if (line.startsWith("END_WORKOUT")) {
-                currentWorkout = null;
-            }
+        if (Files.notExists(filePath)) {
+            throw new FileNonexistent("No save file found for " + month);
         }
-        ui.showMessage("Loaded " + workoutManager.getWorkouts().size() + " workout(s) from file.");
-    }
 
-
-    /**
-     * Saves all workout data to save.txt in the specified format.
-     *
-     * Each save overwrites the entire file.
-     *
-     * @param workouts list of workouts to be saved
-     * @throws IOException if writing fails
-     */
-    public void saveFile(List<Workout> workouts) throws IOException {
-        ensureFile();
-        try (FileWriter fw = new FileWriter(FILE_PATH.toFile())) {
-            for (Workout w : workouts) {
-                fw.write("WORKOUT | " + w.getWorkoutName() + " | " + w.getDuration() + "\n");
-                for (Exercise ex : w.getExercises()) {
-                    // join all reps from each set with commas
-                    StringBuilder setsStr = new StringBuilder();
-                    for (int i = 0; i < ex.getSets().size(); i++) {
-                        setsStr.append(ex.getSets().get(i));
-                        if (i < ex.getSets().size() - 1) {
-                            setsStr.append(",");
-                        }
-                    }
-                    fw.write("EXERCISE | " + ex.getName() + " | " + setsStr + "\n");
-                }
-                fw.write("END_WORKOUT\n");
-            }
+        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
+            return (ArrayList<Workout>) in.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Workout class not found when reading file. " +
+                    "Something might've corrupted it", e);
         }
-        ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
     }
 }
