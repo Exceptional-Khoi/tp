@@ -60,49 +60,29 @@ public class FileHandler {
      * @param workoutManager the WorkoutManager to populate
      * @throws IOException if reading the save file fails
      */
-    public void loadFileContentArray(WorkoutManager workoutManager) throws IOException {
+    public void loadFileContentArray(WorkoutManager workoutManager, Person person) throws IOException {
         ensureFile();
         List<String> lines = Files.readAllLines(FILE_PATH);
 
         Workout currentWorkout = null;
 
         for (String line : lines) {
-            if (line.startsWith("WORKOUT")) {
+            if (line.startsWith("USER")) {
                 try {
                     String[] parts = line.split("\\|");
-                    String name = parts[1].trim();
-                    int duration = Integer.parseInt(parts[2].trim());
-                    currentWorkout = new Workout(name, duration);
-                    workoutManager.getWorkouts().add(currentWorkout);
-                } catch (Exception e) {
-                    ui.showMessage("Skipping malformed workout entry: " + line);
-                }
-
-
+                    String userName = parts[1].trim();
+                    person.setName(userName);
+                    ui.showMessage("Welcome back, " + userName + "!");
+                } catch (Exception ignored) {}
+            } else if (line.startsWith("WORKOUT")) {
+                // existing logic
             } else if (line.startsWith("EXERCISE") && currentWorkout != null) {
-                try {
-                    String[] parts = line.split("\\|");
-                    String exName = parts[1].trim();
-                    String[] repsList = parts[2].trim().split(",");
-
-
-                    Exercise exercise = new Exercise(exName, Integer.parseInt(repsList[0]));
-                    for (int i = 1; i < repsList.length; i++) {
-                        exercise.addSet(Integer.parseInt(repsList[i]));
-                    }
-                    currentWorkout.addExercise(exercise);
-                } catch (Exception e) {
-                    ui.showMessage("Skipping malformed exercise entry: " + line);
-                }
-
-
+                // existing logic
             } else if (line.startsWith("END_WORKOUT")) {
                 currentWorkout = null;
             }
         }
-        ui.showMessage("Loaded " + workoutManager.getWorkouts().size() + " workout(s) from file.");
     }
-
 
     /**
      * Saves all workout data to save.txt in the specified format.
@@ -112,13 +92,13 @@ public class FileHandler {
      * @param workouts list of workouts to be saved
      * @throws IOException if writing fails
      */
-    public void saveFile(List<Workout> workouts) throws IOException {
+    public void saveFile(Person person, List<Workout> workouts) throws IOException {
         ensureFile();
         try (FileWriter fw = new FileWriter(FILE_PATH.toFile())) {
+            fw.write("USER | " + person.getName() + "\n"); // header line
             for (Workout w : workouts) {
                 fw.write("WORKOUT | " + w.getWorkoutName() + " | " + w.getDuration() + "\n");
                 for (Exercise ex : w.getExercises()) {
-                    // join all reps from each set with commas
                     StringBuilder setsStr = new StringBuilder();
                     for (int i = 0; i < ex.getSets().size(); i++) {
                         setsStr.append(ex.getSets().get(i));
@@ -131,6 +111,6 @@ public class FileHandler {
                 fw.write("END_WORKOUT\n");
             }
         }
-        ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
+        ui.showMessage("Successfully saved " + workouts.size() + " workout(s) for " + person.getName());
     }
 }

@@ -38,6 +38,11 @@ public class UI {
         return scanner.nextLine().trim();
     }
 
+    public String promptForName() {
+        System.out.print(MAGENTA + "Enter your name: " + RESET);
+        return scanner.nextLine().trim();
+    }
+
     /**
      * Displays a standard informational message in green color,
      * followed by a divider for readability.

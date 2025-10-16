@@ -22,15 +22,21 @@ public class FitChasers {
         UI ui = new UI();
         WorkoutManager workoutManager = new WorkoutManager();
         FileHandler fileHandler = new FileHandler();
-        Person person = new Person("Nary");
+        Person person = new Person("Unknown");
         WeightManager weightManager = new WeightManager(person);
         Scanner scanner = new Scanner(System.in);
 
         // Attempt to load persistent data
         try {
-            fileHandler.loadFileContentArray(workoutManager);
+            fileHandler.loadFileContentArray(workoutManager, person);
         } catch (IOException e) {
             ui.showError("Could not load saved data. Starting fresh!");
+        }
+
+        if (person.getName().equals("Unknown")) {
+            String name = ui.promptForName();
+            person.setName(name);
+            ui.showMessage("Nice to meet you, " + name + "!");
         }
 
         ui.showGreeting();
@@ -110,7 +116,7 @@ public class FitChasers {
                 case "/exit":
                     ui.showMessage("Saving your progress...");
                     try {
-                        fileHandler.saveFile(workoutManager.getWorkouts());
+                        fileHandler.saveFile(person, workoutManager.getWorkouts());
                         ui.showExitMessage();
                     } catch (IOException e) {
                         ui.showError("Failed to save workouts before exit.");
