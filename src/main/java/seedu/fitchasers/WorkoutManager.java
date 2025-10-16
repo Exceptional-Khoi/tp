@@ -21,12 +21,6 @@ public class WorkoutManager {
     private final UI ui = new UI();
 
     /**
-     * Constructs a new WorkoutManager instance.
-     */
-    public WorkoutManager() {
-    }
-
-    /**
      * Creates and adds a new workout to the list.
      *
      * Expected format: /create_workout n/NAME d/DD/MM/YY t/HHmm
@@ -123,8 +117,17 @@ public class WorkoutManager {
     public void deleteWorkout(String name) {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
-                workouts.remove(w);
-                ui.showMessage("Deleted workout: " + name);
+                Scanner scanner = new Scanner(System.in);
+                ui.showMessage("Deleting " + w.getWorkoutName() + " | " +
+                        w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type y/yes to confirm)");
+                String confirmation = scanner.nextLine().trim().toLowerCase();
+                if (confirmation.equals("y") || confirmation.equals("yes")) {
+                    workouts.remove(w);
+                    ui.showMessage("Workout deleted successfully! 💪");
+                } else {
+                    ui.showMessage("Okay, I didn’t delete it. 🫶");
+                }
+                ui.showDivider();
                 return;
             }
         }
