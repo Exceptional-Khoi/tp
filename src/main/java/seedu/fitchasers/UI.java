@@ -1,5 +1,6 @@
 package seedu.fitchasers;
 
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -35,7 +36,15 @@ public class UI {
      */
     public String readCommand() {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
-        return scanner.nextLine().trim();
+        try {
+            if (scanner.hasNextLine()) {
+                return scanner.nextLine().trim();
+            } else {
+                return ""; // Or handle as appropriate for your application
+            }
+        } catch (NoSuchElementException e) {
+            return ""; // Prevent crash during CI/testing
+        }
     }
 
     public String promptForName() {
