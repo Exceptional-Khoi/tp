@@ -10,13 +10,13 @@ import java.util.List;
 /**
  * Handles the permanent storage of workout and exercise data.
  * Saves to and loads from: data/save.txt
- *
+ * <p>
  * If the "data" folder does not exist, it will be created automatically.
- *
+ * <p>
  * File format:
  * Each workout starts with "WORKOUT" and ends with "END_WORKOUT".
  * Exercises are listed between, with all set repetitions joined by commas.
- *
+ * <p>
  * Example:
  * WORKOUT | Chest Day | 45
  * EXERCISE | Push Ups | 15,15,12
@@ -51,7 +51,7 @@ public class FileHandler {
 
     /**
      * Loads all workout and exercise data from save.txt into the given WorkoutManager.
-     *
+     * <p>
      * Expected format:
      * WORKOUT | Name | Duration
      * EXERCISE | Name | reps,reps,reps
@@ -73,11 +73,37 @@ public class FileHandler {
                     String userName = parts[1].trim();
                     person.setName(userName);
                     ui.showMessage("Welcome back, " + userName + "!");
-                } catch (Exception ignored) {}
+                } catch (Exception e) {
+                    ui.showError("Failed to read user name from save file. Using default name instead.");
+                }
+
             } else if (line.startsWith("WORKOUT")) {
-                // existing logic
+                try {
+                    String[] parts = line.split("\\|");
+                    String name = parts[1].trim();
+                    int duration = Integer.parseInt(parts[2].trim());
+                    currentWorkout = new Workout(name, duration);
+                    workoutManager.getWorkouts().add(currentWorkout);
+                } catch (Exception e) {
+                    ui.showMessage("Skipping malformed workout entry: " + line);
+                }
+
             } else if (line.startsWith("EXERCISE") && currentWorkout != null) {
-                // existing logic
+                try {
+                    String[] parts = line.split("\\|");
+                    String exName = parts[1].trim();
+                    String[] repsList = parts[2].trim().split(",");
+
+
+                    Exercise exercise = new Exercise(exName, Integer.parseInt(repsList[0]));
+                    for (int i = 1; i < repsList.length; i++) {
+                        exercise.addSet(Integer.parseInt(repsList[i]));
+                    }
+                    currentWorkout.addExercise(exercise);
+                } catch (Exception e) {
+                    ui.showMessage("Skipping malformed exercise entry: " + line);
+                }
+
             } else if (line.startsWith("END_WORKOUT")) {
                 currentWorkout = null;
             }
@@ -86,7 +112,7 @@ public class FileHandler {
 
     /**
      * Saves all workout data to save.txt in the specified format.
-     *
+     * <p>
      * Each save overwrites the entire file.
      *
      * @param workouts list of workouts to be saved
