@@ -22,7 +22,7 @@ public class FitChasers {
         UI ui = new UI();
         WorkoutManager workoutManager = new WorkoutManager();
         FileHandler fileHandler = new FileHandler();
-        Person person = new Person("Unknown");
+        Person person = new Person("Nary");
         WeightManager weightManager = new WeightManager(person);
         Scanner scanner = new Scanner(System.in);
 
@@ -33,19 +33,16 @@ public class FitChasers {
             ui.showError("Could not load saved data. Starting fresh!");
         }
 
-        if (person.getName().equals("Unknown")) {
-            String name = ui.promptForName();
-            person.setName(name);
-            ui.showMessage("Nice to meet you, " + name + "!");
-        }
-
         ui.showGreeting();
 
         boolean isRunning = true;
 
         while (isRunning) {
             String input = ui.readCommand();
-            if (input == null || input.trim().isEmpty()) {
+            if (input == null) {
+                break;
+            }
+            if (input.trim().isEmpty()) {
                 continue;
             }
 
@@ -58,6 +55,24 @@ public class FitChasers {
                 case "/help":
                     ui.showHelp();
                     break;
+
+                case "/my_name": {
+                    if (argumentStr == null || !argumentStr.startsWith("n/")) {
+                        ui.showMessage("Usage: /my_name n/YourName");
+                        ui.showDivider();
+                        break;
+                    }
+                    String newName = argumentStr.substring(2).trim();
+                    if (newName.isEmpty()) {
+                        ui.showMessage("Usage: /my_name n/YourName");
+                        ui.showDivider();
+                        break;
+                    }
+                    person.setName(newName);
+                    ui.showMessage("Alright, I'll call you " + newName + " from now on.");
+                    ui.showDivider();
+                    break;
+                }
 
                 case "/add_weight":
                     ui.showMessage("Logging your weight... don't lie to me!");

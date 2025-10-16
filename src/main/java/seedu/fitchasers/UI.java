@@ -1,6 +1,5 @@
 package seedu.fitchasers;
 
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
@@ -36,15 +35,7 @@ public class UI {
      */
     public String readCommand() {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
-        try {
-            if (scanner.hasNextLine()) {
-                return scanner.nextLine().trim();
-            } else {
-                return ""; // Or handle as appropriate for your application
-            }
-        } catch (NoSuchElementException e) {
-            return ""; // Prevent crash during CI/testing
-        }
+        return scanner.nextLine().trim();
     }
 
     public String promptForName() {
@@ -110,6 +101,8 @@ public class UI {
      */
     public void showHelp() {
         System.out.println("/help                                - View all commands");
+        System.out.println("/my_name n/NAME                        - Set your display name"
+                + " (e.g. /my_name n/Nitin)");
         System.out.println("/add_weight w/WEIGHT d/DATE          - Record your weight "
                 + "(e.g. /add_weight w/81.5 d/19/10/25)");
         System.out.println("/create_workout n/NAME d/DATE t/TIME - Create a new workout "

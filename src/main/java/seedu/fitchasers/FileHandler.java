@@ -70,9 +70,11 @@ public class FileHandler {
             if (line.startsWith("USER")) {
                 try {
                     String[] parts = line.split("\\|");
+                    if (parts.length < 2) {
+                        throw new IllegalArgumentException("Malformed USER line: " + line);
+                    }
                     String userName = parts[1].trim();
                     person.setName(userName);
-                    ui.showMessage("Welcome back, " + userName + "!");
                 } catch (Exception e) {
                     ui.showError("Failed to read user name from save file. Using default name instead.");
                 }
@@ -94,7 +96,6 @@ public class FileHandler {
                     String exName = parts[1].trim();
                     String[] repsList = parts[2].trim().split(",");
 
-
                     Exercise exercise = new Exercise(exName, Integer.parseInt(repsList[0]));
                     for (int i = 1; i < repsList.length; i++) {
                         exercise.addSet(Integer.parseInt(repsList[i]));
@@ -108,6 +109,8 @@ public class FileHandler {
                 currentWorkout = null;
             }
         }
+
+        ui.showMessage("Loaded " + workoutManager.getWorkouts().size() + " workout(s) from file.");
     }
 
     /**
@@ -121,7 +124,7 @@ public class FileHandler {
     public void saveFile(Person person, List<Workout> workouts) throws IOException {
         ensureFile();
         try (FileWriter fw = new FileWriter(FILE_PATH.toFile())) {
-            fw.write("USER | " + person.getName() + "\n"); // header line
+            fw.write("USER | " + person.getName() + "\n");
             for (Workout w : workouts) {
                 fw.write("WORKOUT | " + w.getWorkoutName() + " | " + w.getDuration() + "\n");
                 for (Exercise ex : w.getExercises()) {
@@ -137,6 +140,6 @@ public class FileHandler {
                 fw.write("END_WORKOUT\n");
             }
         }
-        ui.showMessage("Successfully saved " + workouts.size() + " workout(s) for " + person.getName());
+        ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
     }
 }
