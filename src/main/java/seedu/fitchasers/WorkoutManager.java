@@ -104,6 +104,10 @@ public class WorkoutManager {
         return text.substring(index + token.length()).trim();
     }
 
+    public int getWorkoutSize() {
+        return workouts.size();
+    }
+
     /**
      * Returns all workouts.
      *
