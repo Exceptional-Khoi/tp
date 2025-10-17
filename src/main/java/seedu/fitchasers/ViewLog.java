@@ -251,17 +251,18 @@ public class ViewLog {
     }
 
     private static String daySuffix(int day) {
-        if (day >= 11 && day <= 13) return "th";
-        return
-        switch (day % 10) {
-        case 1 -> "st";
-        case 2 -> "nd";
-        case 3 -> "rd";
-        default -> "th";
+        if (day >= 11 && day <= 13) {
+            return "th";
+        }
+        return switch (day % 10) {
+            case 1 -> "st";
+            case 2 -> "nd";
+            case 3 -> "rd";
+            default -> "th";
         };
     }
 
-/*
+    /*
     private static String getTagsJoined(Workout w) {
         Set<String> tags = getTags(w);
         if (tags.isEmpty()) return "-";
@@ -276,8 +277,8 @@ public class ViewLog {
 
 
     /* ----------------------- Tag template (optional) ------------------------- */
-
-/*    public static Set<String> suggestTags(Workout w) {
+    /*
+    public static Set<String> suggestTags(Workout w) {
         String name = safe(w.getWorkoutName()).toLowerCase(Locale.ENGLISH);
         Set<String> tags = new LinkedHashSet<>();
         if (name.matches(".*(squat|deadlift|bench|press|row).*")) tags.add("strength");
