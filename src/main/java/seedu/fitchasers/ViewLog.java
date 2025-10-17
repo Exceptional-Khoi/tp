@@ -1,8 +1,6 @@
 package seedu.fitchasers;
-import seedu.fitchasers.Exceptions.InvalidArgumentInput;
+import seedu.fitchasers.exceptions.InvalidArgumentInput;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -10,7 +8,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class ViewLog {
     private final UI ui;                         // your existing UI class

@@ -1,9 +1,7 @@
 package seedu.fitchasers;
 
-import seedu.fitchasers.Exceptions.FileNonexistent;
+import seedu.fitchasers.exceptions.FileNonexistent;
 
-import java.io.FileOutputStream;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -12,7 +10,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.YearMonth;
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Handles the permanent storage of workout and exercise data.
