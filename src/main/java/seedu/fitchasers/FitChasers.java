@@ -122,7 +122,6 @@ public class FitChasers {
                     break;
 
                 case "/del_workout":
-                    ui.showMessage("Deleting that workout? T.T Are you sure, bestie?");
                     // Format: /del_workout WORKOUT_NAME
                     workoutManager.deleteWorkout(argumentStr);
                     ui.showDivider();

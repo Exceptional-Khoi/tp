@@ -3,6 +3,8 @@ package seedu.fitchasers;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 /**
  * Represents a workout session containing a name, duration, start/end times, and a list of exercises.
@@ -87,6 +89,39 @@ public class Workout {
 
     public LocalDateTime getWorkoutEndDateTime() {
         return workoutEndDateTime;
+    }
+
+    public String getWorkoutDateString(){
+        return formatWorkoutDate(workoutStartDateTime);
+    }
+    /**
+     * Returns a formatted date string such as "Monday 30th of June"
+     *
+     * @param dateTime the LocalDateTime to format
+     * @return the formatted date string
+     */
+    private static String formatWorkoutDate(LocalDateTime dateTime) {
+        String dayOfWeek = dateTime.getDayOfWeek()
+                .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+        int dayOfMonth = dateTime.getDayOfMonth();
+        String month = dateTime.getMonth()
+                .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+
+        String suffix = getDaySuffix(dayOfMonth);
+
+        return String.format("%s %d%s of %s", dayOfWeek, dayOfMonth, suffix, month);
+    }
+
+    private static String getDaySuffix(int day) {
+        if (day >= 11 && day <= 13) {
+            return "th";
+        }
+        return switch (day % 10) {
+        case 1 -> "st";
+        case 2 -> "nd";
+        case 3 -> "rd";
+        default -> "th";
+        };
     }
 
     public void setWorkoutEndDateTime(LocalDateTime workoutEndDateTime) {
