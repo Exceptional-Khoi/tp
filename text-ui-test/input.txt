@@ -1,6 +1,157 @@
 /create_workout n/swimming d/14/10/25 t/1500
 /add_exercise n/lap r/10
 /add_exercise n/lap r/10
-/view_log
 /end_workout d/14/10/25 t/1600
-/view_log
+
+/create_workout n/push day d/15/10/25 t/1800
+/add_exercise n/bench press r/8
+/add_exercise n/incline dumbbell press r/10
+/add_exercise n/triceps dips r/12
+/end_workout d/15/10/25 t/1910
+
+/create_workout n/leg day d/16/10/25 t/1700
+/add_exercise n/squat r/8
+/add_exercise n/lunges r/12
+/add_exercise n/calf raises r/20
+/end_workout d/16/10/25 t/1825
+
+/create_workout n/run d/17/10/25 t/0700
+/add_exercise n/jogging r/1
+/add_exercise n/sprint r/3
+/end_workout d/17/10/25 t/0740
+
+/create_workout n/core d/18/10/25 t/2000
+/add_exercise n/plank r/3
+/add_exercise n/sit-up r/25
+/add_exercise n/russian twist r/30
+/end_workout d/18/10/25 t/2045
+
+/create_workout n/pull day d/19/10/25 t/1830
+/add_exercise n/deadlifts r/6
+/add_exercise n/barbell row r/10
+/add_exercise n/bicep curl r/12
+/end_workout d/19/10/25 t/1945
+
+/create_workout n/cardio mix d/20/10/25 t/0630
+/add_exercise n/jump rope r/5
+/add_exercise n/cycle r/20
+/end_workout d/20/10/25 t/0720
+
+/create_workout n/yoga session d/20/10/25 t/2100
+/add_exercise n/sun salutation r/5
+/add_exercise n/tree pose r/3
+/end_workout d/20/10/25 t/2140
+
+/create_workout n/hiit d/21/10/25 t/1200
+/add_exercise n/burpees r/10
+/add_exercise n/push-ups r/15
+/add_exercise n/mountain climbers r/20
+/end_workout d/21/10/25 t/1230
+
+/create_workout n/swim endurance d/22/10/25 t/1530
+/add_exercise n/laps r/30
+/add_exercise n/floating kick r/10
+/end_workout d/22/10/25 t/1630
+
+/create_workout n/stretching d/23/10/25 t/0930
+/add_exercise n/hamstring stretch r/3
+/add_exercise n/shoulder stretch r/3
+/end_workout d/23/10/25 t/1000
+
+/create_workout n/hike d/24/10/25 t/0800
+/add_exercise n/ascent r/5
+/add_exercise n/descent r/5
+/end_workout d/24/10/25 t/1100
+
+/create_workout n/spin class d/24/10/25 t/1800
+/add_exercise n/sprints r/10
+/add_exercise n/climb r/10
+/end_workout d/24/10/25 t/1850
+
+/create_workout n/back day d/25/10/25 t/1730
+/add_exercise n/pull-ups r/10
+/add_exercise n/lat pulldown r/12
+/add_exercise n/seated row r/10
+/end_workout d/25/10/25 t/1845
+
+/create_workout n/arm blast d/26/10/25 t/1600
+/add_exercise n/bicep curl r/12
+/add_exercise n/tricep pushdown r/12
+/add_exercise n/hammer curl r/10
+/end_workout d/26/10/25 t/1700
+
+/create_workout n/run d/27/10/25 t/0615
+/add_exercise n/warmup jog r/1
+/add_exercise n/5k pace r/1
+/end_workout d/27/10/25 t/0710
+
+/create_workout n/full body d/27/10/25 t/1900
+/add_exercise n/push-up r/20
+/add_exercise n/squat r/20
+/add_exercise n/burpee r/10
+/end_workout d/27/10/25 t/2000
+
+/create_workout n/cycle d/28/10/25 t/0600
+/add_exercise n/flat road r/20
+/add_exercise n/hill climb r/10
+/end_workout d/28/10/25 t/0700
+
+/create_workout n/core burn d/28/10/25 t/2000
+/add_exercise n/sit-up r/30
+/add_exercise n/leg raise r/20
+/add_exercise n/plank r/3
+/end_workout d/28/10/25 t/2050
+
+/create_workout n/boxing d/29/10/25 t/1800
+/add_exercise n/shadowboxing r/5
+/add_exercise n/punch bag r/10
+/add_exercise n/footwork drill r/5
+/end_workout d/29/10/25 t/1900
+
+/create_workout n/tennis d/30/10/25 t/1700
+/add_exercise n/serve practice r/5
+/add_exercise n/rally r/5
+/end_workout d/30/10/25 t/1830
+
+/create_workout n/pilates d/31/10/25 t/2000
+/add_exercise n/roll-up r/5
+/add_exercise n/leg circle r/10
+/end_workout d/31/10/25 t/2040
+
+/create_workout n/jump circuit d/01/11/25 t/0930
+/add_exercise n/jump squat r/15
+/add_exercise n/jumping jack r/30
+/end_workout d/01/11/25 t/1010
+
+/create_workout n/swimming d/02/11/25 t/1600
+/add_exercise n/lap freestyle r/15
+/add_exercise n/lap butterfly r/5
+/end_workout d/02/11/25 t/1700
+
+/create_workout n/rowing d/03/11/25 t/0730
+/add_exercise n/row machine r/10
+/add_exercise n/core twist r/10
+/end_workout d/03/11/25 t/0820
+
+/create_workout n/mobility d/03/11/25 t/2030
+/add_exercise n/shoulder rolls r/5
+/add_exercise n/hip circles r/5
+/end_workout d/03/11/25 t/2100
+
+/create_workout n/bodyweight d/04/11/25 t/1900
+/add_exercise n/push-up r/20
+/add_exercise n/squat r/25
+/add_exercise n/plank r/4
+/end_workout d/04/11/25 t/1955
+
+/create_workout n/powerlift d/05/11/25 t/1700
+/add_exercise n/squat r/5
+/add_exercise n/deadlift r/5
+/add_exercise n/bench press r/5
+/end_workout d/05/11/25 t/1830
+
+/create_workout n/flexibility d/06/11/25 t/2100
+/add_exercise n/backbend r/3
+/add_exercise n/toe touch r/3
+/add_exercise n/shoulder stretch r/3
+/end_workout d/06/11/25 t/2140

@@ -1,6 +1,10 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.exceptions.FileNonexistent;
+
 import java.io.IOException;
+import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 
@@ -18,21 +22,32 @@ public class FitChasers {
      *
      * @param args command line arguments (not used)
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         UI ui = new UI();
         WorkoutManager workoutManager = new WorkoutManager();
         FileHandler fileHandler = new FileHandler();
         Person person = new Person("Nary");
         WeightManager weightManager = new WeightManager(person);
         Scanner scanner = new Scanner(System.in);
+        YearMonth currentMonth = YearMonth.now();
+        ViewLog viewLog;
 
-        // Attempt to load persistent data
+        // Attempt to load persistent datai by month
+        // #TODO add select month #TODO need to add seperate month to current month check!
         try {
-            fileHandler.loadFileContentArray(workoutManager, person);
-        } catch (IOException e) {
-            ui.showError("Could not load saved data. Starting fresh!");
+            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth));
+            ui.showMessage("Loaded " + currentMonth + " workouts");
+        } catch ( FileNonexistent e) {
+            ui.showError("Seems like this is a new month!"
+                    + "\n Would you like to create new workouts for this month? (Y/N)" );
+            if(ui.confirmationMessage()) {
+                fileHandler.saveMonthList(currentMonth,new ArrayList<>());
+                workoutManager.setWorkouts(new ArrayList<>());
+            }
+        }catch(IOException e) {
+            ui.showError(e.getMessage());
         }
-
+        viewLog = new ViewLog(ui,workoutManager);
         ui.showGreeting();
 
         boolean isRunning = true;
@@ -116,12 +131,16 @@ public class FitChasers {
                     break;
 
                 case "/view_log":
-                    ui.showMessage("Here's your workout glow-up history!");
-                    workoutManager.viewWorkouts();
+                    try{
+                        viewLog.render(argumentStr,false);
+                    }catch (IndexOutOfBoundsException e){
+                        ui.showError(e.getMessage());
+                    }
                     ui.showDivider();
                     break;
 
                 case "/del_workout":
+                    ui.showMessage("Deleting that workout? T.T Are you sure, bestie?");
                     // Format: /del_workout WORKOUT_NAME
                     workoutManager.deleteWorkout(argumentStr);
                     ui.showDivider();
@@ -130,7 +149,7 @@ public class FitChasers {
                 case "/exit":
                     ui.showMessage("Saving your progress...");
                     try {
-                        fileHandler.saveFile(person, workoutManager.getWorkouts());
+                        fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
                         ui.showExitMessage();
                     } catch (IOException e) {
                         ui.showError("Failed to save workouts before exit.");
