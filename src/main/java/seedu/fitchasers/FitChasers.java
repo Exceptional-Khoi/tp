@@ -28,7 +28,7 @@ public class FitChasers {
 
         // Attempt to load persistent data
         try {
-            fileHandler.loadFileContentArray(workoutManager);
+            fileHandler.loadFileContentArray(workoutManager, person);
         } catch (IOException e) {
             ui.showError("Could not load saved data. Starting fresh!");
         }
@@ -39,7 +39,10 @@ public class FitChasers {
 
         while (isRunning) {
             String input = ui.readCommand();
-            if (input == null || input.trim().isEmpty()) {
+            if (input == null) {
+                break;
+            }
+            if (input.trim().isEmpty()) {
                 continue;
             }
 
@@ -52,6 +55,24 @@ public class FitChasers {
                 case "/help":
                     ui.showHelp();
                     break;
+
+                case "/my_name": {
+                    if (argumentStr == null || !argumentStr.startsWith("n/")) {
+                        ui.showMessage("Usage: /my_name n/YourName");
+                        ui.showDivider();
+                        break;
+                    }
+                    String newName = argumentStr.substring(2).trim();
+                    if (newName.isEmpty()) {
+                        ui.showMessage("Usage: /my_name n/YourName");
+                        ui.showDivider();
+                        break;
+                    }
+                    person.setName(newName);
+                    ui.showMessage("Alright, I'll call you " + newName + " from now on.");
+                    ui.showDivider();
+                    break;
+                }
 
                 case "/add_weight":
                     ui.showMessage("Logging your weight... don't lie to me!");
@@ -110,7 +131,7 @@ public class FitChasers {
                 case "/exit":
                     ui.showMessage("Saving your progress...");
                     try {
-                        fileHandler.saveFile(workoutManager.getWorkouts());
+                        fileHandler.saveFile(person, workoutManager.getWorkouts());
                         ui.showExitMessage();
                     } catch (IOException e) {
                         ui.showError("Failed to save workouts before exit.");
