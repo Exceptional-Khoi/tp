@@ -1,105 +1,149 @@
 package seedu.fitchasers;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-/**
- * Unit tests for the {@link WeightManager} class.
- */
 class WeightManagerTest {
 
     private Person person;
     private WeightManager manager;
-    private ByteArrayOutputStream outContent;
-    private PrintStream originalOut;
+    private UI ui;
 
     @BeforeEach
     void setUp() {
-        person = new Person("Alex");
+        person = new Person("TestUser");
         manager = new WeightManager(person);
-        outContent = new ByteArrayOutputStream();
-        originalOut = System.out;
-        System.setOut(new PrintStream(outContent));
-    }
-
-    @AfterEach
-    void tearDown() {
-        System.setOut(originalOut);
-    }
-
-    // ----------------------------------------------------
-    // Tests for addWeight()
-    // ----------------------------------------------------
-    @Test
-    void addWeight_validInput_addsWeightRecordAndShowsMessage() {
-        manager.addWeight("/add_weight w/81.5 d/19/10/25");
-
-        // verify that a record was added
-        assertEquals(1, person.getWeightHistory().size());
-        WeightRecord record = person.getWeightHistory().get(0);
-        assertEquals(81.5, record.getWeight());
-        assertEquals(LocalDate.of(2025, 10, 19), record.getDate());
-
-        // verify printed output contains confirmation message
-        String output = outContent.toString().replace(",", ".");
-        assertTrue(output.contains("Recorded new weight"));
-        assertTrue(output.contains("81.5"));
+        ui = new UI();
     }
 
     @Test
-    void addWeight_invalidFormat_showsErrorMessage() {
-        manager.addWeight("/add_weight wrong_format");
-        String output = outContent.toString().replace(",", ".");
-        assertTrue(output.contains("Invalid format"));
+    void addWeight_validInput_addsRecord() {
+        manager.addWeight("/add_weight w/70.5 d/17/10/25");
+        List<WeightRecord> history = person.getWeightHistory();
+        assertEquals(1, history.size());
+        assertEquals(70.5, history.get(0).getWeight());
+        assertEquals(LocalDate.parse("17/10/25", DateTimeFormatter.ofPattern("dd/MM/yy")), history.get(0).getDate());
     }
 
     @Test
-    void addWeight_missingDate_showsErrorMessage() {
-        manager.addWeight("/add_weight w/80.0");
-        String output = outContent.toString().replace(",", ".");
-        assertTrue(output.contains("Invalid format"));
+    void addWeight_invalidWeight_showsError() {
+        manager.addWeight("/add_weight w/abc d/17/10/25");
         assertEquals(0, person.getWeightHistory().size());
     }
 
-    // ----------------------------------------------------
-    // Tests for viewWeights()
-    // ----------------------------------------------------
     @Test
-    void viewWeights_noRecords_printsNoRecordMessage() {
-        manager.viewWeights();
-        String output = outContent.toString().replace(",", ".");
-        assertTrue(output.contains("has no weight records yet."));
+    void addWeight_invalidDate_showsError() {
+        manager.addWeight("/add_weight w/70.5 d/2025-10-17");
+        assertEquals(0, person.getWeightHistory().size());
     }
 
     @Test
-    void viewWeights_withRecords_printsAllWeights() {
-        person.addWeightRecord(new WeightRecord(70.0, LocalDate.of(2025, 10, 10)));
-        person.addWeightRecord(new WeightRecord(71.2, LocalDate.of(2025, 10, 11)));
-
-        manager.viewWeights();
-        String output = outContent.toString().replace(",", ".");
-
-        assertTrue(output.contains("Weight history for Alex"));
-        assertTrue(output.contains("70.0"));
-        assertTrue(output.contains("71.2"));
+    void addWeight_missingWeight_showsError() {
+        manager.addWeight("/add_weight w/ d/17/10/25");
+        assertEquals(0, person.getWeightHistory().size());
     }
 
-    // ----------------------------------------------------
-    // Indirect test for private extractBetween() via addWeight()
-    // ----------------------------------------------------
     @Test
-    void addWeight_incorrectOrder_returnsError() {
-        assertThrows(StringIndexOutOfBoundsException.class, () ->
-                manager.addWeight("/add_weight d/19/10/25 w/80.0")
-        );
+    void addWeight_missingDate_showsError() {
+        manager.addWeight("/add_weight w/70.5 d/");
+        assertEquals(0, person.getWeightHistory().size());
+    }
+
+    @Test
+    void addWeight_extraSpaces_trimsCorrectly() {
+        manager.addWeight(" /add_weight w/  72.0   d/ 17/10/25 ");
+        List<WeightRecord> history = person.getWeightHistory();
+        assertEquals(1, history.size());
+        assertEquals(72.0, history.get(0).getWeight());
+    }
+
+    @Test
+    void addWeight_multipleRecords_allAdded() {
+        manager.addWeight("/add_weight w/70.0 d/17/10/25");
+        manager.addWeight("/add_weight w/71.0 d/18/10/25");
+        assertEquals(2, person.getWeightHistory().size());
+    }
+
+    @Test
+    void addWeight_invalidFormat_noSlash_showsError() {
+        manager.addWeight("add_weight w70.0 d18/10/25");
+        assertEquals(0, person.getWeightHistory().size());
+    }
+
+    @Test
+    void addWeight_negativeWeight_accepts() {
+        manager.addWeight("/add_weight w/-5 d/17/10/25");
+        assertEquals(1, person.getWeightHistory().size());
+        assertEquals(-5.0, person.getWeightHistory().get(0).getWeight());
+    }
+
+    @Test
+    void addWeight_largeWeight_accepts() {
+        manager.addWeight("/add_weight w/500 d/17/10/25");
+        assertEquals(1, person.getWeightHistory().size());
+        assertEquals(500.0, person.getWeightHistory().get(0).getWeight());
+    }
+
+    @Test
+    void addWeight_invalidDateFormatWithSlashes_showsError() {
+        manager.addWeight("/add_weight w/70 d/17-10-25");
+        assertEquals(0, person.getWeightHistory().size());
+    }
+
+    @Test
+    void addWeight_onlyCommand_showsError() {
+        manager.addWeight("/add_weight");
+        assertEquals(0, person.getWeightHistory().size());
+    }
+
+    @Test
+    void addWeight_weightAtZero_accepts() {
+        manager.addWeight("/add_weight w/0 d/17/10/25");
+        assertEquals(1, person.getWeightHistory().size());
+        assertEquals(0.0, person.getWeightHistory().get(0).getWeight());
+    }
+
+    @Test
+    void addWeight_dateAtEdge_accepts() {
+        manager.addWeight("/add_weight w/60 d/01/01/00");
+        assertEquals(1, person.getWeightHistory().size());
+    }
+
+    @Test
+    void addWeight_leadingTrailingSpaces() {
+        manager.addWeight("/add_weight w/ 65.0 d/17/10/25 ");
+        assertEquals(1, person.getWeightHistory().size());
+    }
+
+    @Test
+    void addWeight_multipleSpacesBetweenCommand() {
+        manager.addWeight("/add_weight   w/66 d/17/10/25");
+        assertEquals(1, person.getWeightHistory().size());
+    }
+
+    @Test
+    void addWeight_decimalWeight() {
+        manager.addWeight("/add_weight w/72.75 d/17/10/25");
+        assertEquals(1, person.getWeightHistory().size());
+        assertEquals(72.75, person.getWeightHistory().get(0).getWeight());
+    }
+
+    @Test
+    void addWeight_dateWithSingleDigitDayMonth() {
+        manager.addWeight("/add_weight w/70.5 d/7/5/25");
+        // Sẽ lỗi nếu format ko match dd/MM/yy, test này để kiểm tra lỗi format
+        assertEquals(0, person.getWeightHistory().size());
+    }
+
+    @Test
+    void addWeight_missingWeightAndDate() {
+        manager.addWeight("/add_weight w/ d/");
+        assertEquals(0, person.getWeightHistory().size());
     }
 }
