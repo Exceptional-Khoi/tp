@@ -1,8 +1,6 @@
 package seedu.fitchasers;
-import seedu.fitchasers.Exceptions.InvalidArgumentInput;
+import seedu.fitchasers.exceptions.InvalidArgumentInput;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
@@ -10,12 +8,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class ViewLog {
+    public  static final int MINIMUN_PAGE_SIZE = 1;
     private final UI ui;                         // your existing UI class
     private final WorkoutManager workoutManager;
-    public  static final int MINIMUN_PAGE_SIZE = 1;
     private int pageSize = 10;
 
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
@@ -86,21 +83,22 @@ public class ViewLog {
     private void renderDetailedRow(int id, Workout w) {
         String dateLong = formatLong(w.getWorkoutEndDateTime());   // e.g., Monday 30th of June, 6:00 PM
         String dur = formatDuration(w.getDuration());
-//        String type = safe(w.getType());
-//        String tags = getTagsJoined(w);                  // "-" if none
 
         ui.showMessage("—".repeat(60));
         ui.showMessage(String.format("#%d  %s", id, safe(w.getWorkoutName())));
         ui.showMessage("Date     : " + dateLong);
         ui.showMessage("Duration : " + dur);
-//        ui.showMessage("Type     : " + (type.isBlank() ? "-" : type));
-//        ui.showMessage("Tags     : " + (tags.isBlank() ? "-" : tags));
+        /*
+        String type = safe(w.getType());
+        String tags = getTagsJoined(w);                  // "-" if none
+        ui.showMessage("Type     : " + (type.isBlank() ? "-" : type));
+        ui.showMessage("Tags     : " + (tags.isBlank() ? "-" : tags));
         // Add more fields from Workout here (sets/reps, notes, RPE, etc.)
+        */
     }
 
     /* ------------------------------ Commands API ----------------------------- */
 
-    /** For `/open <index>`: returns the workout from the last rendered set, 1-based index. */
     public Optional<Workout> openByIndex(int oneBasedIndex) {
         int i = oneBasedIndex - 1;
         if (i < 0 || i >= lastFilteredSorted.size()) {
@@ -109,7 +107,6 @@ public class ViewLog {
         return Optional.of(lastFilteredSorted.get(i));
     }
 
-    /** `/view_log --search <text>` returns all matching 1-based indexes (name contains). */
     /*public List<Integer> searchByName(List<Workout> monthWorkouts, String query) {
         if (query == null || query.isBlank()) {
             return List.of();
@@ -141,7 +138,6 @@ public class ViewLog {
         return matches;
     } */
 
-    /** `/view_log --type strength` (or any tag). Falls back to type, then tags set. */
     /*public void renderByTag(List<Workout> monthWorkouts, String tag, int page, boolean detailed) {
         if (tag == null || tag.isBlank()) {
             ui.showMessage("Please provide a tag, e.g., /view_log --type strength");
@@ -164,7 +160,6 @@ public class ViewLog {
         render(filtered, page, detailed);
     } */
 
-    /** `/view_log --summary` (optionally by tag). */
     /*public void renderSummary(List<Workout> monthWorkouts, Optional<String> tagOpt) {
         List<Workout> scope = monthWorkouts;
         if (tagOpt.isPresent()) {
@@ -243,7 +238,6 @@ public class ViewLog {
         return String.format("%s %d %s", dow, day, mon);
     }
 
-    /** e.g., "Monday 30th of June, 6:00 PM" */
     private static String formatLong(LocalDateTime dt) {
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int d = dt.getDayOfMonth();
@@ -258,7 +252,8 @@ public class ViewLog {
 
     private static String daySuffix(int day) {
         if (day >= 11 && day <= 13) return "th";
-        return switch (day % 10) {
+        return
+        switch (day % 10) {
         case 1 -> "st";
         case 2 -> "nd";
         case 3 -> "rd";
@@ -282,7 +277,6 @@ public class ViewLog {
 
     /* ----------------------- Tag template (optional) ------------------------- */
 
-    /** Optional helper to auto-suggest tags like "strength", "leg day", "cardio". */
 /*    public static Set<String> suggestTags(Workout w) {
         String name = safe(w.getWorkoutName()).toLowerCase(Locale.ENGLISH);
         Set<String> tags = new LinkedHashSet<>();

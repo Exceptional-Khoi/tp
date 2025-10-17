@@ -1,9 +1,8 @@
 package seedu.fitchasers;
 
-import seedu.fitchasers.Exceptions.FileNonexistent;
+import seedu.fitchasers.exceptions.FileNonexistent;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -33,10 +32,11 @@ public class FitChasers {
         YearMonth currentMonth = YearMonth.now();
         ViewLog viewLog;
 
-        // Attempt to load persistent datai by month #TODO add select month #TODO need to add seperate month to current month check!
+        // Attempt to load persistent datai by month
+        // #TODO add select month #TODO need to add seperate month to current month check!
         try {
-             workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth));
-             ui.showMessage("Loaded " + currentMonth + " workouts");
+            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth));
+            ui.showMessage("Loaded " + currentMonth + " workouts");
         } catch ( FileNonexistent e) {
             ui.showError("Seems like this is a new month!"
                     + "\n Would you like to create new workouts for this month? (Y/N)" );
