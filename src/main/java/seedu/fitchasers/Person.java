@@ -1,6 +1,9 @@
 package seedu.fitchasers;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a person using the FitChasers app.
@@ -9,7 +12,7 @@ import java.util.ArrayList;
 public class Person {
 
     /** The name of the person */
-    private final String name;
+    private String name;
 
     /** The list of weight records for the person */
     private final ArrayList<WeightRecord> weightHistory;
@@ -19,9 +22,10 @@ public class Person {
      * Initializes an empty weight history.
      *
      * @param name The name of the person
+     * @throws IllegalArgumentException if name is null or empty
      */
     public Person(String name) {
-        this.name = name;
+        setName(name); // reuse setter để kiểm tra name
         this.weightHistory = new ArrayList<>();
     }
 
@@ -35,21 +39,36 @@ public class Person {
     }
 
     /**
+     * Updates the name of the person.
+     *
+     * @param newName The new name
+     * @throws IllegalArgumentException if newName is null or empty
+     */
+    public void setName(String newName) {
+        if (newName == null || newName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Name cannot be null or empty.");
+        }
+        this.name = newName.trim();
+    }
+
+    /**
      * Adds a weight record to the person's weight history.
      *
      * @param record The WeightRecord to add
+     * @throws NullPointerException if record is null
      */
     public void addWeightRecord(WeightRecord record) {
+        Objects.requireNonNull(record, "WeightRecord cannot be null.");
         weightHistory.add(record);
     }
 
     /**
-     * Returns the full weight history of the person.
+     * Returns an unmodifiable copy of the weight history.
      *
-     * @return An ArrayList of WeightRecord objects
+     * @return A List of WeightRecord objects
      */
-    public ArrayList<WeightRecord> getWeightHistory() {
-        return weightHistory;
+    public List<WeightRecord> getWeightHistory() {
+        return Collections.unmodifiableList(new ArrayList<>(weightHistory));
     }
 
     /**
@@ -70,12 +89,34 @@ public class Person {
     /**
      * Returns the most recent weight recorded for the person.
      *
-     * @return The latest weight, or 0 if no records exist
+     * @return The latest weight, or -1 if no records exist
      */
     public double getLatestWeight() {
         if (weightHistory.isEmpty()) {
-            return 0;
+            return -1; // dùng -1 để phân biệt không có dữ liệu
         }
         return weightHistory.get(weightHistory.size() - 1).getWeight();
+    }
+
+    /**
+     * Returns the number of weight records.
+     *
+     * @return the size of the weight history
+     */
+    public int getWeightHistorySize() {
+        return weightHistory.size();
+    }
+
+    /**
+     * Removes the most recent weight record.
+     *
+     * @return true if a record was removed, false if no records exist
+     */
+    public boolean removeLatestWeightRecord() {
+        if (weightHistory.isEmpty()) {
+            return false;
+        }
+        weightHistory.remove(weightHistory.size() - 1);
+        return true;
     }
 }

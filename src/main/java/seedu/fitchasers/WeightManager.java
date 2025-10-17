@@ -2,71 +2,77 @@ package seedu.fitchasers;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 /**
- * Manages weight records for a specific person.
- * Provides functionality to add a new weight and view weight history.
+ * Handles the recording and viewing of weight data for a person.
  */
 public class WeightManager {
 
-    /** The person whose weight records are being managed */
-    private final Person person;
-    private final UI ui = new UI();
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
 
-    /**
-     * Constructs a WeightManager for the given person.
-     *
-     * @param person The person whose weights will be managed
-     */
+    private final Person currentUser;
+    private final UI uiHandler = new UI();
+
     public WeightManager(Person person) {
-        this.person = person;
+        this.currentUser = person;
     }
 
     /**
-     * Adds a weight record for the person based on the input command string.
-     * Expected format: "/add_weight w/WEIGHT d/DATE"
-     * Example: "/add_weight w/81.5 d/19/10/25"
+     * Adds a new weight entry.
+     * Command example: "/add_weight w/75.2 d/17/10/25"
      *
-     * @param args The command string containing weight and date information
+     * @param command full command string containing weight and date
      */
-    public void addWeight(String args) {
-        // Format: /add_weight w/81.5 d/19/10/25
-        String weightStr = extractBetween(args, "w/", "d/").trim();
-        String dateStr = args.substring(args.indexOf("d/") + 2).trim();
+    public void addWeight(String command) {
+        String weightString = extractBetween(command, "w/", "d/");
+        String dateString = extractAfter(command, "d/");
+
+        if (weightString.isEmpty() || dateString.isEmpty()) {
+            uiHandler.showMessage("Invalid input. Correct format: /add_weight w/WEIGHT d/DATE");
+            return;
+        }
 
         try {
-            double weight = Double.parseDouble(weightStr);
-            LocalDate date = LocalDate.parse(dateStr, DateTimeFormatter.ofPattern("dd/MM/yy"));
+            double weightValue = Double.parseDouble(weightString);
+            LocalDate entryDate = LocalDate.parse(dateString, DATE_FORMAT);
 
-            WeightRecord record = new WeightRecord(weight, date);
-            person.addWeightRecord(record);
-            ui.showMessage("Recorded new weight: " + record);
+            WeightRecord weightRecord = new WeightRecord(weightValue, entryDate);
+            currentUser.addWeightRecord(weightRecord);
+            uiHandler.showMessage("New weight recorded: " + weightRecord);
+
+        } catch (NumberFormatException nfe) {
+            uiHandler.showMessage("Invalid weight. Please enter a number.");
+        } catch (DateTimeParseException dtpe) {
+            uiHandler.showMessage("Invalid date format. Use dd/MM/yy.");
         } catch (Exception e) {
-            ui.showMessage("Invalid format. Example: /add_weight w/81.5 d/19/10/25");
+            uiHandler.showMessage("Unexpected error: " + e.getMessage());
         }
     }
 
     /**
-     * Displays all weight records for the person to the console.
+     * Displays all weight records for the person.
      */
     public void viewWeights() {
-        person.displayWeightHistory();
+        currentUser.displayWeightHistory();
     }
 
-    /**
-     * Extracts a substring between two delimiters from the given text.
-     *
-     * @param text  The full string to extract from
-     * @param start The starting delimiter
-     * @param end   The ending delimiter
-     * @return The substring between the start and end delimiters, or empty string if not found
-     */
+    // ----------------- Helper methods -----------------
+
     private String extractBetween(String text, String start, String end) {
-        int startIndex = text.indexOf(start) + start.length();
+        int startIndex = text.indexOf(start);
         int endIndex = text.indexOf(end);
-        if (startIndex < start.length() || endIndex == -1) {
+        if (startIndex == -1 || endIndex == -1 || startIndex + start.length() >= endIndex) {
             return "";
         }
-        return text.substring(startIndex, endIndex);
+        return text.substring(startIndex + start.length(), endIndex).trim();
+    }
+
+    private String extractAfter(String text, String start) {
+        int startIndex = text.indexOf(start);
+        if (startIndex == -1 || startIndex + start.length() >= text.length()) {
+            return "";
+        }
+        return text.substring(startIndex + start.length()).trim();
     }
 }
