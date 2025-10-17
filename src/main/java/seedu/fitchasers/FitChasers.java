@@ -54,7 +54,10 @@ public class FitChasers {
 
         while (isRunning) {
             String input = ui.readCommand();
-            if (input == null || input.trim().isEmpty()) {
+            if (input == null) {
+                break;
+            }
+            if (input.trim().isEmpty()) {
                 continue;
             }
 
@@ -67,6 +70,24 @@ public class FitChasers {
                 case "/help":
                     ui.showHelp();
                     break;
+
+                case "/my_name": {
+                    if (argumentStr == null || !argumentStr.startsWith("n/")) {
+                        ui.showMessage("Usage: /my_name n/YourName");
+                        ui.showDivider();
+                        break;
+                    }
+                    String newName = argumentStr.substring(2).trim();
+                    if (newName.isEmpty()) {
+                        ui.showMessage("Usage: /my_name n/YourName");
+                        ui.showDivider();
+                        break;
+                    }
+                    person.setName(newName);
+                    ui.showMessage("Alright, I'll call you " + newName + " from now on.");
+                    ui.showDivider();
+                    break;
+                }
 
                 case "/add_weight":
                     ui.showMessage("Logging your weight... don't lie to me!");
@@ -119,6 +140,7 @@ public class FitChasers {
                     break;
 
                 case "/del_workout":
+                    ui.showMessage("Deleting that workout? T.T Are you sure, bestie?");
                     // Format: /del_workout WORKOUT_NAME
                     workoutManager.deleteWorkout(argumentStr);
                     ui.showDivider();

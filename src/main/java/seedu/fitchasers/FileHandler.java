@@ -17,13 +17,13 @@ import java.util.List;
 /**
  * Handles the permanent storage of workout and exercise data.
  * Saves to and loads from: data/save.txt
- *
+ * <p>
  * If the "data" folder does not exist, it will be created automatically.
- *
+ * <p>
  * File format:
  * Each workout starts with "WORKOUT" and ends with "END_WORKOUT".
  * Exercises are listed between, with all set repetitions joined by commas.
- *
+ * <p>
  * Example:
  * WORKOUT | Chest Day | 45
  * EXERCISE | Push Ups | 15,15,12
@@ -35,6 +35,8 @@ public class FileHandler {
 
     private static final Path DATA_DIR = Paths.get("data", "workouts");
     private final UI ui = new UI();
+
+
 
     /**
      * Ensures that the save file and its parent directory exist.
