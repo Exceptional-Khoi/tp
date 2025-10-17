@@ -9,9 +9,10 @@ import java.time.format.DateTimeParseException;
  */
 public class WeightManager {
 
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yy");
+
     private final Person person;
     private final UI ui = new UI();
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yy");
 
     public WeightManager(Person person) {
         this.person = person;
@@ -61,13 +62,17 @@ public class WeightManager {
     private String getBetween(String text, String start, String end) {
         int s = text.indexOf(start);
         int e = text.indexOf(end);
-        if (s == -1 || e == -1 || s + start.length() >= e) return "";
+        if (s == -1 || e == -1 || s + start.length() >= e) {
+            return "";
+        }
         return text.substring(s + start.length(), e).trim();
     }
 
     private String getAfter(String text, String start) {
         int s = text.indexOf(start);
-        if (s == -1 || s + start.length() >= text.length()) return "";
+        if (s == -1 || s + start.length() >= text.length()) {
+            return "";
+        }
         return text.substring(s + start.length()).trim();
     }
 }
