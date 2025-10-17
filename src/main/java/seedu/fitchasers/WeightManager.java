@@ -9,13 +9,13 @@ import java.time.format.DateTimeParseException;
  */
 public class WeightManager {
 
-    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yy");
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
 
-    private final Person person;
-    private final UI ui = new UI();
+    private final Person currentUser;
+    private final UI uiHandler = new UI();
 
     public WeightManager(Person person) {
-        this.person = person;
+        this.currentUser = person;
     }
 
     /**
@@ -25,54 +25,54 @@ public class WeightManager {
      * @param command full command string containing weight and date
      */
     public void addWeight(String command) {
-        String weightPart = getBetween(command, "w/", "d/");
-        String datePart = getAfter(command, "d/");
+        String weightString = extractBetween(command, "w/", "d/");
+        String dateString = extractAfter(command, "d/");
 
-        if (weightPart.isEmpty() || datePart.isEmpty()) {
-            ui.showMessage("Invalid input. Correct format: /add_weight w/WEIGHT d/DATE");
+        if (weightString.isEmpty() || dateString.isEmpty()) {
+            uiHandler.showMessage("Invalid input. Correct format: /add_weight w/WEIGHT d/DATE");
             return;
         }
 
         try {
-            double weight = Double.parseDouble(weightPart);
-            LocalDate date = LocalDate.parse(datePart, FORMATTER);
+            double weightValue = Double.parseDouble(weightString);
+            LocalDate entryDate = LocalDate.parse(dateString, DATE_FORMAT);
 
-            WeightRecord record = new WeightRecord(weight, date);
-            person.addWeightRecord(record);
-            ui.showMessage("New weight recorded: " + record);
+            WeightRecord weightRecord = new WeightRecord(weightValue, entryDate);
+            currentUser.addWeightRecord(weightRecord);
+            uiHandler.showMessage("New weight recorded: " + weightRecord);
 
         } catch (NumberFormatException nfe) {
-            ui.showMessage("Invalid weight. Please enter a number.");
+            uiHandler.showMessage("Invalid weight. Please enter a number.");
         } catch (DateTimeParseException dtpe) {
-            ui.showMessage("Invalid date format. Use dd/MM/yy.");
+            uiHandler.showMessage("Invalid date format. Use dd/MM/yy.");
         } catch (Exception e) {
-            ui.showMessage("Unexpected error: " + e.getMessage());
+            uiHandler.showMessage("Unexpected error: " + e.getMessage());
         }
     }
 
     /**
-     * Prints all recorded weights.
+     * Displays all weight records for the person.
      */
     public void viewWeights() {
-        person.displayWeightHistory();
+        currentUser.displayWeightHistory();
     }
 
-    // ----------------- Utility methods -----------------
+    // ----------------- Helper methods -----------------
 
-    private String getBetween(String text, String start, String end) {
-        int s = text.indexOf(start);
-        int e = text.indexOf(end);
-        if (s == -1 || e == -1 || s + start.length() >= e) {
+    private String extractBetween(String text, String start, String end) {
+        int startIndex = text.indexOf(start);
+        int endIndex = text.indexOf(end);
+        if (startIndex == -1 || endIndex == -1 || startIndex + start.length() >= endIndex) {
             return "";
         }
-        return text.substring(s + start.length(), e).trim();
+        return text.substring(startIndex + start.length(), endIndex).trim();
     }
 
-    private String getAfter(String text, String start) {
-        int s = text.indexOf(start);
-        if (s == -1 || s + start.length() >= text.length()) {
+    private String extractAfter(String text, String start) {
+        int startIndex = text.indexOf(start);
+        if (startIndex == -1 || startIndex + start.length() >= text.length()) {
             return "";
         }
-        return text.substring(s + start.length()).trim();
+        return text.substring(startIndex + start.length()).trim();
     }
 }
