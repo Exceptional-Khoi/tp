@@ -95,6 +95,5 @@ public class FileHandler {
             throw new IOException("Workout class not found when reading file. " +
                     "Something might've corrupted it", e);
         }
-        ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
     }
 }
