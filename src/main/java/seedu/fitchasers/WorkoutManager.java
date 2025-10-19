@@ -16,13 +16,9 @@ import java.time.temporal.ChronoUnit;
  */
 public class WorkoutManager {
     private static final int ARRAY_OFFSET = 1;
-    private ArrayList<Workout> workouts = new ArrayList<>();
+    private final ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
-
-    public void setWorkouts(ArrayList<Workout> workouts) {
-        this.workouts = workouts;
-    }
 
     /**
      * Creates and adds a new workout to the list.
@@ -104,10 +100,6 @@ public class WorkoutManager {
         return text.substring(index + token.length()).trim();
     }
 
-    public int getWorkoutSize() {
-        return workouts.size();
-    }
-
     /**
      * Returns all workouts.
      *
@@ -128,12 +120,14 @@ public class WorkoutManager {
                 Scanner scanner = new Scanner(System.in);
                 ui.showMessage("Deleting " + w.getWorkoutName() + " | " +
                         w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type y/yes to confirm)");
-                if (ui.confirmationMessage()) {
+                String confirmation = scanner.nextLine().trim().toLowerCase();
+                if (confirmation.equals("y") || confirmation.equals("yes")) {
                     workouts.remove(w);
                     ui.showMessage("Workout deleted successfully! 💪");
                 } else {
                     ui.showMessage("Okay, I didn’t delete it. 🫶");
                 }
+                ui.showDivider();
                 return;
             }
         }
