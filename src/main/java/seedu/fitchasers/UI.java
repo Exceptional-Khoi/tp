@@ -35,18 +35,15 @@ public class UI {
      */
     public String readCommand() {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
-        if (!scanner.hasNextLine()) {
-            // Running non-interactive (CI) — return empty command to avoid exception.
+        String input = scanner.nextLine();
+        if (input == null || input.equals("")) {
             return "";
         }
-        return scanner.nextLine().trim();
+        return input.trim();
     }
 
     public String promptForName() {
         System.out.print(MAGENTA + "Enter your name: " + RESET);
-        if (!scanner.hasNextLine()) {
-            return "";
-        }
         return scanner.nextLine().trim();
     }
 
