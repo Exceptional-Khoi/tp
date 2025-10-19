@@ -1,12 +1,11 @@
 package seedu.fitchasers;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  * Represents an exercise with a name and multiple sets, each having a number of reps.
  */
-public class Exercise implements Serializable {
+public class Exercise {
     private final String name;
     private final ArrayList<Integer> sets; // each element = reps for one set
 
