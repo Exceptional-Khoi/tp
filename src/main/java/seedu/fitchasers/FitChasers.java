@@ -27,11 +27,11 @@ public class FitChasers {
         Scanner scanner = new Scanner(System.in);
 
         // Attempt to load persistent data
-        try {
-            fileHandler.loadFileContentArray(workoutManager, person);
-        } catch (IOException e) {
-            ui.showError("Could not load saved data. Starting fresh!");
-        }
+        //try {
+            //fileHandler.loadFileContentArray(workoutManager, person);
+        //} catch (IOException e) {
+            //ui.showError("Could not load saved data. Starting fresh!");
+        //}
 
         ui.showGreeting();
 
@@ -129,12 +129,12 @@ public class FitChasers {
 
                 case "/exit":
                     ui.showMessage("Saving your progress...");
-                    try {
+                    /*try {
                         fileHandler.saveFile(person, workoutManager.getWorkouts());
                         ui.showExitMessage();
                     } catch (IOException e) {
                         ui.showError("Failed to save workouts before exit.");
-                    }
+                    }*/
                     isRunning = false;
                     break;
 
