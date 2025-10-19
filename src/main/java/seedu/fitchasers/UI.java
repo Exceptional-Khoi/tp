@@ -133,13 +133,4 @@ public class UI {
         System.out.println(WHITE_BOLD
                 + "--------------------------------------------------" + RESET);
     }
-
-    public boolean confirmationMessage() {
-        if (!scanner.hasNextLine()) {
-            // Default to 'no' if no input is available.
-            return false;
-        }
-        String confirmation = scanner.nextLine().trim().toLowerCase();
-        return confirmation.equals("y") || confirmation.equals("yes");
-    }
 }
