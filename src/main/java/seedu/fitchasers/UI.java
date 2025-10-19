@@ -37,7 +37,7 @@ public class UI {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
         if (!scanner.hasNextLine()) {
             // no more input (EOF)
-            return "";
+            return null;
         }
 
         String input = scanner.nextLine();
