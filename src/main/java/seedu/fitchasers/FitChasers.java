@@ -1,6 +1,6 @@
 package seedu.fitchasers;
 
-import java.io.IOException;
+//import java.io.IOException;
 import java.util.Scanner;
 
 
@@ -30,7 +30,7 @@ public class FitChasers {
         //try {
             //fileHandler.loadFileContentArray(workoutManager, person);
         //} catch (IOException e) {
-            //ui.showError("Could not load saved data. Starting fresh!");
+        //ui.showError("Could not load saved data. Starting fresh!");
         //}
 
         ui.showGreeting();
