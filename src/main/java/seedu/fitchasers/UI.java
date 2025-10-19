@@ -35,6 +35,11 @@ public class UI {
      */
     public String readCommand() {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
+        if (!scanner.hasNextLine()) {
+            // no more input (EOF)
+            return "";
+        }
+
         String input = scanner.nextLine();
         if (input == null || input.isEmpty()) {
             return "";
@@ -42,10 +47,11 @@ public class UI {
         return input.trim();
     }
 
-    public String promptForName() {
+
+    /*public String promptForName() {
         System.out.print(MAGENTA + "Enter your name: " + RESET);
         return scanner.nextLine().trim();
-    }
+    }*/
 
     /**
      * Displays a standard informational message in green color,
