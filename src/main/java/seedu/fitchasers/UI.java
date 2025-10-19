@@ -35,11 +35,18 @@ public class UI {
      */
     public String readCommand() {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
+        if (!scanner.hasNextLine()) {
+            // Running non-interactive (CI) — return empty command to avoid exception.
+            return "";
+        }
         return scanner.nextLine().trim();
     }
 
     public String promptForName() {
         System.out.print(MAGENTA + "Enter your name: " + RESET);
+        if (!scanner.hasNextLine()) {
+            return "";
+        }
         return scanner.nextLine().trim();
     }
 
@@ -125,5 +132,14 @@ public class UI {
     public void showDivider() {
         System.out.println(WHITE_BOLD
                 + "--------------------------------------------------" + RESET);
+    }
+
+    public boolean confirmationMessage() {
+        if (!scanner.hasNextLine()) {
+            // Default to 'no' if no input is available.
+            return false;
+        }
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+        return confirmation.equals("y") || confirmation.equals("yes");
     }
 }
