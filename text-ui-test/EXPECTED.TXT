@@ -6,4 +6,4 @@
 [36mType [1;37m/help[36m to explore all available commands![0m
 [36mLet's crush your fitness goals together![0m
 [1;37m--------------------------------------------------[0m
-[35mEnter command[0m > 
+[35mEnter command[0m >
