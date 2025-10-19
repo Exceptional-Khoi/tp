@@ -1,3 +1,6 @@
+[35m[Oops!] [0mSeems like this is a new month!
+ Would you like to create new workouts for this month? (Y/N)
+[1;37mSaved 0 workouts for 2025-10.[0m
 [1;34m+------------------------------------------------------+
 |                      FITCHASER                       |
 +------------------------------------------------------+
