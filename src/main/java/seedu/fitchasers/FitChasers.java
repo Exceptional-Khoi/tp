@@ -28,7 +28,7 @@ public class FitChasers {
 
         // Attempt to load persistent data
         //try {
-            //fileHandler.loadFileContentArray(workoutManager, person);
+        //fileHandler.loadFileContentArray(workoutManager, person);
         //} catch (IOException e) {
         //ui.showError("Could not load saved data. Starting fresh!");
         //}
