@@ -31,6 +31,7 @@ public class FitChasers {
         WeightManager weightManager = new WeightManager(person);
         Scanner scanner = new Scanner(System.in);
         YearMonth currentMonth = YearMonth.now();
+        ViewLog viewLog;
 
         // Attempt to load persistent datai by month
         // #TODO add select month #TODO need to add seperate month to current month check!
@@ -47,8 +48,7 @@ public class FitChasers {
         }catch(IOException e) {
             ui.showError(e.getMessage());
         }
-
-
+        viewLog = new ViewLog(ui,workoutManager);
         ui.showGreeting();
 
         boolean isRunning = true;
@@ -132,8 +132,11 @@ public class FitChasers {
                     break;
 
                 case "/view_log":
-                    ui.showMessage("Here's your workout glow-up history!");
-                    workoutManager.viewWorkouts();
+                    try{
+                        viewLog.render(argumentStr,false);
+                    }catch (IndexOutOfBoundsException e){
+                        ui.showError(e.getMessage());
+                    }
                     ui.showDivider();
                     break;
 
