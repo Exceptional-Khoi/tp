@@ -10,7 +10,7 @@ import java.util.Locale;
 import java.util.Optional;
 
 public class ViewLog {
-    public  static final int MINIMUN_PAGE_SIZE = 1;
+    public  static final int MINIMUM_PAGE_SIZE = 1;
     private final UI ui;                         // your existing UI class
     private final WorkoutManager workoutManager;
     private int pageSize = 10;
@@ -205,8 +205,8 @@ public class ViewLog {
 
     private int ensureValidPage(int page) {
         int totalPages = computeTotalPages(this.workoutManager.getWorkoutSize(), pageSize);
-        if (page < MINIMUN_PAGE_SIZE) {
-            return MINIMUN_PAGE_SIZE;
+        if (page < MINIMUM_PAGE_SIZE) {
+            return MINIMUM_PAGE_SIZE;
         }
         return Math.min(page, totalPages);
     }
