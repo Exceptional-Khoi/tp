@@ -1,5 +1,6 @@
 package seedu.fitchasers;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.Objects;
  * Represents a person using the FitChasers app.
  * Stores the person's name and their weight history.
  */
-public class Person {
+public class Person implements Serializable {
 
     /** The name of the person */
     private String name;

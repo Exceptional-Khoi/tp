@@ -1,4 +1,6 @@
-[1;37mLoaded 0 workout(s) from file.[0m
+[35m[Oops!] [0mSeems like this is a new month!
+ Would you like to create new workouts for this month? (Y/N)
+[1;37mSaved 0 workouts for 2025-10.[0m
 [1;34m+------------------------------------------------------+
 |                      FITCHASER                       |
 +------------------------------------------------------+
@@ -7,38 +9,4 @@
 [36mType [1;37m/help[36m to explore all available commands![0m
 [36mLet's crush your fitness goals together![0m
 [1;37m--------------------------------------------------[0m
-[35mEnter command[0m > [1;37mNew workout sesh incoming![0m
-[1;37mAdded workout: swimming[0m
-[1;37m--------------------------------------------------[0m
-[35mEnter command[0m > [1;37mAdding that spicy new exercise![0m
-[1;37mAdded exercise:
-lap:
-Set 1 -> Reps: 10
-[0m
-[1;37m--------------------------------------------------[0m
-[35mEnter command[0m > [1;37mAdding that spicy new exercise![0m
-[1;37mAdded exercise:
-lap:
-Set 1 -> Reps: 10
-[0m
-[1;37m--------------------------------------------------[0m
-[35mEnter command[0m > [1;37mHere's your workout glow-up history![0m
-[1;37m------------------------------------------------[0m
-[1;37m[1]: swimming | 0 Min[0m
-[1;37m     Exercise 1. lap [1 sets][0m
-[1;37m         Set 1 -> Reps: 10[0m
-[1;37m     Exercise 2. lap [1 sets][0m
-[1;37m         Set 1 -> Reps: 10[0m
-[1;37m--------------------------------------------------[0m
-[35mEnter command[0m > [1;37mWorkout wrapped! Time to refuel![0m
-[1;37mWorkout 'swimming' ended. Duration: 60 minute(s).[0m
-[1;37m--------------------------------------------------[0m
-[35mEnter command[0m > [1;37mHere's your workout glow-up history![0m
-[1;37m------------------------------------------------[0m
-[1;37m[1]: swimming | 60 Min[0m
-[1;37m     Exercise 1. lap [1 sets][0m
-[1;37m         Set 1 -> Reps: 10[0m
-[1;37m     Exercise 2. lap [1 sets][0m
-[1;37m         Set 1 -> Reps: 10[0m
-[1;37m--------------------------------------------------[0m
-[35mEnter command[0m > 
+[35mEnter command[0m >

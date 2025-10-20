@@ -35,14 +35,31 @@ public class UI {
      */
     public String readCommand() {
         System.out.print(MAGENTA + "Enter command" + RESET + " > ");
-        return scanner.nextLine().trim();
+        if (!scanner.hasNextLine()) {
+            // no more input (EOF)
+            return null;
+        }
+
+        String input = scanner.nextLine();
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+        return input.trim();
     }
 
     public String promptForName() {
-        System.out.print(MAGENTA + "Enter your name: " + RESET);
-        return scanner.nextLine().trim();
-    }
+        System.out.print(MAGENTA + "Enter your name: " + RESET + " > ");
+        if (!scanner.hasNextLine()) {
+            // no more input (EOF)
+            return null;
+        }
 
+        String input = scanner.nextLine();
+        if (input == null || input.isEmpty()) {
+            return "";
+        }
+        return input.trim();
+    }
     /**
      * Displays a standard informational message in green color,
      * followed by a divider for readability.
@@ -125,5 +142,14 @@ public class UI {
     public void showDivider() {
         System.out.println(WHITE_BOLD
                 + "--------------------------------------------------" + RESET);
+    }
+
+    public boolean confirmationMessage() {
+        if (!scanner.hasNextLine()) {
+            // Default to 'no' if no input is available.
+            return false;
+        }
+        String confirmation = scanner.nextLine().trim().toLowerCase();
+        return confirmation.equals("y") || confirmation.equals("yes");
     }
 }
