@@ -40,15 +40,31 @@ public class DefaultTagger implements Tagger {
         Set<String> tags = new LinkedHashSet<>();
 
         // Modality
-        MODALITY.forEach((keyword, tag) -> { if (text.contains(keyword)) tags.add(tag); });
+        MODALITY.forEach((keyword, tag) -> {
+            if (text.contains(keyword)){
+                tags.add(tag);
+            }
+        });
 
         // Muscle groups (can add multiple)
-        MUSCLES.forEach((keyword, tag) -> { if (text.contains(keyword)) tags.add(tag); });
+        MUSCLES.forEach((keyword, tag) -> {
+            if (text.contains(keyword)){
+                tags.add(tag);
+            }
+        });
 
         // Higher-level patterns
-        if (text.contains("push")) tags.add("push");
-        if (text.contains("pull")) tags.add("pull");
-        if (text.contains("leg day")) tags.add("legs");
+        if (text.contains("push")){
+            tags.add("push");
+        }
+
+        if (text.contains("pull")){
+            tags.add("pull");
+        }
+
+        if (text.contains("leg day")){
+            tags.add("legs");
+        }
 
         return tags;
     }
