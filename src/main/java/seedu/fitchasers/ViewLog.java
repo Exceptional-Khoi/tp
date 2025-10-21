@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.Locale;
 
 public class ViewLog {
-    public  static final int MINIMUM_PAGE_SIZE = 1;
+    public static final int MINIMUM_PAGE_SIZE = 1;
     public static final int ARRAY_INDEX_OFFSET = 1;
+    public static final int DETAILED_ARG_CONST = 3;
     private static UI ui = new UI();                         // your existing UI class
     private final WorkoutManager workoutManager;
     private int pageSize = 10;
-    private final int DETAILED_ARG_CONST = 3;
 
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
     private List<Workout> lastFilteredSorted = List.of();

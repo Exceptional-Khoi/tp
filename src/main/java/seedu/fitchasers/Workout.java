@@ -13,14 +13,14 @@ import java.util.Set;
  * Represents a workout session containing a name, duration, start/end times, and a list of exercises.
  */
 public class Workout implements Serializable {
+    private static final UI ui = new UI();
+    private final ArrayList<Exercise> exercises = new ArrayList<>();
     private String workoutName;
     private int duration = 0;
     private LocalDateTime workoutStartDateTime;
     private LocalDateTime workoutEndDateTime;
-    private final ArrayList<Exercise> exercises = new ArrayList<>();
     private Exercise currentExercise = null;
     private Set<String> tags = new LinkedHashSet<>();   // multiple tags
-    private static final UI ui = new UI();
 
     public Workout(String workoutName, int duration) {
         this.workoutName = workoutName;
