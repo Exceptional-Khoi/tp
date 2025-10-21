@@ -1,6 +1,8 @@
 package seedu.fitchasers;
 
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.Set;
 
 /**
  * The {@code UI} class handles all user interactions for the FitChaser application.
@@ -151,5 +153,76 @@ public class UI {
         }
         String confirmation = scanner.nextLine().trim().toLowerCase();
         return confirmation.equals("y") || confirmation.equals("yes");
+    }
+
+    /**
+     * Displays detailed information about a given workout.
+     *
+     * @param workout The workout to display.
+     */
+    public void displayDetailsOfWorkout(Workout workout) {
+        if (workout == null) {
+            showMessage("No workout found to display.");
+            return;
+        }
+
+        showDivider();
+        showMessage("Here you go bestie! These are the workout details!");
+        showDivider();
+
+        // Basic info
+        showMessage("Name       : " + workout.getWorkoutName());
+        showMessage("Date       : " + workout.getWorkoutDateString());
+
+        // Duration formatting
+        int totalMinutes = workout.getDuration();
+        int hours = totalMinutes / 60;
+        int minutes = totalMinutes % 60;
+        String durationStr = (hours > 0)
+                ? String.format("%dh %dm", hours, minutes)
+                : String.format("%dm", minutes);
+        showMessage("Duration   : " + durationStr);
+
+        // Time details
+        if (workout.getWorkoutStartDateTime() != null && workout.getWorkoutEndDateTime() != null) {
+            showMessage("Start Time : " + workout.getWorkoutStartDateTime());
+            showMessage("End Time   : " + workout.getWorkoutEndDateTime());
+        }
+
+        // Tags
+        Set<String> tags = workout.getTags();
+        if (tags != null && !tags.isEmpty()) {
+            showMessage("Tags       : " + String.join(", ", tags));
+        } else {
+            showMessage("Tags       : -");
+        }
+
+        // Exercises
+        ArrayList<Exercise> exercises = workout.getExercises();
+        if (exercises.isEmpty()) {
+            showMessage("Exercises  : (none added)");
+        } else {
+            showMessage("Exercises  : ");
+            int i = 1;
+            for (Exercise e : exercises) {
+                showMessage(String.format("  %d. %s", i++, e.toString()));
+            }
+        }
+
+        showDivider();
+    }
+
+
+
+    static String getDaySuffix(int day) {
+        if (day >= 11 && day <= 13) {
+            return "th";
+        }
+        return switch (day % 10) {
+            case 1 -> "st";
+            case 2 -> "nd";
+            case 3 -> "rd";
+            default -> "th";
+        };
     }
 }

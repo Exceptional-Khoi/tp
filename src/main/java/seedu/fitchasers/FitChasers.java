@@ -132,6 +132,7 @@ public class FitChasers {
                     ui.showDivider();
                     break;
 
+                case "vl":
                 case "/view_log":
                     try{
                         viewLog.render(argumentStr); //#TODO select detailed or not
@@ -141,6 +142,9 @@ public class FitChasers {
                     ui.showDivider();
                     break;
 
+                case "/open":
+                    viewLog.openByIndex(Integer.parseInt(argumentStr));
+                    break;
                 case "/del_workout":
                     // Format: /del_workout WORKOUT_NAME
                     if(argumentStr.isEmpty()){
