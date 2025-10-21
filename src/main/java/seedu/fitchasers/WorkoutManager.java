@@ -46,10 +46,16 @@ public class WorkoutManager {
             workoutName = command.substring(nIndex + 2).trim();
         }
 
-        String dateStr = extractBetween(command, "d/", "t/").trim();
+        String dateStr = "";
+        if (command.contains("d/")) {
+            String[] dateTokens = extractAfter(command, "d/").split("\\s+");
+            dateStr = dateTokens[0].trim();
+        }
+
         String timeStr = "";
         if (command.contains("t/")) {
-            timeStr = command.substring(command.indexOf("t/") + 2).trim();
+            String[] timeTokens = extractAfter(command, "t/").split("\\s+");
+            timeStr = timeTokens[0].trim();
         }
 
         if(dateStr.isEmpty()) {
