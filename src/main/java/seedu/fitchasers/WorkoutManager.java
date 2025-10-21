@@ -147,6 +147,33 @@ public class WorkoutManager {
         ui.showMessage("Workout not found: " + name);
     }
 
+    public void deleteWorkoutByIndex(int index) {
+        if(index < 0 || index >= workouts.size()) {
+            ui.showMessage("Invalid workout index: " + index + "Please try again.:(");
+            return;
+        }
+        Workout w = workouts.get(index);
+        ui.showMessage("Deleting " + w.getWorkoutName() + " | " + w.getWorkoutName() + "|");
+        ui.showMessage("You sure you want to delete this?(y/n)");
+        if(ui.confirmationMessage()) {
+            ui.showMessage("Deleted workout: " + w.getWorkoutName());
+            workouts.remove(index);
+        }else{
+            ui.showMessage("Okay, deletion aborted.");
+        }
+    }
+
+    private ArrayList<Workout> getWorkoutsByDate(LocalDate date) {
+        ArrayList<Workout> filteredWorkout = new ArrayList<>();
+        for (Workout w : workouts) {
+            LocalDateTime startDateTime = w.getWorkoutStartDateTime();
+            if (startDateTime != null && startDateTime.toLocalDate().equals(date)) {
+                filteredWorkout.add(w);
+            }
+        }
+        return filteredWorkout;
+    }
+
     /**
      * Adds an exercise to the current workout.
      *
@@ -246,6 +273,69 @@ public class WorkoutManager {
                     }
                 }
             }
+        }
+    }
+
+    public void showWorkoutsWIthIndices(ArrayList<Workout> list) {
+        if(list.isEmpty()) {
+            ui.showMessage("No workouts recorded for this selection!");
+            return;
+        }
+        for (int i = 0; i < list.size(); i++) {
+            Workout w = list.get(i);
+            ui.showMessage((i+1) + ". " + w.getWorkoutName() + " - " + w.getWorkoutDateString());
+        }
+    }
+
+    public void interactiveDeleteWorkout(String command, Scanner scanner) {
+        ArrayList<Workout> targetList = workouts;
+
+        if(command.contains("d/")){
+            String dateStr = extractAfter(command, "d/").trim();
+            String[] dateTokens = dateStr.split("\\s+");
+            String datePart = dateTokens[0];
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
+            try {
+                LocalDate date = LocalDate.parse(datePart, formatter);
+                targetList = getWorkoutsByDate(date);
+            } catch (Exception e) {
+                ui.showError("Invalid date format! (Use d/DD/MM/YY)");
+                return;
+            }
+        }
+
+        if (targetList.isEmpty()) {
+            ui.showMessage("No workouts found for the given date.");
+            return;
+        }
+
+        showWorkoutsWIthIndices(targetList);
+        ui.showMessage("Enter the number/numbers of the workout to be deleted:");
+        ui.showMessage("> ");
+        String selection = scanner.nextLine().trim();
+
+        String[] tokens = selection.split("\\s+");
+        ArrayList<Integer> indicesToDelete = new ArrayList<>();
+        for(String token :tokens){
+            try{
+                int index = Integer.parseInt(token) - 1;
+                if(index >= 0 && index < targetList.size()){
+                    indicesToDelete.add(index);
+                }
+            }catch(NumberFormatException ignored){
+                ui.showError("An unexpected error occurred: " + ignored.getMessage());
+            }
+        }
+
+        if(indicesToDelete.isEmpty()) {
+            ui.showMessage("No valid indices entered. Nothing deleted.");
+            return;
+        }
+
+        for(int i = indicesToDelete.size() - 1; i >= 0; i--) {
+            Workout w = targetList.get(indicesToDelete.get(i));
+            workouts.remove(w);
+            ui.showMessage("Delete: " + w.getWorkoutName());
         }
     }
 

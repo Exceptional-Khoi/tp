@@ -2,6 +2,7 @@ package seedu.fitchasers;
 
 //import java.io.IOException;
 import seedu.fitchasers.exceptions.FileNonexistent;
+import seedu.fitchasers.exceptions.InvalidCommandException;
 
 import java.io.IOException;
 import java.time.YearMonth;
@@ -64,7 +65,7 @@ public class FitChasers {
 
             String[] parts = input.trim().split("\\s+", 2);
             String command = parts[0].toLowerCase();
-            String argumentStr = (parts.length > 1) ? parts[1] : "";
+            String argumentStr = (parts.length > 1) ? parts[1].trim() : "";
 
             try {
                 switch (command) {
@@ -142,8 +143,14 @@ public class FitChasers {
 
                 case "/del_workout":
                     // Format: /del_workout WORKOUT_NAME
-                    workoutManager.deleteWorkout(argumentStr);
-                    ui.showDivider();
+                    if(argumentStr.isEmpty()){
+                        throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
+                                "Please enter a valid command.");
+                    } else if (argumentStr.contains("d/")) {
+                        workoutManager.interactiveDeleteWorkout(argumentStr, scanner);
+                    } else{
+                        workoutManager.deleteWorkout(argumentStr);
+                    }
                     break;
 
                 case "/exit":
