@@ -14,6 +14,7 @@ public class ViewLog {
     private final UI ui;                         // your existing UI class
     private final WorkoutManager workoutManager;
     private int pageSize = 10;
+    private final int DETAILED_ARG_CONST = 3;
 
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
     private List<Workout> lastFilteredSorted = List.of();
@@ -30,9 +31,15 @@ public class ViewLog {
     /* ----------------------------- Core renderers ----------------------------- */
 
     /** Renders a month’s workouts with pagination. Sorting: newest first. */
-    public void render(String requestedPage, boolean detailed) throws InvalidArgumentInput {
+    public void render(String requestedPage) throws InvalidArgumentInput {
+        boolean detailed = false;
+        int requestedPageNumber;
+
+        if(requestedPage.contains("-d")){
+            detailed = true;
+            requestedPage = requestedPage.substring (requestedPage.indexOf("/d") + DETAILED_ARG_CONST);
+        }
         List<Workout> sortedArray = new ArrayList<>(workoutManager.getWorkouts());
-        int requestedPageNumber = 1;
         sortedArray.sort(Comparator.comparing(Workout::getWorkoutEndDateTime).reversed());
         this.lastFilteredSorted = sortedArray; // store for /open <n>
         try{

@@ -133,7 +133,7 @@ public class FitChasers {
 
                 case "/view_log":
                     try{
-                        viewLog.render(argumentStr,true); //#TODO select detailed or not
+                        viewLog.render(argumentStr); //#TODO select detailed or not
                     }catch (IndexOutOfBoundsException e){
                         ui.showError(e.getMessage());
                     }
