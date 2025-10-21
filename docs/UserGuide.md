@@ -71,7 +71,7 @@ Design Considerations
   * Cons: Requires correct date format.
 
 UML Sequence Design
-![Alt text](UML_del_workout.jpeg)
+![Alt text](diagrams/UML_del_workout.jpeg)
 ## FAQ
 
 **Q**: How do I transfer my data to another computer? 
