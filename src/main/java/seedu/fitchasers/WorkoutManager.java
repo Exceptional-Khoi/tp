@@ -1,5 +1,6 @@
 package seedu.fitchasers;
 
+import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -7,6 +8,7 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Set;
 
 /**
  * Manages workout sessions for the FitChasers application.
@@ -19,6 +21,7 @@ public class WorkoutManager {
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
+    private final Tagger tagger = new DefaultTagger();
 
     public void setWorkouts(ArrayList<Workout> workouts) {
         this.workouts = workouts;
@@ -51,11 +54,11 @@ public class WorkoutManager {
 
         if(dateStr.isEmpty()) {
             dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yy"));
-            ui.showMessage("You missed out the date! Using current date: " + dateStr);
+            ui.showMessage("No date input detected - Using current date: " + dateStr);
         }
         if(timeStr.isEmpty()) {
             timeStr = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmm"));
-            ui.showMessage("You missed out the time! Using current time: " + timeStr);
+            ui.showMessage("No date input detected - Using current time: " + timeStr);
         }
 
         String dateTimeStr = dateStr + " " + timeStr;
@@ -64,6 +67,10 @@ public class WorkoutManager {
         try {
             LocalDateTime workoutDateTime = LocalDateTime.parse(dateTimeStr, formatter);
             Workout newWorkout = new Workout(workoutName, workoutDateTime);
+            Set<String> mergedTags = new LinkedHashSet<>(newWorkout.getTags());
+            mergedTags.addAll(tagger.suggest(newWorkout));
+            newWorkout.setTags(mergedTags);
+
             workouts.add(newWorkout);
             currentWorkout = newWorkout;
             ui.showMessage("Added workout: " + workoutName);

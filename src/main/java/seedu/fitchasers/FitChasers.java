@@ -132,15 +132,19 @@ public class FitChasers {
                     ui.showDivider();
                     break;
 
+                case "vl":
                 case "/view_log":
                     try{
-                        viewLog.render(argumentStr,false);
+                        viewLog.render(argumentStr); //#TODO select detailed or not
                     }catch (IndexOutOfBoundsException e){
                         ui.showError(e.getMessage());
                     }
                     ui.showDivider();
                     break;
 
+                case "/open":
+                    viewLog.openByIndex(Integer.parseInt(argumentStr));
+                    break;
                 case "/del_workout":
                     // Format: /del_workout WORKOUT_NAME
                     if(argumentStr.isEmpty()){

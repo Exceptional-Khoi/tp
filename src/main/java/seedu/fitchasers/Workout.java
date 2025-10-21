@@ -5,18 +5,22 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.TextStyle;
+import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Represents a workout session containing a name, duration, start/end times, and a list of exercises.
  */
 public class Workout implements Serializable {
+    private static final UI ui = new UI();
+    private final ArrayList<Exercise> exercises = new ArrayList<>();
     private String workoutName;
     private int duration = 0;
     private LocalDateTime workoutStartDateTime;
     private LocalDateTime workoutEndDateTime;
-    private final ArrayList<Exercise> exercises = new ArrayList<>();
     private Exercise currentExercise = null;
+    private Set<String> tags = new LinkedHashSet<>();   // multiple tags
 
     public Workout(String workoutName, int duration) {
         this.workoutName = workoutName;
@@ -35,6 +39,13 @@ public class Workout implements Serializable {
         this.duration = calculateDuration();
     }
 
+    public Set<String> getTags() {
+        return tags == null ? Set.of() : tags;
+    }
+
+    public void setTags(Set<String> tags) {
+        this.tags = new LinkedHashSet<>(tags);
+    }
 
     public String getWorkoutName() {
         return workoutName;
@@ -108,22 +119,12 @@ public class Workout implements Serializable {
         String month = dateTime.getMonth()
                 .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
 
-        String suffix = getDaySuffix(dayOfMonth);
+        String suffix = UI.getDaySuffix(dayOfMonth);
 
         return String.format("%s %d%s of %s", dayOfWeek, dayOfMonth, suffix, month);
     }
 
-    private static String getDaySuffix(int day) {
-        if (day >= 11 && day <= 13) {
-            return "th";
-        }
-        return switch (day % 10) {
-        case 1 -> "st";
-        case 2 -> "nd";
-        case 3 -> "rd";
-        default -> "th";
-        };
-    }
+
 
     public void setWorkoutEndDateTime(LocalDateTime workoutEndDateTime) {
         this.workoutEndDateTime = workoutEndDateTime;
