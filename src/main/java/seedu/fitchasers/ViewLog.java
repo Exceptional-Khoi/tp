@@ -80,21 +80,20 @@ public class ViewLog {
         ui.showMessage(String.format("%-4d %-20s %-22s %-10s", id, date, name, dur));
     }
 
-    private void renderDetailedRow(int id, Workout w) {
-        String dateLong = formatLong(w.getWorkoutEndDateTime());   // e.g., Monday 30th of June, 6:00 PM
-        String dur = formatDuration(w.getDuration());
+    private void renderDetailedRow(int id, Workout workout) {
+        String dateLong = formatLong(workout.getWorkoutEndDateTime());   // e.g., Monday 30th of June, 6:00 PM
+        String dur = formatDuration(workout.getDuration());
 
         ui.showMessage("—".repeat(60));
-        ui.showMessage(String.format("#%d  %s", id, safe(w.getWorkoutName())));
+        ui.showMessage(String.format("#%d  %s", id, safe(workout.getWorkoutName())));
         ui.showMessage("Date     : " + dateLong);
         ui.showMessage("Duration : " + dur);
-        /*
-        String type = safe(w.getType());
-        String tags = getTagsJoined(w);                  // "-" if none
-        ui.showMessage("Type     : " + (type.isBlank() ? "-" : type));
+        //String type = safe(workout.getType());
+        String tags = workout.getTags().toString();                  // "-" if none
+        //ui.showMessage("Type     : " + (type.isBlank() ? "-" : type));
         ui.showMessage("Tags     : " + (tags.isBlank() ? "-" : tags));
         // Add more fields from Workout here (sets/reps, notes, RPE, etc.)
-        */
+
     }
 
     /* ------------------------------ Commands API ----------------------------- */
