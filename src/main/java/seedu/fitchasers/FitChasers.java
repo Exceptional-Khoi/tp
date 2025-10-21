@@ -142,8 +142,13 @@ public class FitChasers {
 
                 case "/del_workout":
                     // Format: /del_workout WORKOUT_NAME
-                    workoutManager.deleteWorkout(argumentStr);
-                    ui.showDivider();
+                    if(argumentStr.trim().isEmpty()){
+                        workoutManager.interactiveDeleteWorkout(" ", scanner);
+                    } else if (argumentStr.contains("d/")) {
+                        workoutManager.interactiveDeleteWorkout(argumentStr, scanner);
+                    } else{
+                      workoutManager.deleteWorkout(argumentStr.trim());
+                    }
                     break;
 
                 case "/exit":
