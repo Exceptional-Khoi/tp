@@ -315,7 +315,9 @@ public class WorkoutManager {
                 if(index >= 0 && index < targetList.size()){
                     indicesToDelete.add(index);
                 }
-            }catch(NumberFormatException ignored){}
+            }catch(NumberFormatException ignored){
+                ui.showError("An unexpected error occurred: " + ignored.getMessage());
+            }
         }
 
         if(indicesToDelete.isEmpty()) {

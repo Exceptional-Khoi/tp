@@ -147,7 +147,7 @@ public class FitChasers {
                     } else if (argumentStr.contains("d/")) {
                         workoutManager.interactiveDeleteWorkout(argumentStr, scanner);
                     } else{
-                      workoutManager.deleteWorkout(argumentStr.trim());
+                        workoutManager.deleteWorkout(argumentStr.trim());
                     }
                     break;
 
