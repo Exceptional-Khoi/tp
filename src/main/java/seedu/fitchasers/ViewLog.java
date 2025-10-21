@@ -11,7 +11,8 @@ import java.util.Optional;
 
 public class ViewLog {
     public  static final int MINIMUM_PAGE_SIZE = 1;
-    private final UI ui;                         // your existing UI class
+    public static final int ARRAY_INDEX_OFFSET = 1;
+    private static UI ui = new UI();                         // your existing UI class
     private final WorkoutManager workoutManager;
     private int pageSize = 10;
     private final int DETAILED_ARG_CONST = 3;
@@ -20,7 +21,7 @@ public class ViewLog {
     private List<Workout> lastFilteredSorted = List.of();
 
     public ViewLog(UI ui, WorkoutManager workoutManager) {
-        this.ui = ui;
+        ViewLog.ui = ui;
         this.workoutManager = workoutManager;
     }
 
@@ -43,7 +44,7 @@ public class ViewLog {
         sortedArray.sort(Comparator.comparing(Workout::getWorkoutEndDateTime).reversed());
         this.lastFilteredSorted = sortedArray; // store for /open <n>
         try{
-            if(requestedPage.equals("")){
+            if(requestedPage.isEmpty()){
                 requestedPage = "1";
             }
             requestedPageNumber = Integer.parseInt(requestedPage);
@@ -105,12 +106,12 @@ public class ViewLog {
 
     /* ------------------------------ Commands API ----------------------------- */
 
-    public Optional<Workout> openByIndex(int oneBasedIndex) {
-        int i = oneBasedIndex - 1;
+    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput {
+        int i = oneBasedIndex - ARRAY_INDEX_OFFSET;
         if (i < 0 || i >= lastFilteredSorted.size()) {
-            return Optional.empty();
+            throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again. ");
         }
-        return Optional.of(lastFilteredSorted.get(i));
+        ui.displayDetailsOfWorkout(lastFilteredSorted.get(i));
     }
 
     /*public List<Integer> searchByName(List<Workout> monthWorkouts, String query) {
@@ -238,16 +239,16 @@ public class ViewLog {
     }
 
     private static String formatDayMon(LocalDateTime dt) {
-        String dow = dt.getDayOfWeek().getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.ENGLISH);
+        String dow = dt.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
         int day = dt.getDayOfMonth();
-        String mon = dt.getMonth().getDisplayName(java.time.format.TextStyle.SHORT, java.util.Locale.ENGLISH);
+        String mon = dt.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
         return String.format("%s %d %s", dow, day, mon);
     }
 
     private static String formatLong(LocalDateTime dt) {
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int d = dt.getDayOfMonth();
-        String suffix = daySuffix(d);
+        String suffix = UI.getDaySuffix(d);
         String mon = dt.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int hr = dt.getHour();
         int min = dt.getMinute();
@@ -256,46 +257,5 @@ public class ViewLog {
         return String.format("%s %d%s of %s, %d:%02d %s", dow, d, suffix, mon, hr12, min, ampm);
     }
 
-    private static String daySuffix(int day) {
-        if (day >= 11 && day <= 13) {
-            return "th";
-        }
-        return switch (day % 10) {
-        case 1 -> "st";
-        case 2 -> "nd";
-        case 3 -> "rd";
-        default -> "th";
-        };
-    }
-
-    /*
-    private static String getTagsJoined(Workout w) {
-        Set<String> tags = getTags(w);
-        if (tags.isEmpty()) return "-";
-        return String.join(", ", tags);
-    }
-
-    // If you don't have tags yet, this stays empty. Once implemented, wire Workout#getTags().
-    private static Set<String> getTags(Workout w) {
-        Set<String> tags = w.getTags(); // if not implemented yet, return Set.of()
-        return tags == null ? Set.of() : tags;
-    }*/
-
-
-    /* ----------------------- Tag template (optional) ------------------------- */
-    /*
-    public static Set<String> suggestTags(Workout w) {
-        String name = safe(w.getWorkoutName()).toLowerCase(Locale.ENGLISH);
-        Set<String> tags = new LinkedHashSet<>();
-        if (name.matches(".*(squat|deadlift|bench|press|row).*")) tags.add("strength");
-        if (name.matches(".*(run|jog|treadmill|cycle|bike|swim|rower).*")) tags.add("cardio");
-        if (name.matches(".*(leg|squat|deadlift|calf|quad|hamstring).*")) tags.add("leg day");
-        if (name.matches(".*(push|bench|overhead|press|tricep).*")) tags.add("push");
-        if (name.matches(".*(pull|row|lat|bicep).*")) tags.add("pull");
-        // merge with existing user-provided tags
-        if (w.getTags() != null) tags.addAll(w.getTags());
-        return tags;
-    }
-    */
 }
 

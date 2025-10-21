@@ -20,6 +20,7 @@ public class Workout implements Serializable {
     private final ArrayList<Exercise> exercises = new ArrayList<>();
     private Exercise currentExercise = null;
     private Set<String> tags = new LinkedHashSet<>();   // multiple tags
+    private static final UI ui = new UI();
 
     public Workout(String workoutName, int duration) {
         this.workoutName = workoutName;
@@ -118,22 +119,12 @@ public class Workout implements Serializable {
         String month = dateTime.getMonth()
                 .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
 
-        String suffix = getDaySuffix(dayOfMonth);
+        String suffix = UI.getDaySuffix(dayOfMonth);
 
         return String.format("%s %d%s of %s", dayOfWeek, dayOfMonth, suffix, month);
     }
 
-    private static String getDaySuffix(int day) {
-        if (day >= 11 && day <= 13) {
-            return "th";
-        }
-        return switch (day % 10) {
-        case 1 -> "st";
-        case 2 -> "nd";
-        case 3 -> "rd";
-        default -> "th";
-        };
-    }
+
 
     public void setWorkoutEndDateTime(LocalDateTime workoutEndDateTime) {
         this.workoutEndDateTime = workoutEndDateTime;
