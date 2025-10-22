@@ -64,7 +64,8 @@ class UITest {
     void showGreeting_containsFitchaserTitleAndHelpHint() {
         ui.showGreeting();
         String output = outContent.toString();
-        assertTrue(output.contains("FITCHASER"));
+        assertTrue(output.toLowerCase().contains("virtual gym buddy"),
+                "Greeting should mention the virtual gym buddy introduction");
         assertTrue(output.contains("/help"), "Greeting should guide user to /help command");
     }
 

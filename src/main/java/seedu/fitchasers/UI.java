@@ -43,23 +43,22 @@ public class UI {
         }
 
         String input = scanner.nextLine();
-        if (input == null || input.isEmpty()) {
-            return "";
-        }
+        assert input != null : "User input should never be null";
+
         return input.trim();
     }
 
     public String promptForName() {
         System.out.print(MAGENTA + "Enter your name: " + RESET + " > ");
+
         if (!scanner.hasNextLine()) {
             // no more input (EOF)
             return null;
         }
 
         String input = scanner.nextLine();
-        if (input == null || input.isEmpty()) {
-            return "";
-        }
+        assert input != null : "Input from user should not be null";
+
         return input.trim();
     }
     /**
@@ -69,6 +68,7 @@ public class UI {
      * @param message the message to display.
      */
     public void showMessage(String message) {
+        assert message != null : "Message to display should not be null";
         System.out.println(WHITE_BOLD + message + RESET);
     }
 
@@ -79,6 +79,7 @@ public class UI {
      * @param error the error message to display.
      */
     public void showError(String error) {
+        assert error != null : "Error message must not be null";
         System.out.println(MAGENTA + "[Oops!] " + RESET + error);
     }
 
@@ -89,9 +90,11 @@ public class UI {
     public void showGreeting() {
 
         System.out.println(BLUE_BOLD + """
-                +------------------------------------------------------+
-                |                      FITCHASER                       |
-                +------------------------------------------------------+
+                 ▄▄▄▄▄▄   ▀      ▄      ▄▄▄  █                                       \s
+                 █      ▄▄▄    ▄▄█▄▄  ▄▀   ▀ █ ▄▄    ▄▄▄    ▄▄▄    ▄▄▄    ▄ ▄▄   ▄▄▄ \s
+                 █▄▄▄▄▄   █      █    █      █▀  █  ▀   █  █   ▀  █▀  █   █▀  ▀ █   ▀\s
+                 █        █      █    █      █   █  ▄▀▀▀█   ▀▀▀▄  █▀▀▀▀   █      ▀▀▀▄\s
+                 █      ▄▄█▄▄    ▀▄▄   ▀▄▄▄▀ █   █  ▀▄▄▀█  ▀▄▄▄▀  ▀█▄▄▀   █     ▀▄▄▄▀\s
                 """ + RESET);
 
         System.out.println(CYAN
@@ -152,6 +155,7 @@ public class UI {
             return false;
         }
         String confirmation = scanner.nextLine().trim().toLowerCase();
+        assert confirmation != null : "Confirmation input must not be null";
         return confirmation.equals("y") || confirmation.equals("yes");
     }
 
@@ -171,11 +175,13 @@ public class UI {
         showDivider();
 
         // Basic info
+        assert workout.getWorkoutName() != null : "Workout name should not be null";
         showMessage("Name       : " + workout.getWorkoutName());
         showMessage("Date       : " + workout.getWorkoutDateString());
 
         // Duration formatting
         int totalMinutes = workout.getDuration();
+        assert totalMinutes >= 0 : "Workout duration must not be negative";
         int hours = totalMinutes / 60;
         int minutes = totalMinutes % 60;
         String durationStr = (hours > 0)
@@ -199,6 +205,7 @@ public class UI {
 
         // Exercises
         ArrayList<Exercise> exercises = workout.getExercises();
+        assert exercises != null : "Workout exercises should not be null";
         if (exercises.isEmpty()) {
             showMessage("Exercises  : (none added)");
         } else {
@@ -215,6 +222,7 @@ public class UI {
 
 
     static String getDaySuffix(int day) {
+        assert day >= 1 && day <= 31 : "Day should be between 1 and 31";
         if (day >= 11 && day <= 13) {
             return "th";
         }
