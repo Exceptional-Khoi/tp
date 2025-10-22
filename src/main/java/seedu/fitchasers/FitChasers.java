@@ -99,6 +99,7 @@ public class FitChasers {
 
                 case "/view_weight":
                     weightManager.viewWeights();
+                    person.displayWeightGraphWithDates();
                     ui.showDivider();
                     break;
 

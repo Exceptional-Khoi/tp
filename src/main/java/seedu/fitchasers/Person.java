@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Represents a person using the FitChasers app.
@@ -121,5 +122,93 @@ public class Person implements Serializable {
         }
         weightHistory.remove(weightHistory.size() - 1);
         return true;
+    }
+
+    public void displayWeightGraphWithDates() {
+        if (weightHistory.isEmpty()) {
+            System.out.println(name + " has no weight records yet.");
+            return;
+        }
+
+        List<Double> weights = new ArrayList<>();
+        List<String> dates = new ArrayList<>();
+        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM");
+
+        for (WeightRecord record : weightHistory) {
+            weights.add(record.getWeight());
+            dates.add(record.getDate().format(df));
+        }
+
+        double min = Collections.min(weights);
+        double max = Collections.max(weights);
+
+        int height = 10;
+        int spacing = 12;
+        int width = (weights.size() - 1) * spacing + 1;
+
+        char[][] grid = new char[height][width];
+        for (int i = 0; i < height; i++) {
+            for (int j = 0; j < width; j++) grid[i][j] = ' ';
+        }
+
+        int[] y = new int[weights.size()];
+        for (int i = 0; i < weights.size(); i++) {
+            double normalized = (weights.get(i) - min) / (max - min);
+            y[i] = height - 1 - (int) Math.round(normalized * (height - 1));
+        }
+
+        for (int i = 0; i < weights.size() - 1; i++) {
+            int x1 = i * spacing, y1 = y[i];
+            int x2 = (i + 1) * spacing, y2 = y[i + 1];
+            int dx = x2 - x1, dy = y2 - y1;
+            int steps = Math.max(Math.abs(dx), Math.abs(dy));
+            for (int s = 0; s <= steps; s++) {
+                int x = x1 + s * dx / steps;
+                int yy = y1 + s * dy / steps;
+                if (yy >= 0 && yy < height && x >= 0 && x < width)
+                    grid[yy][x] = '+';
+            }
+        }
+
+        boolean[][] isWeightPoint = new boolean[height][width];
+        for (int i = 0; i < weights.size(); i++) {
+            int x = i * spacing;
+            int yy = y[i];
+            if (yy >= 0 && yy < height && x < width) {
+                grid[yy][x] = '●';
+                isWeightPoint[yy][x] = true;
+            }
+        }
+
+        final String RESET = "\u001B[0m";
+        final String ORANGE = "\u001B[1m\u001B[38;5;208m";
+
+        System.out.println("\nWeight Progress Graph for " + name + ":");
+
+        for (int i = 0; i < height; i++) {
+            double label = max - (max - min) * i / (height - 1);
+            System.out.printf("%6.1f | ", label);
+            for (int j = 0; j < width; j++) {
+                if (isWeightPoint[i][j]) System.out.print(ORANGE + '●' + RESET);
+                else System.out.print(grid[i][j]);
+            }
+            System.out.println();
+        }
+
+        System.out.print("        ");
+        for (int j = 0; j < width + 4; j++) System.out.print('_');
+        System.out.println();
+
+        System.out.print("        ");
+        for (int i = 0; i < dates.size(); i++) {
+            int x = i * spacing;
+            if (x < width) {
+                System.out.print(dates.get(i));
+                int extra = spacing - dates.get(i).length();
+                for (int k = 0; k < extra && x + k + dates.get(i).length() < width; k++)
+                    System.out.print(' ');
+            }
+        }
+        System.out.println("\n");
     }
 }
