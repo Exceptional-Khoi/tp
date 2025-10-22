@@ -15,7 +15,7 @@ public class UI {
     private static final String BLUE_BOLD = "\u001B[1;34m";
     private static final String CYAN = "\u001B[36m";
     private static final String MAGENTA = "\u001B[35m";
-    private static final String WHITE_BOLD = "\u001B[1;37m";
+    private static final String WHITE_BRIGHT = "\u001B[97m";
 
     /**
      * Scanner instance for reading user input from the console.
@@ -69,7 +69,7 @@ public class UI {
      */
     public void showMessage(String message) {
         assert message != null : "Message to display should not be null";
-        System.out.println(WHITE_BOLD + message + RESET);
+        System.out.println(WHITE_BRIGHT + message + RESET);
     }
 
     /**
@@ -101,7 +101,7 @@ public class UI {
                 + "Your virtual gym buddy's clocked in and ready to make you strong!"
                 + RESET);
 
-        System.out.println(CYAN + "Type " + WHITE_BOLD + "/help" + CYAN
+        System.out.println(CYAN + "Type " + WHITE_BRIGHT + "/help" + RESET + CYAN
                 + " to explore all available commands!" + RESET);
         System.out.println(CYAN + "Let's crush your fitness goals together!" + RESET);
 
@@ -122,30 +122,32 @@ public class UI {
      * Displays all available commands and their usage.
      */
     public void showHelp() {
-        System.out.println("/help                                - View all commands");
-        System.out.println("/my_name n/NAME                        - Set your display name"
-                + " (e.g. /my_name n/Nitin)");
-        System.out.println("/add_weight w/WEIGHT d/DATE          - Record your weight "
-                + "(e.g. /add_weight w/81.5 d/19/10/25)");
-        System.out.println("/create_workout n/NAME d/DATE t/TIME - Create a new workout "
-                + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)");
-        System.out.println("/add_exercise n/NAME r/REPS          - Add an exercise "
-                + "(e.g. /add_exercise n/Squat r/12)");
-        System.out.println("/add_set r/REPS                      - Add a new set "
-                + "(e.g. /add_set r/10)");
-        System.out.println("/end_workout d/DATE t/TIME           - End the current workout "
-                + "(e.g. /end_workout d/20/10/25 t/2030)");
-        System.out.println("/view_log                            - View your workout history");
-        System.out.println("/del_workout NAME                    - Delete a workout "
-                + "(e.g. /del_workout PushDay)");
-        System.out.println("/exit                                - Save progress and exit the app");
+        System.out.print(WHITE_BRIGHT +
+                "/help                                - View all commands\n" +
+                "/my_name n/NAME                      - Set your display name "
+                + "(e.g. /my_name n/Nitin)\n" +
+                "/add_weight w/WEIGHT d/DATE          - Record your weight "
+                + "(e.g. /add_weight w/81.5 d/19/10/25)\n" +
+                "/create_workout n/NAME d/DATE t/TIME - Create a new workout "
+                + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)\n" +
+                "/add_exercise n/NAME r/REPS          - Add an exercise "
+                + "(e.g. /add_exercise n/Squat r/12)\n" +
+                "/add_set r/REPS                      - Add a new set "
+                + "(e.g. /add_set r/10)\n" +
+                "/end_workout d/DATE t/TIME           - End the current workout "
+                + "(e.g. /end_workout d/20/10/25 t/2030)\n" +
+                "/view_log                            - View your workout history\n" +
+                "/del_workout NAME                    - Delete a workout "
+                + "(e.g. /del_workout PushDay)\n" +
+                "/exit                                - Save progress and exit the app\n" +
+                RESET);
     }
 
     /**
      * Displays a visual divider line to separate sections in the console output.
      */
     public void showDivider() {
-        System.out.println(WHITE_BOLD
+        System.out.println(WHITE_BRIGHT
                 + "--------------------------------------------------" + RESET);
     }
 

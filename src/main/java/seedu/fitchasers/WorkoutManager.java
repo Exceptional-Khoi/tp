@@ -1,7 +1,6 @@
 package seedu.fitchasers;
 
 import java.util.LinkedHashSet;
-import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -139,14 +138,13 @@ public class WorkoutManager {
     public void deleteWorkout(String name) {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
-                Scanner scanner = new Scanner(System.in);
                 ui.showMessage("Deleting " + w.getWorkoutName() + " | " +
                         w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type y/yes to confirm)");
                 if (ui.confirmationMessage()) {
                     workouts.remove(w);
-                    ui.showMessage("Workout deleted successfully! 💪");
+                    ui.showMessage("Workout deleted successfully!");
                 } else {
-                    ui.showMessage("Okay, I didn’t delete it. 🫶");
+                    ui.showMessage("Okay, I didn’t delete it.");
                 }
                 return;
             }
@@ -296,7 +294,7 @@ public class WorkoutManager {
         }
     }
 
-    public void interactiveDeleteWorkout(String command, Scanner scanner) {
+    public void interactiveDeleteWorkout(String command, UI ui) {
         ArrayList<Workout> targetList = workouts;
 
         if(command.contains("d/")){
@@ -321,7 +319,7 @@ public class WorkoutManager {
         showWorkoutsWIthIndices(targetList);
         ui.showMessage("Enter the number/numbers of the workout to be deleted:");
         ui.showMessage("> ");
-        String selection = scanner.nextLine().trim();
+        String selection = ui.readCommand();
 
         String[] tokens = selection.split("\\s+");
         ArrayList<Integer> indicesToDelete = new ArrayList<>();
@@ -356,10 +354,10 @@ public class WorkoutManager {
      * Validates that the end date and time are not before the workout's start.
      * If the user input is invalid (earlier than start), prompts for re-entry until valid.
      *
-     * @param scanner Scanner for reading user input in the retry loop
+     * @param ui UI for reading user input in the retry loop
      * @param initialArgs Initial command arguments containing end date/time details
      */
-    public void endWorkout(Scanner scanner, String initialArgs) {
+    public void endWorkout(UI ui, String initialArgs) {
         if (currentWorkout == null) {
             ui.showMessage("No active workout.");
             return;
@@ -409,7 +407,7 @@ public class WorkoutManager {
                 if (endTimeTruncated.toLocalDate().isBefore(startTimeTruncated.toLocalDate())) {
                     ui.showMessage("End date must not be before start date of the workout!");
                     ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-                    args = scanner.nextLine();
+                    args = ui.readCommand();
                     continue;
                 }
 
@@ -417,7 +415,7 @@ public class WorkoutManager {
                 if (!endTimeTruncated.isAfter(startTimeTruncated)) {
                     ui.showMessage("End time must be after the start time of the workout!");
                     ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-                    args = scanner.nextLine();
+                    args = ui.readCommand();
                     continue;
                 }
 
@@ -434,7 +432,7 @@ public class WorkoutManager {
             } catch (Exception e) {
                 ui.showMessage("Invalid date/time format. Use: /end_workout d/DD/MM/YY t/HHmm");
                 ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-                args = scanner.nextLine();
+                args = ui.readCommand();
             }
         }
     }
