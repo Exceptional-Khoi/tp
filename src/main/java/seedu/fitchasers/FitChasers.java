@@ -118,7 +118,7 @@ public class FitChasers {
                     ui.showDivider();
                     break;
 
-                case "/gym":
+                case "/gym_where":
                     Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
                     if (!gymsToSuggest.isEmpty()) {
                         ui.showMessage("You can do this workout at: " + String.join(", ", gymsToSuggest));
@@ -128,10 +128,18 @@ public class FitChasers {
                     ui.showDivider();
                     break;
 
-
-                case "/nus_gym":
-                    EquipmentDisplay.showEquipmentByGym(gyms);
-                    ui.showDivider();
+                case "/gym_page":
+                    try {
+                        int pageNum = Integer.parseInt(argumentStr.trim());
+                        if (pageNum >= 1 && pageNum <= gyms.size()) {
+                            Gym gym = gyms.get(pageNum - 1);
+                            EquipmentDisplay.showEquipmentForSingleGym(gym);
+                        } else {
+                            System.out.println("Invalid page number. Please enter a number between 1 and " + gyms.size());
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Please enter a valid page number.");
+                    }
                     break;
 
                 case "/add_set":

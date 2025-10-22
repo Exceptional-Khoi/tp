@@ -5,17 +5,17 @@ import java.util.List;
 import java.util.Set;
 
 public class EquipmentDisplay {
-    public static void showEquipmentByGym(List<Gym> gyms) {
+    public static void showEquipmentForSingleGym(Gym gym) {
         System.out.println("| Gym        | Machine        | Body Parts Targeted        |");
         System.out.println("|------------|---------------|----------------------------|");
-        for (Gym gym : gyms) {
-            for (Machine machine : gym.getMachines()) {
-                String bodyParts = String.join(", ", machine.getBodyPartsTargeted());
-                System.out.printf("| %-10s | %-13s | %-26s |\n",
-                        gym.getName(), machine.getName(), bodyParts);
-            }
+        for (Machine machine : gym.getMachines()) {
+            String bodyParts = String.join(", ", machine.getBodyPartsTargeted());
+            System.out.printf("| %-10s | %-13s | %-26s |\n",
+                    gym.getName(), machine.getName(), bodyParts);
         }
+        System.out.println("-----------------------------------------------------------");
     }
+
 
     public static Set<String> suggestGymsForExercise(List<Gym> gyms, String argumentStr) {
         String exerciseName = "";

@@ -1,4 +1,5 @@
 package seedu.fitchasers;
+//import seedu.fitchasers.Machine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,17 +20,3 @@ public class Gym {
     public String getName() { return name; }
     public List<Machine> getMachines() { return machines; }
 }
-
-class Machine {
-    private String name;
-    private List<String> bodyPartsTargeted;
-
-    public Machine(String name, List<String> bodyPartsTargeted) {
-        this.name = name;
-        this.bodyPartsTargeted = bodyPartsTargeted;
-    }
-
-    public String getName() { return name; }
-    public List<String> getBodyPartsTargeted() { return bodyPartsTargeted; }
-}
-

@@ -124,6 +124,10 @@ public class UI {
                 + " (e.g. /my_name n/Nitin)");
         System.out.println("/add_weight w/WEIGHT d/DATE          - Record your weight "
                 + "(e.g. /add_weight w/81.5 d/19/10/25)");
+        System.out.println("/gym_page PAGE_NUMBER                - View the pages of the different gyms in NUS" +
+                "e.g. /gym_page 1");
+        System.out.println("/gym_where n/EXERCISE                 - View where to workout"
+                +"e.g. /gym_where n/squat");
         System.out.println("/create_workout n/NAME d/DATE t/TIME - Create a new workout "
                 + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)");
         System.out.println("/add_exercise n/NAME r/REPS          - Add an exercise "
