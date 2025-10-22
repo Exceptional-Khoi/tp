@@ -92,41 +92,35 @@ public class FitChasers {
                 }
 
                 case "/add_weight":
-                    ui.showMessage("Logging your weight... don't lie to me!");
                     weightManager.addWeight(argumentStr);
                     // Format: /add_weight w/WEIGHT d/DATE
                     ui.showDivider();
                     break;
 
                 case "/view_weight":
-                    ui.showMessage("Here's your weight, you've been killin' it lately!");
                     weightManager.viewWeights();
                     ui.showDivider();
                     break;
 
                 case "/create_workout":
-                    ui.showMessage("New workout sesh incoming!");
                     // Format: /create_workout n/NAME d/DD/MM/YY t/HHmm
                     workoutManager.addWorkout(argumentStr);
                     ui.showDivider();
                     break;
 
                 case "/add_exercise":
-                    ui.showMessage("Adding that spicy new exercise!");
                     // Format: /add_exercise n/NAME r/REPS
                     workoutManager.addExercise(argumentStr);
                     ui.showDivider();
                     break;
 
                 case "/add_set":
-                    ui.showMessage("Adding a new set to your exercise!");
                     // Format: /add_set r/REPS
                     workoutManager.addSet(argumentStr);
                     ui.showDivider();
                     break;
 
                 case "/end_workout":
-                    ui.showMessage("Workout wrapped! Time to refuel!");
                     // Format: /end_workout d/DD/MM/YY t/HHmm
                     workoutManager.endWorkout(scanner, argumentStr);
                     ui.showDivider();

@@ -12,6 +12,7 @@ import java.util.Objects;
  */
 public class Person implements Serializable {
 
+    private final UI ui = new UI();
     /** The name of the person */
     private String name;
 
@@ -81,6 +82,7 @@ public class Person implements Serializable {
             System.out.println(name + " has no weight records yet.");
             return;
         }
+        ui.showMessage("Here's your weight, you've been killin' it lately!");
         System.out.println("Weight history for " + name + ":");
         for (WeightRecord record : weightHistory) {
             System.out.println("  " + record);
