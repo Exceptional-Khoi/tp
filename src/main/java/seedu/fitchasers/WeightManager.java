@@ -39,6 +39,7 @@ public class WeightManager {
 
             WeightRecord weightRecord = new WeightRecord(weightValue, entryDate);
             currentUser.addWeightRecord(weightRecord);
+            uiHandler.showMessage("Logging your weight... don't lie to me!");
             uiHandler.showMessage("New weight recorded: " + weightRecord);
 
         } catch (NumberFormatException nfe) {
