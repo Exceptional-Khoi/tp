@@ -181,7 +181,7 @@ public class Person implements Serializable {
             int x = i * spacing;
             int yy = y[i];
             if (yy >= 0 && yy < height && x < width) {
-                grid[yy][x] = '●';
+                grid[yy][x] = '\u25CF';
                 isWeightPoint[yy][x] = true;
             }
         }
@@ -196,7 +196,7 @@ public class Person implements Serializable {
             System.out.printf("%6.1f | ", label);
             for (int j = 0; j < width; j++) {
                 if (isWeightPoint[i][j]) {
-                    System.out.print(orange + '●' + reset);
+                    System.out.print(orange + "\u25CF" + reset);
                 } else {
                     System.out.print(grid[i][j]);
                 }
