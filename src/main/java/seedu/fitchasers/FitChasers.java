@@ -3,11 +3,14 @@ package seedu.fitchasers;
 //import java.io.IOException;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidCommandException;
+import seedu.fitchasers.EquipmentDisplay;
 
 import java.io.IOException;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 
 
 /**
@@ -33,6 +36,7 @@ public class FitChasers {
         Scanner scanner = new Scanner(System.in);
         YearMonth currentMonth = YearMonth.now();
         ViewLog viewLog;
+        List<Gym> gyms = StaticGymData.getNusGyms();
 
         // Attempt to load persistent datai by month
         // #TODO add select month #TODO need to add seperate month to current month check!
@@ -111,6 +115,22 @@ public class FitChasers {
                 case "/add_exercise":
                     // Format: /add_exercise n/NAME r/REPS
                     workoutManager.addExercise(argumentStr);
+                    ui.showDivider();
+                    break;
+
+                case "/gym":
+                    Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
+                    if (!gymsToSuggest.isEmpty()) {
+                        ui.showMessage("You can do this workout at: " + String.join(", ", gymsToSuggest));
+                    } else {
+                        ui.showMessage("Sorry, no gyms found for that exercise.");
+                    }
+                    ui.showDivider();
+                    break;
+
+
+                case "/nus_gym":
+                    EquipmentDisplay.showEquipmentByGym(gyms);
                     ui.showDivider();
                     break;
 
