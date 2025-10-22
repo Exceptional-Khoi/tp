@@ -148,7 +148,9 @@ public class Person implements Serializable {
 
         char[][] grid = new char[height][width];
         for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) grid[i][j] = ' ';
+            for (int j = 0; j < width; j++) {
+                grid[i][j] = ' ';
+            }
         }
 
         int[] y = new int[weights.size()];
@@ -158,15 +160,19 @@ public class Person implements Serializable {
         }
 
         for (int i = 0; i < weights.size() - 1; i++) {
-            int x1 = i * spacing, y1 = y[i];
-            int x2 = (i + 1) * spacing, y2 = y[i + 1];
-            int dx = x2 - x1, dy = y2 - y1;
+            int x1 = i * spacing;
+            int y1 = y[i];
+            int x2 = (i + 1) * spacing;
+            int y2 = y[i + 1];
+            int dx = x2 - x1;
+            int dy = y2 - y1;
             int steps = Math.max(Math.abs(dx), Math.abs(dy));
             for (int s = 0; s <= steps; s++) {
                 int x = x1 + s * dx / steps;
                 int yy = y1 + s * dy / steps;
-                if (yy >= 0 && yy < height && x >= 0 && x < width)
+                if (yy >= 0 && yy < height && x >= 0 && x < width) {
                     grid[yy][x] = '+';
+                }
             }
         }
 
@@ -180,8 +186,8 @@ public class Person implements Serializable {
             }
         }
 
-        final String RESET = "\u001B[0m";
-        final String ORANGE = "\u001B[1m\u001B[38;5;208m";
+        final String reset = "\u001B[0m";
+        final String orange = "\u001B[1m\u001B[38;5;208m";
 
         System.out.println("\nWeight Progress Graph for " + name + ":");
 
@@ -189,14 +195,19 @@ public class Person implements Serializable {
             double label = max - (max - min) * i / (height - 1);
             System.out.printf("%6.1f | ", label);
             for (int j = 0; j < width; j++) {
-                if (isWeightPoint[i][j]) System.out.print(ORANGE + '●' + RESET);
-                else System.out.print(grid[i][j]);
+                if (isWeightPoint[i][j]) {
+                    System.out.print(orange + '●' + reset);
+                } else {
+                    System.out.print(grid[i][j]);
+                }
             }
             System.out.println();
         }
 
         System.out.print("        ");
-        for (int j = 0; j < width + 4; j++) System.out.print('_');
+        for (int j = 0; j < width + 4; j++) {
+            System.out.print('_');
+        }
         System.out.println();
 
         System.out.print("        ");
@@ -205,8 +216,9 @@ public class Person implements Serializable {
             if (x < width) {
                 System.out.print(dates.get(i));
                 int extra = spacing - dates.get(i).length();
-                for (int k = 0; k < extra && x + k + dates.get(i).length() < width; k++)
+                for (int k = 0; k < extra && x + k + dates.get(i).length() < width; k++) {
                     System.out.print(' ');
+                }
             }
         }
         System.out.println("\n");
