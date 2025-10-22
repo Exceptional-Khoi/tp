@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 public class Person implements Serializable {
 
-    private final static UI ui = new UI();
+    private final UI ui = new UI();
     /** The name of the person */
     private String name;
 
