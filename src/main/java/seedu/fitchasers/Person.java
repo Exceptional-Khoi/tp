@@ -80,13 +80,13 @@ public class Person implements Serializable {
      */
     public void displayWeightHistory() {
         if (weightHistory.isEmpty()) {
-            System.out.println(name + " has no weight records yet.");
+            ui.showMessage(name + " has no weight records yet.");
             return;
         }
         ui.showMessage("Here's your weight, you've been killin' it lately!");
-        System.out.println("Weight history for " + name + ":");
+        ui.showMessage("Weight history for " + name + ":");
         for (WeightRecord record : weightHistory) {
-            System.out.println("  " + record);
+            ui.showMessage("  " + record);
         }
     }
 
