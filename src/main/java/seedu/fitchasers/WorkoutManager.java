@@ -274,27 +274,92 @@ public class WorkoutManager {
             return;
         }
 
-        String name = extractBetween(args, "n/", "r/").trim();
-        String repsStr = extractAfter(args, "r/").trim();
-
-        if (name.isEmpty() || repsStr.isEmpty()) {
-            ui.showMessage("Invalid format. Please use: /add_exercise n/NAME r/REPS");
+        if (args == null || args.trim().isEmpty()) {
+            ui.showMessage("Missing information. Use: /add_exercise n/NAME r/REPS (e.g., /add_exercise n/PushUp r/12)");
             return;
         }
 
-        try {
-            int reps = Integer.parseInt(repsStr);
-            if (reps <= 0) {
-                throw new NumberFormatException();
-            }
-
-            Exercise exercise = new Exercise(name, reps);
-            currentWorkout.addExercise(exercise);
-            ui.showMessage("Adding that spicy new exercise!");
-            ui.showMessage("Added exercise:\n" + exercise.toDetailedString());
-        } catch (NumberFormatException e) {
-            ui.showMessage("REPS must be a positive integer. Example: /add_exercise n/Push_Up r/12");
+        String s = args.trim();
+        int nIdx = s.indexOf("n/");
+        if (nIdx == -1) {
+            ui.showMessage("Missing name. Use: /add_exercise n/NAME r/REPS (e.g., /add_exercise n/PushUp r/12)");
+            return;
         }
+
+        int rIdx = s.indexOf("r/");
+
+        // n/ must come before r/ if r/ exists
+        if (rIdx != -1 && rIdx < nIdx) {
+            ui.showMessage("Invalid order. Put r/ after n/. Example: /add_exercise n/PushUp r/12");
+            return;
+        }
+
+        // Extract name candidate (text between n/ and r/ if r/ exists, else to end)
+        int nameStart = nIdx + 2;
+        int nameEnd   = (rIdx != -1) ? rIdx : s.length();
+
+        if (nameStart >= s.length() || nameStart >= nameEnd) {
+            // n/ immediately followed by r/ -> invalid format
+            if (rIdx == nameStart) {
+                ui.showMessage("Invalid format. Put a space after the name. Example: /add_exercise n/PushUp r/12");
+            } else {
+                ui.showMessage("Missing name. Use: /add_exercise n/NAME r/REPS (e.g., /add_exercise n/PushUp r/12)");
+            }
+            return;
+        }
+
+        String between = s.substring(nameStart, nameEnd);
+        String name = between.trim();
+
+        if (name.isEmpty()) {
+            ui.showMessage("Missing name. Use: /add_exercise n/NAME r/REPS (e.g., /add_exercise n/PushUp r/12)");
+            return;
+        }
+
+        if (rIdx - 1 >= 0 && !Character.isWhitespace(s.charAt(rIdx - 1))) {
+            ui.showMessage("Add a space between the name and r/. Example: /add_exercise n/PushUp r/12");
+            return;
+        }
+
+        // Ensure r/ is present
+        if (rIdx == -1) {
+            ui.showMessage("Missing reps. Use: /add_exercise n/NAME r/REPS (e.g., /add_exercise n/PushUp r/12)");
+            return;
+        }
+
+        // Extract reps token (first token after r/)
+        int repsStart = rIdx + 2;
+        if (repsStart >= s.length()) {
+            ui.showMessage("REPS missing. Example: /add_exercise n/PushUp r/12");
+            return;
+        }
+        String afterR = s.substring(repsStart).trim();
+        if (afterR.isEmpty()) {
+            ui.showMessage("REPS missing. Example: /add_exercise n/PushUp r/12");
+            return;
+        }
+        String[] token = afterR.split("\\s+");
+        String repsStr = token[0];
+
+        // Validate reps (positive integer)
+        int reps;
+        try {
+            if (!repsStr.matches("\\d+")) throw new NumberFormatException();
+            reps = Integer.parseInt(repsStr);
+            if (reps <= 0) throw new NumberFormatException();
+        } catch (NumberFormatException e) {
+            ui.showMessage("REPS must be a positive integer. Example: /add_exercise n/PushUp r/12");
+            return;
+        }
+
+        assert name != null && !name.isEmpty() : "Parsed exercise name should be non-empty";
+        assert reps > 0 : "Parsed reps should be positive";
+
+        Exercise exercise = new Exercise(name, reps);
+        currentWorkout.addExercise(exercise);
+
+        ui.showMessage("Adding that spicy new exercise!");
+        ui.showMessage("Added exercise:\n" + exercise.toDetailedString());
     }
 
     /**
@@ -316,24 +381,54 @@ public class WorkoutManager {
             return;
         }
 
-        String repsStr = extractAfter(args, "r/");
-        if (repsStr.isEmpty()) {
-            ui.showMessage("Usage: /add_set r/REPS");
+        if (args == null || args.trim().isEmpty()) {
+            ui.showMessage("Missing REPS. Use: /add_set r/REPS (e.g., /add_set r/15)");
             return;
         }
 
-        try {
-            int reps = Integer.parseInt(repsStr);
-            if (reps <= 0) {
-                throw new NumberFormatException();
-            }
+        String s = args.trim();
+        int rIdx = s.indexOf("r/");
+        if (rIdx == -1) {
+            ui.showMessage("Missing REPS. Use: /add_set r/REPS (e.g., /add_set r/15)");
+            return;
+        }
 
-            currentExercise.addSet(reps);
-            ui.showMessage("Adding a new set to your exercise!");
-            ui.showMessage("Added set to exercise:\n" + currentExercise.toDetailedString());
+        // After r/, there must be a number immediately
+        int repsStart = rIdx + 2;
+        if (repsStart >= s.length()) {
+            ui.showMessage("REPS missing. Example: /add_set r/15");
+            return;
+        }
+        if (Character.isWhitespace(s.charAt(repsStart))) {
+            // explicitly reject "r/ 12"
+            ui.showMessage("Do not put a space between r/ and the number. Example: /add_set r/15");
+            return;
+        }
+
+        // Extract the reps token (first token after r/)
+        String afterR = s.substring(repsStart);
+        String[] token = afterR.split("\\s+");
+        String repsStr = token[0];
+
+        if (token.length > 1) {
+            ui.showMessage("Too many arguments after REPS. Example: /add_set r/15");
+            return;
+        }
+
+        // Validate reps (positive integer)
+        int reps;
+        try {
+            if (!repsStr.matches("\\d+")) throw new NumberFormatException();
+            reps = Integer.parseInt(repsStr);
+            if (reps <= 0) throw new NumberFormatException();
         } catch (NumberFormatException e) {
             ui.showMessage("REPS must be a positive integer. Example: /add_set r/15");
+            return;
         }
+
+        currentExercise.addSet(reps);
+        ui.showMessage("Adding a new set to your exercise!");
+        ui.showMessage("Added set to exercise:\n" + currentExercise.toDetailedString());
     }
 
     /**
