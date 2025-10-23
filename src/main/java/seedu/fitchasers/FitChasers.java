@@ -218,7 +218,8 @@ public class FitChasers {
                                 Gym gym = gyms.get(pageNum - 1);
                                 EquipmentDisplay.showEquipmentForSingleGym(gym);
                             } else {
-                                ui.showMessage("Invalid page number. Please enter a number between 1 and " + gyms.size());
+                                ui.showMessage("Invalid page number. Please enter a number between 1 and "
+                                        + gyms.size());
                             }
                         } else {
                             ui.showMessage("Usage: /gym_page p/page_number (e.g. /gym_page p/1)");
