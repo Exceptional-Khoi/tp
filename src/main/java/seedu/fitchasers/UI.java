@@ -127,7 +127,11 @@ public class UI {
                 "/my_name n/NAME                      - Set your display name "
                 + "(e.g. /my_name n/Nitin)\n" +
                 "/add_weight w/WEIGHT d/DATE          - Record your weight "
-                + "(e.g. /add_weight w/81.5 d/19/10/25)\n" +
+                + "(e.g. /add_weight w/81.5 d/19/10/25)\n" + 
+                "/gym_page PAGE_NUMBER                - View different gyms in NUS" +
+                "e.g. /gym_page 1\n"+
+                "/gym_where n/EXERCISE                - View where to workout"+
+                "e.g. /gym_where n/squat\n"+
                 "/create_workout n/NAME d/DATE t/TIME - Create a new workout "
                 + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)\n" +
                 "/add_exercise n/NAME r/REPS          - Add an exercise "
@@ -139,8 +143,9 @@ public class UI {
                 "/view_log                            - View your workout history\n" +
                 "/del_workout NAME                    - Delete a workout "
                 + "(e.g. /del_workout PushDay)\n" +
-                "/exit                                - Save progress and exit the app\n" +
-                RESET);
+                "/exit                                - Save progress and exit the app\n"
+                + RESET);
+
     }
 
     /**
