@@ -232,4 +232,9 @@ public class Person implements Serializable {
         }
         System.out.println("\n");
     }
+
+    public void setWeightHistory(List<WeightRecord> history) {
+        this.weightHistory.clear();
+        this.weightHistory.addAll(history);
+    }
 }
