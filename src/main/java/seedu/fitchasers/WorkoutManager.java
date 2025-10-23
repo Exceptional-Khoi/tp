@@ -566,12 +566,16 @@ public class WorkoutManager {
         if (dIdx != -1) {
             String tail = args.substring(dIdx + 2).trim();
             String[] toks = tail.split("\\s+");
-            if (toks.length > 0) dateStr = toks[0].trim();
+            if (toks.length > 0) {
+                dateStr = toks[0].trim();
+            }
         }
         if (tIdx != -1) {
             String tail = args.substring(tIdx + 2).trim();
             String[] toks = tail.split("\\s+");
-            if (toks.length > 0) timeStr = toks[0].trim();
+            if (toks.length > 0) {
+                timeStr = toks[0].trim();
+            }
         }
 
         LocalDate date = null;

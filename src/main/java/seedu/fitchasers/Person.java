@@ -1,8 +1,13 @@
 package seedu.fitchasers;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Map;
+import java.util.LinkedHashMap;
 import java.time.format.DateTimeFormatter;
 
 /**
