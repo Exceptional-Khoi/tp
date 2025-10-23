@@ -16,6 +16,7 @@ dependencies {
 
 test {
     useJUnitPlatform()
+    jvmArgs "-ea"
 
     testLogging {
         events "passed", "skipped", "failed"
@@ -30,6 +31,7 @@ test {
 
 application {
     mainClass.set("seedu.fitchasers.FitChasers")
+    applicationDefaultJvmArgs = ["-ea"]
 }
 
 shadowJar {
@@ -43,4 +45,5 @@ checkstyle {
 
 run{
     standardInput = System.in
+    enableAssertions = true
 }
