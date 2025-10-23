@@ -12,7 +12,7 @@ import java.util.Set;
 
 /**
  * Manages workout sessions for the FitChasers application.
- *
+ * <p>
  * Handles creation, deletion, and viewing of workouts,
  * as well as adding exercises and sets within each workout.
  */
@@ -29,7 +29,7 @@ public class WorkoutManager {
 
     /**
      * Creates and adds a new workout to the list.
-     *
+     * <p>
      * Expected format: /create_workout n/NAME d/DD/MM/YY t/HHmm
      *
      * @param command the full user command containing workout details
@@ -170,9 +170,9 @@ public class WorkoutManager {
     /**
      * Extracts text between two tokens.
      *
-     * @param text the full string to search
+     * @param text       the full string to search
      * @param startToken the start marker
-     * @param endToken the end marker
+     * @param endToken   the end marker
      * @return the substring found between the tokens, or an empty string if not found
      */
     private String extractBetween(String text, String startToken, String endToken) {
@@ -187,7 +187,7 @@ public class WorkoutManager {
     /**
      * Extracts text after a specific token.
      *
-     * @param text the full string to search
+     * @param text  the full string to search
      * @param token the token to find
      * @return the text found after the token, or an empty string if not found
      */
@@ -235,17 +235,17 @@ public class WorkoutManager {
     }
 
     public void deleteWorkoutByIndex(int index) {
-        if(index < 0 || index >= workouts.size()) {
+        if (index < 0 || index >= workouts.size()) {
             ui.showMessage("Invalid workout index: " + index + "Please try again.:(");
             return;
         }
         Workout w = workouts.get(index);
         ui.showMessage("Deleting " + w.getWorkoutName() + " | " + w.getWorkoutName() + "|");
         ui.showMessage("You sure you want to delete this?(y/n)");
-        if(ui.confirmationMessage()) {
+        if (ui.confirmationMessage()) {
             ui.showMessage("Deleted workout: " + w.getWorkoutName());
             workouts.remove(index);
-        }else{
+        } else {
             ui.showMessage("Okay, deletion aborted.");
         }
     }
@@ -263,7 +263,7 @@ public class WorkoutManager {
 
     /**
      * Adds an exercise to the current workout.
-     *
+     * <p>
      * Expected format: /add_exercise n/NAME r/REPS
      *
      * @param args the user command arguments
@@ -296,7 +296,7 @@ public class WorkoutManager {
 
         // Extract name candidate (text between n/ and r/ if r/ exists, else to end)
         int nameStart = nIdx + 2;
-        int nameEnd   = (rIdx != -1) ? rIdx : s.length();
+        int nameEnd = (rIdx != -1) ? rIdx : s.length();
 
         if (nameStart >= s.length() || nameStart >= nameEnd) {
             // n/ immediately followed by r/ -> invalid format
@@ -364,7 +364,7 @@ public class WorkoutManager {
 
     /**
      * Adds a new set to the current exercise.
-     *
+     * <p>
      * Expected format: /add_set r/REPS
      *
      * @param args the user command arguments
@@ -461,20 +461,20 @@ public class WorkoutManager {
     }
 
     public void showWorkoutsWIthIndices(ArrayList<Workout> list) {
-        if(list.isEmpty()) {
+        if (list.isEmpty()) {
             ui.showMessage("No workouts recorded for this selection!");
             return;
         }
         for (int i = 0; i < list.size(); i++) {
             Workout w = list.get(i);
-            ui.showMessage((i+1) + ". " + w.getWorkoutName() + " - " + w.getWorkoutDateString());
+            ui.showMessage((i + 1) + ". " + w.getWorkoutName() + " - " + w.getWorkoutDateString());
         }
     }
 
     public void interactiveDeleteWorkout(String command, UI ui) {
         ArrayList<Workout> targetList = workouts;
 
-        if(command.contains("d/")){
+        if (command.contains("d/")) {
             String dateStr = extractAfter(command, "d/").trim();
             String[] dateTokens = dateStr.split("\\s+");
             String datePart = dateTokens[0];
@@ -500,23 +500,23 @@ public class WorkoutManager {
 
         String[] tokens = selection.split("\\s+");
         ArrayList<Integer> indicesToDelete = new ArrayList<>();
-        for(String token :tokens){
-            try{
+        for (String token : tokens) {
+            try {
                 int index = Integer.parseInt(token) - 1;
-                if(index >= 0 && index < targetList.size()){
+                if (index >= 0 && index < targetList.size()) {
                     indicesToDelete.add(index);
                 }
-            }catch(NumberFormatException ignored){
+            } catch (NumberFormatException ignored) {
                 ui.showError("An unexpected error occurred: " + ignored.getMessage());
             }
         }
 
-        if(indicesToDelete.isEmpty()) {
+        if (indicesToDelete.isEmpty()) {
             ui.showMessage("No valid indices entered. Nothing deleted.");
             return;
         }
 
-        for(int i = indicesToDelete.size() - 1; i >= 0; i--) {
+        for (int i = indicesToDelete.size() - 1; i >= 0; i--) {
             Workout w = targetList.get(indicesToDelete.get(i));
             workouts.remove(w);
             ui.showMessage("Delete: " + w.getWorkoutName());
@@ -525,13 +525,13 @@ public class WorkoutManager {
 
     /**
      * Ends the current workout session by recording the end time and calculating duration.
-     *
+     * <p>
      * Accepts user input in the format: /end_workout d/DD/MM/YY t/HHmm
      * If either date or time is missing, uses the current date or time as default.
      * Validates that the end date and time are not before the workout's start.
      * If the user input is invalid (earlier than start), prompts for re-entry until valid.
      *
-     * @param ui UI for reading user input in the retry loop
+     * @param ui          UI for reading user input in the retry loop
      * @param initialArgs Initial command arguments containing end date/time details
      */
     public void endWorkout(UI ui, String initialArgs) {
@@ -547,104 +547,85 @@ public class WorkoutManager {
 
         String args = (initialArgs == null) ? "" : initialArgs.trim();
 
-        while (true) {
-            // Extract raw tokens
-            String dateStr = "";
-            String timeStr = "";
+        // Extract raw tokens
+        String dateStr = "";
+        String timeStr = "";
 
-            int dIdx = args.indexOf("d/");
-            int tIdx = args.indexOf("t/");
-            if (dIdx != -1) {
-                String tail = args.substring(dIdx + 2).trim();
-                String[] toks = tail.split("\\s+");
-                if (toks.length > 0) dateStr = toks[0].trim();
-            }
-            if (tIdx != -1) {
-                String tail = args.substring(tIdx + 2).trim();
-                String[] toks = tail.split("\\s+");
-                if (toks.length > 0) timeStr = toks[0].trim();
-            }
-
-            LocalDate date = null;
-            LocalTime time = null;
-
-            // Validate provided pieces first
-            if (!dateStr.isEmpty()) {
-                try {
-                    date = LocalDate.parse(dateStr, DATE_FMT);
-                } catch (Exception ex) {
-                    ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
-                    ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-                    args = ui.readCommand();
-                    if (args == null) return; // EOF safety
-                    args = args.trim();
-                    continue;
-                }
-            }
-            if (!timeStr.isEmpty()) {
-                try {
-                    time = LocalTime.parse(timeStr, TIME_FMT);
-                } catch (Exception ex) {
-                    ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
-                    ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-                    args = ui.readCommand();
-                    if (args == null) return; // EOF safety
-                    args = args.trim();
-                    continue;
-                }
-            }
-
-            // Prompt ONLY for missing pieces
-            if (date == null) {
-                String todayStr = LocalDate.now().format(DATE_FMT);
-                ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
-                if (ui.confirmationMessage()) {
-                    date = LocalDate.now();
-                } else {
-                    ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-                    args = ui.readCommand();
-                    if (args == null) return;
-                    args = args.trim();
-                    continue;
-                }
-            }
-            if (time == null) {
-                String nowStr = LocalTime.now().format(TIME_FMT);
-                ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
-                if (ui.confirmationMessage()) {
-                    time = LocalTime.now();
-                } else {
-                    ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-                    args = ui.readCommand();
-                    if (args == null) return;
-                    args = args.trim();
-                    continue;
-                }
-            }
-
-            // Combine & validate
-            LocalDateTime endDateTime = LocalDateTime.of(date, time).truncatedTo(ChronoUnit.MINUTES);
-            LocalDateTime startTime = currentWorkout.getWorkoutStartDateTime().truncatedTo(ChronoUnit.MINUTES);
-
-            if (!endDateTime.isAfter(startTime)) {
-                ui.showMessage("End time must be after the start time of the workout!");
-                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-                args = ui.readCommand();
-                if (args == null) return;
-                args = args.trim();
-                continue;
-            }
-
-            currentWorkout.setWorkoutEndDateTime(endDateTime);
-            int duration = currentWorkout.calculateDuration();
-            currentWorkout.setDuration(duration);
-
-            ui.showMessage("Workout wrapped! Time to refuel!");
-            ui.showMessage(String.format("Workout '%s' ended. Duration: %d minute(s).",
-                    currentWorkout.getWorkoutName(), duration));
-
-            currentWorkout = null;
-            break;
+        int dIdx = args.indexOf("d/");
+        int tIdx = args.indexOf("t/");
+        if (dIdx != -1) {
+            String tail = args.substring(dIdx + 2).trim();
+            String[] toks = tail.split("\\s+");
+            if (toks.length > 0) dateStr = toks[0].trim();
         }
+        if (tIdx != -1) {
+            String tail = args.substring(tIdx + 2).trim();
+            String[] toks = tail.split("\\s+");
+            if (toks.length > 0) timeStr = toks[0].trim();
+        }
+
+        LocalDate date = null;
+        LocalTime time = null;
+
+        // Validate provided pieces first
+        if (!dateStr.isEmpty()) {
+            try {
+                date = LocalDate.parse(dateStr, DATE_FMT);
+            } catch (Exception ex) {
+                ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
+                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                return;
+            }
+        }
+        if (!timeStr.isEmpty()) {
+            try {
+                time = LocalTime.parse(timeStr, TIME_FMT);
+            } catch (Exception ex) {
+                ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
+                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                return;
+            }
+        }
+
+        // Prompt ONLY for missing pieces
+        if (date == null) {
+            String todayStr = LocalDate.now().format(DATE_FMT);
+            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
+            if (ui.confirmationMessage()) {
+                date = LocalDate.now();
+            } else {
+                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                return;
+            }
+        }
+        if (time == null) {
+            String nowStr = LocalTime.now().format(TIME_FMT);
+            ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
+            if (ui.confirmationMessage()) {
+                time = LocalTime.now();
+            } else {
+                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                return;
+            }
+        }
+
+        LocalDateTime endDateTime = LocalDateTime.of(date, time).truncatedTo(ChronoUnit.MINUTES);
+        LocalDateTime startTime = currentWorkout.getWorkoutStartDateTime().truncatedTo(ChronoUnit.MINUTES);
+
+        if (!endDateTime.isAfter(startTime)) {
+            ui.showMessage("End time must be after the start time of the workout!");
+            ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+            return;
+        }
+
+        currentWorkout.setWorkoutEndDateTime(endDateTime);
+        int duration = currentWorkout.calculateDuration();
+        currentWorkout.setDuration(duration);
+
+        ui.showMessage("Workout wrapped! Time to refuel!");
+        ui.showMessage(String.format("Workout '%s' ended. Duration: %d minute(s).",
+                currentWorkout.getWorkoutName(), duration));
+
+        currentWorkout = null;
     }
 }
