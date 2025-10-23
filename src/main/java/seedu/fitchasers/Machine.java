@@ -3,6 +3,9 @@ package seedu.fitchasers;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Constructs a Machine with the given name and targeted body parts.
+ */
 public class Machine {
     private String name;
     private List<String> bodyPartsTargeted;

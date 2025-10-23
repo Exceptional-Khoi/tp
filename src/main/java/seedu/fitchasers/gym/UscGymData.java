@@ -1,21 +1,17 @@
 package seedu.fitchasers.gym;
 import seedu.fitchasers.Gym;
 import seedu.fitchasers.Machine;
-
 import java.util.List;
 
 public class UscGymData {
     public static Gym getGym() {
-        Gym UscGymData = new Gym("USC Gym");
-        UscGymData.addMachine(new Machine("Lat Pulldown", List.of("back", "arms", "strength")));
-        UscGymData.addMachine(new Machine("Shoulder Press", List.of("shoulders", "arms", "strength")));
-        UscGymData.addMachine(new Machine("Rowing Machine", List.of("back", "cardio")));
-        UscGymData.addMachine(new Machine("Pull-up Bar", List.of("back", "arms", "strength")));
-        UscGymData.addMachine(new Machine("Ab Crunch", List.of("core", "strength")));
-        UscGymData.addMachine(new Machine("Queenax Functional Trainer", List.of("core", "shoulders", "arms", "strength")));
-        UscGymData.addMachine(new Machine("Yoga Studio", List.of("core")));
-        UscGymData.addMachine(new Machine("Cycling Studio", List.of("cardio")));
-        return UscGymData;
+        Gym uscGym = new Gym("USC Gym");
+        uscGym.addMachine(new Machine("Deadlift Platform", List.of("strength", "posterior-chain", "back")));
+        uscGym.addMachine(new Machine("Squat Rack", List.of("strength", "squat", "legs", "leg")));
+        uscGym.addMachine(new Machine("Cycling Studio", List.of("cardio", "cycle")));
+        uscGym.addMachine(new Machine("Swimming Pool", List.of("cardio", "swim", "back")));
+        uscGym.addMachine(new Machine("Hypertrophy Machine", List.of("strength", "hypertrophy")));
+        uscGym.addMachine(new Machine("Queenax Functional Trainer", List.of("core", "shoulders", "arms")));
+        return uscGym;
     }
 }
-

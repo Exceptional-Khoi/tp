@@ -4,6 +4,9 @@ package seedu.fitchasers;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Constructs a Gym with the given name and an empty list of machines.
+ */
 public class Gym {
     private String name;
     private List<Machine> machines;
