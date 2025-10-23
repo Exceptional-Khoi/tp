@@ -80,7 +80,7 @@ public class UI {
      */
     public void showError(String error) {
         assert error != null : "Error message must not be null";
-        System.out.println(MAGENTA + "[Oops!] " + RESET + error);
+        System.out.println(MAGENTA + "[Oops!] " + RESET + WHITE_BRIGHT + error);
     }
 
     /**
@@ -102,6 +102,7 @@ public class UI {
                 + RESET);
 
         System.out.println(CYAN + "Type " + WHITE_BRIGHT + "/help" + RESET + CYAN
+                + " or " + WHITE_BRIGHT + "h" + RESET + CYAN
                 + " to explore all available commands!" + RESET);
         System.out.println(CYAN + "Let's crush your fitness goals together!" + RESET);
 
@@ -123,25 +124,30 @@ public class UI {
      */
     public void showHelp() {
         System.out.print(WHITE_BRIGHT +
-                "/help                                - View all commands\n" +
-                "/my_name n/NAME                      - Set your display name "
+                "/help (h)                            - View all commands\n" +
+                "/my_name (n) n/NAME                  - Set your display name "
                 + "(e.g. /my_name n/Nitin)\n" +
-                "/add_weight w/WEIGHT d/DATE          - Record your weight "
+                "/add_weight (aw) w/WEIGHT d/DATE     - Record your weight "
                 + "(e.g. /add_weight w/81.5 d/19/10/25)\n" +
-                "/create_workout n/NAME d/DATE t/TIME - Create a new workout "
+                "/view_weight (vw)                    - View your recorded weights\n" +
+                "/create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout "
                 + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)\n" +
-                "/add_exercise n/NAME r/REPS          - Add an exercise "
+                "/add_exercise (ae) n/NAME r/REPS     - Add an exercise "
                 + "(e.g. /add_exercise n/Squat r/12)\n" +
-                "/add_set r/REPS                      - Add a new set "
+                "/add_set (as) r/REPS                 - Add a new set "
                 + "(e.g. /add_set r/10)\n" +
-                "/end_workout d/DATE t/TIME           - End the current workout "
+                "/end_workout (ew) d/DATE t/TIME      - End the current workout "
                 + "(e.g. /end_workout d/20/10/25 t/2030)\n" +
-                "/view_log                            - View your workout history\n" +
-                "/del_workout NAME                    - Delete a workout "
+                "/view_log (vl)                       - View your workout history\n" +
+                "/open (o) INDEX                      - Open workout by index\n" +
+                "/del_workout (d) NAME                - Delete a workout "
                 + "(e.g. /del_workout PushDay)\n" +
-                "/exit                                - Save progress and exit the app\n" +
+                "/exit (e)                            - Save progress and exit the app\n" +
                 RESET);
+
+        showDivider();
     }
+
 
     /**
      * Displays a visual divider line to separate sections in the console output.
