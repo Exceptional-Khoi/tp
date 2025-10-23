@@ -6,6 +6,9 @@ import org.junit.jupiter.api.Test;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -46,14 +49,35 @@ class WorkoutManagerTest {
     }
 
     @Test
-    void addWorkout_validInput_addsWorkoutToCurrentSet() {
+    void addWorkout_validInput_addsWorkoutToCurrentSet() throws Exception {
+        java.lang.reflect.Field field = manager.getClass().getDeclaredField("currentWorkout");
+        field.setAccessible(true);
+        Object current = field.get(manager);
+        if (current != null) {
+            LocalDateTime start = (LocalDateTime) current.getClass()
+                    .getMethod("getWorkoutStartDateTime")
+                    .invoke(current);
+            LocalDateTime end = start.plusMinutes(1);
+
+            String endArgs = String.format("d/%s t/%s",
+                    end.format(DateTimeFormatter.ofPattern("dd/MM/yy")),
+                    end.format(DateTimeFormatter.ofPattern("HHmm")));
+
+            UI dummyUI = new UI() {
+                @Override public boolean confirmationMessage() { return true; }
+            };
+            manager.endWorkout(dummyUI, endArgs);
+        }
+
         manager.addWorkout("n/run d/15/10/25 t/0730");
+        
         assertEquals(2, manager.getWorkouts().size());
         assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
     }
 
+
     @Test
-    void deleteWorkout_aceessingDeletedWorkout_indexOutOfBoundsException() {
+    void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() {
         manager.deleteWorkout("run");
         assertThrows(IndexOutOfBoundsException.class,
                 ()-> manager.getWorkouts().get(1));
@@ -71,4 +95,5 @@ class WorkoutManagerTest {
 
         System.setOut(System.out); // reset stdout
     }
+
 }
