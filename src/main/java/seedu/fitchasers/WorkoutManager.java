@@ -86,8 +86,10 @@ public class WorkoutManager {
         String dateStr = "";
         if (dIdx != -1) {
             String tail = command.substring(dIdx + 2).trim();
-            String[] toks = tail.split("\\s+");
-            if (toks.length > 0) dateStr = toks[0];
+            String[] token = tail.split("\\s+");
+            if (token.length > 0) {
+                dateStr = token[0];
+            }
         }
 
         String timeStr = "";
