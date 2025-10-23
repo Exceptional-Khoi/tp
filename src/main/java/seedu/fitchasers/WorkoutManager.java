@@ -94,7 +94,9 @@ public class WorkoutManager {
         if (tIdx != -1) {
             String tail = command.substring(tIdx + 2).trim();
             String[] toks = tail.split("\\s+");
-            if (toks.length > 0) timeStr = toks[0];
+            if (toks.length > 0){
+                timeStr = toks[0];
+            }
         }
 
         // Strict formatters & validate provided pieces first
@@ -344,9 +346,13 @@ public class WorkoutManager {
         // Validate reps (positive integer)
         int reps;
         try {
-            if (!repsStr.matches("\\d+")) throw new NumberFormatException();
+            if (!repsStr.matches("\\d+")) {
+                throw new NumberFormatException();
+            }
             reps = Integer.parseInt(repsStr);
-            if (reps <= 0) throw new NumberFormatException();
+            if (reps <= 0) {
+                throw new NumberFormatException();
+            }
         } catch (NumberFormatException e) {
             ui.showMessage("REPS must be a positive integer. Example: /add_exercise n/PushUp r/12");
             return;
@@ -418,9 +424,13 @@ public class WorkoutManager {
         // Validate reps (positive integer)
         int reps;
         try {
-            if (!repsStr.matches("\\d+")) throw new NumberFormatException();
+            if (!repsStr.matches("\\d+")) {
+                throw new NumberFormatException();
+            }
             reps = Integer.parseInt(repsStr);
-            if (reps <= 0) throw new NumberFormatException();
+            if (reps <= 0) {
+                throw new NumberFormatException();
+            }
         } catch (NumberFormatException e) {
             ui.showMessage("REPS must be a positive integer. Example: /add_set r/15");
             return;
