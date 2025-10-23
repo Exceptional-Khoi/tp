@@ -131,10 +131,15 @@ public class FitChasers {
                 case "amot": {
                     // Example: /add_modality_tag m=cardio k=hiking
                     String[] params = argumentStr.split("\\s+");
-                    String mod = null, keyword = null;
+                    String mod = null;
+                    String keyword = null;
                     for (String param : params) {
-                        if (param.startsWith("m/")) mod = param.substring(2).toUpperCase();
-                        if (param.startsWith("k/")) keyword = param.substring(2).toLowerCase();
+                        if (param.startsWith("m/")){
+                            mod = param.substring(2).toUpperCase();
+                        }
+                        if (param.startsWith("k/")){
+                            keyword = param.substring(2).toLowerCase();
+                        }
                     }
                     if (mod != null && keyword != null) {
                         tagger.addModalityKeyword(Modality.valueOf(mod), keyword);
@@ -155,10 +160,15 @@ public class FitChasers {
                 case "amt": {
                     // Example: /add_muscle_tag m=legs k=lunges
                     String[] params = argumentStr.split("\\s+");
-                    String mus = null, keyword = null;
+                    String mus = null;
+                    String keyword = null;
                     for (String param : params) {
-                        if (param.startsWith("m/")) mus = param.substring(2).toUpperCase();
-                        if (param.startsWith("k/")) keyword = param.substring(2).toLowerCase();
+                        if (param.startsWith("m/")){
+                            mus = param.substring(2).toUpperCase();
+                        }
+                        if (param.startsWith("k/")){
+                            keyword = param.substring(2).toLowerCase();
+                        }
                     }
                     if (mus != null && keyword != null) {
                         tagger.addMuscleKeyword(MuscleGroup.valueOf(mus), keyword);
@@ -182,7 +192,8 @@ public class FitChasers {
                         if (trimmedArg.startsWith("n/") && trimmedArg.length() > 2) {
                             Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
                             if (!gymsToSuggest.isEmpty()) {
-                                ui.showMessage("You can do this workout at: " + String.join(", ", gymsToSuggest));
+                                ui.showMessage("You can do this workout at: " + String.join(", ",
+                                        gymsToSuggest));
                             } else {
                                 ui.showMessage("Sorry, no gyms found for that exercise.");
                             }
@@ -190,7 +201,8 @@ public class FitChasers {
                             ui.showMessage("Usage: /gym_where n/exercise_name");
                         }
                     } catch (Exception e) {
-                        ui.showMessage("An error occurred while searching for gyms. Please check your input and try again.");
+                        ui.showMessage("An error occurred while searching for gyms. Please check your input " +
+                                "and try again.");
                     }
                     ui.showDivider();
                     break;

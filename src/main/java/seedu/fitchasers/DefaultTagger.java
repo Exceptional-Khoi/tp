@@ -6,9 +6,6 @@ import seedu.fitchasers.tagger.MuscleGroup;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Set;
 
 public class DefaultTagger implements Tagger {
     private final EnumMap<Modality, Set<String>> modalityKeywords = new EnumMap<>(Modality.class);
@@ -63,8 +60,12 @@ public class DefaultTagger implements Tagger {
         }
 
         // Custom patterns
-        if (text.contains("push")) tags.add("push");
-        if (text.contains("pull")) tags.add("pull");
+        if (text.contains("push")){
+            tags.add("push");
+        }
+        if (text.contains("pull")){
+            tags.add("pull");
+        }
 
         return tags;
     }
