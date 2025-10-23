@@ -21,7 +21,11 @@ public class WorkoutManager {
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
-    private final Tagger tagger = new DefaultTagger();
+    private final Tagger tagger;
+
+    public WorkoutManager(Tagger tagger) {
+        this.tagger = tagger;
+    }
 
     public void setWorkouts(ArrayList<Workout> workouts) {
         this.workouts = workouts;
@@ -160,7 +164,7 @@ public class WorkoutManager {
             Set<String> mergedTags = new LinkedHashSet<>(newWorkout.getTags());
             mergedTags.addAll(tagger.suggest(newWorkout));
             newWorkout.setTags(mergedTags);
-
+            System.out.println("Tags generated for workout: " + mergedTags);
             workouts.add(newWorkout);
             currentWorkout = newWorkout;
 
@@ -533,6 +537,31 @@ public class WorkoutManager {
             workouts.remove(w);
             ui.showMessage("Delete: " + w.getWorkoutName());
         }
+    }
+
+    public void editWorkoutTag(int workoutId, String oldTag, String newTag) {
+        if (workoutId < 1 || workoutId > workouts.size()) {
+            ui.showMessage("Invalid workout ID.");
+            return;
+        }
+        Workout w = workouts.get(workoutId - 1);
+        Set<String> tags = new LinkedHashSet<>(w.getTags());
+
+        String tagToRemove = null;
+        for (String tag : tags) {
+            if (tag.equalsIgnoreCase(oldTag)) {
+                tagToRemove = tag;
+                break;
+            }
+        }
+
+        if (tagToRemove == null) {
+            ui.showMessage("Old tag not found.");
+            return;
+        }
+        tags.remove(tagToRemove);
+        tags.add(newTag.toLowerCase());
+        w.setTags(tags);
     }
 
     /**

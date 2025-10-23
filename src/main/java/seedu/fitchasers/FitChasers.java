@@ -3,6 +3,8 @@ package seedu.fitchasers;
 //import java.io.IOException;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidCommandException;
+import seedu.fitchasers.tagger.Modality;
+import seedu.fitchasers.tagger.MuscleGroup;
 
 import java.io.IOException;
 import java.time.YearMonth;
@@ -27,13 +29,14 @@ public class FitChasers {
      */
     public static void main(String[] args) throws IOException {
         UI ui = new UI();
-        WorkoutManager workoutManager = new WorkoutManager();
         FileHandler fileHandler = new FileHandler();
         Person person = new Person("Nary");
         WeightManager weightManager = new WeightManager(person);
         YearMonth currentMonth = YearMonth.now();
         ViewLog viewLog;
         List<Gym> gyms = StaticGymData.getNusGyms();
+        DefaultTagger tagger = new DefaultTagger();
+        WorkoutManager workoutManager = new WorkoutManager(tagger);
 
         // Attempt to load persistent datai by month
         // #TODO add select month #TODO need to add seperate month to current month check!
@@ -124,12 +127,54 @@ public class FitChasers {
                     ui.showDivider();
                     break;
 
-                case "/gym_where":
-                    Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
-                    if (!gymsToSuggest.isEmpty()) {
-                        ui.showMessage("You can do this workout at: " + String.join(", ", gymsToSuggest));
+                case "/add_modality_tag":
+                case "amot": {
+                    // Example: /add_modality_tag m=cardio k=hiking
+                    String[] params = argumentStr.split("\\s+");
+                    String mod = null, keyword = null;
+                    for (String param : params) {
+                        if (param.startsWith("m/")) mod = param.substring(2).toUpperCase();
+                        if (param.startsWith("k/")) keyword = param.substring(2).toLowerCase();
+                    }
+                    if (mod != null && keyword != null) {
+                        tagger.addModalityKeyword(Modality.valueOf(mod), keyword);
+                        for (Workout w : workoutManager.getWorkouts()) {
+                            Set<String> updatedTags = tagger.suggest(w);
+                            w.setTags(updatedTags);
+                            System.out.println("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
+                        }
+                        ui.showMessage("Added keyword " + keyword + " to modality " + mod);
                     } else {
-                        ui.showMessage("Sorry, no gyms found for that exercise.");
+                        ui.showMessage("Usage: /add_modality_tag m/(CARDIO/ STRENGTH) k/keyword");
+                    }
+                    break;
+                }
+
+
+                case "/add_muscle_tag":
+                case "amt": {
+                    // Example: /add_muscle_tag m=legs k=lunges
+                    String[] params = argumentStr.split("\\s+");
+                    String mus = null, keyword = null;
+                    for (String param : params) {
+                        if (param.startsWith("m/")) mus = param.substring(2).toUpperCase();
+                        if (param.startsWith("k/")) keyword = param.substring(2).toLowerCase();
+                    }
+                    if (mus != null && keyword != null) {
+                        tagger.addMuscleKeyword(MuscleGroup.valueOf(mus), keyword);
+                        for (Workout w : workoutManager.getWorkouts()) {
+                            Set<String> updatedTags = tagger.suggest(w);
+                            w.setTags(updatedTags);
+                            System.out.println("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
+                        }
+                        ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
+                    } else {
+                        ui.showMessage("Usage: /add_muscle_tag m/LEGS/ CHEST/... k/keyword");
+                    }
+                    break;
+                }
+
+
                 case "/gym_where": {
                     String trimmedArg = argumentStr.trim();
                     try {
@@ -171,8 +216,38 @@ public class FitChasers {
                     }
                     break;
                 }
+                case "/edit_workout_tag": {
+                    // Expected format: /edit_workout_tag id/1 oldTag=cardio newTag=strength
+                    String[] params = argumentStr.split("\\s+");
+                    Integer workoutId = null;
+                    String oldTag = null;
+                    String newTag = null;
+
+                    for (String param : params) {
+                        if (param.startsWith("id/")) {
+                            try {
+                                workoutId = Integer.parseInt(param.substring(3));
+                            } catch (NumberFormatException e) {
+                                ui.showMessage("Invalid workout ID. Must be an integer.");
+                                break;
+                            }
+                        } else if (param.startsWith("oldTag/")) {
+                            oldTag = param.substring(7).toLowerCase();
+                        } else if (param.startsWith("newTag/")) {
+                            newTag = param.substring(7).toLowerCase();
+                        }
                     }
+
+                    if (workoutId != null && oldTag != null && newTag != null) {
+                        workoutManager.editWorkoutTag(workoutId, oldTag, newTag);
+                        ui.showMessage("Workout tags updated.");
+                    } else {
+                        ui.showMessage("Usage: /edit_workout_tag id/WORKOUT_ID oldTag/OLD_TAG newTag/NEW_TAG");
+                    }
+                    ui.showDivider();
                     break;
+                }
+
 
                 case "/add_set":
                 case "as":
