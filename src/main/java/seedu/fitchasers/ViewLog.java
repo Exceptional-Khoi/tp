@@ -238,6 +238,9 @@ public class ViewLog {
     }
 
     private static String formatDayMon(LocalDateTime dt) {
+        if (dt == null) {
+            return "Unknown date";
+        }
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
         int day = dt.getDayOfMonth();
         String mon = dt.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
@@ -245,6 +248,9 @@ public class ViewLog {
     }
 
     private static String formatLong(LocalDateTime dt) {
+        if (dt == null) {
+            return "Unknown date";
+        }
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int d = dt.getDayOfMonth();
         String suffix = UI.getDaySuffix(d);

@@ -113,6 +113,9 @@ public class Workout implements Serializable {
      * @return the formatted date string
      */
     private static String formatWorkoutDate(LocalDateTime dateTime) {
+        if (dateTime == null) {
+            return "Unknown date";
+        }
         String dayOfWeek = dateTime.getDayOfWeek()
                 .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int dayOfMonth = dateTime.getDayOfMonth();
