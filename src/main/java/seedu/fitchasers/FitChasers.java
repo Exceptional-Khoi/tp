@@ -130,22 +130,47 @@ public class FitChasers {
                         ui.showMessage("You can do this workout at: " + String.join(", ", gymsToSuggest));
                     } else {
                         ui.showMessage("Sorry, no gyms found for that exercise.");
+                case "/gym_where": {
+                    String trimmedArg = argumentStr.trim();
+                    try {
+                        // Only proceed if argument starts with "n/"
+                        if (trimmedArg.startsWith("n/") && trimmedArg.length() > 2) {
+                            Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
+                            if (!gymsToSuggest.isEmpty()) {
+                                ui.showMessage("You can do this workout at: " + String.join(", ", gymsToSuggest));
+                            } else {
+                                ui.showMessage("Sorry, no gyms found for that exercise.");
+                            }
+                        } else {
+                            ui.showMessage("Usage: /gym_where n/exercise_name");
+                        }
+                    } catch (Exception e) {
+                        ui.showMessage("An error occurred while searching for gyms. Please check your input and try again.");
                     }
                     ui.showDivider();
                     break;
+                }
 
-                case "/gym_page":
+                case "/gym_page": {
                     try {
-                        int pageNum = Integer.parseInt(argumentStr.trim());
-                        if (pageNum >= 1 && pageNum <= gyms.size()) {
-                            Gym gym = gyms.get(pageNum - 1);
-                            EquipmentDisplay.showEquipmentForSingleGym(gym);
+                        String trimmedArg = argumentStr.trim();
+                        if (trimmedArg.startsWith("p/") && trimmedArg.length() > 2) {
+                            String pageNumStr = trimmedArg.substring(2).trim();
+                            int pageNum = Integer.parseInt(pageNumStr);
+                            if (pageNum >= 1 && pageNum <= gyms.size()) {
+                                Gym gym = gyms.get(pageNum - 1);
+                                EquipmentDisplay.showEquipmentForSingleGym(gym);
+                            } else {
+                                ui.showMessage("Invalid page number. Please enter a number between 1 and " + gyms.size());
+                            }
                         } else {
-                            System.out.println("Invalid page number. Please enter a number between 1 and " +
-                                    gyms.size());
+                            ui.showMessage("Usage: /gym_page p/page_number (e.g. /gym_page p/1)");
                         }
                     } catch (NumberFormatException e) {
-                        System.out.println("Please enter a valid page number.");
+                        ui.showMessage("Usage: /gym_page page_number (must be an integer)");
+                    }
+                    break;
+                }
                     }
                     break;
 

@@ -130,6 +130,10 @@ public class UI {
                 "/add_weight (aw) w/WEIGHT d/DATE     - Record your weight "
                 + "(e.g. /add_weight w/81.5 d/19/10/25)\n" +
                 "/view_weight (vw)                    - View your recorded weights\n" +
+                "/gym_where n/EXERCISE                - Find gyms with equipment for your exercise "
+                + "(e.g. /gym_where n/squat)\n" +
+                "/gym_page                            - Find available gyms in NUS"+
+                "/gym_page page_number\n"+
                 "/create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout "
                 + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)\n" +
                 "/add_exercise (ae) n/NAME r/REPS     - Add an exercise "
