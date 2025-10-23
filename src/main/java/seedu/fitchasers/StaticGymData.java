@@ -4,7 +4,8 @@ import seedu.fitchasers.gym.UTownGymData;
 import seedu.fitchasers.gym.SrcGymData;
 import seedu.fitchasers.gym.UscGymData;
 
-import java.util.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class StaticGymData {
     public static List<Gym> getNusGyms() {

@@ -1,6 +1,5 @@
 package seedu.fitchasers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -18,7 +17,7 @@ public class Machine {
     public String getName() {
         return name;
     }
-    
+
     public List<String> getBodyPartsTargeted() {
         return bodyPartsTargeted;
     }

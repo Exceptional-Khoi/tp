@@ -3,13 +3,11 @@ package seedu.fitchasers;
 //import java.io.IOException;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidCommandException;
-import seedu.fitchasers.EquipmentDisplay;
 
 import java.io.IOException;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
 
@@ -135,7 +133,8 @@ public class FitChasers {
                             Gym gym = gyms.get(pageNum - 1);
                             EquipmentDisplay.showEquipmentForSingleGym(gym);
                         } else {
-                            System.out.println("Invalid page number. Please enter a number between 1 and " + gyms.size());
+                            System.out.println("Invalid page number. Please enter a number between 1 and " +
+                                    gyms.size());
                         }
                     } catch (NumberFormatException e) {
                         System.out.println("Please enter a valid page number.");
