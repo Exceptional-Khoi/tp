@@ -21,7 +21,7 @@ public class WorkoutManager {
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
-    private final Tagger tagger;
+    private Tagger tagger;
 
     public WorkoutManager(Tagger tagger) {
         this.tagger = tagger;
