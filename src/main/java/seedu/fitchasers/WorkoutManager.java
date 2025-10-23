@@ -35,12 +35,16 @@ public class WorkoutManager {
      * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
+        assert workouts != null : "workouts list should be initialized";
+
         if (currentWorkout != null) {
             ui.showMessage("You currently have an active workout: '"
                     + currentWorkout.getWorkoutName() + "'.");
             ui.showMessage("Please end the active workout first with: /end_workout d/DD/MM/YY t/HHmm");
             return;
         }
+
+        assert currentWorkout == null : "No active workout expected before creating a new one";
 
         if (command == null || !command.contains("n/")) {
             ui.showMessage("Invalid format. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
@@ -75,6 +79,8 @@ public class WorkoutManager {
             ui.showMessage("Workout name cannot be empty. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
             return;
         }
+
+        assert !workoutName.isEmpty() : "workoutName should be non-empty after validation";
 
         // Extract raw date/time strings if present (first token after marker)
         String dateStr = "";
@@ -272,7 +278,7 @@ public class WorkoutManager {
         String repsStr = extractAfter(args, "r/").trim();
 
         if (name.isEmpty() || repsStr.isEmpty()) {
-            ui.showMessage("Usage: /add_exercise n/NAME r/REPS");
+            ui.showMessage("Invalid format. Please use: /add_exercise n/NAME r/REPS");
             return;
         }
 
