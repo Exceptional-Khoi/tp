@@ -101,7 +101,7 @@ public class FileHandler {
      * Saves all weight entries of the given person into a serialized file.
      * <p>
      * The file is stored inside the {@link #DATA_DIR} directory, with the filename format:
-     * "weight_<PersonName>.dat". If the data directory does not exist, it will be created automatically.
+     * "weight_&lt;PersonName&gt;.dat". If the data directory does not exist, it will be created automatically.
      * </p>
      *
      * @param person the {@link Person} whose weight history will be saved
@@ -120,7 +120,7 @@ public class FileHandler {
      * Loads previously saved weight entries for the given person from a serialized file.
      * <p>
      * The file is expected to be located inside the {@link #DATA_DIR} directory, with the filename format:
-     * "weight_<PersonName>.dat". If no file is found, the method will simply show a message and return.
+     * "weight_&lt;PersonName&gt;.dat". If no file is found, the method will simply show a message and return.
      * The loaded entries are set into the {@link Person}'s weight history.
      * </p>
      *
