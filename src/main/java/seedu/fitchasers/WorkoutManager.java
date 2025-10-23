@@ -1,5 +1,6 @@
 package seedu.fitchasers;
 
+import java.time.format.ResolverStyle;
 import java.util.LinkedHashSet;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -34,54 +35,122 @@ public class WorkoutManager {
      * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
-        String workoutName;
-        if (command.contains("d/")) {
-            workoutName = extractBetween(command, "n/", "d/").trim();
-        } else if (command.contains("t/")) {
-            workoutName = extractBetween(command, "n/", "t/").trim();
-        } else {
-            // If neither d/ nor t/ found, take the rest of the string after n/
-            int nIndex = command.indexOf("n/");
-            workoutName = command.substring(nIndex + 2).trim();
+        if (command == null || !command.contains("n/")) {
+            ui.showMessage("Invalid format. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
+            return;
         }
 
+        String workoutName;
+        int nIdx = command.indexOf("n/");
+        int afterN = nIdx + 2;
+
+        // Find first marker after n/
+        int dIdx = command.indexOf("d/", afterN);
+        int tIdx = command.indexOf("t/", afterN);
+
+        // pick the nearest positive marker after n/
+        int nextMarker = -1;
+        if (dIdx != -1 && tIdx != -1) {
+            nextMarker = Math.min(dIdx, tIdx);
+        } else if (dIdx != -1) {
+            nextMarker = dIdx;
+        } else if (tIdx != -1) {
+            nextMarker = tIdx;
+        }
+
+        if (nextMarker != -1) {
+            workoutName = command.substring(afterN, nextMarker).trim();
+        } else {
+            workoutName = command.substring(afterN).trim();
+        }
+
+        if (workoutName.isEmpty()) {
+            ui.showMessage("Workout name cannot be empty. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
+            return;
+        }
+
+        // Extract raw date/time strings if present (first token after marker)
         String dateStr = "";
-        if (command.contains("d/")) {
-            String[] dateTokens = extractAfter(command, "d/").split("\\s+");
-            dateStr = dateTokens[0].trim();
+        if (dIdx != -1) {
+            String tail = command.substring(dIdx + 2).trim();
+            String[] toks = tail.split("\\s+");
+            if (toks.length > 0) dateStr = toks[0];
         }
 
         String timeStr = "";
-        if (command.contains("t/")) {
-            String[] timeTokens = extractAfter(command, "t/").split("\\s+");
-            timeStr = timeTokens[0].trim();
+        if (tIdx != -1) {
+            String tail = command.substring(tIdx + 2).trim();
+            String[] toks = tail.split("\\s+");
+            if (toks.length > 0) timeStr = toks[0];
         }
 
-        if(dateStr.isEmpty()) {
-            dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yy"));
-            ui.showMessage("No date input detected - Using current date: " + dateStr);
-        }
-        if(timeStr.isEmpty()) {
-            timeStr = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmm"));
-            ui.showMessage("No time input detected - Using current time: " + timeStr);
+        // Strict formatters & validate provided pieces first
+        DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yy")
+                .withResolverStyle(ResolverStyle.STRICT);
+        DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HHmm")
+                .withResolverStyle(ResolverStyle.STRICT);
+
+        LocalDate date = null;
+        LocalTime time = null;
+
+        if (!dateStr.isEmpty()) {
+            try {
+                date = LocalDate.parse(dateStr, DATE_FMT);
+            } catch (Exception ex) {
+                ui.showMessage("Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
+                return;
+            }
         }
 
-        String dateTimeStr = dateStr + " " + timeStr;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy HHmm");
+        if (!timeStr.isEmpty()) {
+            try {
+                time = LocalTime.parse(timeStr, TIME_FMT);
+            } catch (Exception ex) {
+                ui.showMessage("Invalid time. Use t/HHmm (e.g., t/1905).");
+                return;
+            }
+        }
+
+        // Prompt ONLY for missing ones
+        if (date == null) {
+            String todayStr = LocalDate.now().format(DATE_FMT);
+            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
+            if (ui.confirmationMessage()) {
+                date = LocalDate.now();
+            } else {
+                ui.showMessage("Please provide a date in format d/DD/MM/YY.");
+                return;
+            }
+        }
+
+        if (time == null) {
+            String nowStr = LocalTime.now().format(TIME_FMT);
+            ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
+            if (ui.confirmationMessage()) {
+                time = LocalTime.now();
+            } else {
+                ui.showMessage("Please provide a time in format t/HHmm.");
+                return;
+            }
+        }
+
+        LocalDateTime workoutDateTime = LocalDateTime.of(date, time);
 
         try {
-            LocalDateTime workoutDateTime = LocalDateTime.parse(dateTimeStr, formatter);
             Workout newWorkout = new Workout(workoutName, workoutDateTime);
+
+            // merge auto-tags if you have a tagger
             Set<String> mergedTags = new LinkedHashSet<>(newWorkout.getTags());
             mergedTags.addAll(tagger.suggest(newWorkout));
             newWorkout.setTags(mergedTags);
 
             workouts.add(newWorkout);
             currentWorkout = newWorkout;
+
             ui.showMessage("New workout sesh incoming!");
             ui.showMessage("Added workout: " + workoutName);
         } catch (Exception e) {
-            ui.showMessage("Invalid date/time format. Use: d/DD/MM/YY t/HHmm");
+            ui.showMessage("Something went wrong creating the workout. Please try again.");
         }
     }
 
