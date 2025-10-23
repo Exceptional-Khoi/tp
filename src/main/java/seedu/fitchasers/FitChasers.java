@@ -33,7 +33,6 @@ public class FitChasers {
         FileHandler fileHandler = new FileHandler();
         Person person = new Person("Nary");
         WeightManager weightManager = new WeightManager(person);
-        Scanner scanner = new Scanner(System.in);
         YearMonth currentMonth = YearMonth.now();
         ViewLog viewLog;
         List<Gym> gyms = StaticGymData.getNusGyms();
@@ -103,6 +102,7 @@ public class FitChasers {
 
                 case "/view_weight":
                     weightManager.viewWeights();
+                    person.displayWeightGraphWithDates();
                     ui.showDivider();
                     break;
 
@@ -150,7 +150,7 @@ public class FitChasers {
 
                 case "/end_workout":
                     // Format: /end_workout d/DD/MM/YY t/HHmm
-                    workoutManager.endWorkout(scanner, argumentStr);
+                    workoutManager.endWorkout(ui, argumentStr);
                     ui.showDivider();
                     break;
 
@@ -173,7 +173,7 @@ public class FitChasers {
                         throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
                                 "Please enter a valid command.");
                     } else if (argumentStr.contains("d/")) {
-                        workoutManager.interactiveDeleteWorkout(argumentStr, scanner);
+                        workoutManager.interactiveDeleteWorkout(argumentStr, ui);
                     } else{
                         workoutManager.deleteWorkout(argumentStr);
                     }

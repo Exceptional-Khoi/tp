@@ -15,7 +15,7 @@ public class UI {
     private static final String BLUE_BOLD = "\u001B[1;34m";
     private static final String CYAN = "\u001B[36m";
     private static final String MAGENTA = "\u001B[35m";
-    private static final String WHITE_BOLD = "\u001B[1;37m";
+    private static final String WHITE_BRIGHT = "\u001B[97m";
 
     /**
      * Scanner instance for reading user input from the console.
@@ -43,23 +43,22 @@ public class UI {
         }
 
         String input = scanner.nextLine();
-        if (input == null || input.isEmpty()) {
-            return "";
-        }
+        assert input != null : "User input should never be null";
+
         return input.trim();
     }
 
     public String promptForName() {
         System.out.print(MAGENTA + "Enter your name: " + RESET + " > ");
+
         if (!scanner.hasNextLine()) {
             // no more input (EOF)
             return null;
         }
 
         String input = scanner.nextLine();
-        if (input == null || input.isEmpty()) {
-            return "";
-        }
+        assert input != null : "Input from user should not be null";
+
         return input.trim();
     }
     /**
@@ -69,7 +68,8 @@ public class UI {
      * @param message the message to display.
      */
     public void showMessage(String message) {
-        System.out.println(WHITE_BOLD + message + RESET);
+        assert message != null : "Message to display should not be null";
+        System.out.println(WHITE_BRIGHT + message + RESET);
     }
 
     /**
@@ -79,6 +79,7 @@ public class UI {
      * @param error the error message to display.
      */
     public void showError(String error) {
+        assert error != null : "Error message must not be null";
         System.out.println(MAGENTA + "[Oops!] " + RESET + error);
     }
 
@@ -89,16 +90,18 @@ public class UI {
     public void showGreeting() {
 
         System.out.println(BLUE_BOLD + """
-                +------------------------------------------------------+
-                |                      FITCHASER                       |
-                +------------------------------------------------------+
+                 ▄▄▄▄▄▄   ▀      ▄      ▄▄▄  █                                       \s
+                 █      ▄▄▄    ▄▄█▄▄  ▄▀   ▀ █ ▄▄    ▄▄▄    ▄▄▄    ▄▄▄    ▄ ▄▄   ▄▄▄ \s
+                 █▄▄▄▄▄   █      █    █      █▀  █  ▀   █  █   ▀  █▀  █   █▀  ▀ █   ▀\s
+                 █        █      █    █      █   █  ▄▀▀▀█   ▀▀▀▄  █▀▀▀▀   █      ▀▀▀▄\s
+                 █      ▄▄█▄▄    ▀▄▄   ▀▄▄▄▀ █   █  ▀▄▄▀█  ▀▄▄▄▀  ▀█▄▄▀   █     ▀▄▄▄▀\s
                 """ + RESET);
 
         System.out.println(CYAN
                 + "Your virtual gym buddy's clocked in and ready to make you strong!"
                 + RESET);
 
-        System.out.println(CYAN + "Type " + WHITE_BOLD + "/help" + CYAN
+        System.out.println(CYAN + "Type " + WHITE_BRIGHT + "/help" + RESET + CYAN
                 + " to explore all available commands!" + RESET);
         System.out.println(CYAN + "Let's crush your fitness goals together!" + RESET);
 
@@ -119,34 +122,36 @@ public class UI {
      * Displays all available commands and their usage.
      */
     public void showHelp() {
-        System.out.println("/help                                - View all commands");
-        System.out.println("/my_name n/NAME                        - Set your display name"
-                + " (e.g. /my_name n/Nitin)");
-        System.out.println("/add_weight w/WEIGHT d/DATE          - Record your weight "
-                + "(e.g. /add_weight w/81.5 d/19/10/25)");
-        System.out.println("/gym_page PAGE_NUMBER                - View the pages of the different gyms in NUS" +
-                "e.g. /gym_page 1");
-        System.out.println("/gym_where n/EXERCISE                 - View where to workout"
-                +"e.g. /gym_where n/squat");
-        System.out.println("/create_workout n/NAME d/DATE t/TIME - Create a new workout "
-                + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)");
-        System.out.println("/add_exercise n/NAME r/REPS          - Add an exercise "
-                + "(e.g. /add_exercise n/Squat r/12)");
-        System.out.println("/add_set r/REPS                      - Add a new set "
-                + "(e.g. /add_set r/10)");
-        System.out.println("/end_workout d/DATE t/TIME           - End the current workout "
-                + "(e.g. /end_workout d/20/10/25 t/2030)");
-        System.out.println("/view_log                            - View your workout history");
-        System.out.println("/del_workout NAME                    - Delete a workout "
-                + "(e.g. /del_workout PushDay)");
-        System.out.println("/exit                                - Save progress and exit the app");
+        System.out.print(WHITE_BRIGHT +
+                "/help                                - View all commands\n" +
+                "/my_name n/NAME                      - Set your display name "
+                + "(e.g. /my_name n/Nitin)\n" +
+                "/add_weight w/WEIGHT d/DATE          - Record your weight "
+                + "(e.g. /add_weight w/81.5 d/19/10/25)\n" + 
+                "/gym_page PAGE_NUMBER                - View different gyms in NUS" +
+                "e.g. /gym_page 1"+ 
+                "/gym_where n/EXERCISE                - View where to workout"+
+                "e.g. /gym_where n/squat"
+                "/create_workout n/NAME d/DATE t/TIME - Create a new workout "
+                + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)\n" +
+                "/add_exercise n/NAME r/REPS          - Add an exercise "
+                + "(e.g. /add_exercise n/Squat r/12)\n" +
+                "/add_set r/REPS                      - Add a new set "
+                + "(e.g. /add_set r/10)\n" +
+                "/end_workout d/DATE t/TIME           - End the current workout "
+                + "(e.g. /end_workout d/20/10/25 t/2030)\n" +
+                "/view_log                            - View your workout history\n" +
+                "/del_workout NAME                    - Delete a workout "
+                + "(e.g. /del_workout PushDay)\n" +
+                "/exit                                - Save progress and exit the app\n" +
+                RESET);
     }
 
     /**
      * Displays a visual divider line to separate sections in the console output.
      */
     public void showDivider() {
-        System.out.println(WHITE_BOLD
+        System.out.println(WHITE_BRIGHT
                 + "--------------------------------------------------" + RESET);
     }
 
@@ -156,6 +161,7 @@ public class UI {
             return false;
         }
         String confirmation = scanner.nextLine().trim().toLowerCase();
+        assert confirmation != null : "Confirmation input must not be null";
         return confirmation.equals("y") || confirmation.equals("yes");
     }
 
@@ -175,11 +181,13 @@ public class UI {
         showDivider();
 
         // Basic info
+        assert workout.getWorkoutName() != null : "Workout name should not be null";
         showMessage("Name       : " + workout.getWorkoutName());
         showMessage("Date       : " + workout.getWorkoutDateString());
 
         // Duration formatting
         int totalMinutes = workout.getDuration();
+        assert totalMinutes >= 0 : "Workout duration must not be negative";
         int hours = totalMinutes / 60;
         int minutes = totalMinutes % 60;
         String durationStr = (hours > 0)
@@ -203,6 +211,7 @@ public class UI {
 
         // Exercises
         ArrayList<Exercise> exercises = workout.getExercises();
+        assert exercises != null : "Workout exercises should not be null";
         if (exercises.isEmpty()) {
             showMessage("Exercises  : (none added)");
         } else {
@@ -219,6 +228,7 @@ public class UI {
 
 
     static String getDaySuffix(int day) {
+        assert day >= 1 && day <= 31 : "Day should be between 1 and 31";
         if (day >= 11 && day <= 13) {
             return "th";
         }
