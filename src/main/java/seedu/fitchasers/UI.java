@@ -148,7 +148,6 @@ public class UI {
         showDivider();
     }
 
-
     /**
      * Displays a visual divider line to separate sections in the console output.
      */

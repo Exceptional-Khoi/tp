@@ -7,6 +7,8 @@ import seedu.fitchasers.exceptions.InvalidCommandException;
 import java.io.IOException;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 
 /**
@@ -31,6 +33,7 @@ public class FitChasers {
         WeightManager weightManager = new WeightManager(person);
         YearMonth currentMonth = YearMonth.now();
         ViewLog viewLog;
+        List<Gym> gyms = StaticGymData.getNusGyms();
 
         // Attempt to load persistent datai by month
         // #TODO add select month #TODO need to add seperate month to current month check!
@@ -103,6 +106,7 @@ public class FitChasers {
                 case "/view_weight":
                 case "vw":
                     weightManager.viewWeights();
+                    person.displayWeightGraphWithDates();
                     ui.showDivider();
                     break;
 
@@ -118,6 +122,31 @@ public class FitChasers {
                     // Format: /add_exercise n/NAME r/REPS
                     workoutManager.addExercise(argumentStr);
                     ui.showDivider();
+                    break;
+
+                case "/gym_where":
+                    Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
+                    if (!gymsToSuggest.isEmpty()) {
+                        ui.showMessage("You can do this workout at: " + String.join(", ", gymsToSuggest));
+                    } else {
+                        ui.showMessage("Sorry, no gyms found for that exercise.");
+                    }
+                    ui.showDivider();
+                    break;
+
+                case "/gym_page":
+                    try {
+                        int pageNum = Integer.parseInt(argumentStr.trim());
+                        if (pageNum >= 1 && pageNum <= gyms.size()) {
+                            Gym gym = gyms.get(pageNum - 1);
+                            EquipmentDisplay.showEquipmentForSingleGym(gym);
+                        } else {
+                            System.out.println("Invalid page number. Please enter a number between 1 and " +
+                                    gyms.size());
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Please enter a valid page number.");
+                    }
                     break;
 
                 case "/add_set":
