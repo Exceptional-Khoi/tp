@@ -35,6 +35,10 @@ public class FitChasers {
         ViewLog viewLog;
         List<Gym> gyms = StaticGymData.getNusGyms();
 
+        // --- Load weight history ---
+        fileHandler.loadWeightList(person);
+
+        // --- Load workouts ---
         // Attempt to load persistent datai by month
         // #TODO add select month #TODO need to add seperate month to current month check!
         try {
@@ -195,6 +199,7 @@ public class FitChasers {
                 case "e":
                     ui.showMessage("Saving your progress...");
                     try {
+                        fileHandler.saveWeightList(person);
                         fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
                         ui.showExitMessage();
                     } catch (IOException e) {
