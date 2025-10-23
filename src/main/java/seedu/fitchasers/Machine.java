@@ -15,6 +15,11 @@ public class Machine {
         this.bodyPartsTargeted = bodyPartsTargeted;
     }
 
-    public String getName() { return name; }
-    public List<String> getBodyPartsTargeted() { return bodyPartsTargeted; }
+    public String getName() {
+        return name;
+    }
+    
+    public List<String> getBodyPartsTargeted() {
+        return bodyPartsTargeted;
+    }
 }

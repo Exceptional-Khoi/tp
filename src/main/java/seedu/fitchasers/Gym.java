@@ -20,6 +20,11 @@ public class Gym {
         machines.add(machine);
     }
 
-    public String getName() { return name; }
-    public List<Machine> getMachines() { return machines; }
+    public String getName() {
+        return name;
+    }
+
+    public List<Machine> getMachines() {
+        return machines;
+    }
 }
