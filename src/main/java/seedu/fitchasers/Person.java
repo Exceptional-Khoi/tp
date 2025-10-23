@@ -1,10 +1,8 @@
 package seedu.fitchasers;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
+import java.time.LocalDate;
+import java.util.*;
 import java.time.format.DateTimeFormatter;
 
 /**
@@ -134,10 +132,16 @@ public class Person implements Serializable {
         List<String> dates = new ArrayList<>();
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM");
 
-        for (WeightRecord record : weightHistory) {
-            weights.add(record.getWeight());
-            dates.add(record.getDate().format(df));
+        Map<LocalDate, WeightRecord> latestPerDay = new LinkedHashMap<>();
+        for (WeightRecord r : weightHistory) {
+            latestPerDay.put(r.getDate(), r);
         }
+
+        for (WeightRecord r : latestPerDay.values()) {
+            weights.add(r.getWeight());
+            dates.add(r.getDate().format(df));
+        }
+
 
         double min = Collections.min(weights);
         double max = Collections.max(weights);
