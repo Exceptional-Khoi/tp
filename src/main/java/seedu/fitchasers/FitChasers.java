@@ -229,38 +229,38 @@ public class FitChasers {
                     }
                     break;
                 }
-//                case "/edit_workout_tag": {
-//                    // Expected format: /edit_workout_tag id/1 oldTag=cardio newTag=strength
-//                    String[] params = argumentStr.split("\\s+");
-//                    Integer workoutId = null;
-//                    String oldTag = null;
-//                    String newTag = null;
-//
-//                    for (String param : params) {
-//                        if (param.startsWith("id/")) {
-//                            try {
-//                                workoutId = Integer.parseInt(param.substring(3));
-//                            } catch (NumberFormatException e) {
-//                                ui.showMessage("Invalid workout ID. Must be an integer.");
-//                                break;
-//                            }
-//                        } else if (param.startsWith("oldTag/")) {
-//                            oldTag = param.substring(7).toLowerCase();
-//                        } else if (param.startsWith("newTag/")) {
-//                            newTag = param.substring(7).toLowerCase();
-//                        }
-//                    }
-//
-//                    if (workoutId != null && oldTag != null && newTag != null) {
-//                        workoutManager.editWorkoutTag(workoutId, oldTag, newTag);
-//                        fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-//                        ui.showMessage("Workout tags updated.");
-//                    } else {
-//                        ui.showMessage("Usage: /edit_workout_tag id/WORKOUT_ID oldTag/OLD_TAG newTag/NEW_TAG");
-//                    }
-//                    ui.showDivider();
-//                    break;
-//                }
+                /*case "/edit_workout_tag": {
+                    // Expected format: /edit_workout_tag id/1 oldTag=cardio newTag=strength
+                    String[] params = argumentStr.split("\\s+");
+                    Integer workoutId = null;
+                    String oldTag = null;
+                    String newTag = null;
+
+                    for (String param : params) {
+                        if (param.startsWith("id/")) {
+                            try {
+                                workoutId = Integer.parseInt(param.substring(3));
+                            } catch (NumberFormatException e) {
+                                ui.showMessage("Invalid workout ID. Must be an integer.");
+                                break;
+                            }
+                        } else if (param.startsWith("oldTag/")) {
+                            oldTag = param.substring(7).toLowerCase();
+                        } else if (param.startsWith("newTag/")) {
+                            newTag = param.substring(7).toLowerCase();
+                        }
+                    }
+
+                    if (workoutId != null && oldTag != null && newTag != null) {
+                        workoutManager.editWorkoutTag(workoutId, oldTag, newTag);
+                        fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
+                        ui.showMessage("Workout tags updated.");
+                    } else {
+                        ui.showMessage("Usage: /edit_workout_tag id/WORKOUT_ID oldTag/OLD_TAG newTag/NEW_TAG");
+                    }
+                    ui.showDivider();
+                    break;
+                }*/
 
 
                 case "/add_set":
