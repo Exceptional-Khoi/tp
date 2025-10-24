@@ -1,4 +1,6 @@
-package seedu.fitchasers;
+package seedu.fitchasers.tagger;
+import seedu.fitchasers.workouts.Workout;
+
 import java.util.Set;
 
 public interface Tagger {

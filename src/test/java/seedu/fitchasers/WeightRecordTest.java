@@ -1,6 +1,7 @@
 package seedu.fitchasers;
 
 import org.junit.jupiter.api.Test;
+import seedu.fitchasers.user.WeightRecord;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;

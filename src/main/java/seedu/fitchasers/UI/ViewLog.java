@@ -1,4 +1,6 @@
-package seedu.fitchasers;
+package seedu.fitchasers.UI;
+import seedu.fitchasers.workouts.Workout;
+import seedu.fitchasers.workouts.WorkoutManager;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 
 import java.time.LocalDateTime;
@@ -11,7 +13,7 @@ import java.util.Locale;
 public class ViewLog {
     public static final int MINIMUM_PAGE_SIZE = 1;
     public static final int ARRAY_INDEX_OFFSET = 1;
-    public static final int DETAILED_ARG_CONST = 3;
+    public static final int DETAILED_ARG_CONST = 4;
     private static UI ui = new UI();                         // your existing UI class
     private final WorkoutManager workoutManager;
     private int pageSize = 10;
@@ -253,7 +255,7 @@ public class ViewLog {
         }
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int d = dt.getDayOfMonth();
-        String suffix = UI.getDaySuffix(d);
+        String suffix = ui.getDaySuffix(d);
         String mon = dt.getMonth().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int hr = dt.getHour();
         int min = dt.getMinute();

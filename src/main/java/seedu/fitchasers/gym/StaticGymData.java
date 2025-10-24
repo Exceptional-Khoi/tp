@@ -1,8 +1,4 @@
-package seedu.fitchasers;
-
-import seedu.fitchasers.gym.UTownGymData;
-import seedu.fitchasers.gym.SrcGymData;
-import seedu.fitchasers.gym.UscGymData;
+package seedu.fitchasers.gym;
 
 import java.util.List;
 import java.util.ArrayList;

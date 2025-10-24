@@ -1,4 +1,6 @@
-package seedu.fitchasers;
+package seedu.fitchasers.user;
+
+import seedu.fitchasers.UI.UI;
 
 import java.io.Serializable;
 import java.util.ArrayList;

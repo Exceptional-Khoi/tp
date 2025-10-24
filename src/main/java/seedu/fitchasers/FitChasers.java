@@ -1,9 +1,19 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.UI.UI;
+import seedu.fitchasers.UI.ViewLog;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidCommandException;
+import seedu.fitchasers.gym.EquipmentDisplay;
+import seedu.fitchasers.gym.Gym;
+import seedu.fitchasers.gym.StaticGymData;
+import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Modality;
 import seedu.fitchasers.tagger.MuscleGroup;
+import seedu.fitchasers.user.Person;
+import seedu.fitchasers.user.WeightManager;
+import seedu.fitchasers.workouts.Workout;
+import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.IOException;
 import java.time.YearMonth;

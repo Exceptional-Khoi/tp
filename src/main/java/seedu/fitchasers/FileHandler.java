@@ -1,6 +1,10 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.UI.UI;
 import seedu.fitchasers.exceptions.FileNonexistent;
+import seedu.fitchasers.user.Person;
+import seedu.fitchasers.user.WeightRecord;
+import seedu.fitchasers.workouts.Workout;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

@@ -1,4 +1,7 @@
-package seedu.fitchasers;
+package seedu.fitchasers.workouts;
+
+import seedu.fitchasers.tagger.Tagger;
+import seedu.fitchasers.UI.UI;
 
 import java.time.format.ResolverStyle;
 import java.util.LinkedHashSet;

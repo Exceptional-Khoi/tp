@@ -1,4 +1,7 @@
-package seedu.fitchasers;
+package seedu.fitchasers.UI;
+
+import seedu.fitchasers.workouts.Exercise;
+import seedu.fitchasers.workouts.Workout;
 
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -242,7 +245,7 @@ public class UI {
 
 
 
-    static String getDaySuffix(int day) {
+    public String getDaySuffix(int day) {
         assert day >= 1 && day <= 31 : "Day should be between 1 and 31";
         if (day >= 11 && day <= 13) {
             return "th";

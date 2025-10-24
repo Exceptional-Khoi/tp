@@ -2,6 +2,12 @@ package seedu.fitchasers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import seedu.fitchasers.UI.UI;
+import seedu.fitchasers.tagger.DefaultTagger;
+import seedu.fitchasers.tagger.Tagger;
+import seedu.fitchasers.workouts.Exercise;
+import seedu.fitchasers.workouts.Workout;
+import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;

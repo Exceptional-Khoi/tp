@@ -1,6 +1,7 @@
 package seedu.fitchasers;
 
 import org.junit.jupiter.api.Test;
+import seedu.fitchasers.workouts.Exercise;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
