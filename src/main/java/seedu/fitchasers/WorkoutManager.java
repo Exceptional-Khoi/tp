@@ -538,36 +538,51 @@ public class WorkoutManager {
         }
     }
 
-    public void editWorkoutTag(int workoutId, String oldTag, String newTag) {
-        if (workoutId < 1 || workoutId > workouts.size()) {
-            ui.showMessage("Invalid workout ID.");
-            return;
-        }
-        Workout w = workouts.get(workoutId - 1);
-        Set<String> manualTags = new LinkedHashSet<>(w.getManualTags());
+//    public void editWorkoutTag(int workoutId, String oldTag, String newTag) {
+//        if (workoutId < 1 || workoutId > workouts.size()) {
+//            ui.showMessage("Invalid workout ID.");
+//            return;
+//        }
+//        Workout w = workouts.get(workoutId - 1);
+//        Set<String> manualTags = new LinkedHashSet<>(w.getManualTags());
+//
+//        String tagToRemove = null;
+//        for (String tag : manualTags) {
+//            if (tag.equalsIgnoreCase(oldTag)) {
+//                tagToRemove = tag;
+//                break;
+//            }
+//        }
+//
+//        if (tagToRemove == null) {
+//            ui.showMessage("Old tag not found.");
+//            return;
+//        }
+//        manualTags.remove(tagToRemove);
+//        if (newTag == null || newTag.trim().isEmpty()) {
+//            // If new tag is empty, just remove old tag without adding
+//            ui.showMessage("Removed tag '" + tagToRemove + "' without replacement.");
+//        } else {
+//            manualTags.add(newTag.toLowerCase().trim());
+//            ui.showMessage("Tag changed from '" + tagToRemove + "' to '" + newTag + "'.");
+//        }
+//
+//        w.setManualTags(manualTags);
+//    }
 
-        String tagToRemove = null;
-        for (String tag : manualTags) {
-            if (tag.equalsIgnoreCase(oldTag)) {
-                tagToRemove = tag;
-                break;
-            }
-        }
-
-        if (tagToRemove == null) {
-            ui.showMessage("Old tag not found.");
-            return;
-        }
-        manualTags.remove(tagToRemove);
-        if (newTag == null || newTag.trim().isEmpty()) {
-            // If new tag is empty, just remove old tag without adding
-            ui.showMessage("Removed tag '" + tagToRemove + "' without replacement.");
-        } else {
-            manualTags.add(newTag.toLowerCase().trim());
-            ui.showMessage("Tag changed from '" + tagToRemove + "' to '" + newTag + "'.");
-        }
-
-        w.setManualTags(manualTags);
+    /**
+     *Overrides the manual tags of a workout with a new single tag and clears all auto tags.
+     *This effectively replaces any existing manual and automatic tags with the specified tag.
+     *
+     *@param workoutId the ID/index of the workout to update (1-based index assumed)
+     *@param newTag the new tag to set as the manual tag for the workout
+     */
+    public void overrideWorkoutTags(int workoutId, String newTag) {
+        Workout workout = workouts.get(workoutId - 1);
+        Set<String> newTagsSet = new LinkedHashSet<>();
+        newTagsSet.add(newTag.toLowerCase().trim());
+        workout.setManualTags(newTagsSet);
+        workout.setAutoTags(new LinkedHashSet<>());
     }
 
     /**
