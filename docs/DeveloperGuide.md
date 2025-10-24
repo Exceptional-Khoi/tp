@@ -34,11 +34,24 @@ The Sequence Diagram below shows how the components interact with each other for
 ## Product scope
 ### Target user profile
 
-{Describe the target user profile}
+FitChasers is designed for individuals who want to track and improve their fitness progress effectively.
+Our target users include:
+
+1. University students and working adults who want a lightweight fitness tracker without complex setup.
+2. Users who prefer a command-line interface for fast and distraction-free input.
+3. Fitness enthusiasts who want to log, view, and analyze workouts and body data (e.g., weight, reps, sets).
+4. People who value privacy and prefer storing their data locally instead of using cloud-based apps.
+5. Beginners who want simple, guided commands to build consistent fitness habits.
 
 ### Value proposition
 
 {Describe the value proposition: what problem does it solve?}
+
+FitChasers provides an intuitive, local, and command-based way to track your workouts and progress over time.
+Unlike most fitness apps that require constant internet access or sign-ins, FitChasers focuses on simplicity and data ownership.
+It helps users build consistency by making fitness tracking fast and rewarding, using summaries and visualization features.
+The system ensures data integrity and transparency — users can view, export, and back up their own fitness records anytime.
+Overall, FitChasers empowers users to understand their progress and stay motivated without unnecessary complexity.
 
 ## User Stories
 
