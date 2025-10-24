@@ -1,6 +1,5 @@
 package seedu.fitchasers;
 
-//import java.io.IOException;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidCommandException;
 
@@ -29,33 +28,59 @@ public class FitChasers {
         UI ui = new UI();
         WorkoutManager workoutManager = new WorkoutManager();
         FileHandler fileHandler = new FileHandler();
-        Person person = new Person("Nary");
+
+        ui.showGreeting();
+
+        String savedName = null;
+        try {
+            savedName = fileHandler.loadUserName();
+        } catch (IOException e) {
+            ui.showError("Error reading saved username: " + e.getMessage());
+        }
+
+        Person person;
+        if (savedName != null) {
+            person = new Person(savedName);
+            ui.showMessage("Welcome back, " + savedName + "!");
+        } else {
+            // Prompt for name if not saved
+            ui.showMessage("Before we begin, please enter your name.");
+            String userName = ui.enterName();
+            while (userName == null || userName.trim().isEmpty()) {
+                ui.showMessage("Name cannot be empty. Please enter your name:");
+                userName = ui.enterName();
+            }
+            person = new Person(userName.trim());
+            ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started.\n");
+
+            try {
+                fileHandler.saveUserName(person);
+            } catch (IOException e) {
+                ui.showError("Failed to save username: " + e.getMessage());
+            }
+        }
+
         WeightManager weightManager = new WeightManager(person);
         YearMonth currentMonth = YearMonth.now();
         ViewLog viewLog;
         List<Gym> gyms = StaticGymData.getNusGyms();
 
-        // --- Load weight history ---
-        fileHandler.loadWeightList(person);
-
-        // --- Load workouts ---
-        // Attempt to load persistent datai by month
-        // #TODO add select month #TODO need to add seperate month to current month check!
         try {
+            fileHandler.loadWeightList(person);
             workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth));
-            ui.showMessage("Loaded " + currentMonth + " workouts");
-        } catch ( FileNonexistent e) {
+            ui.showMessage("Loaded " + currentMonth + " workouts\n");
+        } catch (FileNonexistent e) {
             ui.showError("Seems like this is a new month!"
-                    + "\n Would you like to create new workouts for this month? (Y/N)" );
-            if(ui.confirmationMessage()) {
-                fileHandler.saveMonthList(currentMonth,new ArrayList<>());
+                    + "\nWould you like to create new workouts for this month? (Y/N)");
+            if (ui.confirmationMessage()) {
+                fileHandler.saveMonthList(currentMonth, new ArrayList<>());
                 workoutManager.setWorkouts(new ArrayList<>());
             }
-        }catch(IOException e) {
+        } catch (IOException e) {
             ui.showError(e.getMessage());
         }
-        viewLog = new ViewLog(ui,workoutManager);
-        ui.showGreeting();
+
+        viewLog = new ViewLog(ui, workoutManager);
 
         boolean isRunning = true;
 

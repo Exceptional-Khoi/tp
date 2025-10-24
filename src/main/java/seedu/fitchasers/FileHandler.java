@@ -144,4 +144,34 @@ public class FileHandler {
             throw new IOException("WeightRecord class not found", e);
         }
     }
+    // ----------------- Username -----------------
+    /**
+     * Saves the person's name to a file for future sessions.
+     */
+    public void saveUserName(Person person) throws IOException {
+        ensureDataDir();
+        Path filePath = DATA_DIR.resolve("username.dat");
+        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
+            out.writeObject(person.getName());
+            ui.showMessage("Saved username: " + person.getName());
+        }
+    }
+
+    /**
+     * Loads the saved username from file.
+     * Returns null if file doesn't exist.
+     */
+    public String loadUserName() throws IOException {
+        ensureDataDir();
+        Path filePath = DATA_DIR.resolve("username.dat");
+        if (Files.notExists(filePath)) {
+            ui.showMessage("No saved username found.");
+            return null;
+        }
+        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
+            return (String) in.readObject();
+        } catch (ClassNotFoundException e) {
+            throw new IOException("Failed to read username from file", e);
+        }
+    }
 }
