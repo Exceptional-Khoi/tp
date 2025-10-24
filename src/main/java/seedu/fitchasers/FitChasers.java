@@ -109,8 +109,7 @@ public class FitChasers {
                     break;
 
                 case "/my_name":
-                case "n":
-                {
+                case "n":{
                     if (argumentStr == null || !argumentStr.startsWith("n/")) {
                         ui.showMessage("Usage: /my_name n/YourName");
                         ui.showDivider();
