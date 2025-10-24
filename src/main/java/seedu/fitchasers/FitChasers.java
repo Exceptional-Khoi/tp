@@ -122,8 +122,17 @@ public class FitChasers {
                         ui.showDivider();
                         break;
                     }
+
                     person.setName(newName);
                     ui.showMessage("Alright, I'll call you " + newName + " from now on.");
+
+                    try {
+                        fileHandler.saveUserName(person);
+                        ui.showMessage("Your new name has been saved.");
+                    } catch (IOException e) {
+                        ui.showError("Failed to save username: " + e.getMessage());
+                    }
+
                     ui.showDivider();
                     break;
                 }

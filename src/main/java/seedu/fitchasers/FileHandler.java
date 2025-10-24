@@ -31,10 +31,9 @@ import java.util.List;
 
 public class FileHandler {
 
-    private static final Path DATA_DIR = Paths.get("data", "workouts");
+    private static final Path DATA_DIR = Paths.get("data");
+    private static final Path WORKOUT_DIR = DATA_DIR.resolve("workouts");
     private final UI ui = new UI();
-
-
 
     /**
      * Ensures that the save file and its parent directory exist.
@@ -43,6 +42,7 @@ public class FileHandler {
      */
     private static void ensureDataDir() throws IOException {
         Files.createDirectories(DATA_DIR);
+        Files.createDirectories(WORKOUT_DIR);
     }
 
     // ----------------- Workout -----------------
@@ -62,7 +62,7 @@ public class FileHandler {
 
 
         String filename = String.format("workouts_%s.dat", month); // e.g., workouts_2025-06.dat
-        Path filePath = DATA_DIR.resolve(filename);
+        Path filePath = WORKOUT_DIR.resolve(filename);
 
         try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             out.writeObject(list);
@@ -82,7 +82,7 @@ public class FileHandler {
         ensureDataDir();
 
         String filename = String.format("workouts_%s.dat", month);
-        Path filePath = DATA_DIR.resolve(filename);
+        Path filePath = WORKOUT_DIR.resolve(filename);
 
         if (Files.notExists(filePath)) {
             throw new FileNonexistent("No save file found for " + month);
@@ -109,7 +109,7 @@ public class FileHandler {
      */
     public void saveWeightList(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = DATA_DIR.resolve("weight_" + person.getName() + ".dat");
+        Path filePath = DATA_DIR.resolve("weight.dat");
         try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             out.writeObject(person.getWeightHistory());
             ui.showMessage("Saved " + person.getWeightHistory().size() + " weight entries for " + person.getName());
@@ -131,7 +131,7 @@ public class FileHandler {
     @SuppressWarnings("unchecked")
     public void loadWeightList(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = DATA_DIR.resolve("weight_" + person.getName() + ".dat");
+        Path filePath = DATA_DIR.resolve("weight.dat");
         if (Files.notExists(filePath)) {
             ui.showMessage("No previous weight data found for " + person.getName());
             return;
@@ -153,7 +153,6 @@ public class FileHandler {
         Path filePath = DATA_DIR.resolve("username.dat");
         try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             out.writeObject(person.getName());
-            ui.showMessage("Saved username: " + person.getName());
         }
     }
 
@@ -165,7 +164,6 @@ public class FileHandler {
         ensureDataDir();
         Path filePath = DATA_DIR.resolve("username.dat");
         if (Files.notExists(filePath)) {
-            ui.showMessage("No saved username found.");
             return null;
         }
         try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
