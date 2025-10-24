@@ -48,19 +48,23 @@ public class UI {
         return input.trim();
     }
 
-    public String promptForName() {
-        System.out.print(MAGENTA + "Enter your name: " + RESET + " > ");
-
-        if (!scanner.hasNextLine()) {
-            // no more input (EOF)
-            return null;
+    public String enterName() {
+        String name = "";
+        while (name.isEmpty()) {
+            System.out.print(MAGENTA + "Enter your name: " + RESET);
+            if (scanner.hasNextLine()) {
+                name = scanner.nextLine().trim();
+                if (name.isEmpty()) {
+                    showMessage("Name cannot be empty. Please try again.");
+                }
+            } else {
+                // no more input (EOF)
+                return null;
+            }
         }
-
-        String input = scanner.nextLine();
-        assert input != null : "Input from user should not be null";
-
-        return input.trim();
+        return name;
     }
+
     /**
      * Displays a standard informational message in green color,
      * followed by a divider for readability.
