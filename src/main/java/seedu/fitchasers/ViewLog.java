@@ -96,7 +96,7 @@ public class ViewLog {
         ui.showMessage("Date     : " + dateLong);
         ui.showMessage("Duration : " + dur);
         //String type = safe(workout.getType());
-        String tags = workout.getTags().toString();                  // "-" if none
+        String tags = workout.getAllTags().toString();                  // "-" if none
         //ui.showMessage("Type     : " + (type.isBlank() ? "-" : type));
         ui.showMessage("Tags     : " + (tags.isBlank() ? "-" : tags));
         // Add more fields from Workout here (sets/reps, notes, RPE, etc.)

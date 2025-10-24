@@ -213,7 +213,7 @@ public class UI {
         }
 
         // Tags
-        Set<String> tags = workout.getTags();
+        Set<String> tags = workout.getAllTags();
         if (tags != null && !tags.isEmpty()) {
             showMessage("Tags       : " + String.join(", ", tags));
         } else {

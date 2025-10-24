@@ -20,7 +20,8 @@ public class Workout implements Serializable {
     private LocalDateTime workoutStartDateTime;
     private LocalDateTime workoutEndDateTime;
     private Exercise currentExercise = null;
-    private Set<String> tags = new LinkedHashSet<>();   // multiple tags
+    private Set<String> manualTags = new LinkedHashSet<>(); // tags the user edits manually
+    private Set<String> autoTags = new LinkedHashSet<>();
 
     public Workout(String workoutName, int duration) {
         this.workoutName = workoutName;
@@ -39,12 +40,24 @@ public class Workout implements Serializable {
         this.duration = calculateDuration();
     }
 
-    public Set<String> getTags() {
-        return tags == null ? Set.of() : tags;
+    public Set<String> getManualTags() {
+        return manualTags;
     }
-
-    public void setTags(Set<String> tags) {
-        this.tags = new LinkedHashSet<>(tags);
+    public Set<String> getAutoTags() {
+        return autoTags;
+    }
+    public void setManualTags(Set<String> tags) {
+        this.manualTags = new LinkedHashSet<>(tags);
+    }
+    public void setAutoTags(Set<String> tags) {
+        this.autoTags = new LinkedHashSet<>(tags);
+    }
+    /** Returns union of both for display/UI. */
+    public Set<String> getAllTags() {
+        Set<String> out = new LinkedHashSet<>();
+        out.addAll(manualTags);
+        out.addAll(autoTags);
+        return out;
     }
 
     public String getWorkoutName() {
