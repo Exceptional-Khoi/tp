@@ -19,7 +19,8 @@ class WorkoutManagerTest {
 
     @BeforeEach
     void setup() {
-        manager = new WorkoutManager();
+        Tagger tagger = new DefaultTagger();
+        manager = new WorkoutManager(tagger);
         manager.addWorkout("n/TestWorkout d/25/10/25 t/1400");
     }
 

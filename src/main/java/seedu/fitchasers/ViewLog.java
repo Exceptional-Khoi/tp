@@ -96,7 +96,7 @@ public class ViewLog {
         ui.showMessage("Date     : " + dateLong);
         ui.showMessage("Duration : " + dur);
         //String type = safe(workout.getType());
-        String tags = workout.getTags().toString();                  // "-" if none
+        String tags = workout.getAllTags().toString();                  // "-" if none
         //ui.showMessage("Type     : " + (type.isBlank() ? "-" : type));
         ui.showMessage("Tags     : " + (tags.isBlank() ? "-" : tags));
         // Add more fields from Workout here (sets/reps, notes, RPE, etc.)
@@ -238,6 +238,9 @@ public class ViewLog {
     }
 
     private static String formatDayMon(LocalDateTime dt) {
+        if (dt == null) {
+            return "Unknown date";
+        }
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
         int day = dt.getDayOfMonth();
         String mon = dt.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
@@ -245,6 +248,9 @@ public class ViewLog {
     }
 
     private static String formatLong(LocalDateTime dt) {
+        if (dt == null) {
+            return "Unknown date";
+        }
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int d = dt.getDayOfMonth();
         String suffix = UI.getDaySuffix(d);
