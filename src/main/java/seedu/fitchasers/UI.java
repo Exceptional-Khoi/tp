@@ -136,8 +136,10 @@ public class UI {
                 "/gym_page page_number\n"+
                 "/add_modality_tag (amot) m/TYPE k/keyword - Add keyword for modality "
                 + "(e.g. /add_modality_tag m/cardio k/hiking)\n" +
-                "/add_muscle_tag (amt) m=GROUP k=keyword  - Add keyword for muscle group "
+                "/add_muscle_tag (amt) m/GROUP k/keyword  - Add keyword for muscle group "
                 + "(e.g. /add_muscle_tag m/legs k/lunges)\n" +
+                "/edit_workout_tag id/index oldTag/OLD_TAG newTag/NEW_TAG -Modify workout tag"+
+                        ("e.g. /edit_workout_tag id/1 oldTag/cardio newTag/Strength")+
                 "/create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout "
                 + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)\n" +
                 "/add_exercise (ae) n/NAME r/REPS     - Add an exercise "
