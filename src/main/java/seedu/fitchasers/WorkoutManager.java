@@ -21,7 +21,11 @@ public class WorkoutManager {
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
-    private final Tagger tagger = new DefaultTagger();
+    private Tagger tagger;
+
+    public WorkoutManager(Tagger tagger) {
+        this.tagger = tagger;
+    }
 
     public void setWorkouts(ArrayList<Workout> workouts) {
         this.workouts = workouts;
@@ -157,10 +161,9 @@ public class WorkoutManager {
             Workout newWorkout = new Workout(workoutName, workoutDateTime);
 
             // merge auto-tags if you have a tagger
-            Set<String> mergedTags = new LinkedHashSet<>(newWorkout.getTags());
-            mergedTags.addAll(tagger.suggest(newWorkout));
-            newWorkout.setTags(mergedTags);
-
+            Set<String> suggestedTags = tagger.suggest(newWorkout);
+            newWorkout.setAutoTags(suggestedTags);
+            System.out.println("Tags generated for workout: " + suggestedTags);
             workouts.add(newWorkout);
             currentWorkout = newWorkout;
 
@@ -533,6 +536,38 @@ public class WorkoutManager {
             workouts.remove(w);
             ui.showMessage("Delete: " + w.getWorkoutName());
         }
+    }
+
+    public void editWorkoutTag(int workoutId, String oldTag, String newTag) {
+        if (workoutId < 1 || workoutId > workouts.size()) {
+            ui.showMessage("Invalid workout ID.");
+            return;
+        }
+        Workout w = workouts.get(workoutId - 1);
+        Set<String> manualTags = new LinkedHashSet<>(w.getManualTags());
+
+        String tagToRemove = null;
+        for (String tag : manualTags) {
+            if (tag.equalsIgnoreCase(oldTag)) {
+                tagToRemove = tag;
+                break;
+            }
+        }
+
+        if (tagToRemove == null) {
+            ui.showMessage("Old tag not found.");
+            return;
+        }
+        manualTags.remove(tagToRemove);
+        if (newTag == null || newTag.trim().isEmpty()) {
+            // If new tag is empty, just remove old tag without adding
+            ui.showMessage("Removed tag '" + tagToRemove + "' without replacement.");
+        } else {
+            manualTags.add(newTag.toLowerCase().trim());
+            ui.showMessage("Tag changed from '" + tagToRemove + "' to '" + newTag + "'.");
+        }
+
+        w.setManualTags(manualTags);
     }
 
     /**
