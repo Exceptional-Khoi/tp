@@ -142,8 +142,8 @@ public class UI {
                 + "(e.g. /add_modality_tag m/cardio k/hiking)\n" +
                 "/add_muscle_tag (amt) m/GROUP k/keyword  - Add keyword for muscle group "
                 + "(e.g. /add_muscle_tag m/legs k/lunges)\n" +
-                "/edit_workout_tag id/index oldTag/OLD_TAG newTag/NEW_TAG -Modify workout tag"+
-                        ("e.g. /edit_workout_tag id/1 oldTag/cardio newTag/Strength")+
+                "/overwrite_workout_tag(owt) id/index newTag/NEW_TAG -Modify workout tag"+
+                        ("e.g. /overwrite_workout_tag id/1 newTag/Strength")+
                 "/create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout "
                 + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)\n" +
                 "/add_exercise (ae) n/NAME r/REPS     - Add an exercise "
@@ -217,11 +217,11 @@ public class UI {
         }
 
         // Tags
-        Set<String> tags = workout.getAllTags();
-        if (tags != null && !tags.isEmpty()) {
-            showMessage("Tags       : " + String.join(", ", tags));
-        } else {
+        Set<String> tagsToDisplay = workout.getAllTags();
+        if (tagsToDisplay.isEmpty()) {
             showMessage("Tags       : -");
+        } else {
+            showMessage("Tags       : " + String.join(", ", tagsToDisplay));
         }
 
         // Exercises

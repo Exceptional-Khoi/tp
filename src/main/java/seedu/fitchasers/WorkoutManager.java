@@ -106,9 +106,9 @@ public class WorkoutManager {
         }
 
         // Strict formatters & validate provided pieces first
-        DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yy")
+        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
                 .withResolverStyle(ResolverStyle.SMART);
-        DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HHmm")
+        DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
                 .withResolverStyle(ResolverStyle.SMART);
 
         LocalDate date = null;
@@ -116,7 +116,7 @@ public class WorkoutManager {
 
         if (!dateStr.isEmpty()) {
             try {
-                date = LocalDate.parse(dateStr, DATE_FMT);
+                date = LocalDate.parse(dateStr, dateFmt);
             } catch (Exception ex) {
                 ui.showMessage("Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
                 return;
@@ -125,7 +125,7 @@ public class WorkoutManager {
 
         if (!timeStr.isEmpty()) {
             try {
-                time = LocalTime.parse(timeStr, TIME_FMT);
+                time = LocalTime.parse(timeStr, timeFmt);
             } catch (Exception ex) {
                 ui.showMessage("Invalid time. Use t/HHmm (e.g., t/1905).");
                 return;
@@ -134,7 +134,7 @@ public class WorkoutManager {
 
         // Prompt ONLY for missing ones
         if (date == null) {
-            String todayStr = LocalDate.now().format(DATE_FMT);
+            String todayStr = LocalDate.now().format(dateFmt);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 date = LocalDate.now();
@@ -145,7 +145,7 @@ public class WorkoutManager {
         }
 
         if (time == null) {
-            String nowStr = LocalTime.now().format(TIME_FMT);
+            String nowStr = LocalTime.now().format(timeFmt);
             ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 time = LocalTime.now();
@@ -538,36 +538,19 @@ public class WorkoutManager {
         }
     }
 
-    public void editWorkoutTag(int workoutId, String oldTag, String newTag) {
-        if (workoutId < 1 || workoutId > workouts.size()) {
-            ui.showMessage("Invalid workout ID.");
-            return;
-        }
-        Workout w = workouts.get(workoutId - 1);
-        Set<String> manualTags = new LinkedHashSet<>(w.getManualTags());
-
-        String tagToRemove = null;
-        for (String tag : manualTags) {
-            if (tag.equalsIgnoreCase(oldTag)) {
-                tagToRemove = tag;
-                break;
-            }
-        }
-
-        if (tagToRemove == null) {
-            ui.showMessage("Old tag not found.");
-            return;
-        }
-        manualTags.remove(tagToRemove);
-        if (newTag == null || newTag.trim().isEmpty()) {
-            // If new tag is empty, just remove old tag without adding
-            ui.showMessage("Removed tag '" + tagToRemove + "' without replacement.");
-        } else {
-            manualTags.add(newTag.toLowerCase().trim());
-            ui.showMessage("Tag changed from '" + tagToRemove + "' to '" + newTag + "'.");
-        }
-
-        w.setManualTags(manualTags);
+    /**
+     * Overrides the manual tags of a workout with a new single tag and clears all auto tags.
+     * This effectively replaces any existing manual and automatic tags with the specified tag.
+     *
+     * @param workoutId the ID/index of the workout to update (1-based index assumed)
+     * @param newTag the new tag to set as the manual tag for the workout
+     */
+    public void overrideWorkoutTags(int workoutId, String newTag) {
+        Workout workout = workouts.get(workoutId - 1);
+        Set<String> newTagsSet = new LinkedHashSet<>();
+        newTagsSet.add(newTag.toLowerCase().trim());
+        workout.setManualTags(newTagsSet);
+        workout.setAutoTags(new LinkedHashSet<>());
     }
 
     /**
@@ -587,9 +570,9 @@ public class WorkoutManager {
             return;
         }
 
-        final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yy")
+        final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
                 .withResolverStyle(ResolverStyle.SMART);
-        final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HHmm")
+        final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
                 .withResolverStyle(ResolverStyle.SMART);
 
         String args = (initialArgs == null) ? "" : initialArgs.trim();
@@ -621,7 +604,7 @@ public class WorkoutManager {
         // Validate provided pieces first
         if (!dateStr.isEmpty()) {
             try {
-                date = LocalDate.parse(dateStr, DATE_FMT);
+                date = LocalDate.parse(dateStr, dateFmt);
             } catch (Exception ex) {
                 ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
                 ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
@@ -630,7 +613,7 @@ public class WorkoutManager {
         }
         if (!timeStr.isEmpty()) {
             try {
-                time = LocalTime.parse(timeStr, TIME_FMT);
+                time = LocalTime.parse(timeStr, timeFmt);
             } catch (Exception ex) {
                 ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
                 ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
@@ -640,7 +623,7 @@ public class WorkoutManager {
 
         // Prompt ONLY for missing pieces
         if (date == null) {
-            String todayStr = LocalDate.now().format(DATE_FMT);
+            String todayStr = LocalDate.now().format(dateFmt);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 date = LocalDate.now();
@@ -650,7 +633,7 @@ public class WorkoutManager {
             }
         }
         if (time == null) {
-            String nowStr = LocalTime.now().format(TIME_FMT);
+            String nowStr = LocalTime.now().format(timeFmt);
             ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 time = LocalTime.now();

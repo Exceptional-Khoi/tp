@@ -109,8 +109,7 @@ public class FitChasers {
                     break;
 
                 case "/my_name":
-                case "n":
-                {
+                case "n":{
                     if (argumentStr == null || !argumentStr.startsWith("n/")) {
                         ui.showMessage("Usage: /my_name n/YourName");
                         ui.showDivider();
@@ -193,7 +192,6 @@ public class FitChasers {
                     break;
                 }
 
-
                 case "/add_muscle_tag":
                 case "amt": {
                     // Example: /add_muscle_tag m=legs k=lunges
@@ -223,7 +221,8 @@ public class FitChasers {
                 }
 
 
-                case "/gym_where": {
+                case "/gym_where":
+                case "gw":{
                     String trimmedArg = argumentStr.trim();
                     try {
                         // Only proceed if argument starts with "n/"
@@ -246,7 +245,8 @@ public class FitChasers {
                     break;
                 }
 
-                case "/gym_page": {
+                case "/gym_page":
+                case "gp": {
                     try {
                         String trimmedArg = argumentStr.trim();
                         if (trimmedArg.startsWith("p/") && trimmedArg.length() > 2) {
@@ -267,11 +267,12 @@ public class FitChasers {
                     }
                     break;
                 }
-                /*case "/edit_workout_tag": {
-                    // Expected format: /edit_workout_tag id/1 oldTag=cardio newTag=strength
+
+                case "/override_workout_tag":
+                case "owt": {
+                    // Parse parameters
                     String[] params = argumentStr.split("\\s+");
                     Integer workoutId = null;
-                    String oldTag = null;
                     String newTag = null;
 
                     for (String param : params) {
@@ -279,27 +280,31 @@ public class FitChasers {
                             try {
                                 workoutId = Integer.parseInt(param.substring(3));
                             } catch (NumberFormatException e) {
-                                ui.showMessage("Invalid workout ID. Must be an integer.");
+                                ui.showMessage("Invalid workout ID.");
                                 break;
                             }
-                        } else if (param.startsWith("oldTag/")) {
-                            oldTag = param.substring(7).toLowerCase();
                         } else if (param.startsWith("newTag/")) {
-                            newTag = param.substring(7).toLowerCase();
+                            newTag = param.substring(7);
                         }
                     }
 
-                    if (workoutId != null && oldTag != null && newTag != null) {
-                        workoutManager.editWorkoutTag(workoutId, oldTag, newTag);
-                        fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-                        ui.showMessage("Workout tags updated.");
+                    if (workoutId != null && newTag != null) {
+                        // Update in memory
+                        workoutManager.overrideWorkoutTags(workoutId, newTag);
+                        // Save changes persistently immediately after update
+                        try {
+                            fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
+                            ui.showMessage("Workout tags saved successfully.");
+                        } catch (IOException e) {
+                            ui.showMessage("Error saving workout data: " + e.getMessage());
+                        }
                     } else {
-                        ui.showMessage("Usage: /edit_workout_tag id/WORKOUT_ID oldTag/OLD_TAG newTag/NEW_TAG");
+                        ui.showMessage("Usage: /override_workout_tag id/WORKOUT_ID newTag/NEW_TAG");
                     }
+
                     ui.showDivider();
                     break;
-                }*/
-
+                }
 
                 case "/add_set":
                 case "as":
