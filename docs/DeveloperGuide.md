@@ -62,7 +62,13 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 
 ## Non-Functional Requirements
 
-{Give non-functional requirements}
+- The system should respond to commands within 1 second under normal usage.
+- The app should be able to handle at least 1,000 workout records without noticeable lag.
+- The code should follow standard Java coding conventions and maintain >80% JUnit test coverage.
+- The data should be saved automatically upon exit to prevent accidental loss.
+- The system should be platform-independent (tested on Windows, macOS, Linux).
+- Error messages must be clear, consistent, and user-friendly.
+- The system should launch without internet connectivity.
 
 ## Glossary
 
