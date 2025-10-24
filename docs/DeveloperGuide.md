@@ -68,6 +68,120 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 
 * *glossary item* - Definition
 
-## Instructions for manual testing
+# Instructions for manual testing
 
 {Give instructions on how to do a manual product testing e.g., how to load sample data to be used for testing}
+
+## Create Workout
+
+### Success Case
+```
+/create_workout n/Push d/23/10/25 t/0700 → success
+```
+
+### Prompt for Missing Fields
+```
+/create_workout n/Push → prompts for missing date/time (Y/N)
+```
+
+### Error Cases
+```
+/create_workout n/ → error with usage
+/create_workout → error with usage (missing n/)
+```
+
+**Usage:** `/create_workout n/<name> d/<date> t/<time>`
+
+---
+
+## Add Exercise & Sets
+
+### Success Cases
+```
+/add_exercise n/PushUp r/12 → success
+/add_set r/15 → success
+```
+
+### Error Cases
+```
+/add_exercise n/PushUpr/12 → error (needs space before r/)
+/add_set r/ 15 → error (no space after r/)
+```
+
+**Usage:**
+- `/add_exercise n/<exercise_name> r/<reps>`
+- `/add_set r/<reps>`
+
+---
+
+## End Workout
+
+### Success Case
+```
+/end_workout d/23/10/25 t/0830 → success if after start
+```
+
+### Prompt for Missing Fields
+```
+Missing parts → Y/N prompts
+```
+
+### Error Cases
+```
+/end_workout d/23/10/25 t/0700 → error if before start time
+malformed parts → error + return
+```
+
+**Usage:** `/end_workout d/<date> t/<time>`
+
+---
+
+## Weights
+
+### Success Cases
+```
+/add_weight w/70.5 d/23/10/25 → success
+```
+
+### Error Cases
+```
+/add_weight w/invalid d/23/10/25 → error (invalid weight)
+/add_weight w/70.5 d/invalid/date → error (invalid date)
+/add_weight w/ d/23/10/25 → error (missing weight value)
+```
+
+**Usage:** `/add_weight w/<weight> d/<date>`
+
+**Display:** Graph displayed via `Person.displayWeightGraphWithDates()` with clustered dates handled (latest/avg per day as configured).
+
+---
+
+## Single-Active Workout Rule
+
+### Error Case
+```
+/create_workout n/Legs d/23/10/25 t/0800
+[active workout exists]
+/create_workout n/Arms d/23/10/25 t/0900 → blocked
+
+→ error: Cannot create a new workout while one is active.
+   Guidance: End current workout first with /end_workout.
+```
+
+**Behavior:** Only one workout can be active at a time. Attempting to create a second workout while one is active will be blocked with guidance to end the current workout first.
+
+---
+
+## Date/Time Format
+
+- **Date:** `DD/MM/YY` (e.g., `23/10/25`)
+- **Time:** `HHMM` (24-hour format, e.g., `0700`, `1830`)
+
+---
+
+## Notes
+
+- All parameters are required unless otherwise noted
+- Spacing is critical in parameter syntax (e.g., space before `r/`, no space after `r/`)
+- Invalid or malformed parameters return specific error messages with usage guidance
+- Y/N prompts are used when parameters are missing
