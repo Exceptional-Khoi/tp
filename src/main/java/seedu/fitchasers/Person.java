@@ -133,12 +133,17 @@ public class Person implements Serializable {
             return;
         }
 
+        // Sort records by date ascending
+        List<WeightRecord> sortedRecords = new ArrayList<>(weightHistory);
+        sortedRecords.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
+
         List<Double> weights = new ArrayList<>();
         List<String> dates = new ArrayList<>();
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM");
 
+        // Keep only the latest record per day (if duplicates exist)
         Map<LocalDate, WeightRecord> latestPerDay = new LinkedHashMap<>();
-        for (WeightRecord r : weightHistory) {
+        for (WeightRecord r : sortedRecords) {
             latestPerDay.put(r.getDate(), r);
         }
 
@@ -147,10 +152,8 @@ public class Person implements Serializable {
             dates.add(r.getDate().format(df));
         }
 
-
         double min = Collections.min(weights);
         double max = Collections.max(weights);
-
         int height = 10;
         int spacing = 12;
         int width = (weights.size() - 1) * spacing + 1;
