@@ -14,7 +14,7 @@ import java.util.Set;
 
 /**
  * Main entry point for the FitChasers application.
- *
+ * <p>
  * Handles user input commands, delegates operations to WorkoutManager,
  * and persists data through FileHandler.
  */
@@ -109,7 +109,7 @@ public class FitChasers {
                     break;
 
                 case "/my_name":
-                case "n":{
+                case "n": {
                     if (argumentStr == null || !argumentStr.startsWith("n/")) {
                         ui.showMessage("Usage: /my_name n/YourName");
                         ui.showDivider();
@@ -153,7 +153,6 @@ public class FitChasers {
                         // show text log
                         weightManager.viewWeights();
                     }
-                    ui.showDivider();
                     break;
 
                 case "/create_workout":
@@ -177,10 +176,10 @@ public class FitChasers {
                     String mod = null;
                     String keyword = null;
                     for (String param : params) {
-                        if (param.startsWith("m/")){
+                        if (param.startsWith("m/")) {
                             mod = param.substring(2).toUpperCase();
                         }
-                        if (param.startsWith("k/")){
+                        if (param.startsWith("k/")) {
                             keyword = param.substring(2).toLowerCase();
                         }
                     }
@@ -205,10 +204,10 @@ public class FitChasers {
                     String mus = null;
                     String keyword = null;
                     for (String param : params) {
-                        if (param.startsWith("m/")){
+                        if (param.startsWith("m/")) {
                             mus = param.substring(2).toUpperCase();
                         }
-                        if (param.startsWith("k/")){
+                        if (param.startsWith("k/")) {
                             keyword = param.substring(2).toLowerCase();
                         }
                     }
@@ -228,7 +227,7 @@ public class FitChasers {
 
 
                 case "/gym_where":
-                case "gw":{
+                case "gw": {
                     String trimmedArg = argumentStr.trim();
                     try {
                         // Only proceed if argument starts with "n/"
@@ -328,9 +327,9 @@ public class FitChasers {
 
                 case "/view_log":
                 case "vl":
-                    try{
+                    try {
                         viewLog.render(argumentStr); //#TODO select detailed or not
-                    }catch (IndexOutOfBoundsException e){
+                    } catch (IndexOutOfBoundsException e) {
                         ui.showError(e.getMessage());
                     }
                     ui.showDivider();
@@ -344,12 +343,12 @@ public class FitChasers {
                 case "/del_workout":
                 case "d":
                     // Format: /del_workout WORKOUT_NAME
-                    if(argumentStr.isEmpty()){
+                    if (argumentStr.isEmpty()) {
                         throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
                                 "Please enter a valid command.");
                     } else if (argumentStr.contains("d/")) {
                         workoutManager.interactiveDeleteWorkout(argumentStr, ui);
-                    } else{
+                    } else {
                         workoutManager.deleteWorkout(argumentStr);
                     }
                     break;
