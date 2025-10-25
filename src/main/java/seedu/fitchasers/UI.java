@@ -1,9 +1,15 @@
 package seedu.fitchasers;
 
+
+
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
+
+
+
 
 /**
  * The {@code UI} class handles all user interactions for the FitChaser application.
@@ -18,11 +24,27 @@ public class UI {
     private static final String WHITE = "\u001B[97m";
     private static final int CONSOLE_WIDTH = 150;
 
+
+
+
+    // Chat Bubble Layout Constants
+    private static final int PADDING = 2;
+    private static final int FRAME_OVERHEAD = 6;
+
+
+
+
     private final Scanner scanner;
+
+
+
 
     public UI() {
         this.scanner = new Scanner(System.in);
     }
+
+
+
 
     // -----------------------------
     // Input
@@ -34,15 +56,27 @@ public class UI {
             return null; // EOF
         }
 
+
+
+
         String input = scanner.nextLine();
         showDivider();
         assert input != null : "User input should never be null";
 
+
+
+
         // Display user input as chat bubble on right
         System.out.println(rightBubble("You", input));
 
+
+
+
         return input.trim();
     }
+
+
+
 
     public String enterName() {
         String name = "";
@@ -63,6 +97,9 @@ public class UI {
         return name;
     }
 
+
+
+
     // -----------------------------
     // Output
     // -----------------------------
@@ -71,58 +108,92 @@ public class UI {
         System.out.println(leftBubble("🤖 FitChaser", message));
     }
 
+
+
+
     public void showError(String error) {
         assert error != null : "Error message cannot be null";
         System.out.println(leftBubble("🤖 FitChaser", "[Oops!] " + error));
     }
 
+
+
+
     public void showGreeting() {
         System.out.println(BLUE_BOLD + """
-                 ▄▄▄▄▄▄   ▀      ▄      ▄▄▄  █                                       
-                 █      ▄▄▄    ▄▄█▄▄  ▄▀   ▀ █ ▄▄    ▄▄▄    ▄▄▄    ▄▄▄    ▄ ▄▄   ▄▄▄ 
-                 █▄▄▄▄▄   █      █    █      █▀  █  ▀   █  █   ▀  █▀  █   █▀  ▀ █   ▀
-                 █        █      █    █      █   █  ▄▀▀▀█   ▀▀▀▄  █▀▀▀▀   █      ▀▀▀▄
-                 █      ▄▄█▄▄    ▀▄▄   ▀▄▄▄▀ █   █  ▀▄▄▀█  ▀▄▄▄▀  ▀█▄▄▀   █     ▀▄▄▄▀
-                """ + RESET);
+               ▄▄▄▄▄▄   ▀      ▄      ▄▄▄  █                                     
+               █      ▄▄▄    ▄▄█▄▄  ▄▀   ▀ █ ▄▄    ▄▄▄    ▄▄▄    ▄▄▄    ▄ ▄▄   ▄▄▄
+               █▄▄▄▄▄   █      █    █      █▀  █  ▀   █  █   ▀  █▀  █   █▀  ▀ █   ▀
+               █        █      █    █      █   █  ▄▀▀▀█   ▀▀▀▄  █▀▀▀▀   █      ▀▀▀▄
+               █      ▄▄█▄▄    ▀▄▄   ▀▄▄▄▀ █   █  ▀▄▄▀█  ▀▄▄▄▀  ▀█▄▄▀   █     ▀▄▄▄▀
+            """ + RESET);
 
-        showMessage("Your virtual gym buddy's clocked in and ready to make you strong!\n"
-                    + "Type /help or h to explore all available commands!\n"
-                    + "Let's crush your fitness goals together!");
+
+
+
+        showMessage("""
+          Your virtual gym buddy's clocked in and ready to make you strong!
+          Type /help or h to explore all available commands!
+          Let's crush your fitness goals together!
+            """);
     }
+
+
+
 
     public void showExitMessage() {
         showMessage("Catch you next time, champ — don't ghost your gains!");
         showDivider();
     }
 
+
+
+
     public void showHelp() {
         showMessage("""
-        /help (h)                            - View all commands
-        /my_name (n) n/NAME                  - Set your display name (e.g. /my_name n/Nitin)
-        /add_weight (aw) w/WEIGHT d/DATE     - Record your weight (e.g. /add_weight w/81.5 d/19/10/25)
-        /view_weight (vw)                    - View your recorded weights
-        /gym_where n/EXERCISE                - Find gyms with equipment for your exercise (e.g. /gym_where n/squat)
-        /gym_page                            - Find available gyms in NUS
-        /gym_page page_number                - Navigate gym pages
+          /help (h)                            - View all commands
+          /my_name (n) n/NAME                  - Set your display name (e.g. /my_name n/Nitin)
+          /add_weight (aw) w/WEIGHT d/DATE     - Record your weight (e.g. /add_weight w/81.5 d/19/10/25)
+          /view_weight (vw)                    - View your recorded weights
+          /gym_where n/EXERCISE                - Find gyms with equipment for your exercise (e.g. /gym_where n/squat)
+          /gym_page                            - Find available gyms in NUS
+          /gym_page page_number                - Navigate gym pages
 
-        /add_modality_tag (amot) m/TYPE k/keyword - Add keyword for modality (e.g. /add_modality_tag m/cardio k/hiking)
-        /add_muscle_tag (amt) m/GROUP k/keyword  - Add keyword for muscle group (e.g. /add_muscle_tag m/legs k/lunges)
-        /overwrite_workout_tag (owt) id/index newTag/NEW_TAG - Modify workout tag (e.g. /overwrite_workout_tag id/1 newTag/Strength)
 
-        /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout (e.g. /create_workout n/PushDay d/20/10/25 t/1900)
-        /add_exercise (ae) n/NAME r/REPS     - Add an exercise (e.g. /add_exercise n/Squat r/12)
-        /add_set (as) r/REPS                 - Add a new set (e.g. /add_set r/10)
-        /end_workout (ew) d/DATE t/TIME      - End the current workout (e.g. /end_workout d/20/10/25 t/2030)
-        /view_log (vl)                       - View your workout history
-        /open (o) INDEX                      - Open workout by index
-        /del_workout (d) NAME                - Delete a workout (e.g. /del_workout PushDay)
-        /exit (e)                            - Save progress and exit the app
-        """);
+
+
+          /add_modality_tag (amot) m/TYPE k/keyword - Add keyword for modality
+          (e.g. /add_modality_tag m/cardio k/hiking)
+          /add_muscle_tag (amt) m/GROUP k/keyword  - Add keyword for muscle group
+          (e.g. /add_muscle_tag m/legs k/lunges)
+          /overwrite_workout_tag (owt) id/index newTag/NEW_TAG - Modify workout tag
+          (e.g. /overwrite_workout_tag id/1 newTag/Strength)
+
+
+
+
+          /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
+          (e.g. /create_workout n/PushDay d/20/10/25 t/1900)
+          /add_exercise (ae) n/NAME r/REPS     - Add an exercise (e.g. /add_exercise n/Squat r/12)
+          /add_set (as) r/REPS                 - Add a new set (e.g. /add_set r/10)
+          /end_workout (ew) d/DATE t/TIME      - End the current workout
+          (e.g. /end_workout d/20/10/25 t/2030)
+          /view_log (vl)                       - View your workout history
+          /open (o) INDEX                      - Open workout by index
+          /del_workout (d) NAME                - Delete a workout (e.g. /del_workout PushDay)
+          /exit (e)                            - Save progress and exit the app
+            """);
     }
+
+
+
 
     public void showDivider() {
         System.out.println(WHITE + "--------------------------------------------------" + RESET);
     }
+
+
+
 
     public boolean confirmationMessage() {
         if (!scanner.hasNextLine()) {
@@ -134,20 +205,29 @@ public class UI {
         return confirmation.equals("y") || confirmation.equals("yes");
     }
 
+
+
+
     public void displayDetailsOfWorkout(Workout workout) {
         if (workout == null) {
             showError("No workout found to display.");
             return;
         }
 
-        // Gom toàn bộ nội dung vào 1 StringBuilder để in ra trong 1 bubble duy nhất
-        StringBuilder sb = new StringBuilder();
 
+
+
+        StringBuilder sb = new StringBuilder();
         sb.append("Here you go bestie! These are the workout details!\n\n");
 
-        // ===== Basic Info =====
+
+
+
         sb.append(String.format("Name       : %s%n", workout.getWorkoutName()));
         sb.append(String.format("Date       : %s%n", workout.getWorkoutDateString()));
+
+
+
 
         int totalMinutes = workout.getDuration();
         assert totalMinutes >= 0 : "Workout duration must not be negative";
@@ -158,20 +238,27 @@ public class UI {
                 : String.format("%dm", minutes);
         sb.append(String.format("Duration   : %s%n", durationStr));
 
+
+
+
         if (workout.getWorkoutStartDateTime() != null && workout.getWorkoutEndDateTime() != null) {
             sb.append(String.format("Start Time : %s%n", workout.getWorkoutStartDateTime()));
             sb.append(String.format("End Time   : %s%n", workout.getWorkoutEndDateTime()));
         }
 
-        // ===== Tags =====
-        var tagsToDisplay = workout.getAllTags();
+
+
+
+        Set<String> tagsToDisplay = workout.getAllTags();
         if (tagsToDisplay == null || tagsToDisplay.isEmpty()) {
             sb.append("Tags       : -\n");
         } else {
             sb.append("Tags       : ").append(String.join(", ", tagsToDisplay)).append("\n");
         }
 
-        // ===== Exercises =====
+
+
+
         var exercises = workout.getExercises();
         if (exercises == null || exercises.isEmpty()) {
             sb.append("\nExercises  : (none added)\n");
@@ -183,9 +270,12 @@ public class UI {
             }
         }
 
-        // In ra trong 1 bubble duy nhất
+
+
+
         showMessage(sb.toString());
     }
+
 
 
 
@@ -195,25 +285,29 @@ public class UI {
             return "th";
         }
         return switch (day % 10) {
-            case 1 -> "st";
-            case 2 -> "nd";
-            case 3 -> "rd";
-            default -> "th";
+        case 1 -> "st";
+        case 2 -> "nd";
+        case 3 -> "rd";
+        default -> "th";
         };
     }
 
-    // ================== Chat Bubble Logic (fixed) ==================
 
-    private static final int PADDING = 2;
-    private static final int FRAME_OVERHEAD = 6;
 
+
+    // ================== Chat Bubble Logic ==================
     private static String stripAnsi(String input) {
         return input == null ? "" : input.replaceAll("\u001B\\[[;\\d]*m", "");
     }
 
+
+
+
     private static List<String> wrapLine(String s, int maxWidth) {
         List<String> out = new ArrayList<>();
-        if (s == null) s = "";
+        if (s == null) {
+            s = "";
+        }
         if (maxWidth <= 0) {
             out.add(s);
             return out;
@@ -224,22 +318,36 @@ public class UI {
             out.add(s.substring(i, end));
             i = end;
         }
-        if (s.isEmpty()) out.add("");
+        if (s.isEmpty()) {
+            out.add("");
+        }
         return out;
     }
+
+
+
 
     private static int clampNonNeg(int v) {
         return Math.max(0, v);
     }
+
+
+
 
     private String leftBubble(String sender, String message) {
         String[] rawLines = stripAnsi(message).split("\\R", -1);
         List<String> lines = new ArrayList<>();
         int contentMax = Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD - PADDING * 2);
 
+
+
+
         for (String raw : rawLines) {
             lines.addAll(wrapLine(raw, contentMax));
         }
+
+
+
 
         int innerWidth = 0;
         for (String l : lines) {
@@ -247,8 +355,14 @@ public class UI {
         }
         innerWidth = Math.min(innerWidth, Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD));
 
+
+
+
         String top = "╭" + "─".repeat(clampNonNeg(innerWidth)) + "╮";
         String bottom = "╰" + "─".repeat(clampNonNeg(innerWidth)) + "╯";
+
+
+
 
         StringBuilder sb = new StringBuilder();
         sb.append(CYAN).append(sender).append(RESET).append("\n");
@@ -265,14 +379,23 @@ public class UI {
         return sb.toString();
     }
 
+
+
+
     private String rightBubble(String sender, String message) {
         String[] rawLines = stripAnsi(message).split("\\R", -1);
         List<String> lines = new ArrayList<>();
         int contentMax = Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD - PADDING * 2);
 
+
+
+
         for (String raw : rawLines) {
             lines.addAll(wrapLine(raw, contentMax));
         }
+
+
+
 
         int innerWidth = 0;
         for (String l : lines) {
@@ -280,13 +403,23 @@ public class UI {
         }
         innerWidth = Math.min(innerWidth, Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD));
 
+
+
+
         String top = BLUE_BOLD + "╭" + "─".repeat(clampNonNeg(innerWidth)) + "╮" + RESET;
         String bottom = BLUE_BOLD + "╰" + "─".repeat(clampNonNeg(innerWidth)) + "╯" + RESET;
 
+
+
+
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
 
+
+
+
         StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(pad)).append(CYAN).append("(").append(sender).append(")").append(RESET).append("\n");
+        sb.append(" ".repeat(pad))
+                .append(CYAN).append("(").append(sender).append(")").append(RESET).append("\n");
         sb.append(" ".repeat(pad)).append(top).append("\n");
         for (String l : lines) {
             int spaces = clampNonNeg(innerWidth - l.length() - PADDING);
@@ -301,3 +434,5 @@ public class UI {
         return sb.toString();
     }
 }
+
+
