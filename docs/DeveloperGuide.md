@@ -185,6 +185,144 @@ malformed parts → error + return
 
 ---
 
+## Tagging and Categorization
+### Design
+The tagging system in FitChasers automatically categorizes workouts based on
+exercise modalities (e.g., cardio, strength) and muscle groups (e.g., legs, chest, back).
+This enables users to quickly identify workout types and track training patterns over time.
+
+### Class Diagram
+![Alt text](docs/diagrams/Class_Diagram_for_tagging_2.png "Class Diagram for Tagging")
+
+Key Relationships:
+- Dependency: `WorkoutManager` depends on the `Tagger` interface for tag suggestion services
+- Composition: `WorkoutManager` owns and manages multiple `Workout` instances.
+- Aggregation: `Workout` contains `Exercise` objects (exercises can exist independently
+- Implementation: `DefaultTagger` implements the `Tagger` interface
+- Association: `DefaultTagger` uses Modality and `MuscleGroup` enums to organize keywords
+
+### Implementation
+Automatic Tag Generation
+When a user creates a new workout using the /create_workout command, the system automatically
+generates tags based on keywords found in the workout name.
+
+Example Command: `/create_workout n/run and swim d/24/10/25 t/1200`
+
+Process:
+1. `FitChasers` parses the command and delegates to `WorkoutManager.addWorkout()`
+2. `WorkoutManager` creates a new `Workout` object with name "run and swim"
+3. `WorkoutManager` calls `tagger.suggest(workout)` to generate tags
+4. `DefaultTagger` scans the workout name for matching keywords:
+    * "run" matches `Modality.CARDIO`
+    * "swim" matches `Modality.CARDIO` and `MuscleGroup.BACK`
+5. The suggested tags `{cardio, back}` are stored in workout.autoTags via `workout.setAutoTags()`
+6. The workout is added to the workout list
+
+### Sequence Diagram
+The following sequence diagram shows the interaction between components when a workout is created
+and tags are auto-generated:
+![Alt text](docs/diagrams/Sequence Digram for tagging.png "Sequence Diagram for Tagging")
+
+### Manual Tag Method
+#### Adding modality keywords
+Users can extend the `DefaultTagger`'s keyword dictionary using the `/add_modality_tag` command.
+Example: `/add_modality_tag m/cardio k/jump_rope`
+#### Process
+1. `FitChasers` parses the command and extracts modality (CARDIO) and keyword ("jump_rope")
+2. `FitChasers` calls `tagger.addModalityKeyword(Modality.CARDIO, "jump_rope")` directly on the `DefaultTagger`
+   instance
+3. The keyword "jump_rope" is added to the `Modality.CARDIO` keyword set in `DefaultTagger`
+4. Future workouts containing "jump_rope" in their name will automatically receive the `cardio` tag
+#### Overriding workout tags
+Users can manually override tags for a specific workout using the `/override_workout_tag` command:
+`/override_workout_tag id/3 newTag/strength
+1. WorkoutManager.overrideWorkoutTags(int workoutId, String newTag) is invoked with workoutId=3 and newTag="strength"
+2. The target workout is retrieved by ID (1-based index)
+3. A new Set<String> containing only "strength" is created
+4. `workout.setManualTags(newTagsSet)` replaces any existing manual tags
+5. `workout.setAutoTags(new LinkedHashSet<>())` clears all auto-generated tags
+6. Subsequent calls to `getAllTags()` return only `{strength}`
+
+#### Important Design Decision
+Overriding clears auto-tags to prevent confusion. If a workout is auto-tagged as cardio but the user overrides
+it to strength, keeping both tags would be misleading. This design prioritizes user intent over system suggestions.
+
+### Design Consideration
+#### Aspect: Separate Auto vs. Manual Tags
+#### Alternative 1 (Current Choice): Maintain two separate tag sets (autoTags and manualTags)
+#### Pros:
+* Clear separation of system-generated vs. user-defined data
+* Enables selective clearing (e.g., override can clear auto-tags while preserving manual tags if needed)
+* Easier debugging and testing (verify auto-generation logic independently)
+#### Cons:
+* Requires merging sets when displaying all tags
+  Alternative 2: Use single tag set with metadata flags
+#### Pros
+* Simpler data structure(1 set instead of 2)
+* Easier to implement tag equality checks
+#### Cons:
+* Requires additional data structure (e.g., `Map<String, TagSource>`) to track tag origin
+* More complex override logic
+
+Rationale: Alternative 1 was chosen as the separation provides clearer semantics and aligns with the use
+case where users may want to distinguish between automatic suggestions and their own categorization.
+
+#### Aspect: Keyword Matching Strategy
+#### Alternative 1 (Current Choice): Exact substring matching with predefined keywords
+ Pros:
+* O(n) scan for workout name
+* Easy to extend via `/add_modality_tag` command
+
+Cons:
+* Limited to keywords explicitly registered
+* Cannot handle synonyms or misspellings
+* May miss relevant tags if workout names use non-standard terminology
+
+#### Alternative 2: Natural Language Processing (NLP) with word embeddings
+ Pros:
+* Can recognize semantic similarity (e.g., "jogging" ≈ "running")
+* More robust to variations in user input
+* Could auto-discover new exercise types
+
+Cons:
+* Requires external libraries
+* Higher computational cost
+* Difficult to debug and test
+
+Rationale: ALternative 1 was chosen for simplicity and predictability. For a CLI Fitchaser,
+deterministic tagging with user-extensible keywords provides a better balance of functionality and
+maintainability than complex NLP approaches.
+
+### Future Enhancements
+#### Tag-based filtering(Planned for v3.0)
+#### Proposed feature: Allow use to filter workout logs by tags
+Example command: `/view_log --tag cardio`    
+Expected Output:
+```
+Workouts tagged with 'cardio' (2 total):
+ID    Date          Name              Duration
+2     Fri 24 Oct    gga              45m
+3     Fri 24 Oct    run and swim     45m
+```
+Implementation considerations:
+* Add a `filterByTag(String tag)` method to `WorkoutManager`
+* Modify `Workout.getAllTags()` to support efficient tag lookups
+#### Proposed feature: Display aggregate statistics grouped by tag
+Example command: `/stats --by-tag`
+Expected Output:
+```
+Training Summary by Tag:
+
+Cardio:     12 workouts, 540 minutes total
+Strength:    8 workouts, 320 minutes total
+Legs:        5 workouts, 200 minutes total
+
+```
+Implementation consideration:
+* Add a generateTagStats() method to WorkoutManager
+* Use Java Streams to group and aggregate workout data
+* Consider caching statistics to avoid recalculating on every query
+
 ## Notes
 
 - All parameters are required unless otherwise noted
