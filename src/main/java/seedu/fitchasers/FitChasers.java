@@ -52,7 +52,7 @@ public class FitChasers {
                 userName = ui.enterName();
             }
             person = new Person(userName.trim());
-            ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started.\n");
+            ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started.");
 
             try {
                 fileHandler.saveUserName(person);
@@ -71,7 +71,7 @@ public class FitChasers {
         try {
             fileHandler.loadWeightList(person);
             workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth));
-            ui.showMessage("Loaded " + currentMonth + " workouts\n");
+            ui.showMessage("Loaded " + currentMonth + " workouts");
         } catch (FileNonexistent e) {
             ui.showError("Seems like this is a new month!"
                     + "\nWould you like to create new workouts for this month? (Y/N)");

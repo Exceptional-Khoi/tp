@@ -1,22 +1,22 @@
 package seedu.fitchasers;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+/**
+ * The {@code UI} class handles all user interactions for the FitChaser application.
+ * Combines the robustness of the classic UI logic with a modern “chat bubble” interface.
+ */
 public class UI {
-    // ===== ANSI colors =====
+    // ====== Color and Style Constants ======
     private static final String RESET = "\u001B[0m";
     private static final String BLUE_BOLD = "\u001B[1;34m";
-    private static final String WHITE = "\u001B[97m";;
     private static final String CYAN = "\u001B[36m";
     private static final String MAGENTA = "\u001B[35m";
-
-    // Background colors (256-color mode)
-    private static final String BG_FITCHASER = "\u001B[48;5;236m";   // xám đậm cho FitChaser
-    private static final String BG_USER = "\u001B[48;5;39m";   // xanh navy cho You
-
-    private static final int CONSOLE_WIDTH = 80; // chiều rộng terminal
+    private static final String WHITE = "\u001B[97m";
+    private static final int CONSOLE_WIDTH = 150;
 
     private final Scanner scanner;
 
@@ -29,15 +29,16 @@ public class UI {
     // -----------------------------
     public String readCommand() {
         showDivider();
-        System.out.print(MAGENTA + "Enter command> " + RESET);
+        System.out.print(MAGENTA + "Enter command > " + RESET);
         if (!scanner.hasNextLine()) {
-            return null;
+            return null; // EOF
         }
-        showDivider();
 
         String input = scanner.nextLine();
+        showDivider();
         assert input != null : "User input should never be null";
 
+        // Display user input as chat bubble on right
         System.out.println(rightBubble("You", input));
 
         return input.trim();
@@ -46,13 +47,13 @@ public class UI {
     public String enterName() {
         String name = "";
         while (name.isEmpty()) {
-            System.out.print(rightBubble("You", "Enter your name: "));
+            System.out.print(MAGENTA + "Enter your name: " + RESET);
             if (scanner.hasNextLine()) {
                 name = scanner.nextLine().trim();
                 if (name.isEmpty()) {
-                    showMessage("Name cannot be empty. Please try again.");
+                    showError("Name cannot be empty. Please try again.");
                 } else {
-                    System.out.println(rightBubble("You",  name));
+                    System.out.println(rightBubble("You", name));
                 }
             } else {
                 return null;
@@ -66,13 +67,14 @@ public class UI {
     // Output
     // -----------------------------
     public void showMessage(String message) {
+        assert message != null : "Message cannot be null";
         System.out.println(leftBubble("🤖 FitChaser", message));
     }
 
     public void showError(String error) {
+        assert error != null : "Error message cannot be null";
         System.out.println(leftBubble("🤖 FitChaser", "[Oops!] " + error));
     }
-
 
     public void showGreeting() {
         System.out.println(BLUE_BOLD + """
@@ -83,9 +85,9 @@ public class UI {
                  █      ▄▄█▄▄    ▀▄▄   ▀▄▄▄▀ █   █  ▀▄▄▀█  ▀▄▄▄▀  ▀█▄▄▀   █     ▀▄▄▄▀
                 """ + RESET);
 
-        showMessage("Your virtual gym buddy's clocked in and ready to make you strong!");
-        showMessage("Type /help or h to explore all available commands!");
-        showMessage("Let's crush your fitness goals together!");
+        showMessage("Your virtual gym buddy's clocked in and ready to make you strong!\n"
+                    + "Type /help or h to explore all available commands!\n"
+                    + "Let's crush your fitness goals together!");
     }
 
     public void showExitMessage() {
@@ -95,14 +97,26 @@ public class UI {
 
     public void showHelp() {
         showMessage("""
-        /help (h) - View all commands
-        /my_name (n) n/NAME - Set your display name
-        /add_weight (aw) w/WEIGHT d/DATE - Record your weight
-        /view_weight (vw) - View your recorded weights
-        /gym_where n/EXERCISE - Find gyms for your exercise
-        /gym_page - Find available gyms in NUS
-        /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
-        /exit (e) - Save progress and exit the app
+        /help (h)                            - View all commands
+        /my_name (n) n/NAME                  - Set your display name (e.g. /my_name n/Nitin)
+        /add_weight (aw) w/WEIGHT d/DATE     - Record your weight (e.g. /add_weight w/81.5 d/19/10/25)
+        /view_weight (vw)                    - View your recorded weights
+        /gym_where n/EXERCISE                - Find gyms with equipment for your exercise (e.g. /gym_where n/squat)
+        /gym_page                            - Find available gyms in NUS
+        /gym_page page_number                - Navigate gym pages
+
+        /add_modality_tag (amot) m/TYPE k/keyword - Add keyword for modality (e.g. /add_modality_tag m/cardio k/hiking)
+        /add_muscle_tag (amt) m/GROUP k/keyword  - Add keyword for muscle group (e.g. /add_muscle_tag m/legs k/lunges)
+        /overwrite_workout_tag (owt) id/index newTag/NEW_TAG - Modify workout tag (e.g. /overwrite_workout_tag id/1 newTag/Strength)
+
+        /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout (e.g. /create_workout n/PushDay d/20/10/25 t/1900)
+        /add_exercise (ae) n/NAME r/REPS     - Add an exercise (e.g. /add_exercise n/Squat r/12)
+        /add_set (as) r/REPS                 - Add a new set (e.g. /add_set r/10)
+        /end_workout (ew) d/DATE t/TIME      - End the current workout (e.g. /end_workout d/20/10/25 t/2030)
+        /view_log (vl)                       - View your workout history
+        /open (o) INDEX                      - Open workout by index
+        /del_workout (d) NAME                - Delete a workout (e.g. /del_workout PushDay)
+        /exit (e)                            - Save progress and exit the app
         """);
     }
 
@@ -122,46 +136,58 @@ public class UI {
 
     public void displayDetailsOfWorkout(Workout workout) {
         if (workout == null) {
-            showMessage("No workout found to display.");
+            showError("No workout found to display.");
             return;
         }
 
-        showMessage("Here you go bestie! These are the workout details!");
+        // Gom toàn bộ nội dung vào 1 StringBuilder để in ra trong 1 bubble duy nhất
+        StringBuilder sb = new StringBuilder();
 
-        showMessage("Name       : " + workout.getWorkoutName());
-        showMessage("Date       : " + workout.getWorkoutDateString());
+        sb.append("Here you go bestie! These are the workout details!\n\n");
+
+        // ===== Basic Info =====
+        sb.append(String.format("Name       : %s%n", workout.getWorkoutName()));
+        sb.append(String.format("Date       : %s%n", workout.getWorkoutDateString()));
 
         int totalMinutes = workout.getDuration();
+        assert totalMinutes >= 0 : "Workout duration must not be negative";
         int hours = totalMinutes / 60;
         int minutes = totalMinutes % 60;
         String durationStr = (hours > 0)
                 ? String.format("%dh %dm", hours, minutes)
                 : String.format("%dm", minutes);
-        showMessage("Duration   : " + durationStr);
+        sb.append(String.format("Duration   : %s%n", durationStr));
 
         if (workout.getWorkoutStartDateTime() != null && workout.getWorkoutEndDateTime() != null) {
-            showMessage("Start Time : " + workout.getWorkoutStartDateTime());
-            showMessage("End Time   : " + workout.getWorkoutEndDateTime());
+            sb.append(String.format("Start Time : %s%n", workout.getWorkoutStartDateTime()));
+            sb.append(String.format("End Time   : %s%n", workout.getWorkoutEndDateTime()));
         }
 
-        Set<String> tagsToDisplay = workout.getAllTags();
-        if (tagsToDisplay.isEmpty()) {
-            showMessage("Tags       : -");
+        // ===== Tags =====
+        var tagsToDisplay = workout.getAllTags();
+        if (tagsToDisplay == null || tagsToDisplay.isEmpty()) {
+            sb.append("Tags       : -\n");
         } else {
-            showMessage("Tags       : " + String.join(", ", tagsToDisplay));
+            sb.append("Tags       : ").append(String.join(", ", tagsToDisplay)).append("\n");
         }
 
-        ArrayList<Exercise> exercises = workout.getExercises();
-        if (exercises.isEmpty()) {
-            showMessage("Exercises  : (none added)");
+        // ===== Exercises =====
+        var exercises = workout.getExercises();
+        if (exercises == null || exercises.isEmpty()) {
+            sb.append("\nExercises  : (none added)\n");
         } else {
-            showMessage("Exercises  : ");
+            sb.append("\nExercises:\n");
             int i = 1;
             for (Exercise e : exercises) {
-                showMessage(String.format("  %d. %s", i++, e.toString()));
+                sb.append(String.format("  %d. %s%n", i++, e.toString()));
             }
         }
+
+        // In ra trong 1 bubble duy nhất
+        showMessage(sb.toString());
     }
+
+
 
     static String getDaySuffix(int day) {
         assert day >= 1 && day <= 31 : "Day should be between 1 and 31";
@@ -176,54 +202,102 @@ public class UI {
         };
     }
 
-    // ------------------ Chat Bubble Formatters ------------------
+    // ================== Chat Bubble Logic (fixed) ==================
+
+    private static final int PADDING = 2;
+    private static final int FRAME_OVERHEAD = 6;
+
+    private static String stripAnsi(String input) {
+        return input == null ? "" : input.replaceAll("\u001B\\[[;\\d]*m", "");
+    }
+
+    private static List<String> wrapLine(String s, int maxWidth) {
+        List<String> out = new ArrayList<>();
+        if (s == null) s = "";
+        if (maxWidth <= 0) {
+            out.add(s);
+            return out;
+        }
+        int i = 0;
+        while (i < s.length()) {
+            int end = Math.min(i + maxWidth, s.length());
+            out.add(s.substring(i, end));
+            i = end;
+        }
+        if (s.isEmpty()) out.add("");
+        return out;
+    }
+
+    private static int clampNonNeg(int v) {
+        return Math.max(0, v);
+    }
 
     private String leftBubble(String sender, String message) {
-        String cleanMsg = stripAnsi(message);
-        int padding = 2;
-        int width = Math.min(cleanMsg.length() + padding * 2, CONSOLE_WIDTH - 6);
+        String[] rawLines = stripAnsi(message).split("\\R", -1);
+        List<String> lines = new ArrayList<>();
+        int contentMax = Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD - PADDING * 2);
 
-        String top = "╭" + "─".repeat(width) + "╮";
-        String contentLine = String.format("│%s%s%s│",
-                " ".repeat(padding),
-                WHITE + cleanMsg + RESET,
-                " ".repeat(width - cleanMsg.length() - padding)
-        );
-        String bottom = "╰" + "─".repeat(width) + "╯";
+        for (String raw : rawLines) {
+            lines.addAll(wrapLine(raw, contentMax));
+        }
 
-        return String.format("%s%s%s\n%s\n%s\n%s",
-                CYAN, sender, RESET,
-                top, contentLine, bottom
-        );
+        int innerWidth = 0;
+        for (String l : lines) {
+            innerWidth = Math.max(innerWidth, l.length() + PADDING * 2);
+        }
+        innerWidth = Math.min(innerWidth, Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD));
+
+        String top = "╭" + "─".repeat(clampNonNeg(innerWidth)) + "╮";
+        String bottom = "╰" + "─".repeat(clampNonNeg(innerWidth)) + "╯";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(CYAN).append(sender).append(RESET).append("\n");
+        sb.append(top).append("\n");
+        for (String l : lines) {
+            int spaces = clampNonNeg(innerWidth - l.length() - PADDING);
+            sb.append("│")
+                    .append(" ".repeat(PADDING))
+                    .append(WHITE).append(l).append(RESET)
+                    .append(" ".repeat(spaces))
+                    .append("│\n");
+        }
+        sb.append(bottom);
+        return sb.toString();
     }
 
     private String rightBubble(String sender, String message) {
-        String cleanMsg = stripAnsi(message);
-        int padding = 2;
-        int width = Math.min(cleanMsg.length() + padding * 2, CONSOLE_WIDTH - 6);
+        String[] rawLines = stripAnsi(message).split("\\R", -1);
+        List<String> lines = new ArrayList<>();
+        int contentMax = Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD - PADDING * 2);
 
-        String top = BLUE_BOLD + "╭" + "─".repeat(width) + "╮" + RESET;
-        String contentLine = String.format(
-                "%s│%s%s%s│%s",
-                BLUE_BOLD,                                  // viền trái xanh
-                " ".repeat(padding),
-                BLUE_BOLD + cleanMsg,                       // chữ xanh (không RESET giữa chừng)
-                " ".repeat(width - cleanMsg.length() - padding),
-                RESET                                       // RESET sau khi in viền phải
-        );
-        String bottom = BLUE_BOLD + "╰" + "─".repeat(width) + "╯" + RESET;
+        for (String raw : rawLines) {
+            lines.addAll(wrapLine(raw, contentMax));
+        }
 
+        int innerWidth = 0;
+        for (String l : lines) {
+            innerWidth = Math.max(innerWidth, l.length() + PADDING * 2);
+        }
+        innerWidth = Math.min(innerWidth, Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD));
 
-        int pad = Math.max(0, CONSOLE_WIDTH - width - 6);
-        return " ".repeat(pad) + CYAN + "(" + sender + ")" + RESET + "\n"
-                + " ".repeat(pad) + top + "\n"
-                + " ".repeat(pad) + contentLine + "\n"
-                + " ".repeat(pad) + bottom;
-    }
+        String top = BLUE_BOLD + "╭" + "─".repeat(clampNonNeg(innerWidth)) + "╮" + RESET;
+        String bottom = BLUE_BOLD + "╰" + "─".repeat(clampNonNeg(innerWidth)) + "╯" + RESET;
 
+        int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
 
-    private static String stripAnsi(String input) {
-        return input.replaceAll("\u001B\\[[;\\d]*m", "");
+        StringBuilder sb = new StringBuilder();
+        sb.append(" ".repeat(pad)).append(CYAN).append("(").append(sender).append(")").append(RESET).append("\n");
+        sb.append(" ".repeat(pad)).append(top).append("\n");
+        for (String l : lines) {
+            int spaces = clampNonNeg(innerWidth - l.length() - PADDING);
+            sb.append(" ".repeat(pad))
+                    .append(BLUE_BOLD).append("│").append(RESET)
+                    .append(BLUE_BOLD).append(" ".repeat(PADDING)).append(l)
+                    .append(" ".repeat(spaces))
+                    .append("│").append(RESET)
+                    .append("\n");
+        }
+        sb.append(" ".repeat(pad)).append(bottom);
+        return sb.toString();
     }
 }
-
