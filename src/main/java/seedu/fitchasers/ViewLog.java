@@ -62,22 +62,27 @@ public class ViewLog {
             return;
         }
 
+        StringBuilder sb = new StringBuilder();
+
         if (!detailed) {
-            ui.showMessage(String.format("%-4s %-20s %-22s %-10s", "ID", "Date", "Name", "Duration"));
+            sb.append(String.format("%-4s %-20s %-22s %-10s%n", "ID", "Date", "Name", "Duration"));
         }
 
         for (int i = startIndex; i < endIndex; i++) {
             Workout w = sortedArray.get(i);
-            int rowNum = i + 1; // 1-based global index across the month
+            int rowNum = i + 1;
 
             if (detailed) {
-                renderDetailedRow(rowNum, w);
+                sb.append(renderDetailedRowAsText(rowNum, w));
             } else {
-                renderCompactRow(rowNum, w);
+                sb.append(renderCompactRowAsText(rowNum, w));
             }
         }
 
-        ui.showMessage("Tip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.");
+        sb.append("Tip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.");
+
+        ui.showMessage(sb.toString());
+
     }
 
     private void renderCompactRow(int id, Workout w) {
@@ -262,5 +267,25 @@ public class ViewLog {
         return String.format("%s %d%s of %s, %d:%02d %s", dow, d, suffix, mon, hr12, min, ampm);
     }
 
+    private String renderCompactRowAsText(int id, Workout w) {
+        String date = formatDayMon(w.getWorkoutEndDateTime());
+        String name = truncate(safe(w.getWorkoutName()), 22);
+        String dur = formatDuration(w.getDuration());
+        return String.format("%-4d %-20s %-22s %-10s%n", id, date, name, dur);
+    }
+
+    private String renderDetailedRowAsText(int id, Workout w) {
+        StringBuilder sb = new StringBuilder();
+        String dateLong = formatLong(w.getWorkoutEndDateTime());
+        String dur = formatDuration(w.getDuration());
+        String tags = w.getAllTags().toString();
+
+        sb.append("—".repeat(60)).append("\n");
+        sb.append(String.format("#%d  %s%n", id, safe(w.getWorkoutName())));
+        sb.append("Date     : ").append(dateLong).append("\n");
+        sb.append("Duration : ").append(dur).append("\n");
+        sb.append("Tags     : ").append(tags.isBlank() ? "-" : tags).append("\n\n");
+        return sb.toString();
+    }
 }
 
