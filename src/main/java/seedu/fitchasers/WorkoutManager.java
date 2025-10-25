@@ -180,7 +180,8 @@ public class WorkoutManager {
 
                 if (existingDate.equals(date) && existingTime.equals(time)) {
                     ui.showMessage("A workout already exists at this date and time ("
-                            + existingDate.format(dateFmt) + " " + existingTime.format(timeFmt) + "). Continue anyway? (Y/N)");
+                            + existingDate.format(dateFmt) + " " + existingTime.format(timeFmt) + "). " +
+                            "Continue anyway? (Y/N)");
                     if (!ui.confirmationMessage()) {
                         ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
                         return;
