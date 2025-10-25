@@ -145,8 +145,14 @@ public class FitChasers {
 
                 case "/view_weight":
                 case "vw":
-                    weightManager.viewWeights();
-                    person.displayWeightGraphWithDates();
+                    String arg = argumentStr.trim().toLowerCase();
+                    if (arg.equals("-g")) {
+                        // show graphical weight trend
+                        person.displayWeightGraphWithDates();
+                    } else {
+                        // show text log
+                        weightManager.viewWeights();
+                    }
                     ui.showDivider();
                     break;
 

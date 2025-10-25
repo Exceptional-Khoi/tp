@@ -1,5 +1,6 @@
 package seedu.fitchasers;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -14,10 +15,12 @@ public class WeightManager {
 
     private final Person currentUser;
     private final UI uiHandler = new UI();
+    private final FileHandler fileHandler = new FileHandler();
 
     public WeightManager(Person person) {
         this.currentUser = person;
     }
+
 
     /**
      * Adds a new weight entry.
@@ -89,6 +92,12 @@ public class WeightManager {
             // Add record if confirmed
             WeightRecord weightRecord = new WeightRecord(weightValue, entryDate);
             currentUser.addWeightRecord(weightRecord);
+            try {
+                fileHandler.saveWeightList(currentUser);
+                uiHandler.showMessage("Weight saved successfully!");
+            } catch (IOException e) {
+                uiHandler.showError("Failed to save weight: " + e.getMessage());
+            }
             uiHandler.showMessage("Logging your weight... don't lie to me!");
             uiHandler.showMessage("New weight recorded: " + weightRecord);
 
