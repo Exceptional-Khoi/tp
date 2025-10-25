@@ -70,6 +70,24 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 - Error messages must be clear, consistent, and user-friendly.
 - The system should launch without internet connectivity.
 
+## WorkoutManager component
+**API**: [`WorkoutManager.java`](https://github.com/AY2526S1-CS2113-W14-3/tp/blob/master/src/main/java/seedu/fitchasers/WorkoutManager.java)
+
+The `WorkoutManager` component is responsible for managing all workout-related operations in FitChasers, including 
+workout creation, exercise tracking, and workout history management.
+![Alt text](docs/diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
+### Overview
+The `WorkoutManager` acts as the central controller for workout operations. It maintains a list of completed workouts 
+and tracks the current active workout session. 
+The component handles:
+* Creating and ending workout
+* Adding exercises and sets to activa workouts
+* Managing workout history and persistence
+* Tag generation and management integration
+* Workout deletion and viewing
+
+
+
 ## Glossary
 
 * *glossary item* - Definition
