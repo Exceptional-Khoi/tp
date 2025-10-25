@@ -74,7 +74,7 @@ public class Person implements Serializable {
      * @return A List of WeightRecord objects
      */
     public List<WeightRecord> getWeightHistory() {
-        return Collections.unmodifiableList(new ArrayList<>(weightHistory));
+        return new ArrayList<>(weightHistory);
     }
 
     /**
