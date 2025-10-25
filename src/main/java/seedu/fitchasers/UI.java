@@ -4,46 +4,41 @@ import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Set;
 
-/**
- * The {@code UI} class handles all user interactions for the FitChaser application.
- * It manages console input/output, provides formatted messages, and displays
- * helpful prompts to guide the user through commands.
- *
- */
 public class UI {
+    // ===== ANSI colors =====
     private static final String RESET = "\u001B[0m";
     private static final String BLUE_BOLD = "\u001B[1;34m";
+    private static final String WHITE = "\u001B[97m";;
     private static final String CYAN = "\u001B[36m";
     private static final String MAGENTA = "\u001B[35m";
-    private static final String WHITE_BRIGHT = "\u001B[97m";
 
-    /**
-     * Scanner instance for reading user input from the console.
-     */
+    // Background colors (256-color mode)
+    private static final String BG_FITCHASER = "\u001B[48;5;236m";   // xám đậm cho FitChaser
+    private static final String BG_USER = "\u001B[48;5;39m";   // xanh navy cho You
+
+    private static final int CONSOLE_WIDTH = 80; // chiều rộng terminal
+
     private final Scanner scanner;
 
-    /**
-     * Constructs a new {@code UI} object and initializes a {@link Scanner}
-     * for reading user input.
-     */
     public UI() {
         this.scanner = new Scanner(System.in);
     }
 
-    /**
-     * Prompts the user to enter a command and reads the input line.
-     *
-     * @return the trimmed command string entered by the user.
-     */
+    // -----------------------------
+    // Input
+    // -----------------------------
     public String readCommand() {
-        System.out.print(MAGENTA + "Enter command" + RESET + " > ");
+        showDivider();
+        System.out.print(MAGENTA + "Enter command> " + RESET);
         if (!scanner.hasNextLine()) {
-            // no more input (EOF)
             return null;
         }
+        showDivider();
 
         String input = scanner.nextLine();
         assert input != null : "User input should never be null";
+
+        System.out.println(rightBubble("You", input));
 
         return input.trim();
     }
@@ -51,158 +46,92 @@ public class UI {
     public String enterName() {
         String name = "";
         while (name.isEmpty()) {
-            System.out.print(MAGENTA + "Enter your name: " + RESET);
+            System.out.print(rightBubble("You", "Enter your name: "));
             if (scanner.hasNextLine()) {
                 name = scanner.nextLine().trim();
                 if (name.isEmpty()) {
                     showMessage("Name cannot be empty. Please try again.");
+                } else {
+                    System.out.println(rightBubble("You",  name));
                 }
             } else {
-                // no more input (EOF)
                 return null;
             }
         }
+        showDivider();
         return name;
     }
 
-    /**
-     * Displays a standard informational message in green color,
-     * followed by a divider for readability.
-     *
-     * @param message the message to display.
-     */
+    // -----------------------------
+    // Output
+    // -----------------------------
     public void showMessage(String message) {
-        assert message != null : "Message to display should not be null";
-        System.out.println(WHITE_BRIGHT + message + RESET);
+        System.out.println(leftBubble("🤖 FitChaser", message));
     }
 
-    /**
-     * Displays an error message prefixed with "[Oops!]" in magenta color,
-     * followed by a divider.
-     *
-     * @param error the error message to display.
-     */
     public void showError(String error) {
-        assert error != null : "Error message must not be null";
-        System.out.println(MAGENTA + "[Oops!] " + RESET + WHITE_BRIGHT + error);
+        System.out.println(leftBubble("🤖 FitChaser", "[Oops!] " + error));
     }
 
-    /**
-     * Displays a greeting message when the application starts.
-     * It introduces the app and guides the user on how to get help.
-     */
-    public void showGreeting() {
 
+    public void showGreeting() {
         System.out.println(BLUE_BOLD + """
-                 ▄▄▄▄▄▄   ▀      ▄      ▄▄▄  █                                       \s
-                 █      ▄▄▄    ▄▄█▄▄  ▄▀   ▀ █ ▄▄    ▄▄▄    ▄▄▄    ▄▄▄    ▄ ▄▄   ▄▄▄ \s
-                 █▄▄▄▄▄   █      █    █      █▀  █  ▀   █  █   ▀  █▀  █   █▀  ▀ █   ▀\s
-                 █        █      █    █      █   █  ▄▀▀▀█   ▀▀▀▄  █▀▀▀▀   █      ▀▀▀▄\s
-                 █      ▄▄█▄▄    ▀▄▄   ▀▄▄▄▀ █   █  ▀▄▄▀█  ▀▄▄▄▀  ▀█▄▄▀   █     ▀▄▄▄▀\s
+                 ▄▄▄▄▄▄   ▀      ▄      ▄▄▄  █                                       
+                 █      ▄▄▄    ▄▄█▄▄  ▄▀   ▀ █ ▄▄    ▄▄▄    ▄▄▄    ▄▄▄    ▄ ▄▄   ▄▄▄ 
+                 █▄▄▄▄▄   █      █    █      █▀  █  ▀   █  █   ▀  █▀  █   █▀  ▀ █   ▀
+                 █        █      █    █      █   █  ▄▀▀▀█   ▀▀▀▄  █▀▀▀▀   █      ▀▀▀▄
+                 █      ▄▄█▄▄    ▀▄▄   ▀▄▄▄▀ █   █  ▀▄▄▀█  ▀▄▄▄▀  ▀█▄▄▀   █     ▀▄▄▄▀
                 """ + RESET);
 
-        System.out.println(CYAN
-                + "Your virtual gym buddy's clocked in and ready to make you strong!"
-                + RESET);
-
-        System.out.println(CYAN + "Type " + WHITE_BRIGHT + "/help" + RESET + CYAN
-                + " or " + WHITE_BRIGHT + "h" + RESET + CYAN
-                + " to explore all available commands!" + RESET);
-        System.out.println(CYAN + "Let's crush your fitness goals together!" + RESET);
-
-        showDivider();
+        showMessage("Your virtual gym buddy's clocked in and ready to make you strong!");
+        showMessage("Type /help or h to explore all available commands!");
+        showMessage("Let's crush your fitness goals together!");
     }
 
-    /**
-     * Displays a farewell message when the user exits the application.
-     */
     public void showExitMessage() {
-        System.out.println(CYAN
-                + "Catch you next time, champ — don't ghost your gains!" + RESET);
-
+        showMessage("Catch you next time, champ — don't ghost your gains!");
         showDivider();
     }
 
-    /**
-     * Displays all available commands and their usage.
-     */
     public void showHelp() {
-        System.out.print(WHITE_BRIGHT +
-                "/help (h)                            - View all commands\n" +
-                "/my_name (n) n/NAME                  - Set your display name "
-                + "(e.g. /my_name n/Nitin)\n" +
-                "/add_weight (aw) w/WEIGHT d/DATE     - Record your weight "
-                + "(e.g. /add_weight w/81.5 d/19/10/25)\n" +
-                "/view_weight (vw)                    - View your recorded weights\n" +
-                "/gym_where n/EXERCISE                - Find gyms with equipment for your exercise "
-                + "(e.g. /gym_where n/squat)\n" +
-                "/gym_page                            - Find available gyms in NUS"+
-                "/gym_page page_number\n"+
-                "/add_modality_tag (amot) m/TYPE k/keyword - Add keyword for modality "
-                + "(e.g. /add_modality_tag m/cardio k/hiking)\n" +
-                "/add_muscle_tag (amt) m/GROUP k/keyword  - Add keyword for muscle group "
-                + "(e.g. /add_muscle_tag m/legs k/lunges)\n" +
-                "/overwrite_workout_tag(owt) id/index newTag/NEW_TAG -Modify workout tag"+
-                        ("e.g. /overwrite_workout_tag id/1 newTag/Strength")+
-                "/create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout "
-                + "(e.g. /create_workout n/PushDay d/20/10/25 t/1900)\n" +
-                "/add_exercise (ae) n/NAME r/REPS     - Add an exercise "
-                + "(e.g. /add_exercise n/Squat r/12)\n" +
-                "/add_set (as) r/REPS                 - Add a new set "
-                + "(e.g. /add_set r/10)\n" +
-                "/end_workout (ew) d/DATE t/TIME      - End the current workout "
-                + "(e.g. /end_workout d/20/10/25 t/2030)\n" +
-                "/view_log (vl)                       - View your workout history\n" +
-                "/open (o) INDEX                      - Open workout by index\n" +
-                "/del_workout (d) NAME                - Delete a workout "
-                + "(e.g. /del_workout PushDay)\n" +
-                "/exit (e)                            - Save progress and exit the app\n" +
-                RESET);
-
-        showDivider();
+        showMessage("""
+        /help (h) - View all commands
+        /my_name (n) n/NAME - Set your display name
+        /add_weight (aw) w/WEIGHT d/DATE - Record your weight
+        /view_weight (vw) - View your recorded weights
+        /gym_where n/EXERCISE - Find gyms for your exercise
+        /gym_page - Find available gyms in NUS
+        /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
+        /exit (e) - Save progress and exit the app
+        """);
     }
 
-    /**
-     * Displays a visual divider line to separate sections in the console output.
-     */
     public void showDivider() {
-        System.out.println(WHITE_BRIGHT
-                + "--------------------------------------------------" + RESET);
+        System.out.println(WHITE + "--------------------------------------------------" + RESET);
     }
 
     public boolean confirmationMessage() {
         if (!scanner.hasNextLine()) {
-            // Default to 'no' if no input is available.
             return false;
         }
         String confirmation = scanner.nextLine().trim().toLowerCase();
         assert confirmation != null : "Confirmation input must not be null";
+        System.out.println(rightBubble("You", confirmation));
         return confirmation.equals("y") || confirmation.equals("yes");
     }
 
-    /**
-     * Displays detailed information about a given workout.
-     *
-     * @param workout The workout to display.
-     */
     public void displayDetailsOfWorkout(Workout workout) {
         if (workout == null) {
             showMessage("No workout found to display.");
             return;
         }
 
-        showDivider();
         showMessage("Here you go bestie! These are the workout details!");
-        showDivider();
 
-        // Basic info
-        assert workout.getWorkoutName() != null : "Workout name should not be null";
         showMessage("Name       : " + workout.getWorkoutName());
         showMessage("Date       : " + workout.getWorkoutDateString());
 
-        // Duration formatting
         int totalMinutes = workout.getDuration();
-        assert totalMinutes >= 0 : "Workout duration must not be negative";
         int hours = totalMinutes / 60;
         int minutes = totalMinutes % 60;
         String durationStr = (hours > 0)
@@ -210,13 +139,11 @@ public class UI {
                 : String.format("%dm", minutes);
         showMessage("Duration   : " + durationStr);
 
-        // Time details
         if (workout.getWorkoutStartDateTime() != null && workout.getWorkoutEndDateTime() != null) {
             showMessage("Start Time : " + workout.getWorkoutStartDateTime());
             showMessage("End Time   : " + workout.getWorkoutEndDateTime());
         }
 
-        // Tags
         Set<String> tagsToDisplay = workout.getAllTags();
         if (tagsToDisplay.isEmpty()) {
             showMessage("Tags       : -");
@@ -224,9 +151,7 @@ public class UI {
             showMessage("Tags       : " + String.join(", ", tagsToDisplay));
         }
 
-        // Exercises
         ArrayList<Exercise> exercises = workout.getExercises();
-        assert exercises != null : "Workout exercises should not be null";
         if (exercises.isEmpty()) {
             showMessage("Exercises  : (none added)");
         } else {
@@ -236,11 +161,7 @@ public class UI {
                 showMessage(String.format("  %d. %s", i++, e.toString()));
             }
         }
-
-        showDivider();
     }
-
-
 
     static String getDaySuffix(int day) {
         assert day >= 1 && day <= 31 : "Day should be between 1 and 31";
@@ -248,10 +169,61 @@ public class UI {
             return "th";
         }
         return switch (day % 10) {
-        case 1 -> "st";
-        case 2 -> "nd";
-        case 3 -> "rd";
-        default -> "th";
+            case 1 -> "st";
+            case 2 -> "nd";
+            case 3 -> "rd";
+            default -> "th";
         };
     }
+
+    // ------------------ Chat Bubble Formatters ------------------
+
+    private String leftBubble(String sender, String message) {
+        String cleanMsg = stripAnsi(message);
+        int padding = 2;
+        int width = Math.min(cleanMsg.length() + padding * 2, CONSOLE_WIDTH - 6);
+
+        String top = "╭" + "─".repeat(width) + "╮";
+        String contentLine = String.format("│%s%s%s│",
+                " ".repeat(padding),
+                WHITE + cleanMsg + RESET,
+                " ".repeat(width - cleanMsg.length() - padding)
+        );
+        String bottom = "╰" + "─".repeat(width) + "╯";
+
+        return String.format("%s%s%s\n%s\n%s\n%s",
+                CYAN, sender, RESET,
+                top, contentLine, bottom
+        );
+    }
+
+    private String rightBubble(String sender, String message) {
+        String cleanMsg = stripAnsi(message);
+        int padding = 2;
+        int width = Math.min(cleanMsg.length() + padding * 2, CONSOLE_WIDTH - 6);
+
+        String top = BLUE_BOLD + "╭" + "─".repeat(width) + "╮" + RESET;
+        String contentLine = String.format(
+                "%s│%s%s%s│%s",
+                BLUE_BOLD,                                  // viền trái xanh
+                " ".repeat(padding),
+                BLUE_BOLD + cleanMsg,                       // chữ xanh (không RESET giữa chừng)
+                " ".repeat(width - cleanMsg.length() - padding),
+                RESET                                       // RESET sau khi in viền phải
+        );
+        String bottom = BLUE_BOLD + "╰" + "─".repeat(width) + "╯" + RESET;
+
+
+        int pad = Math.max(0, CONSOLE_WIDTH - width - 6);
+        return " ".repeat(pad) + CYAN + "(" + sender + ")" + RESET + "\n"
+                + " ".repeat(pad) + top + "\n"
+                + " ".repeat(pad) + contentLine + "\n"
+                + " ".repeat(pad) + bottom;
+    }
+
+
+    private static String stripAnsi(String input) {
+        return input.replaceAll("\u001B\\[[;\\d]*m", "");
+    }
 }
+
