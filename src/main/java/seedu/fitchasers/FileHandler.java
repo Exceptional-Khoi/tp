@@ -68,8 +68,7 @@ public class FileHandler {
         return arrayByMonth.computeIfAbsent(targetMonth, month -> {
             try {
                 return loadMonthList(month);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 return new ArrayList<>();
             }
         });
