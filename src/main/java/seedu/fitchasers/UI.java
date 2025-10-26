@@ -82,11 +82,11 @@ public class UI {
 
     public void showGreeting() {
         String[] purpleShades = {
-                "\u001B[38;5;93m",
-                "\u001B[38;5;129m",
-                "\u001B[38;5;135m",
-                "\u001B[38;5;141m",
-                "\u001B[38;5;147m"
+            "\u001B[38;5;93m",
+            "\u001B[38;5;129m",
+            "\u001B[38;5;135m",
+            "\u001B[38;5;141m",
+            "\u001B[38;5;147m"
         };
 
         System.out.println(purpleShades[0] +
