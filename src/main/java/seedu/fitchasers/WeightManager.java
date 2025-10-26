@@ -1,21 +1,23 @@
 package seedu.fitchasers;
 
-import java.io.IOException;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.List;
+
 
 /**
  * Handles the recording and viewing of weight data for a person.
  */
 public class WeightManager {
 
+
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
+
 
     private final Person currentUser;
     private final UI uiHandler = new UI();
-    private final FileHandler fileHandler = new FileHandler();
+
 
     public WeightManager(Person person) {
         this.currentUser = person;
@@ -29,36 +31,15 @@ public class WeightManager {
      * @param command full command string containing weight and date
      */
     public void addWeight(String command) {
-        String weightString;
+        String weightString = extractBetween(command, "w/", "d/");
         String dateString = extractAfter(command, "d/");
 
-        int wIdx = command.indexOf("w/");
-        int dIdx = command.indexOf("d/");
 
-        if (wIdx != -1 && dIdx != -1 && dIdx > wIdx) {
-            weightString = command.substring(wIdx + 2, dIdx).trim();
-        } else if (wIdx != -1) {
-            weightString = command.substring(wIdx + 2).trim();
-        } else {
-            weightString = "";
-        }
-
-        // If date is missing, offer to use today's date
-        if (dateString.isEmpty()) {
-            String todayStr = LocalDate.now().format(DATE_FORMAT);
-            uiHandler.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
-            if (uiHandler.confirmationMessage()) {
-                dateString = todayStr;
-            } else {
-                uiHandler.showMessage("Please provide a date in format d/DD/MM/YY.");
-                return;
-            }
-        }
-
-        if (weightString.isEmpty()) {
+        if (weightString.isEmpty() || dateString.isEmpty()) {
             uiHandler.showMessage("Invalid input. Correct format: /add_weight w/WEIGHT d/DATE");
             return;
         }
+
 
         try {
             double weightValue = Double.parseDouble(weightString);
@@ -71,35 +52,11 @@ public class WeightManager {
                 return;
             }
 
-            // Check if there's already a weight record for this date
-            List<WeightRecord> weightList = currentUser.getWeightHistory();
-            if (weightList != null) {
-                for (int i = 0; i < weightList.size(); i++) {
-                    WeightRecord record = weightList.get(i);
-                    if (record.getDate().equals(entryDate)) {
-                        uiHandler.showMessage("A weight record already exists for "
-                                + entryDate.format(DATE_FORMAT) + ". Overwrite it? (Y/N)");
-                        if (!uiHandler.confirmationMessage()) {
-                            uiHandler.showMessage("Weight entry cancelled. Please choose another date.");
-                            return;
-                        }
-                        weightList.remove(i); // overwrite confirmed
-                        break;
-                    }
-                }
-            }
-
-            // Add record if confirmed
             WeightRecord weightRecord = new WeightRecord(weightValue, entryDate);
             currentUser.addWeightRecord(weightRecord);
-            try {
-                fileHandler.saveWeightList(currentUser);
-                uiHandler.showMessage("Weight saved successfully!");
-            } catch (IOException e) {
-                uiHandler.showError("Failed to save weight: " + e.getMessage());
-            }
             uiHandler.showMessage("Logging your weight... don't lie to me!");
             uiHandler.showMessage("New weight recorded: " + weightRecord);
+
 
         } catch (NumberFormatException nfe) {
             uiHandler.showMessage("Invalid weight. Please enter a number.");
@@ -110,6 +67,7 @@ public class WeightManager {
         }
     }
 
+
     /**
      * Displays all weight records for the person.
      */
@@ -117,7 +75,9 @@ public class WeightManager {
         currentUser.displayWeightHistory();
     }
 
+
     // ----------------- Helper methods -----------------
+
 
     private String extractBetween(String text, String start, String end) {
         int startIndex = text.indexOf(start);
@@ -128,6 +88,7 @@ public class WeightManager {
         return text.substring(startIndex + start.length(), endIndex).trim();
     }
 
+
     private String extractAfter(String text, String start) {
         int startIndex = text.indexOf(start);
         if (startIndex == -1 || startIndex + start.length() >= text.length()) {
@@ -136,3 +97,4 @@ public class WeightManager {
         return text.substring(startIndex + start.length()).trim();
     }
 }
+
