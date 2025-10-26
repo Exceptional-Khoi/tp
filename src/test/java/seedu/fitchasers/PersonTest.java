@@ -76,10 +76,12 @@ class PersonTest {
     }
 
     @Test
-    void getWeightHistory_returnsUnmodifiableList() {
+    void getWeightHistory_returnsCopyList() {
         person.addWeightRecord(new WeightRecord(70.0, LocalDate.now()));
         List<WeightRecord> history = person.getWeightHistory();
-        assertThrows(UnsupportedOperationException.class, () -> history.add(new WeightRecord(71.0, LocalDate.now())));
+        history.add(new WeightRecord(71.0, LocalDate.now()));
+        assertEquals(1, person.getWeightHistorySize(),
+                "Original list should not change after modifying the returned copy");
     }
 
     // ----------------------------------------------------

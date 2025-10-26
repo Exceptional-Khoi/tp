@@ -74,7 +74,7 @@ public class Person implements Serializable {
      * @return A List of WeightRecord objects
      */
     public List<WeightRecord> getWeightHistory() {
-        return Collections.unmodifiableList(new ArrayList<>(weightHistory));
+        return new ArrayList<>(weightHistory);
     }
 
     /**
@@ -91,6 +91,8 @@ public class Person implements Serializable {
         for (WeightRecord record : weightHistory) {
             ui.showMessage("  " + record);
         }
+        ui.showDivider();
+        ui.showMessage("To view your weight progress graph, use the command: /view_weight -g");
     }
 
     /**
