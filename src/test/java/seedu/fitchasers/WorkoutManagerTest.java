@@ -10,6 +10,7 @@ import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import java.time.LocalDateTime;
@@ -26,7 +27,7 @@ class WorkoutManagerTest {
     @BeforeEach
     void setup() {
         Tagger tagger = new DefaultTagger();
-        manager = new WorkoutManager(tagger);
+        manager = new WorkoutManager(tagger, new FileHandler());
         manager.addWorkout("n/TestWorkout d/25/10/25 t/1400");
     }
 
@@ -84,14 +85,14 @@ class WorkoutManagerTest {
 
 
     @Test
-    void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() {
+    void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() throws IOException {
         manager.deleteWorkout("run");
         assertThrows(IndexOutOfBoundsException.class,
                 ()-> manager.getWorkouts().get(1));
     }
 
     @Test
-    void removeWorkout_nonExistingWorkout_printsWorkoutNotFound() {
+    void removeWorkout_nonExistingWorkout_printsWorkoutNotFound() throws IOException {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
 

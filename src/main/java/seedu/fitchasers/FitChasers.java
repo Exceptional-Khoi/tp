@@ -76,24 +76,18 @@ public class FitChasers {
         ViewLog viewLog;
         List<Gym> gyms = StaticGymData.getNusGyms();
         DefaultTagger tagger = new DefaultTagger();
-        WorkoutManager workoutManager = new WorkoutManager(tagger);
+        WorkoutManager workoutManager = new WorkoutManager(tagger, fileHandler);
+        fileHandler.initIndex();
 
         try {
             fileHandler.loadWeightList(person);
-            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth));
+            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
             ui.showMessage("Loaded " + currentMonth + " workouts\n");
-        } catch (FileNonexistent e) {
-            ui.showError("Seems like this is a new month!"
-                    + "\nWould you like to create new workouts for this month? (Y/N)");
-            if (ui.confirmationMessage()) {
-                fileHandler.saveMonthList(currentMonth, new ArrayList<>());
-                workoutManager.setWorkouts(new ArrayList<>());
-            }
         } catch (IOException e) {
             ui.showError(e.getMessage());
         }
 
-        viewLog = new ViewLog(ui, workoutManager);
+        viewLog = new ViewLog(ui, workoutManager, fileHandler);
 
         boolean isRunning = true;
 
@@ -333,7 +327,7 @@ public class FitChasers {
                 case "/view_log":
                 case "vl":
                     try{
-                        viewLog.render(argumentStr); //#TODO select detailed or not
+                        viewLog.render(argumentStr);
                     }catch (IndexOutOfBoundsException e){
                         ui.showError(e.getMessage());
                     }
@@ -363,7 +357,6 @@ public class FitChasers {
                     ui.showMessage("Saving your progress...");
                     try {
                         fileHandler.saveWeightList(person);
-                        fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
                         ui.showExitMessage();
                     } catch (IOException e) {
                         ui.showError("Failed to save workouts before exit.");

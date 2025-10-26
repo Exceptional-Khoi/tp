@@ -42,7 +42,7 @@ public class FileHandler {
     private static final Path DATA_DIR = Paths.get("data");
     private static final Path WORKOUT_DIR = DATA_DIR.resolve("workouts");
     private final UI ui = new UI();
-    private final Map<YearMonth, List<Workout>> arrayByMonth = new HashMap<>();
+    private final Map<YearMonth, ArrayList<Workout>> arrayByMonth = new HashMap<>();
     private final Set<YearMonth> onDiskMonths = new HashSet<>(); // discovered from directory
 
     /**
@@ -60,7 +60,11 @@ public class FileHandler {
         }
     }
 
-    public List<Workout> getWorkoutsForMonth(YearMonth targetMonth) {
+    public Map<YearMonth, ArrayList<Workout>> getArrayByMonth() {
+        return arrayByMonth;
+    }
+
+    public ArrayList<Workout> getWorkoutsForMonth(YearMonth targetMonth) {
         return arrayByMonth.computeIfAbsent(targetMonth, month -> {
             try {
                 return loadMonthList(month);
@@ -94,7 +98,6 @@ public class FileHandler {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
 
         String filename = String.format("workouts_%s.dat", month); // e.g., workouts_2025-06.dat
         Path filePath = WORKOUT_DIR.resolve(filename);
