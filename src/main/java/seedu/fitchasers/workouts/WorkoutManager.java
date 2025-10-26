@@ -199,6 +199,60 @@ public class WorkoutManager {
             }
         }
          workoutDateTime = LocalDateTime.of(date, time);
+
+        if (date.isAfter(LocalDate.now())) {
+            ui.showMessage("The date you entered (" + date.format(dateFmt) + ") is in the future. Are you sure? (Y/N)");
+            if (!ui.confirmationMessage()) {
+                ui.showMessage("Please re-enter the correct date.");
+                return;
+            }
+        }
+
+        if (date.isEqual(LocalDate.now()) && time.isAfter(LocalTime.now())) {
+            ui.showMessage("The time you entered (" + time.format(timeFmt) + ") is in the future. Are you sure? (Y/N)");
+            if (!ui.confirmationMessage()) {
+                ui.showMessage("Please re-enter the correct time.");
+                return;
+            }
+        }
+
+        // Check if any existing workout already has the same date/time
+        for (Workout w : workouts) {
+            LocalDateTime existingStart = w.getWorkoutStartDateTime();
+            if (existingStart != null) {
+                LocalDate existingDate = existingStart.toLocalDate();
+                LocalTime existingTime = existingStart.toLocalTime();
+
+                if (existingDate.equals(date) && existingTime.equals(time)) {
+                    ui.showMessage("A workout already exists at this date and time ("
+                            + existingDate.format(dateFmt) + " " + existingTime.format(timeFmt) + "). " +
+                            "Continue anyway? (Y/N)");
+                    if (!ui.confirmationMessage()) {
+                        ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
+                        return;
+                    }
+                    break;
+                }
+            }
+        }
+
+        LocalDateTime workoutDateTime = LocalDateTime.of(date, time);
+
+        try {
+            Workout newWorkout = new Workout(workoutName, workoutDateTime);
+
+            // merge auto-tags if you have a tagger
+            Set<String> suggestedTags = tagger.suggest(newWorkout);
+            newWorkout.setAutoTags(suggestedTags);
+            System.out.println("Tags generated for workout: " + suggestedTags);
+            workouts.add(newWorkout);
+            currentWorkout = newWorkout;
+
+            ui.showMessage("New workout sesh incoming!");
+            ui.showMessage("Added workout: " + workoutName);
+        } catch (Exception e) {
+            ui.showMessage("Something went wrong creating the workout. Please try again.");
+        }
     }
 
     /**

@@ -72,7 +72,9 @@ class WorkoutManagerTest {
                     end.format(DateTimeFormatter.ofPattern("HHmm")));
 
             UI dummyUI = new UI() {
-                @Override public boolean confirmationMessage() { return true; }
+                @Override public boolean confirmationMessage() {
+                    return true;
+                }
             };
             manager.endWorkout(dummyUI, endArgs);
         }

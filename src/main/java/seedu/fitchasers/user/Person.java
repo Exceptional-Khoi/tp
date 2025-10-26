@@ -2,6 +2,7 @@ package seedu.fitchasers.user;
 
 import seedu.fitchasers.UI.UI;
 
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,18 +13,22 @@ import java.util.Map;
 import java.util.LinkedHashMap;
 import java.time.format.DateTimeFormatter;
 
+
 /**
  * Represents a person using the FitChasers app.
  * Stores the person's name and their weight history.
  */
 public class Person implements Serializable {
 
+
     private final UI ui = new UI();
     /** The name of the person */
     private String name;
 
+
     /** The list of weight records for the person */
     private final ArrayList<WeightRecord> weightHistory;
+
 
     /**
      * Constructs a new Person with the given name.
@@ -37,6 +42,7 @@ public class Person implements Serializable {
         this.weightHistory = new ArrayList<>();
     }
 
+
     /**
      * Returns the name of the person.
      *
@@ -45,6 +51,7 @@ public class Person implements Serializable {
     public String getName() {
         return name;
     }
+
 
     /**
      * Updates the name of the person.
@@ -59,6 +66,7 @@ public class Person implements Serializable {
         this.name = newName.trim();
     }
 
+
     /**
      * Adds a weight record to the person's weight history.
      *
@@ -70,6 +78,7 @@ public class Person implements Serializable {
         weightHistory.add(record);
     }
 
+
     /**
      * Returns an unmodifiable copy of the weight history.
      *
@@ -78,6 +87,7 @@ public class Person implements Serializable {
     public List<WeightRecord> getWeightHistory() {
         return Collections.unmodifiableList(new ArrayList<>(weightHistory));
     }
+
 
     /**
      * Displays the weight history in the console.
@@ -95,6 +105,7 @@ public class Person implements Serializable {
         }
     }
 
+
     /**
      * Returns the most recent weight recorded for the person.
      *
@@ -102,10 +113,11 @@ public class Person implements Serializable {
      */
     public double getLatestWeight() {
         if (weightHistory.isEmpty()) {
-            return -1; // dùng -1 để phân biệt không có dữ liệu
+            return -1;
         }
         return weightHistory.get(weightHistory.size() - 1).getWeight();
     }
+
 
     /**
      * Returns the number of weight records.
@@ -115,6 +127,7 @@ public class Person implements Serializable {
     public int getWeightHistorySize() {
         return weightHistory.size();
     }
+
 
     /**
      * Removes the most recent weight record.
@@ -129,19 +142,23 @@ public class Person implements Serializable {
         return true;
     }
 
+
     public void displayWeightGraphWithDates() {
         if (weightHistory.isEmpty()) {
             System.out.println(name + " has no weight records yet.");
             return;
         }
 
+
         // Sort records by date ascending
         List<WeightRecord> sortedRecords = new ArrayList<>(weightHistory);
         sortedRecords.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
 
+
         List<Double> weights = new ArrayList<>();
         List<String> dates = new ArrayList<>();
         DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM");
+
 
         // Keep only the latest record per day (if duplicates exist)
         Map<LocalDate, WeightRecord> latestPerDay = new LinkedHashMap<>();
@@ -149,16 +166,19 @@ public class Person implements Serializable {
             latestPerDay.put(r.getDate(), r);
         }
 
+
         for (WeightRecord r : latestPerDay.values()) {
             weights.add(r.getWeight());
             dates.add(r.getDate().format(df));
         }
+
 
         double min = Collections.min(weights);
         double max = Collections.max(weights);
         int height = 10;
         int spacing = 12;
         int width = (weights.size() - 1) * spacing + 1;
+
 
         char[][] grid = new char[height][width];
         for (int i = 0; i < height; i++) {
@@ -167,11 +187,13 @@ public class Person implements Serializable {
             }
         }
 
+
         int[] y = new int[weights.size()];
         for (int i = 0; i < weights.size(); i++) {
             double normalized = (weights.get(i) - min) / (max - min);
             y[i] = height - 1 - (int) Math.round(normalized * (height - 1));
         }
+
 
         for (int i = 0; i < weights.size() - 1; i++) {
             int x1 = i * spacing;
@@ -190,6 +212,7 @@ public class Person implements Serializable {
             }
         }
 
+
         boolean[][] isWeightPoint = new boolean[height][width];
         for (int i = 0; i < weights.size(); i++) {
             int x = i * spacing;
@@ -200,10 +223,13 @@ public class Person implements Serializable {
             }
         }
 
+
         final String reset = "\u001B[0m";
         final String orange = "\u001B[1m\u001B[38;5;208m";
 
+
         System.out.println("\nWeight Progress Graph for " + name + ":");
+
 
         for (int i = 0; i < height; i++) {
             double label = max - (max - min) * i / (height - 1);
@@ -218,11 +244,13 @@ public class Person implements Serializable {
             System.out.println();
         }
 
+
         System.out.print("        ");
         for (int j = 0; j < width + 4; j++) {
             System.out.print('_');
         }
         System.out.println();
+
 
         System.out.print("        ");
         for (int i = 0; i < dates.size(); i++) {
@@ -237,6 +265,7 @@ public class Person implements Serializable {
         }
         System.out.println("\n");
     }
+
 
     public void setWeightHistory(List<WeightRecord> history) {
         this.weightHistory.clear();

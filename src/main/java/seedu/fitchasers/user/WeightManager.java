@@ -2,23 +2,29 @@ package seedu.fitchasers.user;
 
 import seedu.fitchasers.UI.UI;
 
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
 
 /**
  * Handles the recording and viewing of weight data for a person.
  */
 public class WeightManager {
 
+
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd/MM/yy");
+
 
     private final Person currentUser;
     private final UI uiHandler = new UI();
 
+
     public WeightManager(Person person) {
         this.currentUser = person;
     }
+
 
     /**
      * Adds a new weight entry.
@@ -30,19 +36,29 @@ public class WeightManager {
         String weightString = extractBetween(command, "w/", "d/");
         String dateString = extractAfter(command, "d/");
 
+
         if (weightString.isEmpty() || dateString.isEmpty()) {
             uiHandler.showMessage("Invalid input. Correct format: /add_weight w/WEIGHT d/DATE");
             return;
         }
 
+
         try {
             double weightValue = Double.parseDouble(weightString);
             LocalDate entryDate = LocalDate.parse(dateString, DATE_FORMAT);
+
+            // Check if date is in the future
+            if (entryDate.isAfter(LocalDate.now())) {
+                uiHandler.showMessage("The date you entered (" + entryDate.format(DATE_FORMAT)
+                        + ") is in the future. Please re-enter a valid date that is not in the future");
+                return;
+            }
 
             WeightRecord weightRecord = new WeightRecord(weightValue, entryDate);
             currentUser.addWeightRecord(weightRecord);
             uiHandler.showMessage("Logging your weight... don't lie to me!");
             uiHandler.showMessage("New weight recorded: " + weightRecord);
+
 
         } catch (NumberFormatException nfe) {
             uiHandler.showMessage("Invalid weight. Please enter a number.");
@@ -53,6 +69,7 @@ public class WeightManager {
         }
     }
 
+
     /**
      * Displays all weight records for the person.
      */
@@ -60,7 +77,9 @@ public class WeightManager {
         currentUser.displayWeightHistory();
     }
 
+
     // ----------------- Helper methods -----------------
+
 
     private String extractBetween(String text, String start, String end) {
         int startIndex = text.indexOf(start);
@@ -71,6 +90,7 @@ public class WeightManager {
         return text.substring(startIndex + start.length(), endIndex).trim();
     }
 
+
     private String extractAfter(String text, String start) {
         int startIndex = text.indexOf(start);
         if (startIndex == -1 || startIndex + start.length() >= text.length()) {
@@ -79,3 +99,4 @@ public class WeightManager {
         return text.substring(startIndex + start.length()).trim();
     }
 }
+

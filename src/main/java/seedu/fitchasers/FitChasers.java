@@ -62,7 +62,7 @@ public class FitChasers {
                 userName = ui.enterName();
             }
             person = new Person(userName.trim());
-            ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started.\n");
+            ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started!");
 
             try {
                 fileHandler.saveUserName(person);
@@ -81,6 +81,15 @@ public class FitChasers {
 
         try {
             fileHandler.loadWeightList(person);
+            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth));
+            ui.showMessage("Loaded " + currentMonth + " workouts.");
+        } catch (FileNonexistent e) {
+            ui.showError("Seems like this is a new month!"
+                    + "\nWould you like to create new workouts for this month? (Y/N)");
+            if (ui.confirmationMessage()) {
+                fileHandler.saveMonthList(currentMonth, new ArrayList<>());
+                workoutManager.setWorkouts(new ArrayList<>());
+            }
             workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
             ui.showMessage("Loaded " + currentMonth + " workouts\n");
         } catch (IOException e) {
@@ -113,7 +122,7 @@ public class FitChasers {
                     break;
 
                 case "/my_name":
-                case "n":{
+                case "n": {
                     if (argumentStr == null || !argumentStr.startsWith("n/")) {
                         ui.showMessage("Usage: /my_name n/YourName");
                         ui.showDivider();
@@ -175,10 +184,10 @@ public class FitChasers {
                     String mod = null;
                     String keyword = null;
                     for (String param : params) {
-                        if (param.startsWith("m/")){
+                        if (param.startsWith("m/")) {
                             mod = param.substring(2).toUpperCase();
                         }
-                        if (param.startsWith("k/")){
+                        if (param.startsWith("k/")) {
                             keyword = param.substring(2).toLowerCase();
                         }
                     }
@@ -203,10 +212,10 @@ public class FitChasers {
                     String mus = null;
                     String keyword = null;
                     for (String param : params) {
-                        if (param.startsWith("m/")){
+                        if (param.startsWith("m/")) {
                             mus = param.substring(2).toUpperCase();
                         }
-                        if (param.startsWith("k/")){
+                        if (param.startsWith("k/")) {
                             keyword = param.substring(2).toLowerCase();
                         }
                     }
