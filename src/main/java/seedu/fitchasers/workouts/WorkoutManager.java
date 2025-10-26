@@ -42,6 +42,7 @@ public class WorkoutManager {
         this.tagger = tagger;
         this.fileHandler = fileHandler;
         this.workoutsByMonth = fileHandler.getArrayByMonth();
+        this.currentLoadedMonth = YearMonth.now();
     }
 
     public void setWorkouts(ArrayList<Workout> workouts, YearMonth monthOfArrayList) {
