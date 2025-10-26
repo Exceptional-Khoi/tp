@@ -234,7 +234,7 @@ public class WorkoutManager {
                 }
             }
         }
-         workoutDateTime = LocalDateTime.of(date, time);
+        workoutDateTime = LocalDateTime.of(date, time);
     }
 
     /**

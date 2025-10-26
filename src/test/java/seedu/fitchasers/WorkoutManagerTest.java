@@ -2,7 +2,6 @@ package seedu.fitchasers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInfo;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Tagger;
