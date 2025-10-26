@@ -234,24 +234,7 @@ public class WorkoutManager {
                 }
             }
         }
-
-        LocalDateTime workoutDateTime = LocalDateTime.of(date, time);
-
-        try {
-            Workout newWorkout = new Workout(workoutName, workoutDateTime);
-
-            // merge auto-tags if you have a tagger
-            Set<String> suggestedTags = tagger.suggest(newWorkout);
-            newWorkout.setAutoTags(suggestedTags);
-            System.out.println("Tags generated for workout: " + suggestedTags);
-            workouts.add(newWorkout);
-            currentWorkout = newWorkout;
-
-            ui.showMessage("New workout sesh incoming!");
-            ui.showMessage("Added workout: " + workoutName);
-        } catch (Exception e) {
-            ui.showMessage("Something went wrong creating the workout. Please try again.");
-        }
+         workoutDateTime = LocalDateTime.of(date, time);
     }
 
     /**

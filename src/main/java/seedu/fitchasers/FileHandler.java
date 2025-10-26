@@ -39,8 +39,8 @@ import java.util.Set;
 
 public class FileHandler {
 
-    private static final Path DATA_DIR = Paths.get("data");
-    private static final Path WORKOUT_DIR = DATA_DIR.resolve("workouts");
+    private Path DATA_DIR = Paths.get("data");
+    private final Path WORKOUT_DIR = DATA_DIR.resolve("workouts");
     private final UI ui = new UI();
     private final Map<YearMonth, ArrayList<Workout>> arrayByMonth = new HashMap<>();
     private final Set<YearMonth> onDiskMonths = new HashSet<>(); // discovered from directory
@@ -78,7 +78,7 @@ public class FileHandler {
      *
      * @throws IOException if directory or file creation fails
      */
-    private static void ensureDataDir() throws IOException {
+    private void ensureDataDir() throws IOException {
         Files.createDirectories(DATA_DIR);
         Files.createDirectories(WORKOUT_DIR);
     }

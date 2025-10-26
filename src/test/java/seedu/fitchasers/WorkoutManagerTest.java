@@ -2,6 +2,7 @@ package seedu.fitchasers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Tagger;
@@ -27,8 +28,9 @@ class WorkoutManagerTest {
     @BeforeEach
     void setup() {
         Tagger tagger = new DefaultTagger();
-        manager = new WorkoutManager(tagger, new FileHandler());
-        manager.addWorkout("n/TestWorkout d/25/10/25 t/1400");
+        FileHandler fileHandler = new FileHandler();
+        manager = new WorkoutManager(tagger, fileHandler);
+        manager.addWorkout("n/TestWorkout d/24/10/25 t/1400");
     }
 
     @Test
@@ -80,9 +82,9 @@ class WorkoutManagerTest {
         }
 
         manager.addWorkout("n/run d/15/10/25 t/0730");
-        
-        assertEquals(4, manager.getWorkouts().size());
-        assertEquals("run", manager.getWorkouts().get(3).getWorkoutName());
+
+        assertEquals(2, manager.getWorkouts().size());
+        assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
     }
 
 
