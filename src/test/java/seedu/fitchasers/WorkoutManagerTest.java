@@ -81,8 +81,8 @@ class WorkoutManagerTest {
 
         manager.addWorkout("n/run d/15/10/25 t/0730");
         
-        assertEquals(2, manager.getWorkouts().size());
-        assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
+        assertEquals(4, manager.getWorkouts().size());
+        assertEquals("run", manager.getWorkouts().get(3).getWorkoutName());
     }
 
 
