@@ -1,6 +1,6 @@
 package seedu.fitchasers;
 
-import seedu.fitchasers.UI.UI;
+import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.user.Person;
 import seedu.fitchasers.user.WeightRecord;
@@ -66,12 +66,12 @@ public class FileHandler {
 
     public ArrayList<Workout> getWorkoutsForMonth(YearMonth targetMonth) {
         return arrayByMonth.computeIfAbsent(targetMonth, month -> {
-            try {
-                return loadMonthList(month);
-            }
-            catch (Exception e) {
-                return new ArrayList<>();
-            }
+        try {
+            return loadMonthList(month);
+        }
+        catch (Exception e) {
+            return new ArrayList<>();
+        }
         });
     }
     /**

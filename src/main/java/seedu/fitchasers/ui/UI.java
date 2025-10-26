@@ -1,4 +1,4 @@
-package seedu.fitchasers.UI;
+package seedu.fitchasers.ui;
 
 import seedu.fitchasers.workouts.Exercise;
 import seedu.fitchasers.workouts.Workout;
@@ -137,8 +137,8 @@ public class UI {
           /add_set (as) r/REPS                 - Add a new set (e.g. /add_set r/10)
           /end_workout (ew) d/DATE t/TIME      - End the current workout
           (e.g. /end_workout d/20/10/25 t/2030)
-          /view_log (vl) [page number]         - View your workout history. Log comes in pages of 10 (Defaults to page 1)
-          /view_log -m [month] [page number]   - Use -m to specify which month you want to view (Default to current year)
+          /view_log (vl) [page number]         - View your workout history.Log comes in pages of 10 (Defaults to page 1)
+          /view_log -m [month] [page number]   - Use -m to specify month you want to view (Default to current year)
           /view_log -ym [year] [month] [page number] -Use -ym to specify year and month. Cannot use together with "-m"
           /view_log -d                         - Use -d to see logs in detail. Can be used with year params
           /open (o) INDEX                      - Open workout by index

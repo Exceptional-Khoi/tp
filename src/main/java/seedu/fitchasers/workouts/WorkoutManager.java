@@ -2,13 +2,11 @@ package seedu.fitchasers.workouts;
 
 import seedu.fitchasers.FileHandler;
 import seedu.fitchasers.tagger.Tagger;
-import seedu.fitchasers.UI.UI;
+import seedu.fitchasers.ui.UI;
 
 import java.io.IOException;
-import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.ResolverStyle;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.time.LocalDate;
@@ -198,7 +196,7 @@ public class WorkoutManager {
                 return;
             }
         }
-         workoutDateTime = LocalDateTime.of(date, time);
+        workoutDateTime = LocalDateTime.of(date, time);
 
         if (date.isAfter(LocalDate.now())) {
             ui.showMessage("The date you entered (" + date.format(dateFmt) + ") is in the future. Are you sure? (Y/N)");

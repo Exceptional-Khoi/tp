@@ -1,6 +1,6 @@
 package seedu.fitchasers.user;
 
-import seedu.fitchasers.UI.UI;
+import seedu.fitchasers.ui.UI;
 
 
 import java.time.LocalDate;

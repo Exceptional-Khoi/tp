@@ -1,4 +1,4 @@
-package seedu.fitchasers.UI;
+package seedu.fitchasers.ui;
 import seedu.fitchasers.FileHandler;
 import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.WorkoutManager;
@@ -79,7 +79,7 @@ public class ViewLog {
         this.lastFilteredSorted = sorted; // for /open <ID>
 
         int totalPages = computeTotalPages(sorted.size(), pageSize);
-        int current = ensureValidPage(p.page, totalPages);
+        int current = ensureValidPage(p.page);
 
         int start = (current - 1) * pageSize;
         int end = Math.min(start + pageSize, sorted.size());
@@ -389,7 +389,9 @@ public class ViewLog {
     private static int readPositiveInt(String s, String err) throws InvalidArgumentInput {
         try {
             int v = Integer.parseInt(s);
-            if (v <= 0) throw new NumberFormatException();
+            if (v <= 0) {
+                throw new NumberFormatException();
+            }
             return v;
         } catch (NumberFormatException nfe) {
             throw new InvalidArgumentInput(err);
@@ -408,14 +410,5 @@ public class ViewLog {
         }
     }
 
-    /**
-     * Ensures page is within 1..totalPages (clamps to nearest valid page).
-     */
-    private int ensureValidPage(int requested, int totalPages) throws InvalidArgumentInput {
-        int tp = Math.max(1, totalPages);
-        if (requested < 1) return 1;
-        if (requested > tp) return tp;
-        return requested;
-    }
 }
 

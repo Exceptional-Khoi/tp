@@ -1,6 +1,6 @@
 package seedu.fitchasers.workouts;
 
-import seedu.fitchasers.UI.UI;
+import seedu.fitchasers.ui.UI;
 
 import java.io.Serializable;
 import java.time.Duration;
