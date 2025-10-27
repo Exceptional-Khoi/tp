@@ -1,12 +1,21 @@
 package seedu.fitchasers;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import seedu.fitchasers.ui.UI;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class UITest {
 
@@ -48,7 +57,7 @@ class UITest {
     // ---------- tests (no Mockito) ----------
 
     @Test
-    void readCommand_trims_and_echoes_right_bubble() {
+    void readCommand_trimsAndEchoesRightBubble() {
         UI ui = uiWithInput("   /help   \n");
         String cmd = ui.readCommand();
         String out = takeOutput();
@@ -60,7 +69,7 @@ class UITest {
     }
 
     @Test
-    void readCommand_eof_returns_null() {
+    void readCommand_eofReturnsNull() {
         System.setIn(new ByteArrayInputStream(new byte[0])); // EOF
         UI ui = new UI();
         String cmd = ui.readCommand();
@@ -71,7 +80,7 @@ class UITest {
     }
 
     @Test
-    void enterName_rejects_empty_then_accepts_name() {
+    void enterName_rejectsEmptyThenAcceptsName() {
         UI ui = uiWithInput("\nAlice\n");
         String name = ui.enterName();
         String out = takeOutput();
@@ -83,8 +92,7 @@ class UITest {
     }
 
     @Test
-    void enterWeight_invalid_then_zero_then_valid() {
-        // enterWeight tạo Scanner mới từ System.in — chỉ cần preload input
+    void enterWeight_invalidThenZeroThenValid() {
         UI ui = uiWithInput("abc\n0\n60.5\n");
         double w = ui.enterWeight();
         String out = takeOutput();
@@ -96,7 +104,7 @@ class UITest {
     }
 
     @Test
-    void confirmation_yes_true() {
+    void confirmation_yesTrue() {
         UI ui = uiWithInput("Yes\n");
         boolean ok = ui.confirmationMessage();
         String out = takeOutput();
@@ -107,7 +115,7 @@ class UITest {
     }
 
     @Test
-    void confirmation_no_false() {
+    void confirmation_noFalse() {
         UI ui = uiWithInput("no\n");
         boolean ok = ui.confirmationMessage();
         String out = takeOutput();
@@ -118,7 +126,7 @@ class UITest {
     }
 
     @Test
-    void getDaySuffix_works_for_edges() {
+    void getDaySuffix_worksForEdges() {
         UI ui = uiWithInput("");
         assertEquals("st", ui.getDaySuffix(1));
         assertEquals("nd", ui.getDaySuffix(2));
@@ -132,7 +140,7 @@ class UITest {
     }
 
     @Test
-    void showHelp_contains_key_commands() {
+    void showHelp_containsKeyCommands() {
         UI ui = uiWithInput("");
         ui.showHelp();
         String out = takeOutput();
@@ -145,7 +153,7 @@ class UITest {
     }
 
     @Test
-    void showGreeting_prints_banner_and_hint() {
+    void showGreeting_printsBannerAndHint() {
         UI ui = uiWithInput("");
         ui.showGreeting();
         String out = takeOutput();
@@ -155,7 +163,7 @@ class UITest {
     }
 
     @Test
-    void displayDetailsOfWorkout_null_shows_error() {
+    void displayDetailsOfWorkout_nullShowsError() {
         UI ui = uiWithInput("");
         ui.displayDetailsOfWorkout(null);
         String out = takeOutput();
