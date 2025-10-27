@@ -1,4 +1,7 @@
-package seedu.fitchasers;
+package seedu.fitchasers.ui;
+
+import seedu.fitchasers.workouts.Exercise;
+import seedu.fitchasers.workouts.Workout;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,7 +56,7 @@ public class UI {
             if (scanner.hasNextLine()) {
                 name = scanner.nextLine().trim();
                 if (name.isEmpty()) {
-                    showError("Name cannot be empty. Please try again.");
+                    showError("Name cannot be empty. Please try again!");
                 } else {
                     System.out.println(rightBubble("You", name));
                 }
@@ -61,7 +64,32 @@ public class UI {
                 return null;
             }
         }
+        showDivider();
         return name;
+    }
+
+    /**
+     * Prompts the user to enter their initial weight in kilograms.
+     * Ensures valid numeric input greater than zero.
+     *
+     * @return the user's initial weight as a double
+     */
+    public double enterWeight() {
+        double weight = -1;
+        while (weight <= 0) {
+            showMessage("Please enter your initial weight (in kg).");
+            System.out.print(MAGENTA + "Enter your weight: " + RESET);
+            String input = new java.util.Scanner(System.in).nextLine().trim();
+            try {
+                weight = Double.parseDouble(input);
+                if (weight <= 0) {
+                    showError("Weight must be a positive number. Try again!");
+                }
+            } catch (NumberFormatException e) {
+                showError("Invalid number. Please enter a valid weight (e.g., 60.5).");
+            }
+        }
+        return weight;
     }
 
     // -----------------------------
@@ -105,6 +133,7 @@ public class UI {
 
     public void showExitMessage() {
         showMessage("Catch you next time, champ — don't ghost your gains!");
+        showDivider();
     }
 
     public void showHelp() {
@@ -158,7 +187,6 @@ public class UI {
         --- SYSTEM ---
         /exit (e)                                 - Save all progress and exit the app """);
     }
-
 
     public boolean confirmationMessage() {
         if (!scanner.hasNextLine()) {
@@ -217,7 +245,7 @@ public class UI {
         showMessage(sb.toString().trim());
     }
 
-    static String getDaySuffix(int day) {
+    public String getDaySuffix(int day) {
         assert day >= 1 && day <= 31 : "Day should be between 1 and 31";
         if (day >= 11 && day <= 13) {
             return "th";

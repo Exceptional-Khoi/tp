@@ -1,5 +1,6 @@
-package seedu.fitchasers;
+package seedu.fitchasers.user;
 
+import seedu.fitchasers.ui.UI;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -54,14 +55,14 @@ public class Person implements Serializable {
     /**
      * Updates the name of the person.
      *
-     * @param newName The new name
+     * @param name The new name
      * @throws IllegalArgumentException if newName is null or empty
      */
-    public void setName(String newName) {
-        if (newName == null || newName.trim().isEmpty()) {
+    public void setName(String name) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be null or empty.");
         }
-        this.name = newName.trim();
+        this.name = name.trim();
     }
 
 
@@ -92,6 +93,10 @@ public class Person implements Serializable {
      * Prints a message if there are no records.
      */
     public void displayWeightHistory() {
+        if (weightHistory.isEmpty()) {
+            ui.showMessage(name + " has no weight records yet.");
+            return;
+        }
         ui.showMessage("Here's your weight, you've been killin' it lately!");
         ui.showMessage("Weight history for " + name + ":");
         for (WeightRecord record : weightHistory) {
@@ -254,7 +259,6 @@ public class Person implements Serializable {
         }
         System.out.println("\n");
     }
-
 
     public void setWeightHistory(List<WeightRecord> history) {
         this.weightHistory.clear();

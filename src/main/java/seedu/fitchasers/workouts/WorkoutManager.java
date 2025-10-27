@@ -1,6 +1,13 @@
-package seedu.fitchasers;
+package seedu.fitchasers.workouts;
 
+import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.tagger.Tagger;
+import seedu.fitchasers.ui.UI;
+
+import java.io.IOException;
+import java.time.YearMonth;
 import java.time.format.ResolverStyle;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -8,6 +15,7 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,13 +30,24 @@ public class WorkoutManager {
     private Workout currentWorkout = null;
     private final UI ui = new UI();
     private Tagger tagger;
+    private LocalDateTime workoutDateTime;
+    private String workoutName;
+    private YearMonth monthOfWorkout;
+    private YearMonth currentLoadedMonth;
+    private Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
+    private final Set<YearMonth> loadedMonths = new HashSet<>();
+    private FileHandler fileHandler;
 
-    public WorkoutManager(Tagger tagger) {
+    public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
         this.tagger = tagger;
+        this.fileHandler = fileHandler;
+        this.workoutsByMonth = fileHandler.getArrayByMonth();
+        this.currentLoadedMonth = YearMonth.now();
     }
 
-    public void setWorkouts(ArrayList<Workout> workouts) {
+    public void setWorkouts(ArrayList<Workout> workouts, YearMonth monthOfArrayList) {
         this.workouts = workouts;
+        currentLoadedMonth = monthOfArrayList;
     }
 
     /**
@@ -39,6 +58,31 @@ public class WorkoutManager {
      * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
+        formatInputForWorkout(command);
+        monthOfWorkout = YearMonth.from(workoutDateTime);
+        if(!currentLoadedMonth.equals(monthOfWorkout)) {
+            setWorkouts(fileHandler.getWorkoutsForMonth(monthOfWorkout), monthOfWorkout);
+        }
+
+        try{
+            Workout newWorkout = new Workout(workoutName, workoutDateTime);
+
+            // merge auto-tags if you have a tagger
+            Set<String> suggestedTags = tagger.suggest(newWorkout);
+            newWorkout.setAutoTags(suggestedTags);
+            System.out.println("Tags generated for workout: " + suggestedTags);
+            workouts.add(newWorkout);
+            currentWorkout = newWorkout;
+            ui.showMessage("New workout sesh incoming!");
+            ui.showMessage("Added workout: " + workoutName);
+            fileHandler.saveMonthList(currentLoadedMonth,workouts);
+
+        } catch (Exception e) {
+            ui.showMessage("Something went wrong creating the workout. Please try again.");
+        }
+    }
+
+    private void formatInputForWorkout(String command) {
         assert workouts != null : "workouts list should be initialized";
 
         if (currentWorkout != null) {
@@ -55,7 +99,6 @@ public class WorkoutManager {
             return;
         }
 
-        String workoutName;
         int nIdx = command.indexOf("n/");
         int afterN = nIdx + 2;
 
@@ -154,6 +197,7 @@ public class WorkoutManager {
                 return;
             }
         }
+        workoutDateTime = LocalDateTime.of(date, time);
 
         if (date.isAfter(LocalDate.now())) {
             ui.showMessage("The date you entered (" + date.format(dateFmt) + ") is in the future. Are you sure? (Y/N)");
@@ -190,24 +234,7 @@ public class WorkoutManager {
                 }
             }
         }
-
-        LocalDateTime workoutDateTime = LocalDateTime.of(date, time);
-
-        try {
-            Workout newWorkout = new Workout(workoutName, workoutDateTime);
-
-            // merge auto-tags if you have a tagger
-            Set<String> suggestedTags = tagger.suggest(newWorkout);
-            newWorkout.setAutoTags(suggestedTags);
-            System.out.println("Tags generated for workout: " + suggestedTags);
-            workouts.add(newWorkout);
-            currentWorkout = newWorkout;
-
-            ui.showMessage("New workout sesh incoming!");
-            ui.showMessage("Added workout: " + workoutName);
-        } catch (Exception e) {
-            ui.showMessage("Something went wrong creating the workout. Please try again.");
-        }
+        workoutDateTime = LocalDateTime.of(date, time);
     }
 
     /**
@@ -260,13 +287,14 @@ public class WorkoutManager {
      *
      * @param name the name of the workout to delete
      */
-    public void deleteWorkout(String name) {
+    public void deleteWorkout(String name) throws IOException {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
                 ui.showMessage("Deleting " + w.getWorkoutName() + " | " +
                         w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type y/yes to confirm)");
                 if (ui.confirmationMessage()) {
                     workouts.remove(w);
+                    fileHandler.saveMonthList(currentLoadedMonth,workouts);
                     ui.showMessage("Workout deleted successfully!");
                 } else {
                     ui.showMessage("Okay, I didn’t delete it.");
@@ -277,7 +305,7 @@ public class WorkoutManager {
         ui.showMessage("Workout not found: " + name);
     }
 
-    public void deleteWorkoutByIndex(int index) {
+    public void deleteWorkoutByIndex(int index) throws IOException {
         if (index < 0 || index >= workouts.size()) {
             ui.showMessage("Invalid workout index: " + index + "Please try again.:(");
             return;
@@ -288,6 +316,7 @@ public class WorkoutManager {
         if (ui.confirmationMessage()) {
             ui.showMessage("Deleted workout: " + w.getWorkoutName());
             workouts.remove(index);
+            fileHandler.saveMonthList(currentLoadedMonth,workouts);
         } else {
             ui.showMessage("Okay, deletion aborted.");
         }
@@ -522,7 +551,7 @@ public class WorkoutManager {
         }
     }
 
-    public void interactiveDeleteWorkout(String command, UI ui) {
+    public void interactiveDeleteWorkout(String command, UI ui) throws IOException {
         ArrayList<Workout> targetList = workouts;
 
         if (command.contains("d/")) {
@@ -570,6 +599,7 @@ public class WorkoutManager {
         for (int i = indicesToDelete.size() - 1; i >= 0; i--) {
             Workout w = targetList.get(indicesToDelete.get(i));
             workouts.remove(w);
+            fileHandler.saveMonthList(currentLoadedMonth,workouts);
             ui.showMessage("Delete: " + w.getWorkoutName());
         }
     }

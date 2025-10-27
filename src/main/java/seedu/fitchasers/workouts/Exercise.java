@@ -1,4 +1,4 @@
-package seedu.fitchasers;
+package seedu.fitchasers.workouts;
 
 import java.io.Serializable;
 import java.util.ArrayList;

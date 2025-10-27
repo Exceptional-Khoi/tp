@@ -1,4 +1,7 @@
-package seedu.fitchasers;
+package seedu.fitchasers.gym;
+
+import seedu.fitchasers.workouts.Workout;
+import seedu.fitchasers.tagger.DefaultTagger;
 
 import java.util.HashSet;
 import java.util.List;

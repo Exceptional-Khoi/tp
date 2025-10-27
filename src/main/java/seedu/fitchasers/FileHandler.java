@@ -1,6 +1,10 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.exceptions.FileNonexistent;
+import seedu.fitchasers.user.Person;
+import seedu.fitchasers.user.WeightRecord;
+import seedu.fitchasers.workouts.Workout;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,7 +14,11 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.YearMonth;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Handles the permanent storage of workout and exercise data.
@@ -31,16 +39,46 @@ import java.util.List;
 
 public class FileHandler {
 
-    private static final Path DATA_DIR = Paths.get("data");
-    private static final Path WORKOUT_DIR = DATA_DIR.resolve("workouts");
+    private Path DATA_DIR = Paths.get("data");
+    private final Path WORKOUT_DIR = DATA_DIR.resolve("workouts");
     private final UI ui = new UI();
+    private final Map<YearMonth, ArrayList<Workout>> arrayByMonth = new HashMap<>();
+    private final Set<YearMonth> onDiskMonths = new HashSet<>(); // discovered from directory
 
+    /**
+     * Initilize index for lazy loading
+     *
+     * @throws IOException if directory or file creation fails
+     */
+    public void initIndex() throws IOException {
+        ensureDataDir();
+        try (var stream = Files.list(DATA_DIR)) {
+            stream.map(p -> p.getFileName().toString())
+                    .filter(n -> n.startsWith("workouts_") && n.endsWith(".dat"))
+                    .map(n -> n.substring(9, 16))           // "YYYY-MM"
+                    .forEach(s -> onDiskMonths.add(YearMonth.parse(s)));
+        }
+    }
+
+    public Map<YearMonth, ArrayList<Workout>> getArrayByMonth() {
+        return arrayByMonth;
+    }
+
+    public ArrayList<Workout> getWorkoutsForMonth(YearMonth targetMonth) {
+        return arrayByMonth.computeIfAbsent(targetMonth, month -> {
+            try {
+                return loadMonthList(month);
+            } catch (Exception e) {
+                return new ArrayList<>();
+            }
+        });
+    }
     /**
      * Ensures that the save file and its parent directory exist.
      *
      * @throws IOException if directory or file creation fails
      */
-    private static void ensureDataDir() throws IOException {
+    private void ensureDataDir() throws IOException {
         Files.createDirectories(DATA_DIR);
         Files.createDirectories(WORKOUT_DIR);
     }
@@ -59,7 +97,6 @@ public class FileHandler {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
 
         String filename = String.format("workouts_%s.dat", month); // e.g., workouts_2025-06.dat
         Path filePath = WORKOUT_DIR.resolve(filename);

@@ -1,4 +1,4 @@
-package seedu.fitchasers;
+package seedu.fitchasers.gym;
 //import seedu.fitchasers.Machine;
 
 import java.util.ArrayList;

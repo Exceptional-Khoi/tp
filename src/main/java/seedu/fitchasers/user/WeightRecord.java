@@ -1,4 +1,4 @@
-package seedu.fitchasers;
+package seedu.fitchasers.user;
 
 import java.io.Serializable;
 import java.time.LocalDate;

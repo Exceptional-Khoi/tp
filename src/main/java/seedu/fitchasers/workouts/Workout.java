@@ -1,4 +1,6 @@
-package seedu.fitchasers;
+package seedu.fitchasers.workouts;
+
+import seedu.fitchasers.ui.UI;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -169,7 +171,7 @@ public class Workout implements Serializable {
         String month = dateTime.getMonth()
                 .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
 
-        String suffix = UI.getDaySuffix(dayOfMonth);
+        String suffix = ui.getDaySuffix(dayOfMonth);
 
         return String.format("%s %d%s of %s", dayOfWeek, dayOfMonth, suffix, month);
     }
