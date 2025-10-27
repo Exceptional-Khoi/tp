@@ -68,7 +68,8 @@ public class FitChasers {
             if (initialWeight > 0) {
                 WeightManager weightManager = new WeightManager(person);
 
-                String todayStr = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
+                String todayStr = java.time.LocalDate.now()
+                        .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
                 String command = "w/" + initialWeight + " d/" + todayStr;
 
                 weightManager.addWeight(command);
