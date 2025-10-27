@@ -54,15 +54,16 @@ public class Person implements Serializable {
     /**
      * Updates the name of the person.
      *
-     * @param name The new name
+     * @param newName The new name
      * @throws IllegalArgumentException if newName is null or empty
      */
-    public void setName(String name) {
-        if (name == null || name.trim().isEmpty()) {
+    public void setName(String newName) {
+        if (newName == null || newName.trim().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be null or empty.");
         }
-        this.name = name.trim();
+        this.name = newName.trim();
     }
+
 
     /**
      * Adds a weight record to the person's weight history.
