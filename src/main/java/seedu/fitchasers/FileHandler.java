@@ -39,8 +39,8 @@ import java.util.Set;
 
 public class FileHandler {
 
-    private Path DATA_DIR = Paths.get("data");
-    private final Path WORKOUT_DIR = DATA_DIR.resolve("workouts");
+    private Path dataDir = Paths.get("data");
+    private final Path workoutDir = dataDir.resolve("workouts");
     private final UI ui = new UI();
     private final Map<YearMonth, ArrayList<Workout>> arrayByMonth = new HashMap<>();
     private final Set<YearMonth> onDiskMonths = new HashSet<>(); // discovered from directory
@@ -52,7 +52,7 @@ public class FileHandler {
      */
     public void initIndex() throws IOException {
         ensureDataDir();
-        try (var stream = Files.list(DATA_DIR)) {
+        try (var stream = Files.list(dataDir)) {
             stream.map(p -> p.getFileName().toString())
                     .filter(n -> n.startsWith("workouts_") && n.endsWith(".dat"))
                     .map(n -> n.substring(9, 16))           // "YYYY-MM"
@@ -79,8 +79,8 @@ public class FileHandler {
      * @throws IOException if directory or file creation fails
      */
     private void ensureDataDir() throws IOException {
-        Files.createDirectories(DATA_DIR);
-        Files.createDirectories(WORKOUT_DIR);
+        Files.createDirectories(dataDir);
+        Files.createDirectories(workoutDir);
     }
 
     // ----------------- Workout -----------------
@@ -99,7 +99,7 @@ public class FileHandler {
         }
 
         String filename = String.format("workouts_%s.dat", month); // e.g., workouts_2025-06.dat
-        Path filePath = WORKOUT_DIR.resolve(filename);
+        Path filePath = workoutDir.resolve(filename);
 
         try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             out.writeObject(list);
@@ -119,7 +119,7 @@ public class FileHandler {
         ensureDataDir();
 
         String filename = String.format("workouts_%s.dat", month);
-        Path filePath = WORKOUT_DIR.resolve(filename);
+        Path filePath = workoutDir.resolve(filename);
 
         if (Files.notExists(filePath)) {
             throw new FileNonexistent("No save file found for " + month);
@@ -137,7 +137,7 @@ public class FileHandler {
     /**
      * Saves all weight entries of the given person into a serialized file.
      * <p>
-     * The file is stored inside the {@link #DATA_DIR} directory, with the filename format:
+     * The file is stored inside the {@link #dataDir} directory, with the filename format:
      * "weight_&lt;PersonName&gt;.dat". If the data directory does not exist, it will be created automatically.
      * </p>
      *
@@ -146,7 +146,7 @@ public class FileHandler {
      */
     public void saveWeightList(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = DATA_DIR.resolve("weight.dat");
+        Path filePath = dataDir.resolve("weight.dat");
         try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             out.writeObject(person.getWeightHistory());
             ui.showMessage("Saved " + person.getWeightHistory().size() + " weight entries for " + person.getName());
@@ -156,7 +156,7 @@ public class FileHandler {
     /**
      * Loads previously saved weight entries for the given person from a serialized file.
      * <p>
-     * The file is expected to be located inside the {@link #DATA_DIR} directory, with the filename format:
+     * The file is expected to be located inside the {@link #dataDir} directory, with the filename format:
      * "weight_&lt;PersonName&gt;.dat". If no file is found, the method will simply show a message and return.
      * The loaded entries are set into the {@link Person}'s weight history.
      * </p>
@@ -168,7 +168,7 @@ public class FileHandler {
     @SuppressWarnings("unchecked")
     public void loadWeightList(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = DATA_DIR.resolve("weight.dat");
+        Path filePath = dataDir.resolve("weight.dat");
         if (Files.notExists(filePath)) {
             ui.showMessage("No previous weight data found for " + person.getName());
             return;
@@ -187,7 +187,7 @@ public class FileHandler {
      */
     public void saveUserName(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = DATA_DIR.resolve("username.dat");
+        Path filePath = dataDir.resolve("username.dat");
         try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             out.writeObject(person.getName());
         }
@@ -199,7 +199,7 @@ public class FileHandler {
      */
     public String loadUserName() throws IOException {
         ensureDataDir();
-        Path filePath = DATA_DIR.resolve("username.dat");
+        Path filePath = dataDir.resolve("username.dat");
         if (Files.notExists(filePath)) {
             return null;
         }
