@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  * The {@code UI} class handles all user interactions for the FitChaser application.
- * Combines the robustness of the classic UI logic with a modern “chat bubble” interface.
+ * Combines the robustness of the classic UI logic with a modern "chat bubble" interface.
  */
 public class UI {
     // ====== Color and Style Constants ======
@@ -64,7 +64,6 @@ public class UI {
                 return null;
             }
         }
-        showDivider();
         return name;
     }
 
@@ -133,7 +132,6 @@ public class UI {
 
     public void showExitMessage() {
         showMessage("Catch you next time, champ — don't ghost your gains!");
-        showDivider();
     }
 
     public void showHelp() {
