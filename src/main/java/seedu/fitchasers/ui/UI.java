@@ -81,7 +81,11 @@ public class UI {
         while (weight <= 0) {
             showMessage("Please enter your initial weight (in kg).");
             System.out.print(MAGENTA + "Enter your weight: " + RESET);
-            String input = new java.util.Scanner(System.in).nextLine().trim();
+            if (!scanner.hasNextLine()) {
+                showError("No input detected. Exiting weight entry.");
+                return -1;
+            }
+            String input = scanner.nextLine().trim();
             try {
                 weight = Double.parseDouble(input);
                 if (weight <= 0) {

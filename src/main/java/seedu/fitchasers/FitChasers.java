@@ -62,6 +62,24 @@ public class FitChasers {
                 userName = ui.enterName();
             }
             person = new Person(userName.trim());
+
+            // Prompt for initial weight
+            double initialWeight = ui.enterWeight();
+            if (initialWeight > 0) {
+                WeightManager weightManager = new WeightManager(person);
+
+                String todayStr = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
+                String command = "w/" + initialWeight + " d/" + todayStr;
+
+                weightManager.addWeight(command);
+                try {
+                    fileHandler.saveWeightList(person);
+                    ui.showMessage("Your initial weight of " + initialWeight + "kg has been added successfully!");
+                } catch (IOException e) {
+                    ui.showError("Failed to save initial weight: " + e.getMessage());
+                }
+            }
+
             ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started!");
 
             try {
