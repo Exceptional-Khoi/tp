@@ -124,13 +124,28 @@ public class FitChasers {
                 case "/my_name":
                 case "n": {
                     if (argumentStr == null || !argumentStr.startsWith("n/")) {
-                        ui.showMessage("Usage: /my_name n/YourName");
+                        ui.showMessage("Missing prefix 'n/'. Usage: /my_name n/YourName");
                         ui.showDivider();
                         break;
                     }
+
                     String newName = argumentStr.substring(2).trim();
+
                     if (newName.isEmpty()) {
-                        ui.showMessage("Usage: /my_name n/YourName");
+                        ui.showMessage("You didn’t enter any name after 'n/'. Example: /my_name n/Nary");
+                        ui.showDivider();
+                        break;
+                    }
+
+                    if (newName.length() > 30) {
+                        ui.showMessage("Name is too long. Maximum is 30 characters.");
+                        ui.showDivider();
+                        break;
+                    }
+
+                    if (!newName.matches("^[a-zA-Z0-9 _-]+$")) {
+                        ui.showMessage("Name can only contain letters, numbers, spaces, " +
+                                "underscores (_), or dashes (-).");
                         ui.showDivider();
                         break;
                     }
