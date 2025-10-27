@@ -1,122 +1,166 @@
 package seedu.fitchasers;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import seedu.fitchasers.ui.UI;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 
-/**
- * Unit tests for the {@link UI} class.
- */
+import static org.junit.jupiter.api.Assertions.*;
+
 class UITest {
 
-    private UI ui;
-    private ByteArrayOutputStream outContent;
     private PrintStream originalOut;
+    private InputStream originalIn;
+    private ByteArrayOutputStream outContent;
 
     @BeforeEach
     void setUp() {
-        ui = new UI();
-        outContent = new ByteArrayOutputStream();
         originalOut = System.out;
-        System.setOut(new PrintStream(outContent));
+        originalIn = System.in;
+        outContent = new ByteArrayOutputStream();
+        System.setOut(new PrintStream(outContent, true, StandardCharsets.UTF_8));
     }
 
     @AfterEach
-    void tearDown() {
+    void tearDown() throws IOException {
         System.setOut(originalOut);
+        System.setIn(originalIn);
+        outContent.close();
     }
 
-    // ----------------------------------------------------
-    // Tests for showMessage()
-    // ----------------------------------------------------
-    @Test
-    void showMessage_printsMessageWithResetCode() {
-        ui.showMessage("Test message");
-        String output = outContent.toString();
-        assertTrue(output.contains("Test message"));
-        assertTrue(output.contains("\u001B[0m"), "Should reset color at end");
+    // ---------- helpers ----------
+    private static String stripAnsi(String s) {
+        return s.replaceAll("\u001B\\[[;\\d]*m", "");
     }
 
-    // ----------------------------------------------------
-    // Tests for showError()
-    // ----------------------------------------------------
-    @Test
-    void showError_printsOopsPrefixAndMessage() {
-        ui.showError("Invalid input");
-        String output = outContent.toString();
-        assertTrue(output.contains("[Oops!]"));
-        assertTrue(output.contains("Invalid input"));
+    private String takeOutput() {
+        String s = new String(outContent.toByteArray(), StandardCharsets.UTF_8);
+        outContent.reset();
+        return stripAnsi(s);
     }
 
-    // ----------------------------------------------------
-    // Tests for showGreeting()
-    // ----------------------------------------------------
-    @Test
-    void showGreeting_containsFitchaserTitleAndHelpHint() {
-        ui.showGreeting();
-        String output = outContent.toString();
-        assertTrue(output.toLowerCase().contains("virtual gym buddy"),
-                "Greeting should mention the virtual gym buddy introduction");
-        assertTrue(output.contains("/help"), "Greeting should guide user to /help command");
+    private UI uiWithInput(String input) {
+        System.setIn(new ByteArrayInputStream(input.getBytes(StandardCharsets.UTF_8)));
+        return new UI();
     }
 
-    // ----------------------------------------------------
-    // Tests for showExitMessage()
-    // ----------------------------------------------------
+    // ---------- tests (no Mockito) ----------
+
     @Test
-    void showExitMessage_containsFarewellMessage() {
-        ui.showExitMessage();
-        String output = outContent.toString();
-        assertTrue(output.contains("Catch you next time"));
-        assertTrue(output.contains("champ"), "Should contain motivational farewell");
+    void readCommand_trims_and_echoes_right_bubble() {
+        UI ui = uiWithInput("   /help   \n");
+        String cmd = ui.readCommand();
+        String out = takeOutput();
+
+        assertEquals("/help", cmd);
+        assertTrue(out.contains("Enter command >"));
+        assertTrue(out.contains("(You)"));
+        assertTrue(out.contains("/help"));
     }
 
-    // ----------------------------------------------------
-    // Tests for showHelp()
-    // ----------------------------------------------------
     @Test
-    void showHelp_displaysAllMainCommands() {
+    void readCommand_eof_returns_null() {
+        System.setIn(new ByteArrayInputStream(new byte[0])); // EOF
+        UI ui = new UI();
+        String cmd = ui.readCommand();
+        String out = takeOutput();
+
+        assertNull(cmd);
+        assertTrue(out.contains("Enter command >"));
+    }
+
+    @Test
+    void enterName_rejects_empty_then_accepts_name() {
+        UI ui = uiWithInput("\nAlice\n");
+        String name = ui.enterName();
+        String out = takeOutput();
+
+        assertEquals("Alice", name);
+        assertTrue(out.contains("Name cannot be empty"));
+        assertTrue(out.contains("(You)"));
+        assertTrue(out.contains("Alice"));
+    }
+
+    @Test
+    void enterWeight_invalid_then_zero_then_valid() {
+        // enterWeight tạo Scanner mới từ System.in — chỉ cần preload input
+        UI ui = uiWithInput("abc\n0\n60.5\n");
+        double w = ui.enterWeight();
+        String out = takeOutput();
+
+        assertEquals(60.5, w, 1e-9);
+        assertTrue(out.contains("Please enter your initial weight"));
+        assertTrue(out.contains("Invalid number"));
+        assertTrue(out.contains("Weight must be a positive number"));
+    }
+
+    @Test
+    void confirmation_yes_true() {
+        UI ui = uiWithInput("Yes\n");
+        boolean ok = ui.confirmationMessage();
+        String out = takeOutput();
+
+        assertTrue(ok);
+        assertTrue(out.contains("(You)"));
+        assertTrue(out.toLowerCase().contains("yes"));
+    }
+
+    @Test
+    void confirmation_no_false() {
+        UI ui = uiWithInput("no\n");
+        boolean ok = ui.confirmationMessage();
+        String out = takeOutput();
+
+        assertFalse(ok);
+        assertTrue(out.contains("(You)"));
+        assertTrue(out.toLowerCase().contains("no"));
+    }
+
+    @Test
+    void getDaySuffix_works_for_edges() {
+        UI ui = uiWithInput("");
+        assertEquals("st", ui.getDaySuffix(1));
+        assertEquals("nd", ui.getDaySuffix(2));
+        assertEquals("rd", ui.getDaySuffix(3));
+        assertEquals("th", ui.getDaySuffix(4));
+        assertEquals("th", ui.getDaySuffix(11));
+        assertEquals("th", ui.getDaySuffix(12));
+        assertEquals("th", ui.getDaySuffix(13));
+        assertEquals("st", ui.getDaySuffix(21));
+        assertEquals("st", ui.getDaySuffix(31));
+    }
+
+    @Test
+    void showHelp_contains_key_commands() {
+        UI ui = uiWithInput("");
         ui.showHelp();
-        String output = outContent.toString();
+        String out = takeOutput();
 
-        assertAll(
-                () -> assertTrue(output.contains("/help")),
-                () -> assertTrue(output.contains("/add_weight")),
-                () -> assertTrue(output.contains("/create_workout")),
-                () -> assertTrue(output.contains("/add_exercise")),
-                () -> assertTrue(output.contains("/exit"))
-        );
+        assertTrue(out.contains("/help (h)"));
+        assertTrue(out.contains("/create_workout"));
+        assertTrue(out.contains("/view_log"));
+        assertTrue(out.contains("/add_weight"));
+        assertTrue(out.contains("/gym_where"));
     }
 
-    // ----------------------------------------------------
-    // Tests for showDivider()
-    // ----------------------------------------------------
     @Test
-    void showDivider_printsLineOfDashes() {
-        ui.showDivider();
-        String output = outContent.toString();
-        assertTrue(output.contains("--------------------------------------------------"));
+    void showGreeting_prints_banner_and_hint() {
+        UI ui = uiWithInput("");
+        ui.showGreeting();
+        String out = takeOutput();
+
+        assertTrue(out.toLowerCase().contains("fitchaser"));
+        assertTrue(out.contains("Type /help or h to explore"));
     }
 
-    // ----------------------------------------------------
-    // Tests for readCommand()
-    // ----------------------------------------------------
     @Test
-    void readCommand_readsAndReturnsTrimmedInput() {
-        String simulatedInput = "   /exit   \n";
-        System.setIn(new ByteArrayInputStream(simulatedInput.getBytes()));
-        ui = new UI(); // recreate with the new System.in
-        String command = ui.readCommand();
-        assertEquals("/exit", command);
+    void displayDetailsOfWorkout_null_shows_error() {
+        UI ui = uiWithInput("");
+        ui.displayDetailsOfWorkout(null);
+        String out = takeOutput();
+
+        assertTrue(out.contains("[Oops!]"));
+        assertTrue(out.contains("No workout found to display."));
     }
 }
