@@ -10,16 +10,37 @@ public class EquipmentDisplay {
      *
      * @param gym The Gym object whose machines will be displayed.
      */
-    public static void showEquipmentForSingleGym(Gym gym) {
-        System.out.println("| Gym        | Machine        | Body Parts Targeted        |");
-        System.out.println("|------------|---------------|----------------------------|");
+    public static String showEquipmentForSingleGym(Gym gym) {
+        int gymWidth = gym.getName().length();
+        int machineWidth = 7;
+        int bodyWidth = 20;
+
+        for (Machine machine : gym.getMachines()) {
+            machineWidth = Math.max(machineWidth, machine.getName().length());
+            int bodyLen = String.join(", ", machine.getBodyPartsTargeted()).length();
+            bodyWidth = Math.max(bodyWidth, bodyLen);
+        }
+
+        String format = "| %-" + gymWidth + "s | %-" + machineWidth + "s | %-" + bodyWidth + "s |%n";
+        String line = "+" + "-".repeat(gymWidth + 2) + "+"
+                + "-".repeat(machineWidth + 2) + "+"
+                + "-".repeat(bodyWidth + 2) + "+";
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(line).append("\n");
+        sb.append(String.format(format, "Gym", "Machine", "Body Parts Targeted"));
+        sb.append(line).append("\n");
+
         for (Machine machine : gym.getMachines()) {
             String bodyParts = String.join(", ", machine.getBodyPartsTargeted());
-            System.out.printf("| %-10s | %-13s | %-26s |\n",
-                    gym.getName(), machine.getName(), bodyParts);
+            sb.append(String.format(format, gym.getName(), machine.getName(), bodyParts));
         }
-        System.out.println("-----------------------------------------------------------");
+
+        sb.append(line);
+        return sb.toString();
     }
+
+
 
     /**
      * Suggests gyms that have machines matching all tags corresponding to the given exercise.

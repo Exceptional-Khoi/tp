@@ -92,10 +92,6 @@ public class Person implements Serializable {
      * Prints a message if there are no records.
      */
     public void displayWeightHistory() {
-        if (weightHistory.isEmpty()) {
-            ui.showMessage(name + " has no weight records yet.");
-            return;
-        }
         ui.showMessage("Here's your weight, you've been killin' it lately!");
         ui.showMessage("Weight history for " + name + ":");
         for (WeightRecord record : weightHistory) {
@@ -142,11 +138,6 @@ public class Person implements Serializable {
 
 
     public void displayWeightGraphWithDates() {
-        if (weightHistory.isEmpty()) {
-            System.out.println(name + " has no weight records yet.");
-            return;
-        }
-
 
         // Sort records by date ascending
         List<WeightRecord> sortedRecords = new ArrayList<>(weightHistory);
