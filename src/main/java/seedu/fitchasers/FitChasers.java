@@ -143,29 +143,24 @@ public class FitChasers {
                 case "/my_name":
                 case "n": {
                     if (argumentStr == null || !argumentStr.startsWith("n/")) {
-                        ui.showMessage("Missing prefix 'n/'. Usage: /my_name n/YourName");
-                        ui.showDivider();
+                        ui.showMessage("Usage: /my_name n/YourName");
                         break;
                     }
-
                     String newName = argumentStr.substring(2).trim();
-
                     if (newName.isEmpty()) {
+                        ui.showMessage("Usage: /my_name n/YourName");
                         ui.showMessage("You didn’t enter any name after 'n/'. Example: /my_name n/Nary");
-                        ui.showDivider();
                         break;
                     }
 
                     if (newName.length() > 30) {
                         ui.showMessage("Name is too long. Maximum is 30 characters.");
-                        ui.showDivider();
                         break;
                     }
 
                     if (!newName.matches("^[a-zA-Z0-9 _-]+$")) {
                         ui.showMessage("Name can only contain letters, numbers, spaces, " +
                                 "underscores (_), or dashes (-).");
-                        ui.showDivider();
                         break;
                     }
 
@@ -178,8 +173,6 @@ public class FitChasers {
                     } catch (IOException e) {
                         ui.showError("Failed to save username: " + e.getMessage());
                     }
-
-                    ui.showDivider();
                     break;
                 }
 
@@ -187,28 +180,28 @@ public class FitChasers {
                 case "aw":
                     weightManager.addWeight(argumentStr);
                     // Format: /add_weight w/WEIGHT d/DATE
-                    ui.showDivider();
                     break;
 
                 case "/view_weight":
                 case "vw":
+                    if (person.getWeightHistorySize() == 0) {
+                        ui.showMessage(person.getName() + " has no weight records yet.");
+                        break;
+                    }
                     weightManager.viewWeights();
                     person.displayWeightGraphWithDates();
-                    ui.showDivider();
                     break;
 
                 case "/create_workout":
                 case "cw":
                     // Format: /create_workout n/NAME d/DD/MM/YY t/HHmm
                     workoutManager.addWorkout(argumentStr);
-                    ui.showDivider();
                     break;
 
                 case "/add_exercise":
                 case "ae":
                     // Format: /add_exercise n/NAME r/REPS
                     workoutManager.addExercise(argumentStr);
-                    ui.showDivider();
                     break;
 
                 case "/add_modality_tag":
@@ -230,7 +223,7 @@ public class FitChasers {
                         for (Workout w : workoutManager.getWorkouts()) {
                             Set<String> updatedTags = tagger.suggest(w);
                             w.setAutoTags(updatedTags);
-                            System.out.println("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
+                            ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
                         }
                         ui.showMessage("Added keyword " + keyword + " to modality " + mod);
                     } else {
@@ -258,7 +251,7 @@ public class FitChasers {
                         for (Workout w : workoutManager.getWorkouts()) {
                             Set<String> updatedTags = tagger.suggest(w);
                             w.setAutoTags(updatedTags);
-                            System.out.println("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
+                            ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
                         }
                         ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
                     } else {
@@ -288,7 +281,6 @@ public class FitChasers {
                         ui.showMessage("An error occurred while searching for gyms. Please check your input " +
                                 "and try again.");
                     }
-                    ui.showDivider();
                     break;
                 }
 
@@ -301,7 +293,8 @@ public class FitChasers {
                             int pageNum = Integer.parseInt(pageNumStr);
                             if (pageNum >= 1 && pageNum <= gyms.size()) {
                                 Gym gym = gyms.get(pageNum - 1);
-                                EquipmentDisplay.showEquipmentForSingleGym(gym);
+                                String table = EquipmentDisplay.showEquipmentForSingleGym(gym);
+                                ui.showMessage(table);
                             } else {
                                 ui.showMessage("Invalid page number. Please enter a number between 1 and "
                                         + gyms.size());
@@ -349,7 +342,6 @@ public class FitChasers {
                         ui.showMessage("Usage: /override_workout_tag id/WORKOUT_ID newTag/NEW_TAG");
                     }
 
-                    ui.showDivider();
                     break;
                 }
 
@@ -357,14 +349,12 @@ public class FitChasers {
                 case "as":
                     // Format: /add_set r/REPS
                     workoutManager.addSet(argumentStr);
-                    ui.showDivider();
                     break;
 
                 case "/end_workout":
                 case "ew":
                     // Format: /end_workout d/DD/MM/YY t/HHmm
                     workoutManager.endWorkout(ui, argumentStr);
-                    ui.showDivider();
                     break;
 
                 case "/view_log":
@@ -374,7 +364,6 @@ public class FitChasers {
                     }catch (IndexOutOfBoundsException e){
                         ui.showError(e.getMessage());
                     }
-                    ui.showDivider();
                     break;
 
                 case "/open":
@@ -409,12 +398,10 @@ public class FitChasers {
 
                 default:
                     ui.showError("That's not a thing, bestie. Try /help or h for the real moves!");
-                    ui.showDivider();
                     break;
                 }
             } catch (Exception e) {
                 ui.showError("Something went wrong: " + e.getMessage());
-                ui.showDivider();
             }
         }
     }

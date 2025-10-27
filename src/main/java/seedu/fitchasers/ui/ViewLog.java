@@ -138,7 +138,7 @@ public class ViewLog {
     public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput {
         int i = oneBasedIndex - ARRAY_INDEX_OFFSET;
         if (i < 0 || i >= lastFilteredSorted.size()) {
-            throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again. ");
+            throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
         }
         ui.displayDetailsOfWorkout(lastFilteredSorted.get(i));
     }

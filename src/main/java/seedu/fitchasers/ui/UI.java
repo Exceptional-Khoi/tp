@@ -10,7 +10,7 @@ import java.util.Set;
 
 /**
  * The {@code UI} class handles all user interactions for the FitChaser application.
- * Combines the robustness of the classic UI logic with a modern “chat bubble” interface.
+ * Combines the robustness of the classic UI logic with a modern "chat bubble" interface.
  */
 public class UI {
     // ====== Color and Style Constants ======
@@ -35,14 +35,12 @@ public class UI {
     // Input
     // -----------------------------
     public String readCommand() {
-        showDivider();
         System.out.print(MAGENTA + "Enter command > " + RESET);
         if (!scanner.hasNextLine()) {
             return null; // EOF
         }
 
         String input = scanner.nextLine();
-        showDivider();
         assert input != null : "User input should never be null";
 
         // Display user input as chat bubble on right
@@ -66,7 +64,6 @@ public class UI {
                 return null;
             }
         }
-        showDivider();
         return name;
     }
 
@@ -103,12 +100,12 @@ public class UI {
     // -----------------------------
     public void showMessage(String message) {
         assert message != null : "Message cannot be null";
-        System.out.println(leftBubble("🤖 FitChaser", message));
+        System.out.println(leftBubble("^_^ FitChaser", message));
     }
 
     public void showError(String error) {
         assert error != null : "Error message cannot be null";
-        System.out.println(leftBubble("🤖 FitChaser", "[Oops!] " + error));
+        System.out.println(leftBubble("^_^ FitChaser", "[Oops!] " + error));
     }
 
     public void showGreeting() {
@@ -139,44 +136,58 @@ public class UI {
 
     public void showExitMessage() {
         showMessage("Catch you next time, champ — don't ghost your gains!");
-        showDivider();
     }
 
     public void showHelp() {
         showMessage("""
-          /help (h)                            - View all commands
-          /my_name (n) n/NAME                  - Set your display name (e.g. /my_name n/Nitin)
-          /add_weight (aw) w/WEIGHT d/DATE     - Record your weight (e.g. /add_weight w/81.5 d/19/10/25)
-          /view_weight (vw)                    - View your recorded weights
-          /gym_where n/EXERCISE                - Find gyms with equipment for your exercise (e.g. /gym_where n/squat)
-          /gym_page                            - Find available gyms in NUS
-          /gym_page page_number                - Navigate gym pages
+        /help (h)                                 - View all available commands
 
-          /add_modality_tag (amot) m/TYPE k/keyword - Add keyword for modality
-          (e.g. /add_modality_tag m/cardio k/hiking)
-          /add_muscle_tag (amt) m/GROUP k/keyword  - Add keyword for muscle group
-          (e.g. /add_muscle_tag m/legs k/lunges)
-          /overwrite_workout_tag (owt) id/index newTag/NEW_TAG - Modify workout tag
-          (e.g. /overwrite_workout_tag id/1 newTag/Strength)
+        --- USER PROFILE ---
+        /my_name (n) n/NAME                       - Set or change your display name
+                                                    e.g. /my_name n/Nitin
 
-          /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
-          (e.g. /create_workout n/PushDay d/20/10/25 t/1900)
-          /add_exercise (ae) n/NAME r/REPS     - Add an exercise (e.g. /add_exercise n/Squat r/12)
-          /add_set (as) r/REPS                 - Add a new set (e.g. /add_set r/10)
-          /end_workout (ew) d/DATE t/TIME      - End the current workout
-          (e.g. /end_workout d/20/10/25 t/2030)
-          /view_log (vl) [page number]         - View your workout history.Log comes in pages of 10 (Defaults to page 1)
-          /view_log -m [month] [page number]   - Use -m to specify month you want to view (Default to current year)
-          /view_log -ym [year] [month] [page number] -Use -ym to specify year and month. Cannot use together with "-m"
-          /view_log -d                         - Use -d to see logs in detail. Can be used with year params
-          /open (o) INDEX                      - Open workout by index
-          /del_workout (d) NAME                - Delete a workout (e.g. /del_workout PushDay)
-          /exit (e)                            - Save progress and exit the app
-            """);
-    }
+        --- WEIGHT TRACKING ---
+        /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
+                                                    e.g. /add_weight w/81.5 d/19/10/25
+        /view_weight (vw)                         - View your recorded weights and graph
 
-    public void showDivider() {
-        System.out.println(WHITE + "--------------------------------------------------" + RESET);
+        --- WORKOUT CREATION & LOGGING ---
+        /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
+                                                    e.g. /create_workout n/PushDay d/20/10/25 t/1900
+        /add_exercise (ae) n/NAME r/REPS          - Add an exercise to current workout
+                                                    e.g. /add_exercise n/Squat r/12
+        /add_set (as) r/REPS                      - Add another set to the latest exercise
+                                                    e.g. /add_set r/10
+        /end_workout (ew) d/DATE t/TIME           - End and save current workout
+                                                    e.g. /end_workout d/20/10/25 t/2030
+
+        --- WORKOUT LOG MANAGEMENT ---
+        /view_log (vl)                            - View your workout history
+        /open (o) INDEX                           - Open detailed view of a workout
+                                                    e.g. /open 1
+        /del_workout (d) NAME                     - Delete a workout by name
+                                                    e.g. /del_workout PushDay
+        /del_workout (d) d/DATE                   - Delete a workout by date
+                                                    e.g. /del_workout d/20/10/25
+
+        --- TAGGING SYSTEM ---
+        /add_modality_tag (amot) m/(CARDIO/STRENGTH) k/KEYWORD
+                                                    - Add a keyword for a workout modality
+                                                    e.g. /add_modality_tag m/CARDIO k/hiking
+        /add_muscle_tag (amt) m/MUSCLE k/KEYWORD  - Add a keyword for a muscle group
+                                                    e.g. /add_muscle_tag m/LEGS k/lunges
+        /override_workout_tag (owt) id/INDEX newTag/NEW_TAG
+                                                    - Manually override a workout’s tag
+                                                    e.g. /override_workout_tag id/1 newTag/LEG_DAY
+
+        --- GYM FINDER ---
+        /gym_where (gw) n/EXERCISE                - Suggest NUS gyms with equipment for the exercise
+                                                    e.g. /gym_where n/squat
+        /gym_page (gp) p/PAGE_NUMBER              - View available NUS gym pages
+                                                    e.g. /gym_page p/1
+
+        --- SYSTEM ---
+        /exit (e)                                 - Save all progress and exit the app """);
     }
 
     public boolean confirmationMessage() {
@@ -233,7 +244,7 @@ public class UI {
             }
         }
 
-        showMessage(sb.toString());
+        showMessage(sb.toString().trim());
     }
 
     public String getDaySuffix(int day) {
@@ -294,8 +305,8 @@ public class UI {
         }
         innerWidth = Math.min(innerWidth, Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD));
 
-        String top = "╭" + "─".repeat(clampNonNeg(innerWidth)) + "╮";
-        String bottom = "╰" + "─".repeat(clampNonNeg(innerWidth)) + "╯";
+        String top = "+" + "-".repeat(clampNonNeg(innerWidth)) + "+";
+        String bottom = "+" + "-".repeat(clampNonNeg(innerWidth)) + "+";
 
         StringBuilder sb = new StringBuilder();
         sb.append(LIGHT_YELLOW).append(sender).append(RESET).append("\n");
@@ -327,8 +338,8 @@ public class UI {
         }
         innerWidth = Math.min(innerWidth, Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD));
 
-        String top = CYAN + "╭" + "─".repeat(clampNonNeg(innerWidth)) + "╮" + RESET;
-        String bottom = CYAN + "╰" + "─".repeat(clampNonNeg(innerWidth)) + "╯" + RESET;
+        String top = CYAN + "+" + "-".repeat(clampNonNeg(innerWidth)) + "+" + RESET;
+        String bottom = CYAN + "+" + "-".repeat(clampNonNeg(innerWidth)) + "+" + RESET;
 
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
 

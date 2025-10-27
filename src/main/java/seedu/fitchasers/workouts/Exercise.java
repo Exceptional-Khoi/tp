@@ -59,7 +59,10 @@ public class Exercise implements Serializable {
         StringBuilder sb = new StringBuilder();
         sb.append(name).append(":\n");
         for (int i = 0; i < sets.size(); i++) {
-            sb.append("Set ").append(i + 1).append(" -> Reps: ").append(sets.get(i)).append("\n");
+            sb.append("Set ").append(i + 1).append(" -> Reps: ").append(sets.get(i));
+            if (i < sets.size() - 1) {
+                sb.append("\n");
+            }
         }
         return sb.toString();
     }
