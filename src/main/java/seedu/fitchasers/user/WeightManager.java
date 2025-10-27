@@ -1,8 +1,11 @@
-package seedu.fitchasers;
+package seedu.fitchasers.user;
+
+import seedu.fitchasers.ui.UI;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+
 
 /**
  * Handles the recording and viewing of weight data for a person.
@@ -37,9 +40,16 @@ public class WeightManager {
             double weightValue = Double.parseDouble(weightString);
             LocalDate entryDate = LocalDate.parse(dateString, DATE_FORMAT);
 
+            // Check if date is in the future
+            if (entryDate.isAfter(LocalDate.now())) {
+                uiHandler.showMessage("The date you entered (" + entryDate.format(DATE_FORMAT)
+                        + ") is in the future. Please re-enter a valid date that is not in the future.");
+                return;
+            }
+
             WeightRecord weightRecord = new WeightRecord(weightValue, entryDate);
             currentUser.addWeightRecord(weightRecord);
-            uiHandler.showMessage("Logging your weight... don't lie to me!");
+            uiHandler.showMessage("Logging your weight... do not lie to me!");
             uiHandler.showMessage("New weight recorded: " + weightRecord);
 
         } catch (NumberFormatException nfe) {

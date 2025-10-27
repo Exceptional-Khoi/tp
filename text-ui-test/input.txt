@@ -155,3 +155,16 @@
 /add_exercise n/toe touch r/3
 /add_exercise n/shoulder stretch r/3
 /end_workout d/06/11/25 t/2140
+
+/view_log
+/view_log 2
+/view_log 3
+/view_log 0
+/view_log 10000
+
+
+/view_log
+/view_log -d 2
+/view_log -d 3
+/view_log -d 0
+/view_log -d 10000

@@ -2,8 +2,15 @@ package seedu.fitchasers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import seedu.fitchasers.ui.UI;
+import seedu.fitchasers.tagger.DefaultTagger;
+import seedu.fitchasers.tagger.Tagger;
+import seedu.fitchasers.workouts.Exercise;
+import seedu.fitchasers.workouts.Workout;
+import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 
 import java.time.LocalDateTime;
@@ -20,8 +27,9 @@ class WorkoutManagerTest {
     @BeforeEach
     void setup() {
         Tagger tagger = new DefaultTagger();
-        manager = new WorkoutManager(tagger);
-        manager.addWorkout("n/TestWorkout d/25/10/25 t/1400");
+        FileHandler fileHandler = new FileHandler();
+        manager = new WorkoutManager(tagger, fileHandler);
+        manager.addWorkout("n/TestWorkout d/24/10/25 t/1400");
     }
 
     @Test
@@ -65,27 +73,29 @@ class WorkoutManagerTest {
                     end.format(DateTimeFormatter.ofPattern("HHmm")));
 
             UI dummyUI = new UI() {
-                @Override public boolean confirmationMessage() { return true; }
+                @Override public boolean confirmationMessage() {
+                    return true;
+                }
             };
             manager.endWorkout(dummyUI, endArgs);
         }
 
         manager.addWorkout("n/run d/15/10/25 t/0730");
-        
+
         assertEquals(2, manager.getWorkouts().size());
         assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
     }
 
 
     @Test
-    void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() {
+    void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() throws IOException {
         manager.deleteWorkout("run");
         assertThrows(IndexOutOfBoundsException.class,
                 ()-> manager.getWorkouts().get(1));
     }
 
     @Test
-    void removeWorkout_nonExistingWorkout_printsWorkoutNotFound() {
+    void removeWorkout_nonExistingWorkout_printsWorkoutNotFound() throws IOException {
         ByteArrayOutputStream outContent = new ByteArrayOutputStream();
         System.setOut(new PrintStream(outContent));
 

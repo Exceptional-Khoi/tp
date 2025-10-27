@@ -1,4 +1,6 @@
-package seedu.fitchasers;
+package seedu.fitchasers.workouts;
+
+import seedu.fitchasers.ui.UI;
 
 import java.io.Serializable;
 import java.time.Duration;
@@ -40,20 +42,54 @@ public class Workout implements Serializable {
         this.duration = calculateDuration();
     }
 
+    /**
+     * Returns a defensive copy of the set of manual tags.
+     * Manual tags are those explicitly assigned or edited by the user.
+     *
+     * @return a new {@code Set<String>} containing the manual tags
+     */
     public Set<String> getManualTags() {
-        return manualTags;
+        return new LinkedHashSet<>(manualTags);
     }
+    /**
+     * Returns the set of auto tags.
+     * Auto tags are those generated automatically based on workout content or keywords.
+     *
+     * @return the {@code Set<String>} of auto tags
+     */
     public Set<String> getAutoTags() {
         return autoTags;
     }
+    /**
+     * Sets the manual tags to a defensive copy of the given set.
+     * This replaces any existing manual tags with the provided set.
+     *
+     * @param tags a set of tags to assign as manual tags
+     */
     public void setManualTags(Set<String> tags) {
         this.manualTags = new LinkedHashSet<>(tags);
     }
+    /**
+     * Sets the auto tags to a defensive copy of the given set.
+     * This replaces any existing auto tags with the provided set.
+     *
+     * @param tags a set of tags to assign as auto tags
+     */
     public void setAutoTags(Set<String> tags) {
         this.autoTags = new LinkedHashSet<>(tags);
     }
-    /** Returns union of both for display/UI. */
+
+    /**
+     * Returns a set containing the union of manual tags
+     * and automatically generated (auto) tags for the workout.
+     *
+     * Manual tags represent user-edited tags, while auto tags
+     * are suggested based on workout content or keywords.
+     *
+     * @return a new {@code Set<String>} containing all manual and auto tags
+     */
     public Set<String> getAllTags() {
+        //return new LinkedHashSet<>(manualTags);
         Set<String> out = new LinkedHashSet<>();
         out.addAll(manualTags);
         out.addAll(autoTags);
@@ -135,7 +171,7 @@ public class Workout implements Serializable {
         String month = dateTime.getMonth()
                 .getDisplayName(TextStyle.FULL, Locale.ENGLISH);
 
-        String suffix = UI.getDaySuffix(dayOfMonth);
+        String suffix = ui.getDaySuffix(dayOfMonth);
 
         return String.format("%s %d%s of %s", dayOfWeek, dayOfMonth, suffix, month);
     }

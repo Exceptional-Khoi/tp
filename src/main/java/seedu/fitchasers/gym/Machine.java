@@ -1,4 +1,4 @@
-package seedu.fitchasers;
+package seedu.fitchasers.gym;
 
 import java.util.List;
 

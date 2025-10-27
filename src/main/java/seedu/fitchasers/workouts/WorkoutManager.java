@@ -1,6 +1,13 @@
-package seedu.fitchasers;
+package seedu.fitchasers.workouts;
 
+import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.tagger.Tagger;
+import seedu.fitchasers.ui.UI;
+
+import java.io.IOException;
+import java.time.YearMonth;
 import java.time.format.ResolverStyle;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -8,6 +15,7 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -22,13 +30,24 @@ public class WorkoutManager {
     private Workout currentWorkout = null;
     private final UI ui = new UI();
     private Tagger tagger;
+    private LocalDateTime workoutDateTime;
+    private String workoutName;
+    private YearMonth monthOfWorkout;
+    private YearMonth currentLoadedMonth;
+    private Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
+    private final Set<YearMonth> loadedMonths = new HashSet<>();
+    private FileHandler fileHandler;
 
-    public WorkoutManager(Tagger tagger) {
+    public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
         this.tagger = tagger;
+        this.fileHandler = fileHandler;
+        this.workoutsByMonth = fileHandler.getArrayByMonth();
+        this.currentLoadedMonth = YearMonth.now();
     }
 
-    public void setWorkouts(ArrayList<Workout> workouts) {
+    public void setWorkouts(ArrayList<Workout> workouts, YearMonth monthOfArrayList) {
         this.workouts = workouts;
+        currentLoadedMonth = monthOfArrayList;
     }
 
     /**
@@ -39,6 +58,31 @@ public class WorkoutManager {
      * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
+        formatInputForWorkout(command);
+        monthOfWorkout = YearMonth.from(workoutDateTime);
+        if(!currentLoadedMonth.equals(monthOfWorkout)) {
+            setWorkouts(fileHandler.getWorkoutsForMonth(monthOfWorkout), monthOfWorkout);
+        }
+
+        try{
+            Workout newWorkout = new Workout(workoutName, workoutDateTime);
+
+            // merge auto-tags if you have a tagger
+            Set<String> suggestedTags = tagger.suggest(newWorkout);
+            newWorkout.setAutoTags(suggestedTags);
+            System.out.println("Tags generated for workout: " + suggestedTags);
+            workouts.add(newWorkout);
+            currentWorkout = newWorkout;
+            ui.showMessage("New workout sesh incoming!");
+            ui.showMessage("Added workout: " + workoutName);
+            fileHandler.saveMonthList(currentLoadedMonth,workouts);
+
+        } catch (Exception e) {
+            ui.showMessage("Something went wrong creating the workout. Please try again.");
+        }
+    }
+
+    private void formatInputForWorkout(String command) {
         assert workouts != null : "workouts list should be initialized";
 
         if (currentWorkout != null) {
@@ -55,7 +99,6 @@ public class WorkoutManager {
             return;
         }
 
-        String workoutName;
         int nIdx = command.indexOf("n/");
         int afterN = nIdx + 2;
 
@@ -106,9 +149,9 @@ public class WorkoutManager {
         }
 
         // Strict formatters & validate provided pieces first
-        DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yy")
+        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
                 .withResolverStyle(ResolverStyle.SMART);
-        DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HHmm")
+        DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
                 .withResolverStyle(ResolverStyle.SMART);
 
         LocalDate date = null;
@@ -116,7 +159,7 @@ public class WorkoutManager {
 
         if (!dateStr.isEmpty()) {
             try {
-                date = LocalDate.parse(dateStr, DATE_FMT);
+                date = LocalDate.parse(dateStr, dateFmt);
             } catch (Exception ex) {
                 ui.showMessage("Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
                 return;
@@ -125,7 +168,7 @@ public class WorkoutManager {
 
         if (!timeStr.isEmpty()) {
             try {
-                time = LocalTime.parse(timeStr, TIME_FMT);
+                time = LocalTime.parse(timeStr, timeFmt);
             } catch (Exception ex) {
                 ui.showMessage("Invalid time. Use t/HHmm (e.g., t/1905).");
                 return;
@@ -134,7 +177,7 @@ public class WorkoutManager {
 
         // Prompt ONLY for missing ones
         if (date == null) {
-            String todayStr = LocalDate.now().format(DATE_FMT);
+            String todayStr = LocalDate.now().format(dateFmt);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 date = LocalDate.now();
@@ -145,7 +188,7 @@ public class WorkoutManager {
         }
 
         if (time == null) {
-            String nowStr = LocalTime.now().format(TIME_FMT);
+            String nowStr = LocalTime.now().format(timeFmt);
             ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 time = LocalTime.now();
@@ -154,24 +197,44 @@ public class WorkoutManager {
                 return;
             }
         }
+        workoutDateTime = LocalDateTime.of(date, time);
 
-        LocalDateTime workoutDateTime = LocalDateTime.of(date, time);
-
-        try {
-            Workout newWorkout = new Workout(workoutName, workoutDateTime);
-
-            // merge auto-tags if you have a tagger
-            Set<String> suggestedTags = tagger.suggest(newWorkout);
-            newWorkout.setAutoTags(suggestedTags);
-            System.out.println("Tags generated for workout: " + suggestedTags);
-            workouts.add(newWorkout);
-            currentWorkout = newWorkout;
-
-            ui.showMessage("New workout sesh incoming!");
-            ui.showMessage("Added workout: " + workoutName);
-        } catch (Exception e) {
-            ui.showMessage("Something went wrong creating the workout. Please try again.");
+        if (date.isAfter(LocalDate.now())) {
+            ui.showMessage("The date you entered (" + date.format(dateFmt) + ") is in the future. Are you sure? (Y/N)");
+            if (!ui.confirmationMessage()) {
+                ui.showMessage("Please re-enter the correct date.");
+                return;
+            }
         }
+
+        if (date.isEqual(LocalDate.now()) && time.isAfter(LocalTime.now())) {
+            ui.showMessage("The time you entered (" + time.format(timeFmt) + ") is in the future. Are you sure? (Y/N)");
+            if (!ui.confirmationMessage()) {
+                ui.showMessage("Please re-enter the correct time.");
+                return;
+            }
+        }
+
+        // Check if any existing workout already has the same date/time
+        for (Workout w : workouts) {
+            LocalDateTime existingStart = w.getWorkoutStartDateTime();
+            if (existingStart != null) {
+                LocalDate existingDate = existingStart.toLocalDate();
+                LocalTime existingTime = existingStart.toLocalTime();
+
+                if (existingDate.equals(date) && existingTime.equals(time)) {
+                    ui.showMessage("A workout already exists at this date and time ("
+                            + existingDate.format(dateFmt) + " " + existingTime.format(timeFmt) + "). " +
+                            "Continue anyway? (Y/N)");
+                    if (!ui.confirmationMessage()) {
+                        ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
+                        return;
+                    }
+                    break;
+                }
+            }
+        }
+        workoutDateTime = LocalDateTime.of(date, time);
     }
 
     /**
@@ -224,13 +287,14 @@ public class WorkoutManager {
      *
      * @param name the name of the workout to delete
      */
-    public void deleteWorkout(String name) {
+    public void deleteWorkout(String name) throws IOException {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
                 ui.showMessage("Deleting " + w.getWorkoutName() + " | " +
                         w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type y/yes to confirm)");
                 if (ui.confirmationMessage()) {
                     workouts.remove(w);
+                    fileHandler.saveMonthList(currentLoadedMonth,workouts);
                     ui.showMessage("Workout deleted successfully!");
                 } else {
                     ui.showMessage("Okay, I didn’t delete it.");
@@ -241,7 +305,7 @@ public class WorkoutManager {
         ui.showMessage("Workout not found: " + name);
     }
 
-    public void deleteWorkoutByIndex(int index) {
+    public void deleteWorkoutByIndex(int index) throws IOException {
         if (index < 0 || index >= workouts.size()) {
             ui.showMessage("Invalid workout index: " + index + "Please try again.:(");
             return;
@@ -252,6 +316,7 @@ public class WorkoutManager {
         if (ui.confirmationMessage()) {
             ui.showMessage("Deleted workout: " + w.getWorkoutName());
             workouts.remove(index);
+            fileHandler.saveMonthList(currentLoadedMonth,workouts);
         } else {
             ui.showMessage("Okay, deletion aborted.");
         }
@@ -486,7 +551,7 @@ public class WorkoutManager {
         }
     }
 
-    public void interactiveDeleteWorkout(String command, UI ui) {
+    public void interactiveDeleteWorkout(String command, UI ui) throws IOException {
         ArrayList<Workout> targetList = workouts;
 
         if (command.contains("d/")) {
@@ -534,40 +599,24 @@ public class WorkoutManager {
         for (int i = indicesToDelete.size() - 1; i >= 0; i--) {
             Workout w = targetList.get(indicesToDelete.get(i));
             workouts.remove(w);
+            fileHandler.saveMonthList(currentLoadedMonth,workouts);
             ui.showMessage("Delete: " + w.getWorkoutName());
         }
     }
 
-    public void editWorkoutTag(int workoutId, String oldTag, String newTag) {
-        if (workoutId < 1 || workoutId > workouts.size()) {
-            ui.showMessage("Invalid workout ID.");
-            return;
-        }
-        Workout w = workouts.get(workoutId - 1);
-        Set<String> manualTags = new LinkedHashSet<>(w.getManualTags());
-
-        String tagToRemove = null;
-        for (String tag : manualTags) {
-            if (tag.equalsIgnoreCase(oldTag)) {
-                tagToRemove = tag;
-                break;
-            }
-        }
-
-        if (tagToRemove == null) {
-            ui.showMessage("Old tag not found.");
-            return;
-        }
-        manualTags.remove(tagToRemove);
-        if (newTag == null || newTag.trim().isEmpty()) {
-            // If new tag is empty, just remove old tag without adding
-            ui.showMessage("Removed tag '" + tagToRemove + "' without replacement.");
-        } else {
-            manualTags.add(newTag.toLowerCase().trim());
-            ui.showMessage("Tag changed from '" + tagToRemove + "' to '" + newTag + "'.");
-        }
-
-        w.setManualTags(manualTags);
+    /**
+     * Overrides the manual tags of a workout with a new single tag and clears all auto tags.
+     * This effectively replaces any existing manual and automatic tags with the specified tag.
+     *
+     * @param workoutId the ID/index of the workout to update (1-based index assumed)
+     * @param newTag the new tag to set as the manual tag for the workout
+     */
+    public void overrideWorkoutTags(int workoutId, String newTag) {
+        Workout workout = workouts.get(workoutId - 1);
+        Set<String> newTagsSet = new LinkedHashSet<>();
+        newTagsSet.add(newTag.toLowerCase().trim());
+        workout.setManualTags(newTagsSet);
+        workout.setAutoTags(new LinkedHashSet<>());
     }
 
     /**
@@ -587,9 +636,9 @@ public class WorkoutManager {
             return;
         }
 
-        final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yy")
+        final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
                 .withResolverStyle(ResolverStyle.SMART);
-        final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HHmm")
+        final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
                 .withResolverStyle(ResolverStyle.SMART);
 
         String args = (initialArgs == null) ? "" : initialArgs.trim();
@@ -621,7 +670,7 @@ public class WorkoutManager {
         // Validate provided pieces first
         if (!dateStr.isEmpty()) {
             try {
-                date = LocalDate.parse(dateStr, DATE_FMT);
+                date = LocalDate.parse(dateStr, dateFmt);
             } catch (Exception ex) {
                 ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
                 ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
@@ -630,7 +679,7 @@ public class WorkoutManager {
         }
         if (!timeStr.isEmpty()) {
             try {
-                time = LocalTime.parse(timeStr, TIME_FMT);
+                time = LocalTime.parse(timeStr, timeFmt);
             } catch (Exception ex) {
                 ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
                 ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
@@ -640,7 +689,7 @@ public class WorkoutManager {
 
         // Prompt ONLY for missing pieces
         if (date == null) {
-            String todayStr = LocalDate.now().format(DATE_FMT);
+            String todayStr = LocalDate.now().format(dateFmt);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 date = LocalDate.now();
@@ -650,7 +699,7 @@ public class WorkoutManager {
             }
         }
         if (time == null) {
-            String nowStr = LocalTime.now().format(TIME_FMT);
+            String nowStr = LocalTime.now().format(timeFmt);
             ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 time = LocalTime.now();

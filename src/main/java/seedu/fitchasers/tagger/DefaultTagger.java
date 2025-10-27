@@ -1,7 +1,6 @@
-package seedu.fitchasers;
+package seedu.fitchasers.tagger;
 
-import seedu.fitchasers.tagger.Modality;
-import seedu.fitchasers.tagger.MuscleGroup;
+import seedu.fitchasers.workouts.Workout;
 
 import java.util.EnumMap;
 import java.util.LinkedHashSet;

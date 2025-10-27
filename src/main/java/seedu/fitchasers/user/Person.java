@@ -1,4 +1,6 @@
-package seedu.fitchasers;
+package seedu.fitchasers.user;
+
+import seedu.fitchasers.ui.UI;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,6 +11,7 @@ import java.time.LocalDate;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.time.format.DateTimeFormatter;
+
 
 /**
  * Represents a person using the FitChasers app.
@@ -22,6 +25,7 @@ public class Person implements Serializable {
 
     /** The list of weight records for the person */
     private final ArrayList<WeightRecord> weightHistory;
+
 
     /**
      * Constructs a new Person with the given name.
@@ -47,14 +51,14 @@ public class Person implements Serializable {
     /**
      * Updates the name of the person.
      *
-     * @param newName The new name
+     * @param name The new name
      * @throws IllegalArgumentException if newName is null or empty
      */
-    public void setName(String newName) {
-        if (newName == null || newName.trim().isEmpty()) {
+    public void setName(String name) {
+        if (name == null || name.trim().isEmpty()) {
             throw new IllegalArgumentException("Name cannot be null or empty.");
         }
-        this.name = newName.trim();
+        this.name = name.trim();
     }
 
     /**
@@ -100,7 +104,7 @@ public class Person implements Serializable {
      */
     public double getLatestWeight() {
         if (weightHistory.isEmpty()) {
-            return -1; // dùng -1 để phân biệt không có dữ liệu
+            return -1;
         }
         return weightHistory.get(weightHistory.size() - 1).getWeight();
     }
@@ -235,7 +239,7 @@ public class Person implements Serializable {
         }
         System.out.println("\n");
     }
-
+    
     public void setWeightHistory(List<WeightRecord> history) {
         this.weightHistory.clear();
         this.weightHistory.addAll(history);

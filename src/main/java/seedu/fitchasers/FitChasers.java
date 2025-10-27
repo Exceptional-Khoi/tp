@@ -1,9 +1,19 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.ui.UI;
+import seedu.fitchasers.ui.ViewLog;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidCommandException;
+import seedu.fitchasers.gym.EquipmentDisplay;
+import seedu.fitchasers.gym.Gym;
+import seedu.fitchasers.gym.StaticGymData;
+import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Modality;
 import seedu.fitchasers.tagger.MuscleGroup;
+import seedu.fitchasers.user.Person;
+import seedu.fitchasers.user.WeightManager;
+import seedu.fitchasers.workouts.Workout;
+import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.IOException;
 import java.time.YearMonth;
@@ -52,7 +62,7 @@ public class FitChasers {
                 userName = ui.enterName();
             }
             person = new Person(userName.trim());
-            ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started.\n");
+            ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started!");
 
             try {
                 fileHandler.saveUserName(person);
@@ -66,24 +76,27 @@ public class FitChasers {
         ViewLog viewLog;
         List<Gym> gyms = StaticGymData.getNusGyms();
         DefaultTagger tagger = new DefaultTagger();
-        WorkoutManager workoutManager = new WorkoutManager(tagger);
+        WorkoutManager workoutManager = new WorkoutManager(tagger, fileHandler);
+        fileHandler.initIndex();
 
         try {
             fileHandler.loadWeightList(person);
-            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth));
-            ui.showMessage("Loaded " + currentMonth + " workouts\n");
+            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
+            ui.showMessage("Loaded " + currentMonth + " workouts.");
         } catch (FileNonexistent e) {
             ui.showError("Seems like this is a new month!"
                     + "\nWould you like to create new workouts for this month? (Y/N)");
             if (ui.confirmationMessage()) {
                 fileHandler.saveMonthList(currentMonth, new ArrayList<>());
-                workoutManager.setWorkouts(new ArrayList<>());
+                workoutManager.setWorkouts(new ArrayList<>(), currentMonth);
             }
+            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
+            ui.showMessage("Loaded " + currentMonth + " workouts\n");
         } catch (IOException e) {
             ui.showError(e.getMessage());
         }
 
-        viewLog = new ViewLog(ui, workoutManager);
+        viewLog = new ViewLog(ui, workoutManager, fileHandler);
 
         boolean isRunning = true;
 
@@ -109,8 +122,7 @@ public class FitChasers {
                     break;
 
                 case "/my_name":
-                case "n":
-                {
+                case "n": {
                     if (argumentStr == null || !argumentStr.startsWith("n/")) {
                         ui.showMessage("Missing prefix 'n/'. Usage: /my_name n/YourName");
                         ui.showDivider();
@@ -187,10 +199,10 @@ public class FitChasers {
                     String mod = null;
                     String keyword = null;
                     for (String param : params) {
-                        if (param.startsWith("m/")){
+                        if (param.startsWith("m/")) {
                             mod = param.substring(2).toUpperCase();
                         }
-                        if (param.startsWith("k/")){
+                        if (param.startsWith("k/")) {
                             keyword = param.substring(2).toLowerCase();
                         }
                     }
@@ -208,7 +220,6 @@ public class FitChasers {
                     break;
                 }
 
-
                 case "/add_muscle_tag":
                 case "amt": {
                     // Example: /add_muscle_tag m=legs k=lunges
@@ -216,10 +227,10 @@ public class FitChasers {
                     String mus = null;
                     String keyword = null;
                     for (String param : params) {
-                        if (param.startsWith("m/")){
+                        if (param.startsWith("m/")) {
                             mus = param.substring(2).toUpperCase();
                         }
-                        if (param.startsWith("k/")){
+                        if (param.startsWith("k/")) {
                             keyword = param.substring(2).toLowerCase();
                         }
                     }
@@ -238,7 +249,8 @@ public class FitChasers {
                 }
 
 
-                case "/gym_where": {
+                case "/gym_where":
+                case "gw":{
                     String trimmedArg = argumentStr.trim();
                     try {
                         // Only proceed if argument starts with "n/"
@@ -261,7 +273,8 @@ public class FitChasers {
                     break;
                 }
 
-                case "/gym_page": {
+                case "/gym_page":
+                case "gp": {
                     try {
                         String trimmedArg = argumentStr.trim();
                         if (trimmedArg.startsWith("p/") && trimmedArg.length() > 2) {
@@ -282,11 +295,12 @@ public class FitChasers {
                     }
                     break;
                 }
-                /*case "/edit_workout_tag": {
-                    // Expected format: /edit_workout_tag id/1 oldTag=cardio newTag=strength
+
+                case "/override_workout_tag":
+                case "owt": {
+                    // Parse parameters
                     String[] params = argumentStr.split("\\s+");
                     Integer workoutId = null;
-                    String oldTag = null;
                     String newTag = null;
 
                     for (String param : params) {
@@ -294,27 +308,31 @@ public class FitChasers {
                             try {
                                 workoutId = Integer.parseInt(param.substring(3));
                             } catch (NumberFormatException e) {
-                                ui.showMessage("Invalid workout ID. Must be an integer.");
+                                ui.showMessage("Invalid workout ID.");
                                 break;
                             }
-                        } else if (param.startsWith("oldTag/")) {
-                            oldTag = param.substring(7).toLowerCase();
                         } else if (param.startsWith("newTag/")) {
-                            newTag = param.substring(7).toLowerCase();
+                            newTag = param.substring(7);
                         }
                     }
 
-                    if (workoutId != null && oldTag != null && newTag != null) {
-                        workoutManager.editWorkoutTag(workoutId, oldTag, newTag);
-                        fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-                        ui.showMessage("Workout tags updated.");
+                    if (workoutId != null && newTag != null) {
+                        // Update in memory
+                        workoutManager.overrideWorkoutTags(workoutId, newTag);
+                        // Save changes persistently immediately after update
+                        try {
+                            fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
+                            ui.showMessage("Workout tags saved successfully.");
+                        } catch (IOException e) {
+                            ui.showMessage("Error saving workout data: " + e.getMessage());
+                        }
                     } else {
-                        ui.showMessage("Usage: /edit_workout_tag id/WORKOUT_ID oldTag/OLD_TAG newTag/NEW_TAG");
+                        ui.showMessage("Usage: /override_workout_tag id/WORKOUT_ID newTag/NEW_TAG");
                     }
+
                     ui.showDivider();
                     break;
-                }*/
-
+                }
 
                 case "/add_set":
                 case "as":
@@ -333,7 +351,7 @@ public class FitChasers {
                 case "/view_log":
                 case "vl":
                     try{
-                        viewLog.render(argumentStr); //#TODO select detailed or not
+                        viewLog.render(argumentStr);
                     }catch (IndexOutOfBoundsException e){
                         ui.showError(e.getMessage());
                     }
@@ -363,7 +381,6 @@ public class FitChasers {
                     ui.showMessage("Saving your progress...");
                     try {
                         fileHandler.saveWeightList(person);
-                        fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
                         ui.showExitMessage();
                     } catch (IOException e) {
                         ui.showError("Failed to save workouts before exit.");

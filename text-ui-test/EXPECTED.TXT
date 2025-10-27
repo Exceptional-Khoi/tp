@@ -1,12 +1,903 @@
-[35m[Oops!] [0mSeems like this is a new month!
- Would you like to create new workouts for this month? (Y/N)
-[1;37mSaved 0 workouts for 2025-10.[0m
-[1;34m+------------------------------------------------------+
-|                      FITCHASER                       |
-+------------------------------------------------------+
+[1;34m ▄▄▄▄▄▄   ▀      ▄      ▄▄▄  █                                        
+ █      ▄▄▄    ▄▄█▄▄  ▄▀   ▀ █ ▄▄    ▄▄▄    ▄▄▄    ▄▄▄    ▄ ▄▄   ▄▄▄  
+ █▄▄▄▄▄   █      █    █      █▀  █  ▀   █  █   ▀  █▀  █   █▀  ▀ █   ▀ 
+ █        █      █    █      █   █  ▄▀▀▀█   ▀▀▀▄  █▀▀▀▀   █      ▀▀▀▄ 
+ █      ▄▄█▄▄    ▀▄▄   ▀▄▄▄▀ █   █  ▀▄▄▀█  ▀▄▄▄▀  ▀█▄▄▀   █     ▀▄▄▄▀ 
 [0m
 [36mYour virtual gym buddy's clocked in and ready to make you strong![0m
-[36mType [1;37m/help[36m to explore all available commands![0m
+[36mType [97m/help[0m[36m or [97mh[0m[36m to explore all available commands![0m
 [36mLet's crush your fitness goals together![0m
-[1;37m--------------------------------------------------[0m
-[35mEnter command[0m >
+[97m--------------------------------------------------[0m
+[97mBefore we begin, please enter your name.[0m
+[35mEnter your name: [0m[97mNice to meet you, /create_workout n/swimming d/14/10/25 t/1500! Let's get started.
+[0m
+[97mNo previous weight data found for /create_workout n/swimming d/14/10/25 t/1500[0m
+[35m[Oops!] [0m[97mSeems like this is a new month!
+Would you like to create new workouts for this month? (Y/N)
+[35mEnter command[0m > [97mNo active workout. Use /create_workout first.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mNo active workout.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [push]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: push day[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+bench press:
+Set 1 -> Reps: 8
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+incline dumbbell press:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+triceps dips:
+Set 1 -> Reps: 12
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'push day' ended. Duration: 70 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [legs]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: leg day[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+squat:
+Set 1 -> Reps: 8
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+lunges:
+Set 1 -> Reps: 12
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+calf raises:
+Set 1 -> Reps: 20
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'leg day' ended. Duration: 85 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [cardio]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: run[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+jogging:
+Set 1 -> Reps: 1
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+sprint:
+Set 1 -> Reps: 3
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'run' ended. Duration: 40 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [core]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: core[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+plank:
+Set 1 -> Reps: 3
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+sit-up:
+Set 1 -> Reps: 25
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+russian twist:
+Set 1 -> Reps: 30
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'core' ended. Duration: 45 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [pull]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: pull day[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+deadlifts:
+Set 1 -> Reps: 6
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+barbell row:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+bicep curl:
+Set 1 -> Reps: 12
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'pull day' ended. Duration: 75 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: cardio mix[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+jump rope:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+cycle:
+Set 1 -> Reps: 20
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'cardio mix' ended. Duration: 50 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: yoga session[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+sun salutation:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+tree pose:
+Set 1 -> Reps: 3
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'yoga session' ended. Duration: 40 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: hiit[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+burpees:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+push-ups:
+Set 1 -> Reps: 15
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+mountain climbers:
+Set 1 -> Reps: 20
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'hiit' ended. Duration: 30 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [cardio, back]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: swim endurance[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+laps:
+Set 1 -> Reps: 30
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+floating kick:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'swim endurance' ended. Duration: 60 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: stretching[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+hamstring stretch:
+Set 1 -> Reps: 3
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+shoulder stretch:
+Set 1 -> Reps: 3
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'stretching' ended. Duration: 30 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: hike[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+ascent:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+descent:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'hike' ended. Duration: 180 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: spin class[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+sprints:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+climb:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'spin class' ended. Duration: 50 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [back]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: back day[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+pull-ups:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+lat pulldown:
+Set 1 -> Reps: 12
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+seated row:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'back day' ended. Duration: 75 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: arm blast[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+bicep curl:
+Set 1 -> Reps: 12
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+tricep pushdown:
+Set 1 -> Reps: 12
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+hammer curl:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'arm blast' ended. Duration: 60 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [cardio]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: run[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+warmup jog:
+Set 1 -> Reps: 1
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+5k pace:
+Set 1 -> Reps: 1
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'run' ended. Duration: 55 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: full body[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+push-up:
+Set 1 -> Reps: 20
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+squat:
+Set 1 -> Reps: 20
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+burpee:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'full body' ended. Duration: 60 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [cardio]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: cycle[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+flat road:
+Set 1 -> Reps: 20
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+hill climb:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'cycle' ended. Duration: 60 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [core]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: core burn[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+sit-up:
+Set 1 -> Reps: 30
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+leg raise:
+Set 1 -> Reps: 20
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+plank:
+Set 1 -> Reps: 3
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'core burn' ended. Duration: 50 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: boxing[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+shadowboxing:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+punch bag:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+footwork drill:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'boxing' ended. Duration: 60 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: tennis[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+serve practice:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+rally:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'tennis' ended. Duration: 90 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [back]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: pilates[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+roll-up:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+leg circle:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'pilates' ended. Duration: 40 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: jump circuit[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+jump squat:
+Set 1 -> Reps: 15
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+jumping jack:
+Set 1 -> Reps: 30
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'jump circuit' ended. Duration: 40 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [cardio, back]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: swimming[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+lap freestyle:
+Set 1 -> Reps: 15
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+lap butterfly:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'swimming' ended. Duration: 60 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [back]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: rowing[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+row machine:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+core twist:
+Set 1 -> Reps: 10
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'rowing' ended. Duration: 50 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: mobility[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+shoulder rolls:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+hip circles:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'mobility' ended. Duration: 30 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: bodyweight[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+push-up:
+Set 1 -> Reps: 20
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+squat:
+Set 1 -> Reps: 25
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+plank:
+Set 1 -> Reps: 4
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'bodyweight' ended. Duration: 55 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: [strength, back]
+[97mNew workout sesh incoming![0m
+[97mAdded workout: powerlift[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+squat:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+deadlift:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+bench press:
+Set 1 -> Reps: 5
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'powerlift' ended. Duration: 90 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > Tags generated for workout: []
+[97mNew workout sesh incoming![0m
+[97mAdded workout: flexibility[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+backbend:
+Set 1 -> Reps: 3
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+toe touch:
+Set 1 -> Reps: 3
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mAdding that spicy new exercise![0m
+[97mAdded exercise:
+shoulder stretch:
+Set 1 -> Reps: 3
+[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkout wrapped! Time to refuel![0m
+[97mWorkout 'flexibility' ended. Duration: 40 minute(s).[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > [97mWorkouts (28 total) — Page 1/3[0m
+[97mID   Date                 Name                   Duration  [0m
+[97m1    Thu 6 Nov            flexibility            40m       [0m
+[97m2    Wed 5 Nov            powerlift              1h 30m    [0m
+[97m3    Tue 4 Nov            bodyweight             55m       [0m
+[97m4    Mon 3 Nov            mobility               30m       [0m
+[97m5    Mon 3 Nov            rowing                 50m       [0m
+[97m6    Sun 2 Nov            swimming               1h        [0m
+[97m7    Sat 1 Nov            jump circuit           40m       [0m
+[97m8    Fri 31 Oct           pilates                40m       [0m
+[97m9    Thu 30 Oct           tennis                 1h 30m    [0m
+[97m10   Wed 29 Oct           boxing                 1h        [0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkouts (28 total) — Page 2/3[0m
+[97mID   Date                 Name                   Duration  [0m
+[97m11   Tue 28 Oct           core burn              50m       [0m
+[97m12   Tue 28 Oct           cycle                  1h        [0m
+[97m13   Mon 27 Oct           full body              1h        [0m
+[97m14   Mon 27 Oct           run                    55m       [0m
+[97m15   Sun 26 Oct           arm blast              1h        [0m
+[97m16   Sat 25 Oct           back day               1h 15m    [0m
+[97m17   Fri 24 Oct           spin class             50m       [0m
+[97m18   Fri 24 Oct           hike                   3h        [0m
+[97m19   Thu 23 Oct           stretching             30m       [0m
+[97m20   Wed 22 Oct           swim endurance         1h        [0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkouts (28 total) — Page 3/3[0m
+[97mID   Date                 Name                   Duration  [0m
+[97m21   Tue 21 Oct           hiit                   30m       [0m
+[97m22   Mon 20 Oct           yoga session           40m       [0m
+[97m23   Mon 20 Oct           cardio mix             50m       [0m
+[97m24   Sun 19 Oct           pull day               1h 15m    [0m
+[97m25   Sat 18 Oct           core                   45m       [0m
+[97m26   Fri 17 Oct           run                    40m       [0m
+[97m27   Thu 16 Oct           leg day                1h 25m    [0m
+[97m28   Wed 15 Oct           push day               1h 10m    [0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkouts (28 total) — Page 1/3[0m
+[97mID   Date                 Name                   Duration  [0m
+[97m1    Thu 6 Nov            flexibility            40m       [0m
+[97m2    Wed 5 Nov            powerlift              1h 30m    [0m
+[97m3    Tue 4 Nov            bodyweight             55m       [0m
+[97m4    Mon 3 Nov            mobility               30m       [0m
+[97m5    Mon 3 Nov            rowing                 50m       [0m
+[97m6    Sun 2 Nov            swimming               1h        [0m
+[97m7    Sat 1 Nov            jump circuit           40m       [0m
+[97m8    Fri 31 Oct           pilates                40m       [0m
+[97m9    Thu 30 Oct           tennis                 1h 30m    [0m
+[97m10   Wed 29 Oct           boxing                 1h        [0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkouts (28 total) — Page 3/3[0m
+[97mID   Date                 Name                   Duration  [0m
+[97m21   Tue 21 Oct           hiit                   30m       [0m
+[97m22   Mon 20 Oct           yoga session           40m       [0m
+[97m23   Mon 20 Oct           cardio mix             50m       [0m
+[97m24   Sun 19 Oct           pull day               1h 15m    [0m
+[97m25   Sat 18 Oct           core                   45m       [0m
+[97m26   Fri 17 Oct           run                    40m       [0m
+[97m27   Thu 16 Oct           leg day                1h 25m    [0m
+[97m28   Wed 15 Oct           push day               1h 10m    [0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [35mEnter command[0m > [35mEnter command[0m > [97mWorkouts (28 total) — Page 1/3[0m
+[97mID   Date                 Name                   Duration  [0m
+[97m1    Thu 6 Nov            flexibility            40m       [0m
+[97m2    Wed 5 Nov            powerlift              1h 30m    [0m
+[97m3    Tue 4 Nov            bodyweight             55m       [0m
+[97m4    Mon 3 Nov            mobility               30m       [0m
+[97m5    Mon 3 Nov            rowing                 50m       [0m
+[97m6    Sun 2 Nov            swimming               1h        [0m
+[97m7    Sat 1 Nov            jump circuit           40m       [0m
+[97m8    Fri 31 Oct           pilates                40m       [0m
+[97m9    Thu 30 Oct           tennis                 1h 30m    [0m
+[97m10   Wed 29 Oct           boxing                 1h        [0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkouts (28 total) — Page 2/3[0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#11  core burn[0m
+[97mDate     : Tuesday 28th of October, 8:50 PM[0m
+[97mDuration : 50m[0m
+[97mTags     : [core][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#12  cycle[0m
+[97mDate     : Tuesday 28th of October, 7:00 AM[0m
+[97mDuration : 1h[0m
+[97mTags     : [cardio][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#13  full body[0m
+[97mDate     : Monday 27th of October, 8:00 PM[0m
+[97mDuration : 1h[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#14  run[0m
+[97mDate     : Monday 27th of October, 7:10 AM[0m
+[97mDuration : 55m[0m
+[97mTags     : [cardio][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#15  arm blast[0m
+[97mDate     : Sunday 26th of October, 5:00 PM[0m
+[97mDuration : 1h[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#16  back day[0m
+[97mDate     : Saturday 25th of October, 6:45 PM[0m
+[97mDuration : 1h 15m[0m
+[97mTags     : [back][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#17  spin class[0m
+[97mDate     : Friday 24th of October, 6:50 PM[0m
+[97mDuration : 50m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#18  hike[0m
+[97mDate     : Friday 24th of October, 11:00 AM[0m
+[97mDuration : 3h[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#19  stretching[0m
+[97mDate     : Thursday 23rd of October, 10:00 AM[0m
+[97mDuration : 30m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#20  swim endurance[0m
+[97mDate     : Wednesday 22nd of October, 4:30 PM[0m
+[97mDuration : 1h[0m
+[97mTags     : [cardio, back][0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkouts (28 total) — Page 3/3[0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#21  hiit[0m
+[97mDate     : Tuesday 21st of October, 12:30 PM[0m
+[97mDuration : 30m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#22  yoga session[0m
+[97mDate     : Monday 20th of October, 9:40 PM[0m
+[97mDuration : 40m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#23  cardio mix[0m
+[97mDate     : Monday 20th of October, 7:20 AM[0m
+[97mDuration : 50m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#24  pull day[0m
+[97mDate     : Sunday 19th of October, 7:45 PM[0m
+[97mDuration : 1h 15m[0m
+[97mTags     : [pull][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#25  core[0m
+[97mDate     : Saturday 18th of October, 8:45 PM[0m
+[97mDuration : 45m[0m
+[97mTags     : [core][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#26  run[0m
+[97mDate     : Friday 17th of October, 7:40 AM[0m
+[97mDuration : 40m[0m
+[97mTags     : [cardio][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#27  leg day[0m
+[97mDate     : Thursday 16th of October, 6:25 PM[0m
+[97mDuration : 1h 25m[0m
+[97mTags     : [legs][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#28  push day[0m
+[97mDate     : Wednesday 15th of October, 7:10 PM[0m
+[97mDuration : 1h 10m[0m
+[97mTags     : [push][0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkouts (28 total) — Page 1/3[0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#1  flexibility[0m
+[97mDate     : Thursday 6th of November, 9:40 PM[0m
+[97mDuration : 40m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#2  powerlift[0m
+[97mDate     : Wednesday 5th of November, 6:30 PM[0m
+[97mDuration : 1h 30m[0m
+[97mTags     : [strength, back][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#3  bodyweight[0m
+[97mDate     : Tuesday 4th of November, 7:55 PM[0m
+[97mDuration : 55m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#4  mobility[0m
+[97mDate     : Monday 3rd of November, 9:00 PM[0m
+[97mDuration : 30m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#5  rowing[0m
+[97mDate     : Monday 3rd of November, 8:20 AM[0m
+[97mDuration : 50m[0m
+[97mTags     : [back][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#6  swimming[0m
+[97mDate     : Sunday 2nd of November, 5:00 PM[0m
+[97mDuration : 1h[0m
+[97mTags     : [cardio, back][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#7  jump circuit[0m
+[97mDate     : Saturday 1st of November, 10:10 AM[0m
+[97mDuration : 40m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#8  pilates[0m
+[97mDate     : Friday 31st of October, 8:40 PM[0m
+[97mDuration : 40m[0m
+[97mTags     : [back][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#9  tennis[0m
+[97mDate     : Thursday 30th of October, 6:30 PM[0m
+[97mDuration : 1h 30m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#10  boxing[0m
+[97mDate     : Wednesday 29th of October, 7:00 PM[0m
+[97mDuration : 1h[0m
+[97mTags     : [][0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > [97mWorkouts (28 total) — Page 3/3[0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#21  hiit[0m
+[97mDate     : Tuesday 21st of October, 12:30 PM[0m
+[97mDuration : 30m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#22  yoga session[0m
+[97mDate     : Monday 20th of October, 9:40 PM[0m
+[97mDuration : 40m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#23  cardio mix[0m
+[97mDate     : Monday 20th of October, 7:20 AM[0m
+[97mDuration : 50m[0m
+[97mTags     : [][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#24  pull day[0m
+[97mDate     : Sunday 19th of October, 7:45 PM[0m
+[97mDuration : 1h 15m[0m
+[97mTags     : [pull][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#25  core[0m
+[97mDate     : Saturday 18th of October, 8:45 PM[0m
+[97mDuration : 45m[0m
+[97mTags     : [core][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#26  run[0m
+[97mDate     : Friday 17th of October, 7:40 AM[0m
+[97mDuration : 40m[0m
+[97mTags     : [cardio][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#27  leg day[0m
+[97mDate     : Thursday 16th of October, 6:25 PM[0m
+[97mDuration : 1h 25m[0m
+[97mTags     : [legs][0m
+[97m————————————————————————————————————————————————————————————[0m
+[97m#28  push day[0m
+[97mDate     : Wednesday 15th of October, 7:10 PM[0m
+[97mDuration : 1h 10m[0m
+[97mTags     : [push][0m
+[97mTip: /view_log 2 (next page), /view_log --search run, /open <ID> for details.[0m
+[97m--------------------------------------------------[0m
+[35mEnter command[0m > 
