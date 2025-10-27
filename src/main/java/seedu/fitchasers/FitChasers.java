@@ -62,6 +62,25 @@ public class FitChasers {
                 userName = ui.enterName();
             }
             person = new Person(userName.trim());
+
+            // Prompt for initial weight
+            double initialWeight = ui.enterWeight();
+            if (initialWeight > 0) {
+                WeightManager weightManager = new WeightManager(person);
+
+                String todayStr = java.time.LocalDate.now()
+                        .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
+                String command = "w/" + initialWeight + " d/" + todayStr;
+
+                weightManager.addWeight(command);
+                try {
+                    fileHandler.saveWeightList(person);
+                    ui.showMessage("Your initial weight of " + initialWeight + "kg has been added successfully!");
+                } catch (IOException e) {
+                    ui.showError("Failed to save initial weight: " + e.getMessage());
+                }
+            }
+
             ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started!");
 
             try {
@@ -130,6 +149,18 @@ public class FitChasers {
                     String newName = argumentStr.substring(2).trim();
                     if (newName.isEmpty()) {
                         ui.showMessage("Usage: /my_name n/YourName");
+                        ui.showMessage("You didn’t enter any name after 'n/'. Example: /my_name n/Nary");
+                        break;
+                    }
+
+                    if (newName.length() > 30) {
+                        ui.showMessage("Name is too long. Maximum is 30 characters.");
+                        break;
+                    }
+
+                    if (!newName.matches("^[a-zA-Z0-9 _-]+$")) {
+                        ui.showMessage("Name can only contain letters, numbers, spaces, " +
+                                "underscores (_), or dashes (-).");
                         break;
                     }
 
