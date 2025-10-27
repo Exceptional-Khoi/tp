@@ -1,6 +1,4 @@
 package seedu.fitchasers.gym;
-import seedu.fitchasers.Gym;
-import seedu.fitchasers.Machine;
 import java.util.List;
 
 public class UscGymData {

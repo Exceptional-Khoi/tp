@@ -13,6 +13,8 @@ import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import seedu.fitchasers.user.Person;
+import seedu.fitchasers.user.WeightRecord;
 
 /**
  * Unit tests for the {@link Person} class.

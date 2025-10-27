@@ -1,9 +1,19 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.ui.UI;
+import seedu.fitchasers.ui.ViewLog;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidCommandException;
+import seedu.fitchasers.gym.EquipmentDisplay;
+import seedu.fitchasers.gym.Gym;
+import seedu.fitchasers.gym.StaticGymData;
+import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Modality;
 import seedu.fitchasers.tagger.MuscleGroup;
+import seedu.fitchasers.user.Person;
+import seedu.fitchasers.user.WeightManager;
+import seedu.fitchasers.workouts.Workout;
+import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.IOException;
 import java.time.YearMonth;
@@ -66,24 +76,27 @@ public class FitChasers {
         ViewLog viewLog;
         List<Gym> gyms = StaticGymData.getNusGyms();
         DefaultTagger tagger = new DefaultTagger();
-        WorkoutManager workoutManager = new WorkoutManager(tagger);
+        WorkoutManager workoutManager = new WorkoutManager(tagger, fileHandler);
+        fileHandler.initIndex();
 
         try {
             fileHandler.loadWeightList(person);
-            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth));
+            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
             ui.showMessage("Loaded " + currentMonth + " workouts.");
         } catch (FileNonexistent e) {
             ui.showError("Seems like this is a new month!"
                     + "\nWould you like to create new workouts for this month? (Y/N)");
             if (ui.confirmationMessage()) {
                 fileHandler.saveMonthList(currentMonth, new ArrayList<>());
-                workoutManager.setWorkouts(new ArrayList<>());
+                workoutManager.setWorkouts(new ArrayList<>(), currentMonth);
             }
+            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
+            ui.showMessage("Loaded " + currentMonth + " workouts\n");
         } catch (IOException e) {
             ui.showError(e.getMessage());
         }
 
-        viewLog = new ViewLog(ui, workoutManager);
+        viewLog = new ViewLog(ui, workoutManager, fileHandler);
 
         boolean isRunning = true;
 
@@ -220,6 +233,7 @@ public class FitChasers {
                     break;
                 }
 
+
                 case "/gym_where":
                 case "gw":{
                     String trimmedArg = argumentStr.trim();
@@ -322,7 +336,7 @@ public class FitChasers {
                 case "/view_log":
                 case "vl":
                     try{
-                        viewLog.render(argumentStr); //#TODO select detailed or not
+                        viewLog.render(argumentStr);
                     }catch (IndexOutOfBoundsException e){
                         ui.showError(e.getMessage());
                     }
@@ -352,7 +366,6 @@ public class FitChasers {
                     ui.showMessage("Saving your progress...");
                     try {
                         fileHandler.saveWeightList(person);
-                        fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
                         ui.showExitMessage();
                     } catch (IOException e) {
                         ui.showError("Failed to save workouts before exit.");
