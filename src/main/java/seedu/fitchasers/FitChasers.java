@@ -44,15 +44,23 @@ public class FitChasers {
             person = new Person(savedName);
             ui.showMessage("Welcome back, " + savedName + "!");
         } else {
-            // Prompt for name if not saved
+            // Prompt for name and weight if not saved
             ui.showMessage("Before we begin, please enter your name.");
             String userName = ui.enterName();
+            double initialWeight = ui.enterWeight();
             while (userName == null || userName.trim().isEmpty()) {
                 ui.showMessage("Name cannot be empty. Please enter your name:");
                 userName = ui.enterName();
             }
+
             person = new Person(userName.trim());
-            ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started!");
+
+            java.time.LocalDate today = java.time.LocalDate.now();
+            WeightRecord firstRecord = new WeightRecord(initialWeight, today);
+            person.addWeightRecord(firstRecord);
+            ui.showMessage("Awesome! Your starting weight (" + initialWeight + " kg) has been logged for today ("
+                    + today.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy")) + ").\n");
+            ui.showMessage("Welcome aboard, " + person.getName() + "! Let's start chasing those goals!");
 
             try {
                 fileHandler.saveUserName(person);
