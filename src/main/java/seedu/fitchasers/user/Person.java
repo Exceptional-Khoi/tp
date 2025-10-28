@@ -166,14 +166,14 @@ public class Person implements Serializable {
 
         final int height = 10;
         final int spacing = 12;
-        final int MAX_WIDTH_COLUMNS = 12;
+        final int maxWidthColumns = 12;
 
         List<Double> displayWeights = new ArrayList<>();
         List<String> displayDates = new ArrayList<>();
 
-        if (weights.size() > MAX_WIDTH_COLUMNS) {
-            double step = (double) (weights.size() - 1) / (MAX_WIDTH_COLUMNS - 1);
-            for (int i = 0; i < MAX_WIDTH_COLUMNS; i++) {
+        if (weights.size() > maxWidthColumns) {
+            double step = (double) (weights.size() - 1) / (maxWidthColumns - 1);
+            for (int i = 0; i < maxWidthColumns; i++) {
                 int idx = (int) Math.round(i * step);
                 displayWeights.add(weights.get(idx));
                 displayDates.add(dates.get(idx));
