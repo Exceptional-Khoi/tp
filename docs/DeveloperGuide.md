@@ -1,5 +1,39 @@
 # Developer Guide
 
+## Table of Contents
+- [Acknowledgements](#acknowledgements)
+- [Design & Implementation](#design--implementation)
+    - [Design](#design)
+    - [Main Components of the Architecture](#main-components-of-the-architecture)
+    - [How the Architecture Components Interact](#how-the-architecture-components-interact)
+- [Product Scope](#product-scope)
+    - [Target User Profile](#target-user-profile)
+    - [Value Proposition](#value-proposition)
+- [User Stories](#user-stories)
+- [Non-Functional Requirements](#non-functional-requirements)
+- [WorkoutManager Component](#workoutmanager-component)
+- [Glossary](#glossary)
+- [Instructions for Manual Testing](#instructions-for-manual-testing)
+    - [Help](#help)
+    - [Set Name](#set-name)
+    - [Create Workout](#create-workout)
+    - [Add Exercise](#add-exercise)
+    - [Add Set](#add-set)
+    - [End Workout](#end-workout)
+    - [View Log](#view-log)
+    - [Exit](#exit)
+- [Tagging and Categorization](#tagging-and-categorization)
+    - [Design](#design-1)
+    - [Class Diagram](#class-diagram)
+    - [Sequence Diagram](#Sequence-Diagram)
+    - [Implementation](#implementation)
+    - [Manual Tag Method](#manual-tag-method)
+    - [Important Design Decision](#important-design-decision)
+    - [Design Consideration](#design-consideration)
+    - [Future Enhancements](#future-enhancements)
+- [Notes](#notes)
+
+
 ## Acknowledgements
 
 {list here sources of all reused/adapted ideas, code, documentation, and third-party libraries -- include links to the original source as well}
@@ -29,7 +63,7 @@ The bulk of the app’s work is done by the following six components:
 How the architecture components interact with each other
 
 The Sequence Diagram below shows how the components interact with each other for the scenario where the user issues the command /create_workout pushup.
-
+![Alt text](../docs/diagrams/Architectural_Sequence_Diagram_CW.png "Basic Architecture Sequence Diagram")
 
 ## Product scope
 ### Target user profile
@@ -37,7 +71,7 @@ The Sequence Diagram below shows how the components interact with each other for
 FitChasers is designed for individuals who want to track and improve their fitness progress effectively.
 Our target users include:
 
-1. University students and working adults who want a lightweight fitness tracker without complex setup.
+1. University (NUS) students and working adults who want a lightweight fitness tracker without complex setup.
 2. Users who prefer a command-line interface for fast and distraction-free input.
 3. Fitness enthusiasts who want to log, view, and analyze workouts and body data (e.g., weight, reps, sets).
 4. People who value privacy and prefer storing their data locally instead of using cloud-based apps.
@@ -54,11 +88,31 @@ The system ensures data integrity and transparency — users can view, export, a
 Overall, FitChasers empowers users to understand their progress and stay motivated without unnecessary complexity.
 
 ## User Stories
-
-|Version| As a ... | I want to ... | So that I can ...|
-|--------|----------|---------------|------------------|
-|v1.0|new user|see usage instructions|refer to them when I forget how to use the application|
-|v2.0|user|find a to-do item by name|locate a to-do without having to go through the entire list|
+| Version | As a ... | I want to ... | So that I can ... |
+|----------|-----------|---------------|-------------------|
+| v1.0 | new user | see a welcome message and list of commands | know how to start using the app |
+| v1.0 | user | create a new workout with a date and time | plan and record my daily workouts |
+| v1.0 | user | add exercises to a workout | track what I am doing during my session |
+| v1.0 | user | add sets and reps for each exercise | monitor my training volume and progress |
+| v1.0 | user | delete an exercise or set | fix mistakes if I entered wrong data |
+| v1.0 | user | end my workout and record its duration | know how long I trained for each session |
+| v1.0 | user | view a log of past workouts | review my training history easily |
+| v1.1 | frequent user | record my weight by date | monitor my weight progress over time |
+| v1.1 | frequent user | view all recorded weights | observe trends and track fitness goals |
+| v1.1 | user | delete a workout | remove old or incorrect workout entries |
+| v1.1 | user | view total duration of a specific workout | evaluate how long I spent on each session |
+| v2.0 | experienced user | save and load my data automatically | continue from where I left off each time I launch the app |
+| v2.0 | user | receive error messages for invalid commands | understand what went wrong and fix it easily |
+| v2.0 | motivated user | see motivational messages after workouts | stay engaged and encouraged to continue training |
+| v2.0 | keyboard-only user | use short and consistent command prefixes | type faster without memorizing complex syntax |
+| v2.1 | user | tag my workouts with custom labels (e.g., `#strength`, `#cardio`) | categorize workouts by type or goal |
+| v2.1 | user | view only workouts with a specific tag | focus on a particular type of training session |
+| v2.1 | user | view all available tags | quickly recall which categories I’ve created |
+| v2.1 | user | remove or edit a tag from a workout | keep my tag list accurate and organized |
+| v2.1 | user | combine multiple tags in a search (e.g., `#strength #upperbody`) | filter my logs for more precise tracking |
+| v2.1 | long-term user | analyze the number of workouts per tag | understand which types of workouts I do most often |
+| v2.2 | user | filter workouts by date or name | quickly find a specific workout from my log |
+| v2.2 | user | view total training time for a given week or month | measure overall workout consistency |
 
 ## Non-Functional Requirements
 
@@ -584,11 +638,11 @@ The following sequence diagram shows the interaction between components when a w
 and tags are auto-generated:
 ![Alt text](../docs/diagrams/Sequence Digram for tagging.png "Sequence Diagram for Tagging")
 ### Sequence Diagram for creating a workout
-
+![Sequence diagram for creating a workout](diagrams/SD_createw.png)
 ### Sequence Diagram for adding an exercise to current workout
-
+![Sequence diagram for adding an exercise](diagrams/SD_addex.png)
 ### Sequence Diagram for adding a set to the current exercise 
-
+![Sequence diagram for adding a set](diagrams/SD_addset.png)
 ### Manual Tag Method
 #### Adding modality keywords
 Users can extend the `DefaultTagger`'s keyword dictionary using the `/add_modality_tag` command.
