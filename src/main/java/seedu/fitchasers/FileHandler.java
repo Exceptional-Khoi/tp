@@ -12,6 +12,7 @@ import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -181,6 +182,57 @@ public class FileHandler {
             throw new IOException("WeightRecord class not found", e);
         }
     }
+
+    /**
+     * Saves the user's goal weight and the date it was set to a data file named {@code goal.dat}.
+     * <p>
+     * The file is stored inside the application's data directory, created automatically if it does not exist.
+     * This method overwrites any existing goal data.
+     * </p>
+     *
+     * @param goalWeight the target goal weight to be saved (in kilograms)
+     * @param setDate    the {@link LocalDate} when the goal weight was set
+     * @throws IOException if an I/O error occurs while writing to the file
+     */
+    public void saveGoal(double goalWeight, LocalDate setDate) throws IOException {
+        ensureDataDir();
+        Path filePath = dataDir.resolve("goal.dat");
+        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
+            out.writeDouble(goalWeight);
+            out.writeLong(setDate.toEpochDay());
+        }
+    }
+
+    /**
+     * Loads the saved goal weight and the date it was set from the data file {@code goal.dat}.
+     * <p>
+     * If the file does not exist, this method returns {@code null}.
+     * Otherwise, it reads two values in the following order:
+     * <ul>
+     *     <li>The goal weight as a {@code double}</li>
+     *     <li>The date the goal was set, represented as a {@code long} epoch day value</li>
+     * </ul>
+     * The method then returns both values as an array of {@link Double} objects,
+     * where index 0 is the goal weight, and index 1 is the epoch day of the goal date.
+     * </p>
+     *
+     * @return a {@code Double[]} array containing [goalWeight, epochDay], or {@code null} if no data file exists
+     * @throws IOException if an I/O error occurs while reading from the file
+     */
+    public Double[] loadGoal() throws IOException {
+        ensureDataDir();
+        Path filePath = dataDir.resolve("goal.dat");
+        if (Files.notExists(filePath)) {
+            return null;
+        }
+
+        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
+            double goal = in.readDouble();
+            long epochDay = in.readLong();
+            return new Double[]{goal, (double) epochDay};
+        }
+    }
+
     // ----------------- Username -----------------
     /**
      * Saves the person's name to a file for future sessions.
