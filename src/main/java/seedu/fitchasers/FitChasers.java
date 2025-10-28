@@ -202,7 +202,7 @@ public class FitChasers {
                     // Format: /add_exercise n/NAME r/REPS
                     workoutManager.addExercise(argumentStr);
                     break;
-
+                //@@author Kart04
                 case "/add_modality_tag":
                 case "amot": {
 
@@ -343,7 +343,7 @@ public class FitChasers {
 
                     break;
                 }
-
+                //@@author
                 case "/add_set":
                 case "as":
                     // Format: /add_set r/REPS
@@ -369,7 +369,7 @@ public class FitChasers {
                 case "o":
                     viewLog.openByIndex(Integer.parseInt(argumentStr));
                     break;
-
+                //@@author Kart04
                 case "/del_workout":
                 case "d":
                     // Format: /del_workout WORKOUT_NAME
@@ -382,7 +382,7 @@ public class FitChasers {
                         workoutManager.deleteWorkout(argumentStr);
                     }
                     break;
-
+                //@@author
                 case "/exit":
                 case "e":
                     ui.showMessage("Saving your progress...");
