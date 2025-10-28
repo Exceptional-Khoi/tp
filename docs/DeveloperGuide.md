@@ -456,6 +456,7 @@ amt m/CHEST k/bench   → success
 
 ```
 /override_workout_tag id/1 newTag/LEG_DAY → success (tag updated & saved)
+
 owt id/1 newTag/LEG_DAY → success (tag updated & saved)
 ```
 
@@ -478,6 +479,7 @@ owt id/1 newTag/LEG_DAY → success (tag updated & saved)
 
 ```
 /gym_where n/squat → success (lists gyms that support the exercise)
+
 gw n/bench         → success
 ```
 
@@ -499,6 +501,7 @@ gw n/bench         → success
 
 ```
 /gym_page p/1 → success (shows equipment table for gym #1)
+
 gp p/2        → success
 ```
 
@@ -522,6 +525,7 @@ gp p/2        → success
 
 ```
 /exit → saves data and exits
+
 e     → saves data and exits
 ```
 
@@ -579,6 +583,11 @@ Process:
 The following sequence diagram shows the interaction between components when a workout is created
 and tags are auto-generated:
 ![Alt text](../docs/diagrams/Sequence Digram for tagging.png "Sequence Diagram for Tagging")
+### Sequence Diagram for creating a workout
+
+### Sequence Diagram for adding an exercise to current workout
+
+### Sequence Diagram for adding a set to the current exercise 
 
 ### Manual Tag Method
 #### Adding modality keywords
