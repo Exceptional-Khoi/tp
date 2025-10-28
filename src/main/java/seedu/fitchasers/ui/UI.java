@@ -52,8 +52,8 @@ public class UI {
     public String enterName() {
         while (true) {
             String name = readInsideRightBubble("You", "Enter your name > ");
-            if (name == null) return null;
-            if (!name.trim().isEmpty()) return name.trim();
+            if (name == null) { return null; }
+            if (!name.trim().isEmpty()) { return name.trim(); }
             showError("Name cannot be empty. Please try again!");
         }
     }
@@ -184,10 +184,10 @@ public class UI {
     public boolean confirmationMessage() {
         while (true) {
             String ans = readInsideRightBubble("You", "Confirm (Y/N) > ");
-            if (ans == null) return false;
+            if (ans == null) { return false; }
             String lower = ans.trim().toLowerCase();
-            if (lower.equals("y") || lower.equals("yes")) return true;
-            if (lower.equals("n") || lower.equals("no")) return false;
+            if (lower.equals("y") || lower.equals("yes")) { return true; }
+            if (lower.equals("n") || lower.equals("no")) { return false; }
             showError("Please answer Y or N (yes/no).");
         }
     }
