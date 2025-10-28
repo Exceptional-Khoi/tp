@@ -11,7 +11,7 @@ The Architecture Diagram given above explains the high-level design of FitChaser
 Given below is a quick overview of main components and how they interact with each other.
 
 #### Main components of the architecture
-![Alt text](docs/diagrams/FitChaser_Architecture.jpg "Basic Architecture")
+![Alt text](../docs/diagrams/FitChaser_Architecture.jpg "Basic Architecture")
 FitChasers (consisting of classes FitChasers and Managers) is in charge of the app launch and shut down.
 At app launch, it initializes and loads the components and data in the correct sequence, and connects them up with each other.
 At shut down, it shuts down the other components and invokes cleanup methods where necessary.
@@ -73,6 +73,7 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 
 The `WorkoutManager` component is responsible for managing all workout-related operations in FitChasers, including 
 workout creation, exercise tracking, and workout history management.
+
 ![Alt text](../docs/diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
 ### Overview
 The `WorkoutManager` acts as the central controller for workout operations. It maintains a list of completed workouts 
@@ -208,7 +209,7 @@ exercise modalities (e.g., cardio, strength) and muscle groups (e.g., legs, ches
 This enables users to quickly identify workout types and track training patterns over time.
 
 ### Class Diagram
-![Alt text](docs/diagrams/Class_Diagram_for_tagging_2.png "Class Diagram for Tagging")
+![Alt text](../docs/diagrams/Class_Diagram_for_tagging_2.png "Class Diagram for Tagging")
 
 Key Relationships:
 - Dependency: `WorkoutManager` depends on the `Tagger` interface for tag suggestion services
@@ -237,7 +238,7 @@ Process:
 ### Sequence Diagram
 The following sequence diagram shows the interaction between components when a workout is created
 and tags are auto-generated:
-![Alt text](docs/diagrams/Sequence Digram for tagging.png "Sequence Diagram for Tagging")
+![Alt text](../docs/diagrams/Sequence Digram for tagging.png "Sequence Diagram for Tagging")
 
 ### Manual Tag Method
 #### Adding modality keywords
