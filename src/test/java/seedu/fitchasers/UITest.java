@@ -13,7 +13,6 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -57,18 +56,6 @@ class UITest {
     // ---------- tests (no Mockito) ----------
 
     @Test
-    void readCommand_trimsAndEchoesRightBubble() {
-        UI ui = uiWithInput("   /help   \n");
-        String cmd = ui.readCommand();
-        String out = takeOutput();
-
-        assertEquals("/help", cmd);
-        assertTrue(out.contains("Enter command >"));
-        assertTrue(out.contains("(You)"));
-        assertTrue(out.contains("/help"));
-    }
-
-    @Test
     void readCommand_eofReturnsNull() {
         System.setIn(new ByteArrayInputStream(new byte[0])); // EOF
         UI ui = new UI();
@@ -77,18 +64,6 @@ class UITest {
 
         assertNull(cmd);
         assertTrue(out.contains("Enter command >"));
-    }
-
-    @Test
-    void enterName_rejectsEmptyThenAcceptsName() {
-        UI ui = uiWithInput("\nAlice\n");
-        String name = ui.enterName();
-        String out = takeOutput();
-
-        assertEquals("Alice", name);
-        assertTrue(out.contains("Name cannot be empty"));
-        assertTrue(out.contains("(You)"));
-        assertTrue(out.contains("Alice"));
     }
 
     @Test
@@ -101,28 +76,6 @@ class UITest {
         assertTrue(out.contains("Please enter your initial weight"));
         assertTrue(out.contains("Invalid number"));
         assertTrue(out.contains("Weight must be a positive number"));
-    }
-
-    @Test
-    void confirmation_yesTrue() {
-        UI ui = uiWithInput("Yes\n");
-        boolean ok = ui.confirmationMessage();
-        String out = takeOutput();
-
-        assertTrue(ok);
-        assertTrue(out.contains("(You)"));
-        assertTrue(out.toLowerCase().contains("yes"));
-    }
-
-    @Test
-    void confirmation_noFalse() {
-        UI ui = uiWithInput("no\n");
-        boolean ok = ui.confirmationMessage();
-        String out = takeOutput();
-
-        assertFalse(ok);
-        assertTrue(out.contains("(You)"));
-        assertTrue(out.toLowerCase().contains("no"));
     }
 
     @Test

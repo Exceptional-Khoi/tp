@@ -38,6 +38,77 @@
 
 {list here sources of all reused/adapted ideas, code, documentation, and third-party libraries -- include links to the original source as well}
 
+## Setting up and getting started
+
+### Setting up the project in your computer
+
+Follow the steps in this guide precisely. Things may not work if you deviate at some steps.
+1. Fork this repo to your own GitHub account, then clone your fork to your computer:
+```commandline
+git clone https://github.com/AY2526S1-CS2113-W14-3/tp.git
+```
+2. If you plan to use IntelliJ IDEA (highly recommended):
+- Configure the JDK (Java 17): Follow the guide [se-edu/guides] IDEA: Configuring the JDK to ensure IntelliJ uses JDK 17.
+- Import as a Gradle project: Follow [se-edu/guides] IDEA: Importing a Gradle project to import this project into IDEA.
+
+**Note:** Importing a Gradle project is slightly different from importing a normal Java project.
+
+3. Verify the setup:
+
+- **Run the app:** Run the main class seedu.fitchasers.FitChasers and try a few commands:
+```commandline
+h (or /help)
+aw w/70.2 d/29/10/25
+cw n/Push Day d/29/10/25 t/1830
+e (to exit and save)
+```
+- **Run the test:** Execute the test task to ensure all pass:
+```commandline
+./gradlew test
+```
+
+### Before writing code
+
+#### Configure the coding style
+If using IntelliJ IDEA, follow [se-edu/guides] IDEA: Configuring the code style to match the project’s conventions (indentation, imports, wrapping, etc.).
+**Tips** Optionally, follow [se-edu/guides] Using Checkstyle to enable Checkstyle in IDEA so style issues are reported as you code.
+
+#### Set up CI
+This repository already includes GitHub Actions workflow files in .github/workflows/.
+When GitHub detects these, CI runs automatically for pushes to the master branch and any pull requests. No extra setup required.
+
+#### Learn the design
+When you are ready to start coding, get an overview of FitChasers’ architecture and flow:
+- Read the Architecture section of this DG (module boundaries and data flow).
+- Skim the high-level package responsibilities:
+  - `seedu.fitchasers.ui` – chat-bubble UI, input readers, prompts.
+  - `seedu.fitchasers.workouts` – core domain (Workout, Exercise, WorkoutManager).
+  - `seedu.fitchasers.user` – Person, WeightManager, weight graph utilities.
+  - `seedu.fitchasers.tagger` – auto-tagging (Modality, MuscleGroup, DefaultTagger).
+  - `seedu.fitchasers.gym` – gym metadata and equipment display.
+  - `seedu.fitchasers` – entry point (FitChasers), FileHandler, app wiring.
+
+#### Do the tutorials
+These short hands-on tutorials will help you become familiar with the codebase:
+1. Tracing code
+- Start from `FitChasers.main()` and trace a simple command like `/help`.
+- Follow how `UI.readCommand()` feeds the command loop and how handlers route to managers (e.g., `WorkoutManager`, `WeightManager`).
+2. Adding a new command
+- Add a new command keyword (e.g., `/stats`) to the `switch (command)` in FitChasers.
+- Parse flags using the existing pattern (e.g., `n/`, `d/`, `t/`).
+- Implement the feature in the appropriate manager (domain logic) and expose minimal UI changes (messages only).
+- Add tests for:
+  - command parsing (valid/invalid flags), 
+  - domain behavior,
+  - output messages (strip ANSI when asserting).
+3. Removing or changing fields
+- If modifying domain models (e.g., `Workout`), ensure:
+  - Serialization/deserialization in `FileHandler` remains compatible (or include a migration).
+  - UI and tagger logic are updated accordingly.
+  - Tests covering JSON persistence and rendering are updated.
+
+That’s it — once you can launch the app, run a few commands, and pass the tests, you’re ready to contribute!
+
 ## Design & implementation
 
 ### Design
@@ -60,7 +131,7 @@ The bulk of the app’s work is done by the following six components:
 7) Commons: represents a collection of classes used by multiple other components.
 
 
-How the architecture components interact with each other
+#### How the architecture components interact with each other
 
 The Sequence Diagram below shows how the components interact with each other for the scenario where the user issues the command /create_workout pushup.
 ![Alt text](../docs/diagrams/Architectural_Sequence_Diagram_CW.png "Basic Architecture Sequence Diagram")
@@ -86,6 +157,7 @@ The system ensures data integrity and transparency — users can view, export, a
 Overall, FitChasers empowers users to understand their progress and stay motivated without unnecessary complexity.
 
 ## User Stories
+
 | Version | As a ... | I want to ... | So that I can ... |
 |----------|-----------|---------------|-------------------|
 | v1.0 | new user | see a welcome message and list of commands | know how to start using the app |
@@ -121,6 +193,71 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 - The system should be platform-independent (tested on Windows, macOS, Linux).
 - Error messages must be clear, consistent, and user-friendly.
 - The system should launch without internet connectivity.
+
+## UI Component
+The API of this component is specified in seedu.fitchasers.ui.UI.
+
+![img.png](img.png)
+
+### Structure of the UI component
+FitChasers uses a single-process, console (CLI) UI with a chat-bubble presentation. There is no JavaFX; instead, the UI renders styled text (ANSI colors, box drawing) to `System.out` and reads user input from `System.in`.
+
+###Key classes
+UI — the façade for all user I/O. Owns the `Scanner`, prints chat bubbles, and provides high-level input helpers (e.g., `readCommand()`, `enterName()`, `confirmationMessage()`).
+
+
+###Console layout
+- Left bubble: system responses from FitChasers (sender: `{^o^} FitChaser`).
+- Right bubble: user input (sender: `(You)`), with the caret located inside the right bubble.
+- Width and padding are controlled by `CONSOLE_WIDTH`, `PADDING`, and `FRAME_OVERHEAD` constants.
+
+```commandline
+{^o^} FitChaser
++---------------------------------------------+
+|  Welcome back, Nary!                        |
++---------------------------------------------+
+
+
+                                              (You)
+                                              +------------------------------+
+                                              |  Enter command > █          |
+                                              +------------------------------+
+```
+
+### Responsibilities
+The UI component:
+- Executes user commands via the application loop:
+  - App (in FitChasers) calls ui.readCommand().
+  - App parses the command and calls the appropriate domain method.
+  - App passes domain output (or exceptions) back to UI for presentation via showMessage(...) / showError(...).
+- Listens to model changes indirectly: Domain managers return updated entities/strings; UI redraws views (e.g., ViewLog.render(...) for monthly logs).
+
+
+Responsibilities
+
+The UI component:
+
+Executes user commands via the application loop:
+
+App (in FitChasers) calls `ui.readCommand()`.
+
+App parses the command and calls the appropriate domain method.
+
+App passes domain output (or exceptions) back to UI for presentation via `showMessage(...)` / `showError(...)`.
+
+Listens to model changes indirectly:
+
+Domain managers return updated entities/strings; UI redraws views (e.g., `ViewLog.render(...)` for monthly logs).
+
+Keeps references to logic/domain only at the composition points:
+
+ViewLog receives WorkoutManager + FileHandler (read-only usage).
+
+UI itself keeps no domain state; it is a pure I/O boundary.
+
+Depends on model types for display:
+
+E.g., displayDetailsOfWorkout(Workout workout) formats fields (name, date, duration, tags, exercises) for the left bubble.
 
 ## WorkoutManager component
 **API**: [`WorkoutManager.java`](https://github.com/AY2526S1-CS2113-W14-3/tp/blob/master/src/main/java/seedu/fitchasers/WorkoutManager.java)

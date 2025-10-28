@@ -35,47 +35,31 @@ public class UI {
     // Input
     // -----------------------------
     public String readCommand() {
-        System.out.print(MAGENTA + "Enter command > " + RESET);
-        if (!scanner.hasNextLine()) {
-            return null; // EOF
-        }
-
-        String input = scanner.nextLine();
-        assert input != null : "User input should never be null";
-
-        // Display user input as chat bubble on right
-        System.out.println(rightBubble("You", input));
-
-        return input.trim();
+        return readInsideRightBubble("You", "Enter command > ");
     }
 
+
     public String enterSelection() {
-        System.out.print(MAGENTA + "Enter the number/numbers of the workout to be deleted > " + RESET);
-        if (!scanner.hasNextLine()) {
+        String s = readInsideRightBubble("You", "Enter the number/numbers of the workout to be deleted > ");
+        if (s == null || s.isEmpty()) {
             showError("No input detected.");
             return null;
         }
-        String input = scanner.nextLine();
-        System.out.println(rightBubble("You", input));
-        return input.trim();
+        return s.trim();
     }
 
+
     public String enterName() {
-        String name = "";
-        while (name.isEmpty()) {
-            System.out.print(MAGENTA + "Enter your name > " + RESET);
-            if (scanner.hasNextLine()) {
-                name = scanner.nextLine().trim();
-                if (name.isEmpty()) {
-                    showError("Name cannot be empty. Please try again!");
-                } else {
-                    System.out.println(rightBubble("You", name));
-                }
-            } else {
+        while (true) {
+            String name = readInsideRightBubble("You", "Enter your name > ");
+            if (name == null) {
                 return null;
             }
+            if (!name.trim().isEmpty()) {
+                return name.trim();
+            }
+            showError("Name cannot be empty. Please try again!");
         }
-        return name;
     }
 
     /**
@@ -202,15 +186,20 @@ public class UI {
     }
 
     public boolean confirmationMessage() {
-        System.out.print(MAGENTA + "Confirm (Y/N) > " + RESET);
-        if (!scanner.hasNextLine()) {
-            return false;
+        while (true) {
+            String ans = readInsideRightBubble("You", "Confirm (Y/N) > ");
+            if (ans == null) {
+                return false;
+            }
+            String lower = ans.trim().toLowerCase();
+            if (lower.equals("y") || lower.equals("yes")) {
+                return true;
+            }
+            if (lower.equals("n") || lower.equals("no")) {
+                return false;
+            }
+            showError("Please answer Y or N (yes/no).");
         }
-        String confirmation = scanner.nextLine().trim();
-        System.out.println(rightBubble("You", confirmation));
-        confirmation = confirmation.toLowerCase();
-        assert confirmation != null : "Confirmation input must not be null";
-        return confirmation.equals("y") || confirmation.equals("yes");
     }
 
     public void displayDetailsOfWorkout(Workout workout) {
@@ -336,40 +325,35 @@ public class UI {
         return sb.toString();
     }
 
-    private String rightBubble(String sender, String message) {
-        String[] rawLines = stripAnsi(message).split("\\R", -1);
-        List<String> lines = new ArrayList<>();
-        int contentMax = Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD - PADDING * 2);
-
-        for (String raw : rawLines) {
-            lines.addAll(wrapLine(raw, contentMax));
-        }
-
-        int innerWidth = 0;
-        for (String l : lines) {
-            innerWidth = Math.max(innerWidth, l.length() + PADDING * 2);
-        }
-        innerWidth = Math.min(innerWidth, Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD));
-
-        String top = CYAN + "+" + "-".repeat(clampNonNeg(innerWidth)) + "+" + RESET;
-        String bottom = CYAN + "+" + "-".repeat(clampNonNeg(innerWidth)) + "+" + RESET;
-
+    private String readInsideRightBubble(String sender, String prompt) {
+        // Bubble = 2/3 console
+        int innerWidth = Math.max(1, (int) (CONSOLE_WIDTH * 3.0 / 5) - FRAME_OVERHEAD);
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
+        int contentMax = Math.max(1, innerWidth - PADDING * 2);
 
-        StringBuilder sb = new StringBuilder();
-        sb.append(" ".repeat(pad))
-                .append(LIGHT_YELLOW).append("(").append(sender).append(")").append(RESET).append("\n");
-        sb.append(" ".repeat(pad)).append(top).append("\n");
-        for (String l : lines) {
-            int spaces = clampNonNeg(innerWidth - l.length() - PADDING);
-            sb.append(" ".repeat(pad))
-                    .append(CYAN).append("|").append(RESET)
-                    .append(CYAN).append(" ".repeat(PADDING)).append(l)
-                    .append(" ".repeat(spaces))
-                    .append("|").append(RESET)
-                    .append("\n");
+        String top = CYAN + "+" + "-".repeat(innerWidth) + "+" + RESET;
+        String bottom = CYAN + "+" + "-".repeat(innerWidth) + "+" + RESET;
+        String leftPrefix = " ".repeat(pad) + CYAN + "|" + RESET + CYAN + " ".repeat(PADDING) + RESET;
+
+        // Header + top
+        System.out.println(" ".repeat(pad) + LIGHT_YELLOW + "(" + sender + ")" + RESET);
+        System.out.println(" ".repeat(pad) + top);
+
+        // In dòng prompt bên trong bubble (KHÔNG xuống dòng)
+        System.out.print(leftPrefix + prompt);
+        System.out.flush();
+
+        if (!scanner.hasNextLine()) {
+            System.out.println();
+            System.out.println(" ".repeat(pad) + bottom);
+            return null;
         }
-        sb.append(" ".repeat(pad)).append(bottom);
-        return sb.toString();
+
+        String input = scanner.nextLine();
+        String trimmed = input.trim();
+
+        System.out.println(" ".repeat(pad) + bottom);
+
+        return trimmed;
     }
 }
