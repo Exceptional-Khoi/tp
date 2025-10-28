@@ -84,53 +84,54 @@ public class ViewLog {
         int start = (current - 1) * pageSize;
         int end = Math.min(start + pageSize, sorted.size());
 
-        ui.showMessage(String.format("Workouts for %s (%d total) — Page %d/%d",
+        StringBuilder buf = new StringBuilder();
+        buf.append(String.format("Workouts for %s (%d total) — Page %d/%d%n",
                 p.ym, sorted.size(), current, Math.max(1, totalPages)));
 
         if (sorted.isEmpty()) {
-            ui.showMessage("No workouts this month.");
+            buf.append("No workouts this month.");
+            ui.showMessage(buf.toString());
             return;
         }
 
         if (!p.detailed) {
-            ui.showMessage(String.format("%-4s %-20s %-22s %-10s", "ID", "Date", "Name", "Duration"));
+            buf.append(String.format("%-4s %-20s %-22s %-10s%n", "ID", "Date", "Name", "Duration"));
         }
 
         for (int i = start; i < end; i++) {
             Workout w = sorted.get(i);
             int rowNum = i + 1; // 1-based across the month
-
             if (p.detailed) {
-                renderDetailedRow(rowNum, w);
+                buf.append(renderDetailedRow(rowNum, w));
             } else {
-                renderCompactRow(rowNum, w);
+                buf.append(renderCompactRow(rowNum, w));
             }
         }
 
-        ui.showMessage("Tip: /view_log -m 10 2 (next page Oct), /view_log --search run, /open <ID>.");
+        buf.append("Tip: /view_log -m 10 2 (next page Oct), /view_log --search run, /open <ID>.");
+        ui.showMessage(buf.toString());
     }
 
-    private void renderCompactRow(int id, Workout w) {
-        String date = formatDayMon(w.getWorkoutEndDateTime());     // e.g., Mon 30 Jun
+    private String renderCompactRow(int id, Workout w) {
+        String date = formatDayMon(w.getWorkoutEndDateTime());
         String name = truncate(safe(w.getWorkoutName()), 22);
-        String dur = formatDuration(w.getDuration()); // e.g., 1h 15m
-        ui.showMessage(String.format("%-4d %-20s %-22s %-10s", id, date, name, dur));
+        String dur  = formatDuration(w.getDuration());
+        return String.format("%-4d %-20s %-22s %-10s%n",
+                id, safe(date), safe(name), safe(dur));
     }
 
-    private void renderDetailedRow(int id, Workout workout) {
-        String dateLong = formatLong(workout.getWorkoutEndDateTime());   // e.g., Monday 30th of June, 6:00 PM
+
+    private String renderDetailedRow(int id, Workout workout) {
+        String dateLong = formatLong(workout.getWorkoutEndDateTime());
         String dur = formatDuration(workout.getDuration());
-
-        ui.showMessage("—".repeat(60));
-        ui.showMessage(String.format("#%d  %s", id, safe(workout.getWorkoutName())));
-        ui.showMessage("Date     : " + dateLong);
-        ui.showMessage("Duration : " + dur);
-        //String type = safe(workout.getType());
-        String tags = workout.getAllTags().toString();                  // "-" if none
-        //ui.showMessage("Type     : " + (type.isBlank() ? "-" : type));
-        ui.showMessage("Tags     : " + (tags.isBlank() ? "-" : tags));
-        // Add more fields from Workout here (sets/reps, notes, RPE, etc.)
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("—".repeat(60)).append('\n');
+        sb.append(String.format("#%d  %s%n", id, safe(workout.getWorkoutName())));
+        sb.append("Date     : ").append(dateLong).append('\n');
+        sb.append("Duration : ").append(dur).append('\n');
+        String tags = workout.getAllTags().toString();
+        sb.append("Tags     : ").append((tags.isBlank() ? "-" : tags)).append('\n');
+        return sb.toString();
     }
 
     /* ------------------------------ Commands API ----------------------------- */

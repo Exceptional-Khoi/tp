@@ -217,6 +217,7 @@ public class Person implements Serializable {
             }
         }
 
+
         boolean[][] isWeightPoint = new boolean[height][width];
         for (int i = 0; i < displayWeights.size(); i++) {
             int x = i * spacing;
@@ -226,6 +227,7 @@ public class Person implements Serializable {
                 isWeightPoint[yy][x] = true;
             }
         }
+
 
         final String reset = "\u001B[0m";
         final String orange = "\u001B[1m\u001B[38;5;208m";
@@ -260,11 +262,13 @@ public class Person implements Serializable {
             System.out.println();
         }
 
+
         System.out.print("        ");
         for (int j = 0; j < width + 4; j++) {
             System.out.print('_');
         }
         System.out.println();
+
 
         System.out.print("        ");
         for (int i = 0; i < displayDates.size(); i++) {
