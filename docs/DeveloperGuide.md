@@ -1,5 +1,39 @@
 # Developer Guide
 
+## Table of Contents
+- [Acknowledgements](#acknowledgements)
+- [Design & Implementation](#design--implementation)
+    - [Design](#design)
+    - [Main Components of the Architecture](#main-components-of-the-architecture)
+    - [How the Architecture Components Interact](#how-the-architecture-components-interact)
+- [Product Scope](#product-scope)
+    - [Target User Profile](#target-user-profile)
+    - [Value Proposition](#value-proposition)
+- [User Stories](#user-stories)
+- [Non-Functional Requirements](#non-functional-requirements)
+- [WorkoutManager Component](#workoutmanager-component)
+- [Glossary](#glossary)
+- [Instructions for Manual Testing](#instructions-for-manual-testing)
+    - [Help](#help)
+    - [Set Name](#set-name)
+    - [Create Workout](#create-workout)
+    - [Add Exercise](#add-exercise)
+    - [Add Set](#add-set)
+    - [End Workout](#end-workout)
+    - [View Log](#view-log)
+    - [Exit](#exit)
+- [Tagging and Categorization](#tagging-and-categorization)
+    - [Design](#design-1)
+    - [Class Diagram](#class-diagram)
+    - [Sequence Diagram](#Sequence-Diagram)
+    - [Implementation](#implementation)
+    - [Manual Tag Method](#manual-tag-method)
+    - [Important Design Decision](#important-design-decision)
+    - [Design Consideration](#design-consideration)
+    - [Future Enhancements](#future-enhancements)
+- [Notes](#notes)
+
+
 ## Acknowledgements
 
 {list here sources of all reused/adapted ideas, code, documentation, and third-party libraries -- include links to the original source as well}
@@ -11,7 +45,7 @@ The Architecture Diagram given above explains the high-level design of FitChaser
 Given below is a quick overview of main components and how they interact with each other.
 
 #### Main components of the architecture
-![Alt text](../docs/diagrams/FitChaser_Architecture.jpg "Basic Architecture")
+![Alt text](docs/diagrams/FitChaser_Architecture.jpg "Basic Architecture")
 FitChasers (consisting of classes FitChasers and Managers) is in charge of the app launch and shut down.
 At app launch, it initializes and loads the components and data in the correct sequence, and connects them up with each other.
 At shut down, it shuts down the other components and invokes cleanup methods where necessary.
@@ -45,6 +79,8 @@ Our target users include:
 
 ### Value proposition
 
+{Describe the value proposition: what problem does it solve?}
+
 FitChasers provides an intuitive, local, and command-based way to track your workouts and progress over time.
 Unlike most fitness apps that require constant internet access or sign-ins, FitChasers focuses on simplicity and data ownership.
 It helps users build consistency by making fitness tracking fast and rewarding, using summaries and visualization features.
@@ -52,10 +88,6 @@ The system ensures data integrity and transparency — users can view, export, a
 Overall, FitChasers empowers users to understand their progress and stay motivated without unnecessary complexity.
 
 ## User Stories
-
-## User Stories
-## User Stories
-
 | Version | As a ... | I want to ... | So that I can ... |
 |----------|-----------|---------------|-------------------|
 | v1.0 | new user | see a welcome message and list of commands | know how to start using the app |
@@ -82,7 +114,6 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 | v2.2 | user | filter workouts by date or name | quickly find a specific workout from my log |
 | v2.2 | user | view total training time for a given week or month | measure overall workout consistency |
 
-
 ## Non-Functional Requirements
 
 - The system should respond to commands within 1 second under normal usage.
@@ -98,8 +129,7 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 
 The `WorkoutManager` component is responsible for managing all workout-related operations in FitChasers, including 
 workout creation, exercise tracking, and workout history management.
-
-![Alt text](../docs/diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
+![Alt text](docs/diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
 ### Overview
 The `WorkoutManager` acts as the central controller for workout operations. It maintains a list of completed workouts 
 and tracks the current active workout session. 
@@ -115,119 +145,458 @@ The component handles:
 ## Glossary
 
 Mainstream OS: Windows, Linux, Unix, MacOS
-Workout: The theme of the workout
-Set: Sets of Exercises of certain repetition
-Modality: Type of training, strength/cardio/endurance
+
+| Term                         | Definition                                                                                     |
+| ---------------------------- | ---------------------------------------------------------------------------------------------- |
+| **Active Workout**           | The workout session that is currently in progress.                                             |
+| **Command**                  | A user instruction starting with a verb (e.g., `/add_weight`, `/create_workout`, `/view_log`). |
+| **Completed Workout**        | A workout session that has been ended and saved to history.                                    |
+| **Date format**              | `dd/MM/yy`, e.g., `26/10/25` (used with `d/`).                                                 |
+| **Exercise**                 | A specific physical activity performed during a workout (e.g., bench press, push-ups, squats). |
+| **FileHandler**              | Component responsible for persistence (reading/writing app data on disk).                      |
+| **FitChasers (app)**         | The main application that wires UI, logic, and storage; runs the command loop.                 |
+| **Manager**                  | Service object that encapsulates a feature area (e.g., `WeightManager`, `WorkoutManager`).     |
+| **Modality**                 | The type of exercise (e.g., cardio, strength).                                                 |
+| **Muscle Group**             | The primary muscles targeted by an exercise (e.g., legs, chest).                               |
+| **Parameter token / Prefix** | Short marker introducing an argument (e.g., `n/` name, `d/` date, `t/` time, `w/` weight).     |
+| **Parsing**                  | Converting raw command text into a structured request (command + arguments).                   |
+| **Persistence**              | Saving/loading data between runs (handled by `FileHandler`).                                   |
+| **Person**                   | Domain entity representing the user; owns profile and histories.                               |
+| **Prompt**                   | The UI input line where the user types commands.                                               |
+| **Repetition (Rep)**         | A single complete motion of an exercise.                                                       |
+| **Set (workout)**            | A group of consecutive repetitions of an exercise (e.g., “Set 2 → Reps: 14”).                  |
+| **Storage**                  | The persistence layer; the files managed by `FileHandler`.                                     |
+| **Tag**                      | A label assigned to workouts for categorization (e.g., `cardio`, `strength`).                  |
+| **Time format**              | `HHmm` 24-hour time for `t/` tokens (e.g., `1900` = 7:00 PM).                                  |
+| **UI**                       | Presentation layer handling all user I/O (printing messages, reading input).                   |
+| **Validation**               | Checks that inputs satisfy constraints (e.g., numeric weight, date not in the future).         |
+| **ViewLog**                  | Component that formats and displays logs/history for the user.                                 |
+| **WeightManager**            | Feature service for creating, validating, and listing weight entries.                          |
+| **WeightRecord**             | Domain object holding a single weight entry (value + date).                                    |
+| **Workout**                  | A session of physical exercise consisting of various exercises and sets.                       |
 
 # Instructions for manual testing
-
-{Give instructions on how to do a manual product testing e.g., how to load sample data to be used for testing}
-
-## Create Workout
-
-
-### Success Case
-```
-/create_workout n/Push d/23/10/25 t/0700 → success
-```
-
-### Prompt for Missing Fields
-```
-/create_workout n/Push → prompts for missing date/time (Y/N)
-```
-
-### Error Cases
-```
-/create_workout n/ → error with usage
-/create_workout → error with usage (missing n/)
-```
-
-**Usage:** `/create_workout n/<name> d/<date> t/<time>`
-
----
-
-## Add Exercise & Sets
+## Help
 
 ### Success Cases
+
 ```
-/add_exercise n/PushUp r/12 → success
-/add_set r/15 → success
+/help → shows all commands
+
+h     → shows all commands
 ```
 
 ### Error Cases
+
 ```
-/add_exercise n/PushUpr/12 → error (needs space before r/)
-/add_set r/ 15 → error (no space after r/)
+(n/a)
 ```
 
-**Usage:**
-- `/add_exercise n/<exercise_name> r/<reps>`
-- `/add_set r/<reps>`
+**Usage:** `/help` (alias: `h`)
 
 ---
 
-## End Workout
+## Set Name
 
-### Success Case
-```
-/end_workout d/23/10/25 t/0830 → success if after start
-```
+### Success Cases
 
-### Prompt for Missing Fields
 ```
-Missing parts → Y/N prompts
+/rename n/Nitin → success (name saved)
+
+rn n/Ana   → success
 ```
 
 ### Error Cases
+
 ```
-/end_workout d/23/10/25 t/0700 → error if before start time
-malformed parts → error + return
+/my_name           → error (missing n/)
+/my_name n/       → error (empty name)
+/my_name n/<31+ chars> → error (name too long; max 30)
 ```
 
-**Usage:** `/end_workout d/<date> t/<time>`
+**Usage:** `/rename n/<name>` (alias: `rn`)
 
 ---
 
 ## Weights
 
 ### Success Cases
+
 ```
 /add_weight w/70.5 d/23/10/25 → success
+
+aw w/70.5 d/23/10/25 → success
 ```
 
 ### Error Cases
+
 ```
-/add_weight w/invalid d/23/10/25 → error (invalid weight)
-/add_weight w/70.5 d/invalid/date → error (invalid date)
-/add_weight w/ d/23/10/25 → error (missing weight value)
+/add_weight w/invalid d/23/10/25     → error (invalid weight)
+/add_weight w/70.5 d/invalid/date    → error (invalid date)
+/add_weight w/ d/23/10/25            → error (missing weight value)
+/add_weight w/70.5 d/<future date>   → error (date cannot be in the future)
 ```
 
-**Usage:** `/add_weight w/<weight> d/<date>`
-
-**Display:** Graph displayed via `Person.displayWeightGraphWithDates()` with clustered dates handled (latest/avg per day as configured).
+**Usage:** `/add_weight w/<weight> d/<dd/MM/yy>` (alias: `aw`)
 
 ---
 
-## Single-Active Workout Rule
+## View Weight
 
-### Error Case
+### Success Cases
+
 ```
-/create_workout n/Legs d/23/10/25 t/0800
-[active workout exists]
-/create_workout n/Arms d/23/10/25 t/0900 → blocked
+/view_weight → shows weight history and graph
 
-→ error: Cannot create a new workout while one is active.
-   Guidance: End current workout first with /end_workout.
+vw           → shows weight history and graph
 ```
 
-**Behavior:** Only one workout can be active at a time. Attempting to create a second workout while one is active will be blocked with guidance to end the current workout first.
+### Error Cases
+
+```
+(none; if no data) → "<name> has no weight records yet."
+```
+
+**Usage:** `/view_weight` (alias: `vw`)
 
 ---
 
-## Date/Time Format
+## Create Workout
 
-- **Date:** `DD/MM/YY` (e.g., `23/10/25`)
-- **Time:** `HHMM` (24-hour format, e.g., `0700`, `1830`)
+### Success Cases
+
+```
+/create_workout n/Push d/23/10/25 t/0700 → success (active workout created)
+
+cw n/Push d/23/10/25 t/0700 → success (active workout created)
+```
+
+### Error Cases
+
+```
+/create_workout                          → error (missing n/)
+/create_workout n/                       → error (empty name)
+/create_workout n/Push d/23/10/25        → error (missing t/)
+/create_workout n/Push t/0700            → error (missing d/)
+/create_workout n/Push d/32/10/25 t/0700 → error (invalid date)
+/create_workout n/Push d/23/10/25 t/2460 → error (invalid time)
+
+[when a workout is already active]
+/create_workout n/Arms d/23/10/25 t/0900 → error (cannot create while another workout is active)
+```
+
+**Usage:** `/create_workout n/<name> d/<dd/MM/yy> t/<HHmm>` (alias: `cw`)
+
+---
+
+## Add Exercise
+
+### Success Cases
+
+```
+/add_exercise n/PushUp r/12 → success (adds exercise to active workout)
+
+ae n/PushUp r/12 → success (adds exercise to active workout)
+```
+
+### Error Cases
+
+```
+/add_exercise                 → error (missing n/ and r/)
+/add_exercise n/PushUp        → error (missing r/)
+/add_exercise n/PushUpr/12    → error (needs space before r/)
+/add_exercise n/ r/12         → error (empty name)
+/add_exercise n/PushUp r/x12  → error (invalid reps)
+
+[no active workout]
+/add_exercise n/PushUp r/12  → error (no active workout)
+```
+
+**Usage:** `/add_exercise n/<exercise_name> r/<reps>` (alias: `ae`)
+
+---
+
+## Add Set
+
+### Success Cases
+
+```
+/add_set r/15 → success (appends set to latest exercise)
+
+as r/15 → success (appends set to latest exercise)
+```
+
+### Error Cases
+
+```
+/add_set         → error (missing r/)
+/add_set r/      → error (missing reps)
+/add_set r/abc   → error (invalid reps)
+
+[no active workout]
+/add_set r/15    → error (no active workout)
+
+[no exercise yet in active workout]
+/add_set r/15    → error (no exercise to attach set)
+```
+
+**Usage:** `/add_set r/<reps>` (alias: `as`)
+
+---
+
+## End Workout
+
+### Success Cases
+
+```
+/end_workout d/23/10/25 t/0830 → success (ends active workout)
+
+ew d/23/10/25 t/0830 → success (ends active workout)
+```
+
+### Error Cases
+
+```
+/end_workout                           → error (missing d/ and t/)
+/end_workout d/23/10/25                → error (missing t/)
+/end_workout t/0830                    → error (missing d/)
+/end_workout d/23/10/25 t/0700         → error (end time before start time)
+/end_workout d/32/10/25 t/0830         → error (invalid date)
+/end_workout d/23/10/25 t/2460         → error (invalid time)
+
+[no active workout]
+/end_workout d/23/10/25 t/0830         → error (no active workout)
+```
+
+**Usage:** `/end_workout d/<dd/MM/yy> t/<HHmm>` (alias: `ew`)
+
+---
+
+## View Log
+
+### Success Cases
+
+```
+/view_log            → success (current month, page 1)
+
+/view_log -m 10      → success (Oct of current year, page 1)
+
+/view_log -m 10 2    → success (Oct, page 2)
+
+/view_log -ym 2024 10 → success (Oct 2024, page 1)
+
+/view_log -m 10 -d   → success (detailed view)
+```
+
+### Error Cases
+
+```
+/view_log -m x          → error (month must be 1..12)
+/view_log -ym 2024 x    → error (month must be 1..12)
+/view_log -ym yyyy mm p → error (page must be positive integer)
+/view_log -q            → error (unknown flag)
+/view_log -m 10 0       → error (page must be positive)
+```
+
+**Usage:**
+
+* `/view_log`
+* `/view_log -m <month 1..12> [page]`
+* `/view_log -ym <year> <month 1..12> [page]`
+* Optional `-d` for detailed view (alias: `vl`)
+
+---
+
+## Open (Workout Details)
+
+### Success Cases
+
+```
+/view_log
+/open 1    → success (opens the 1st listed workout)
+```
+
+### Error Cases
+
+```
+/open           → error (missing index)
+/open abc       → error (index must be an integer)
+/open 999       → error (index out of bounds)
+```
+
+**Usage:** `/open <index>` (alias: `o`)
+
+---
+
+## Delete Workout
+
+### Success Cases
+
+```
+/del_workout Push          → success (delete by name)
+
+/del_workout d/23/10/25    → success (delete by date; interactive path)
+```
+
+### Error Cases
+
+```
+/del_workout                   → error (missing target)
+/del_workout d/99/99/99        → error (invalid date)
+/del_workout NotAWorkout       → error (not found)
+```
+
+**Usage:**
+
+* `/del_workout <WORKOUT_NAME>`
+* `/del_workout d/<dd/MM/yy>` (interactive delete)
+  (aliases: `d`)
+
+---
+
+## Add Modality Tag
+
+### Success Cases
+
+```
+/add_modality_tag m/CARDIO k/hiking   → success (keyword added; workouts retagged)
+amot m/CARDIO k/hiking   → success (keyword added; workouts retagged)
+
+/add_modality_tag m/STRENGTH k/deadlift → success
+amot m/STRENGTH k/deadlift → success
+```
+
+### Error Cases
+
+```
+/add_modality_tag                 → error (missing m/ and k/)
+/add_modality_tag m/CARDIO        → error (missing k/)
+/add_modality_tag k/hiking        → error (missing m/)
+/add_modality_tag m/XYZ k/run     → error (unknown modality)
+```
+
+**Usage:** `/add_modality_tag m/(CARDIO|STRENGTH) k/<keyword>` (alias: `amot`)
+
+---
+
+## Add Muscle Tag
+
+### Success Cases
+
+```
+/add_muscle_tag m/LEGS k/lunges   → success (keyword added; workouts retagged)
+amt m/LEGS k/lunges   → success (keyword added; workouts retagged)
+
+/add_muscle_tag m/CHEST k/bench   → success
+amt m/CHEST k/bench   → success
+```
+
+### Error Cases
+
+```
+/add_muscle_tag                 → error (missing m/ and k/)
+/add_muscle_tag m/LEGS          → error (missing k/)
+/add_muscle_tag k/squat         → error (missing m/)
+/add_muscle_tag m/XYZ k/foo     → error (unknown muscle group)
+```
+
+**Usage:** `/add_muscle_tag m/<MUSCLE_GROUP> k/<keyword>` (alias: `amt`)
+
+---
+
+## Override Workout Tag
+
+### Success Cases
+
+```
+/override_workout_tag id/1 newTag/LEG_DAY → success (tag updated & saved)
+
+owt id/1 newTag/LEG_DAY → success (tag updated & saved)
+```
+
+### Error Cases
+
+```
+/override_workout_tag                    → error (missing id/ and newTag/)
+/override_workout_tag id/1               → error (missing newTag/)
+/override_workout_tag newTag/LEG_DAY     → error (missing id/)
+/override_workout_tag id/x newTag/Y      → error (invalid id)
+```
+
+**Usage:** `/override_workout_tag id/<WORKOUT_ID> newTag/<NEW_TAG>` (alias: `owt`)
+
+---
+
+## Gym Where
+
+### Success Cases
+
+```
+/gym_where n/squat → success (lists gyms that support the exercise)
+
+gw n/bench         → success
+```
+
+### Error Cases
+
+```
+/gym_where           → error (missing n/)
+/gym_where n/        → error (empty exercise)
+/gym_where n/unknown → "Sorry, no gyms found for that exercise."
+```
+
+**Usage:** `/gym_where n/<exercise>` (alias: `gw`)
+
+---
+
+## Gym Page
+
+### Success Cases
+
+```
+/gym_page p/1 → success (shows equipment table for gym #1)
+
+gp p/2        → success
+```
+
+### Error Cases
+
+```
+/gym_page        → error (missing p/)
+/gym_page p/     → error (missing page number)
+/gym_page p/abc  → error (page must be an integer)
+/gym_page p/0    → error (page must be ≥ 1)
+/gym_page p/999  → error (invalid page; out of range)
+```
+
+**Usage:** `/gym_page p/<page_number>` (alias: `gp`)
+
+---
+
+## Exit
+
+### Success Cases
+
+```
+/exit → saves data and exits
+
+e     → saves data and exits
+```
+
+### Error Cases
+
+```
+(n/a; any I/O error is reported before exit)
+```
+
+**Usage:** `/exit` (alias: `e`)
+
+---
+
+### Formats (for reference)
+
+* **Date:** `dd/MM/yy` (e.g., `23/10/25`)
+* **Time:** `HHmm` 24-hour (e.g., `0700`, `1830`)
 
 ---
 
@@ -268,7 +637,12 @@ Process:
 The following sequence diagram shows the interaction between components when a workout is created
 and tags are auto-generated:
 ![Alt text](../docs/diagrams/Sequence Digram for tagging.png "Sequence Diagram for Tagging")
-
+### Sequence Diagram for creating a workout
+![Sequence diagram for creating a workout](diagrams/SD_createw.png)
+### Sequence Diagram for adding an exercise to current workout
+![Sequence diagram for adding an exercise](diagrams/SD_addex.png)
+### Sequence Diagram for adding a set to the current exercise 
+![Sequence diagram for adding a set](diagrams/SD_addset.png)
 ### Manual Tag Method
 #### Adding modality keywords
 Users can extend the `DefaultTagger`'s keyword dictionary using the `/add_modality_tag` command.
