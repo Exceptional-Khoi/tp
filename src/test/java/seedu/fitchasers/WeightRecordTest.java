@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the {@link WeightRecord} class.
@@ -63,9 +64,7 @@ public class WeightRecordTest {
         // Normalize any locale differences
         output = output.replace(',', '.');
 
-        assertEquals(true, output.contains(formattedDate),
-                "toString() should include the formatted date.");
-        assertEquals(true, output.contains("60.0"),
-                "toString() should include the weight value.");
+        assertTrue(output.contains(formattedDate), "toString() should include the formatted date.");
+        assertTrue(output.contains("60.0"), "toString() should include the weight value.");
     }
 }
