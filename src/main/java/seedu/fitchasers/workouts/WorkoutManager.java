@@ -70,11 +70,11 @@ public class WorkoutManager {
             // merge auto-tags if you have a tagger
             Set<String> suggestedTags = tagger.suggest(newWorkout);
             newWorkout.setAutoTags(suggestedTags);
-            System.out.println("Tags generated for workout: " + suggestedTags);
             workouts.add(newWorkout);
             currentWorkout = newWorkout;
             ui.showMessage("New workout sesh incoming!");
-            ui.showMessage("Added workout: " + workoutName);
+            ui.showMessage("Tags generated for workout: " + suggestedTags + "\n"
+                            + "Added workout: " + workoutName);
             fileHandler.saveMonthList(currentLoadedMonth,workouts);
 
         } catch (Exception e) {
@@ -545,10 +545,20 @@ public class WorkoutManager {
             ui.showMessage("No workouts recorded for this selection!");
             return;
         }
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < list.size(); i++) {
             Workout w = list.get(i);
-            ui.showMessage((i + 1) + ". " + w.getWorkoutName() + " - " + w.getWorkoutDateString());
+            sb.append(i + 1)
+                    .append(". ")
+                    .append(w.getWorkoutName())
+                    .append(" - ")
+                    .append(w.getWorkoutDateString());
+
+            if (i < list.size() - 1) {
+                sb.append('\n');
+            }
         }
+        ui.showMessage(sb.toString());
     }
 
     public void interactiveDeleteWorkout(String command, UI ui) throws IOException {
@@ -574,9 +584,7 @@ public class WorkoutManager {
         }
 
         showWorkoutsWIthIndices(targetList);
-        ui.showMessage("Enter the number/numbers of the workout to be deleted:");
-        ui.showMessage("> ");
-        String selection = ui.readCommand();
+        String selection = ui.enterSelection();
 
         String[] tokens = selection.split("\\s+");
         ArrayList<Integer> indicesToDelete = new ArrayList<>();
@@ -721,6 +729,14 @@ public class WorkoutManager {
         currentWorkout.setWorkoutEndDateTime(endDateTime);
         int duration = currentWorkout.calculateDuration();
         currentWorkout.setDuration(duration);
+
+        try {
+            YearMonth monthToSave = YearMonth.from(startTime);
+            fileHandler.saveMonthList(monthToSave, workouts);
+            currentLoadedMonth = monthToSave;
+        } catch (IOException ioe) {
+            ui.showMessage("[Oops] Failed to save updated workout: " + ioe.getMessage());
+        }
 
         ui.showMessage("Workout wrapped! Time to refuel!");
         ui.showMessage(String.format("Workout '%s' ended. Duration: %d minute(s).",

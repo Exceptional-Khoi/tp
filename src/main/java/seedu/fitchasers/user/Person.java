@@ -98,10 +98,16 @@ public class Person implements Serializable {
             return;
         }
         ui.showMessage("Here's your weight, you've been killin' it lately!");
-        ui.showMessage("Weight history for " + name + ":");
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("Weight history for ").append(name).append(":\n");
+
         for (WeightRecord record : weightHistory) {
-            ui.showMessage("  " + record);
+            sb.append("  ").append(record).append("\n");
         }
+
+        ui.showMessage(sb.toString().trim());
+
     }
 
 

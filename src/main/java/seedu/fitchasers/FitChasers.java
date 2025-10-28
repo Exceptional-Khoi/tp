@@ -110,7 +110,7 @@ public class FitChasers {
                 workoutManager.setWorkouts(new ArrayList<>(), currentMonth);
             }
             workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
-            ui.showMessage("Loaded " + currentMonth + " workouts\n");
+            ui.showMessage("Loaded " + currentMonth + " workouts");
         } catch (IOException e) {
             ui.showError(e.getMessage());
         }

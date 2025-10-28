@@ -49,10 +49,21 @@ public class UI {
         return input.trim();
     }
 
+    public String enterSelection() {
+        System.out.print(MAGENTA + "Enter the number/numbers of the workout to be deleted > " + RESET);
+        if (!scanner.hasNextLine()) {
+            showError("No input detected.");
+            return null;
+        }
+        String input = scanner.nextLine();
+        System.out.println(rightBubble("You", input));
+        return input.trim();
+    }
+
     public String enterName() {
         String name = "";
         while (name.isEmpty()) {
-            System.out.print(MAGENTA + "Enter your name: " + RESET);
+            System.out.print(MAGENTA + "Enter your name > " + RESET);
             if (scanner.hasNextLine()) {
                 name = scanner.nextLine().trim();
                 if (name.isEmpty()) {
@@ -77,7 +88,7 @@ public class UI {
         double weight = -1;
         while (weight <= 0) {
             showMessage("Please enter your initial weight (in kg).");
-            System.out.print(MAGENTA + "Enter your weight: " + RESET);
+            System.out.print(MAGENTA + "Enter your weight > " + RESET);
             if (!scanner.hasNextLine()) {
                 showError("No input detected. Exiting weight entry.");
                 return -1;
@@ -100,12 +111,12 @@ public class UI {
     // -----------------------------
     public void showMessage(String message) {
         assert message != null : "Message cannot be null";
-        System.out.println(leftBubble("^_^ FitChaser", message));
+        System.out.println(leftBubble("{^o^} FitChaser", message));
     }
 
     public void showError(String error) {
         assert error != null : "Error message cannot be null";
-        System.out.println(leftBubble("^_^ FitChaser", "[Oops!] " + error));
+        System.out.println(leftBubble("{^o^} FitChaser", "[Oops!] " + error));
     }
 
     public void showGreeting() {
@@ -142,16 +153,16 @@ public class UI {
         showMessage("""
         /help (h)                                 - View all available commands
 
-        --- USER PROFILE ---
+        ~~~ USER PROFILE ~~~
         /my_name (n) n/NAME                       - Set or change your display name
                                                     e.g. /my_name n/Nitin
 
-        --- WEIGHT TRACKING ---
+        ~~~ WEIGHT TRACKING ~~~
         /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
                                                     e.g. /add_weight w/81.5 d/19/10/25
         /view_weight (vw)                         - View your recorded weights and graph
 
-        --- WORKOUT CREATION & LOGGING ---
+        ~~~ WORKOUT CREATION & LOGGING ~~~
         /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
                                                     e.g. /create_workout n/PushDay d/20/10/25 t/1900
         /add_exercise (ae) n/NAME r/REPS          - Add an exercise to current workout
@@ -161,7 +172,7 @@ public class UI {
         /end_workout (ew) d/DATE t/TIME           - End and save current workout
                                                     e.g. /end_workout d/20/10/25 t/2030
 
-        --- WORKOUT LOG MANAGEMENT ---
+        ~~~ WORKOUT LOG MANAGEMENT ~~~
         /view_log (vl)                            - View your workout history
         /open (o) INDEX                           - Open detailed view of a workout
                                                     e.g. /open 1
@@ -170,7 +181,7 @@ public class UI {
         /del_workout (d) d/DATE                   - Delete a workout by date
                                                     e.g. /del_workout d/20/10/25
 
-        --- TAGGING SYSTEM ---
+        ~~~ TAGGING SYSTEM ~~~
         /add_modality_tag (amot) m/(CARDIO/STRENGTH) k/KEYWORD
                                                     - Add a keyword for a workout modality
                                                     e.g. /add_modality_tag m/CARDIO k/hiking
@@ -180,23 +191,25 @@ public class UI {
                                                     - Manually override a workout’s tag
                                                     e.g. /override_workout_tag id/1 newTag/LEG_DAY
 
-        --- GYM FINDER ---
+        ~~~ GYM FINDER ~~~
         /gym_where (gw) n/EXERCISE                - Suggest NUS gyms with equipment for the exercise
                                                     e.g. /gym_where n/squat
         /gym_page (gp) p/PAGE_NUMBER              - View available NUS gym pages
                                                     e.g. /gym_page p/1
 
-        --- SYSTEM ---
+        ~~~ SYSTEM ~~~
         /exit (e)                                 - Save all progress and exit the app """);
     }
 
     public boolean confirmationMessage() {
+        System.out.print(MAGENTA + "Confirm (Y/N) > " + RESET);
         if (!scanner.hasNextLine()) {
             return false;
         }
-        String confirmation = scanner.nextLine().trim().toLowerCase();
-        assert confirmation != null : "Confirmation input must not be null";
+        String confirmation = scanner.nextLine().trim();
         System.out.println(rightBubble("You", confirmation));
+        confirmation = confirmation.toLowerCase();
+        assert confirmation != null : "Confirmation input must not be null";
         return confirmation.equals("y") || confirmation.equals("yes");
     }
 
@@ -313,11 +326,11 @@ public class UI {
         sb.append(top).append("\n");
         for (String l : lines) {
             int spaces = clampNonNeg(innerWidth - l.length() - PADDING);
-            sb.append("│")
+            sb.append("|")
                     .append(" ".repeat(PADDING))
                     .append(WHITE).append(l).append(RESET)
                     .append(" ".repeat(spaces))
-                    .append("│\n");
+                    .append("|\n");
         }
         sb.append(bottom);
         return sb.toString();
@@ -350,10 +363,10 @@ public class UI {
         for (String l : lines) {
             int spaces = clampNonNeg(innerWidth - l.length() - PADDING);
             sb.append(" ".repeat(pad))
-                    .append(CYAN).append("│").append(RESET)
+                    .append(CYAN).append("|").append(RESET)
                     .append(CYAN).append(" ".repeat(PADDING)).append(l)
                     .append(" ".repeat(spaces))
-                    .append("│").append(RESET)
+                    .append("|").append(RESET)
                     .append("\n");
         }
         sb.append(" ".repeat(pad)).append(bottom);
