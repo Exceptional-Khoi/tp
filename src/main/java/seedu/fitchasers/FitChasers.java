@@ -1,5 +1,6 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.ui.ViewLog;
 import seedu.fitchasers.exceptions.InvalidCommandException;
@@ -16,6 +17,7 @@ import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.IOException;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -35,13 +37,13 @@ public class FitChasers {
      * @param args command line arguments (not used)
      */
     private static Person person;
-    private static final String savedName = null;
+    private static String savedName = null;
     private static final UI ui = new UI();
     private static final FileHandler fileHandler = new FileHandler();
     private static final YearMonth currentMonth = YearMonth.now();
     private static ViewLog viewLog;
-    private static DefaultTagger tagger = new DefaultTagger();
-    private static List<Gym> gyms = StaticGymData.getNusGyms();
+    private static final DefaultTagger tagger = new DefaultTagger();
+    private static final List<Gym> gyms = StaticGymData.getNusGyms();
     private static WorkoutManager workoutManager;
     private static boolean isRunning = true;
     private static String command;
@@ -50,7 +52,7 @@ public class FitChasers {
     private static WeightManager weightManager;
 
     public static void main(String[] args) throws IOException {
-        initVariables(savedName, fileHandler, ui);
+        initVariables();
         ui.showGreeting();
 
         while (isRunning) {
@@ -116,7 +118,7 @@ public class FitChasers {
 
 
                 case "/gym_where":
-                case "gw":{
+                case "gw": {
                     gwMethod();
                     break;
                 }
@@ -147,9 +149,9 @@ public class FitChasers {
 
                 case "/view_log":
                 case "vl":
-                    try{
+                    try {
                         viewLog.render(argumentStr);
-                    }catch (IndexOutOfBoundsException e){
+                    } catch (IndexOutOfBoundsException e) {
                         ui.showError(e.getMessage());
                     }
                     break;
@@ -192,12 +194,12 @@ public class FitChasers {
 
     private static void delMethod() throws InvalidCommandException, IOException {
         // Format: /del_workout WORKOUT_NAME
-        if(argumentStr.isEmpty()){
+        if (argumentStr.isEmpty()) {
             throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
                     "Please enter a valid command.");
         } else if (argumentStr.contains("d/")) {
             workoutManager.interactiveDeleteWorkout(argumentStr, ui);
-        } else{
+        } else {
             workoutManager.deleteWorkout(argumentStr);
         }
     }
@@ -373,22 +375,13 @@ public class FitChasers {
         }
     }
 
-    private static void initVariables(String savedName, FileHandler fileHandler, UI ui) throws IOException {
-        workoutManager = new WorkoutManager(tagger, fileHandler);
-        try {
-            fileHandler.loadWeightList(person);
-            weightManager= new WeightManager(person);
-            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
-        } catch (IOException e) {
-            ui.showError(e.getMessage());
-        }
-        fileHandler.initIndex();
-        viewLog = new ViewLog(ui, workoutManager, fileHandler);
+    private static void initVariables() throws IOException {
         try {
             savedName = fileHandler.loadUserName();
         } catch (IOException e) {
             ui.showError("Error reading saved username: " + e.getMessage());
         }
+
         if (savedName != null) {
             person = new Person(savedName);
             ui.showMessage("Welcome back, " + savedName + "!");
@@ -427,5 +420,18 @@ public class FitChasers {
                 ui.showError("Failed to save username: " + e.getMessage());
             }
         }
+
+        weightManager = new WeightManager(person);
+        workoutManager = new WorkoutManager(tagger, fileHandler);
+        fileHandler.initIndex();
+
+        try {
+            fileHandler.loadWeightList(person);
+            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
+        } catch (IOException e) {
+            ui.showError(e.getMessage());
+        }
+
+        viewLog = new ViewLog(ui, workoutManager, fileHandler);
     }
 }

@@ -39,7 +39,7 @@ import java.util.Set;
 
 public class FileHandler {
 
-    private Path dataDir = Paths.get("data");
+    private final Path dataDir = Paths.get("data");
     private final Path workoutDir = dataDir.resolve("workouts");
     private final UI ui = new UI();
     private final Map<YearMonth, ArrayList<Workout>> arrayByMonth = new HashMap<>();

@@ -1,6 +1,7 @@
 package seedu.fitchasers.workouts;
 
 import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.tagger.Tagger;
 import seedu.fitchasers.ui.UI;
 
@@ -29,14 +30,14 @@ public class WorkoutManager {
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
-    private Tagger tagger;
+    private final Tagger tagger;
     private LocalDateTime workoutDateTime;
     private String workoutName;
     private YearMonth monthOfWorkout;
     private YearMonth currentLoadedMonth;
-    private Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
+    private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
     private final Set<YearMonth> loadedMonths = new HashSet<>();
-    private FileHandler fileHandler;
+    private final FileHandler fileHandler;
 
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
         this.tagger = tagger;
@@ -58,8 +59,12 @@ public class WorkoutManager {
      * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
+        try {
+            formatInputForWorkout(command);
+        } catch (InvalidArgumentInput e) {
+            return;
+        }
         workoutName = "";
-        formatInputForWorkout(command);
         monthOfWorkout = YearMonth.from(workoutDateTime);
         if(!currentLoadedMonth.equals(monthOfWorkout)) {
             setWorkouts(fileHandler.getWorkoutsForMonth(monthOfWorkout), monthOfWorkout);
@@ -83,14 +88,14 @@ public class WorkoutManager {
         }
     }
 
-    private void formatInputForWorkout(String command) {
+    private void formatInputForWorkout(String command) throws InvalidArgumentInput {
         assert workouts != null : "workouts list should be initialized";
 
         if (currentWorkout != null) {
             ui.showMessage("You currently have an active workout: '"
                     + currentWorkout.getWorkoutName() + "'.");
             ui.showMessage("Please end the active workout first with: /end_workout d/DD/MM/YY t/HHmm");
-            return;
+            throw new InvalidArgumentInput("");
         }
 
         assert currentWorkout == null : "No active workout expected before creating a new one";
@@ -644,7 +649,6 @@ public class WorkoutManager {
             ui.showMessage("No active workout.");
             return;
         }
-
         final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
                 .withResolverStyle(ResolverStyle.SMART);
         final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")

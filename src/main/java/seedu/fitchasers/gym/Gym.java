@@ -8,8 +8,8 @@ import java.util.List;
  * Constructs a Gym with the given name and an empty list of machines.
  */
 public class Gym {
-    private String name;
-    private List<Machine> machines;
+    private final String name;
+    private final List<Machine> machines;
 
     public Gym(String name) {
         this.name = name;
