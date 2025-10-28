@@ -1,27 +1,5 @@
 # Developer Guide
 
-## Table of Contents
-
-1. [Acknowledgements](#acknowledgements)
-2. [Setting up, Getting Started](#setting-up-getting-started)
-3. [Design](#Design-&-implementation)
-    - [Architecture](#architecture)
-    - [UI Component](#ui-component)
-    - [CaseFile Component](#casefile-component)
-    - [Command Component](#command-component)
-    - [Storage Component](#storage-component)
-    - [Common](#common)
-4. [Implementation](#implementation)
-5. [Appendix A: Product Scope](#appendix-a-product-scope)
-    - [Target user profile](#target-user-profile)
-    - [Value proposition](#value-proposition)
-6. [Appendix B: User Stories](#appendix-b-user-stories)
-7. [Appendix C: Non-Functional Requirements](#appendix-c-non-functional-requirements)
-8. [Appendix D: Glossary](#appendix-d-glossary)
-9. [Appendix E: Instructions for Manual Testing](#appendix-e-instructions-for-manual-testing)
-
----
-
 ## Acknowledgements
 
 {list here sources of all reused/adapted ideas, code, documentation, and third-party libraries -- include links to the original source as well}
@@ -111,6 +89,9 @@ The component handles:
 
 
 ## Glossary
+
+Mainstream OS: Windows, Linux, Unix, MacOS
+
 | Term                         | Definition                                                                                     |
 | ---------------------------- | ---------------------------------------------------------------------------------------------- |
 | **Active Workout**           | The workout session that is currently in progress.                                             |
@@ -568,7 +549,7 @@ exercise modalities (e.g., cardio, strength) and muscle groups (e.g., legs, ches
 This enables users to quickly identify workout types and track training patterns over time.
 
 ### Class Diagram
-![Alt text](docs/diagrams/Class_Diagram_for_tagging_2.png "Class Diagram for Tagging")
+![Alt text](../docs/diagrams/Class_Diagram_for_tagging_2.png "Class Diagram for Tagging")
 
 Key Relationships:
 - Dependency: `WorkoutManager` depends on the `Tagger` interface for tag suggestion services
@@ -597,7 +578,7 @@ Process:
 ### Sequence Diagram
 The following sequence diagram shows the interaction between components when a workout is created
 and tags are auto-generated:
-![Alt text](docs/diagrams/Sequence Digram for tagging.png "Sequence Diagram for Tagging")
+![Alt text](../docs/diagrams/Sequence Digram for tagging.png "Sequence Diagram for Tagging")
 
 ### Manual Tag Method
 #### Adding modality keywords
@@ -705,4 +686,3 @@ Implementation consideration:
 - Spacing is critical in parameter syntax (e.g., space before `r/`, no space after `r/`)
 - Invalid or malformed parameters return specific error messages with usage guidance
 - Y/N prompts are used when parameters are missing
-
