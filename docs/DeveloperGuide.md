@@ -29,7 +29,7 @@ The bulk of the app’s work is done by the following six components:
 How the architecture components interact with each other
 
 The Sequence Diagram below shows how the components interact with each other for the scenario where the user issues the command /create_workout pushup.
-
+![Alt text](../docs/diagrams/Architectural_Sequence_Diagram_CW.png "Basic Architecture Sequence Diagram")
 
 ## Product scope
 ### Target user profile
@@ -53,10 +53,35 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 
 ## User Stories
 
-|Version| As a ... | I want to ... | So that I can ...|
-|--------|----------|---------------|------------------|
-|v1.0|new user|see usage instructions|refer to them when I forget how to use the application|
-|v2.0|user|find a to-do item by name|locate a to-do without having to go through the entire list|
+## User Stories
+## User Stories
+
+| Version | As a ... | I want to ... | So that I can ... |
+|----------|-----------|---------------|-------------------|
+| v1.0 | new user | see a welcome message and list of commands | know how to start using the app |
+| v1.0 | user | create a new workout with a date and time | plan and record my daily workouts |
+| v1.0 | user | add exercises to a workout | track what I am doing during my session |
+| v1.0 | user | add sets and reps for each exercise | monitor my training volume and progress |
+| v1.0 | user | delete an exercise or set | fix mistakes if I entered wrong data |
+| v1.0 | user | end my workout and record its duration | know how long I trained for each session |
+| v1.0 | user | view a log of past workouts | review my training history easily |
+| v1.1 | frequent user | record my weight by date | monitor my weight progress over time |
+| v1.1 | frequent user | view all recorded weights | observe trends and track fitness goals |
+| v1.1 | user | delete a workout | remove old or incorrect workout entries |
+| v1.1 | user | view total duration of a specific workout | evaluate how long I spent on each session |
+| v2.0 | experienced user | save and load my data automatically | continue from where I left off each time I launch the app |
+| v2.0 | user | receive error messages for invalid commands | understand what went wrong and fix it easily |
+| v2.0 | motivated user | see motivational messages after workouts | stay engaged and encouraged to continue training |
+| v2.0 | keyboard-only user | use short and consistent command prefixes | type faster without memorizing complex syntax |
+| v2.1 | user | tag my workouts with custom labels (e.g., `#strength`, `#cardio`) | categorize workouts by type or goal |
+| v2.1 | user | view only workouts with a specific tag | focus on a particular type of training session |
+| v2.1 | user | view all available tags | quickly recall which categories I’ve created |
+| v2.1 | user | remove or edit a tag from a workout | keep my tag list accurate and organized |
+| v2.1 | user | combine multiple tags in a search (e.g., `#strength #upperbody`) | filter my logs for more precise tracking |
+| v2.1 | long-term user | analyze the number of workouts per tag | understand which types of workouts I do most often |
+| v2.2 | user | filter workouts by date or name | quickly find a specific workout from my log |
+| v2.2 | user | view total training time for a given week or month | measure overall workout consistency |
+
 
 ## Non-Functional Requirements
 
@@ -89,13 +114,17 @@ The component handles:
 
 ## Glossary
 
-* *glossary item* - Definition
+Mainstream OS: Windows, Linux, Unix, MacOS
+Workout: The theme of the workout
+Set: Sets of Exercises of certain repetition
+Modality: Type of training, strength/cardio/endurance
 
 # Instructions for manual testing
 
 {Give instructions on how to do a manual product testing e.g., how to load sample data to be used for testing}
 
 ## Create Workout
+
 
 ### Success Case
 ```
