@@ -2,7 +2,6 @@ package seedu.fitchasers;
 
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.ui.ViewLog;
-import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidCommandException;
 import seedu.fitchasers.gym.EquipmentDisplay;
 import seedu.fitchasers.gym.Gym;
@@ -17,7 +16,6 @@ import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.IOException;
 import java.time.YearMonth;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
