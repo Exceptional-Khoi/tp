@@ -270,7 +270,7 @@ public class ViewLog {
 
     private static String formatDayMon(LocalDateTime dt) {
         if (dt == null) {
-            return "Unknown date";
+            return "Unended";
         }
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
         int day = dt.getDayOfMonth();
@@ -280,7 +280,7 @@ public class ViewLog {
 
     private static String formatLong(LocalDateTime dt) {
         if (dt == null) {
-            return "Unknown date";
+            return "Unended";
         }
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int d = dt.getDayOfMonth();
@@ -292,16 +292,8 @@ public class ViewLog {
         String ampm = hr < 12 ? "AM" : "PM";
         return String.format("%s %d%s of %s, %d:%02d %s", dow, d, suffix, mon, hr12, min, ampm);
     }
-    private static final class Parsed {
-        final YearMonth ym;
-        final int page;
-        final boolean detailed;
 
-        Parsed(YearMonth ym, int page, boolean detailed) {
-            this.ym = ym;
-            this.page = page;
-            this.detailed = detailed;
-        }
+    private record Parsed(YearMonth ym, int page, boolean detailed) {
     }
 
     /**

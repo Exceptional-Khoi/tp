@@ -44,7 +44,7 @@ class UITest {
     }
 
     private String takeOutput() {
-        String s = new String(outContent.toByteArray(), StandardCharsets.UTF_8);
+        String s = outContent.toString(StandardCharsets.UTF_8);
         outContent.reset();
         return stripAnsi(s);
     }

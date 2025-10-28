@@ -1,6 +1,7 @@
 package seedu.fitchasers.workouts;
 
 import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.tagger.Tagger;
 import seedu.fitchasers.ui.UI;
 
@@ -29,14 +30,14 @@ public class WorkoutManager {
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
-    private Tagger tagger;
+    private final Tagger tagger;
     private LocalDateTime workoutDateTime;
     private String workoutName;
     private YearMonth monthOfWorkout;
     private YearMonth currentLoadedMonth;
-    private Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
+    private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
     private final Set<YearMonth> loadedMonths = new HashSet<>();
-    private FileHandler fileHandler;
+    private final FileHandler fileHandler;
 
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
         this.tagger = tagger;
@@ -58,7 +59,12 @@ public class WorkoutManager {
      * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
-        formatInputForWorkout(command);
+        workoutName = "";
+        try {
+            formatInputForWorkout(command);
+        } catch (InvalidArgumentInput e) {
+            return;
+        }
         monthOfWorkout = YearMonth.from(workoutDateTime);
         if(!currentLoadedMonth.equals(monthOfWorkout)) {
             setWorkouts(fileHandler.getWorkoutsForMonth(monthOfWorkout), monthOfWorkout);
@@ -82,57 +88,56 @@ public class WorkoutManager {
         }
     }
 
-    private void formatInputForWorkout(String command) {
+    private void formatInputForWorkout(String command) throws InvalidArgumentInput {
         assert workouts != null : "workouts list should be initialized";
-
         if (currentWorkout != null) {
             ui.showMessage("You currently have an active workout: '"
                     + currentWorkout.getWorkoutName() + "'.");
             ui.showMessage("Please end the active workout first with: /end_workout d/DD/MM/YY t/HHmm");
-            return;
+            throw new InvalidArgumentInput("");
         }
 
         assert currentWorkout == null : "No active workout expected before creating a new one";
 
         if (command == null || !command.contains("n/")) {
             ui.showMessage("Invalid format. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
-            return;
+            throw new InvalidArgumentInput("");
         }
 
-        int nIdx = command.indexOf("n/");
-        int afterN = nIdx + 2;
+        int nameIndex = command.indexOf("n/");
+        int afterNameIndex = nameIndex + 2;
 
         // Find first marker after n/
-        int dIdx = command.indexOf("d/", afterN);
-        int tIdx = command.indexOf("t/", afterN);
+        int dIndex = command.indexOf("d/", afterNameIndex);
+        int tIndex = command.indexOf("t/", afterNameIndex);
 
         // pick the nearest positive marker after n/
         int nextMarker = -1;
-        if (dIdx != -1 && tIdx != -1) {
-            nextMarker = Math.min(dIdx, tIdx);
-        } else if (dIdx != -1) {
-            nextMarker = dIdx;
-        } else if (tIdx != -1) {
-            nextMarker = tIdx;
+        if (dIndex != -1 && tIndex != -1) {
+            nextMarker = Math.min(dIndex, tIndex);
+        } else if (dIndex != -1) {
+            nextMarker = dIndex;
+        } else if (tIndex != -1) {
+            nextMarker = tIndex;
         }
 
         if (nextMarker != -1) {
-            workoutName = command.substring(afterN, nextMarker).trim();
+            workoutName = command.substring(afterNameIndex, nextMarker).trim();
         } else {
-            workoutName = command.substring(afterN).trim();
+            workoutName = command.substring(afterNameIndex).trim();
         }
 
         if (workoutName.isEmpty()) {
             ui.showMessage("Workout name cannot be empty. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
-            return;
+            throw new InvalidArgumentInput("");
         }
 
         assert !workoutName.isEmpty() : "workoutName should be non-empty after validation";
 
         // Extract raw date/time strings if present (first token after marker)
         String dateStr = "";
-        if (dIdx != -1) {
-            String tail = command.substring(dIdx + 2).trim();
+        if (dIndex != -1) {
+            String tail = command.substring(dIndex + 2).trim();
             String[] token = tail.split("\\s+");
             if (token.length > 0) {
                 dateStr = token[0];
@@ -140,8 +145,8 @@ public class WorkoutManager {
         }
 
         String timeStr = "";
-        if (tIdx != -1) {
-            String tail = command.substring(tIdx + 2).trim();
+        if (tIndex != -1) {
+            String tail = command.substring(tIndex + 2).trim();
             String[] toks = tail.split("\\s+");
             if (toks.length > 0){
                 timeStr = toks[0];
@@ -162,7 +167,7 @@ public class WorkoutManager {
                 date = LocalDate.parse(dateStr, dateFmt);
             } catch (Exception ex) {
                 ui.showMessage("Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -171,7 +176,7 @@ public class WorkoutManager {
                 time = LocalTime.parse(timeStr, timeFmt);
             } catch (Exception ex) {
                 ui.showMessage("Invalid time. Use t/HHmm (e.g., t/1905).");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -183,7 +188,7 @@ public class WorkoutManager {
                 date = LocalDate.now();
             } else {
                 ui.showMessage("Please provide a date in format d/DD/MM/YY.");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -194,7 +199,7 @@ public class WorkoutManager {
                 time = LocalTime.now();
             } else {
                 ui.showMessage("Please provide a time in format t/HHmm.");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
         workoutDateTime = LocalDateTime.of(date, time);
@@ -203,7 +208,7 @@ public class WorkoutManager {
             ui.showMessage("The date you entered (" + date.format(dateFmt) + ") is in the future. Are you sure? (Y/N)");
             if (!ui.confirmationMessage()) {
                 ui.showMessage("Please re-enter the correct date.");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -211,7 +216,7 @@ public class WorkoutManager {
             ui.showMessage("The time you entered (" + time.format(timeFmt) + ") is in the future. Are you sure? (Y/N)");
             if (!ui.confirmationMessage()) {
                 ui.showMessage("Please re-enter the correct time.");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -228,7 +233,7 @@ public class WorkoutManager {
                             "Continue anyway? (Y/N)");
                     if (!ui.confirmationMessage()) {
                         ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
-                        return;
+                        throw new InvalidArgumentInput("");
                     }
                     break;
                 }
@@ -643,7 +648,6 @@ public class WorkoutManager {
             ui.showMessage("No active workout.");
             return;
         }
-
         final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
                 .withResolverStyle(ResolverStyle.SMART);
         final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")

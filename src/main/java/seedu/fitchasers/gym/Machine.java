@@ -6,8 +6,8 @@ import java.util.List;
  * Constructs a Machine with the given name and targeted body parts.
  */
 public class Machine {
-    private String name;
-    private List<String> bodyPartsTargeted;
+    private final String name;
+    private final List<String> bodyPartsTargeted;
 
     public Machine(String name, List<String> bodyPartsTargeted) {
         this.name = name;
