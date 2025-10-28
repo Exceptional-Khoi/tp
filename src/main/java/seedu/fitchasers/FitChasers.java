@@ -40,7 +40,6 @@ public class FitChasers {
         UI ui = new UI();
         FileHandler fileHandler = new FileHandler();
 
-        ui.showGreeting();
 
         String savedName = null;
         try {
@@ -100,23 +99,14 @@ public class FitChasers {
 
         try {
             fileHandler.loadWeightList(person);
-            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
-            ui.showMessage("Loaded " + currentMonth + " workouts.");
-        } catch (FileNonexistent e) {
-            ui.showError("Seems like this is a new month!"
-                    + "\nWould you like to create new workouts for this month? (Y/N)");
-            if (ui.confirmationMessage()) {
-                fileHandler.saveMonthList(currentMonth, new ArrayList<>());
-                workoutManager.setWorkouts(new ArrayList<>(), currentMonth);
-            }
             workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
-            ui.showMessage("Loaded " + currentMonth + " workouts\n");
+            ui.showMessage("Loaded " + currentMonth + " workouts.");
         } catch (IOException e) {
             ui.showError(e.getMessage());
         }
 
         viewLog = new ViewLog(ui, workoutManager, fileHandler);
-
+        ui.showGreeting();
         boolean isRunning = true;
 
         while (isRunning) {
