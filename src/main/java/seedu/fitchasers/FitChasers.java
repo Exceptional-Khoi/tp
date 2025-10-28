@@ -75,7 +75,6 @@ public class FitChasers {
                 weightManager.addWeight(command);
                 try {
                     fileHandler.saveWeightList(person);
-                    ui.showMessage("Your initial weight of " + initialWeight + "kg has been added successfully!");
                 } catch (IOException e) {
                     ui.showError("Failed to save initial weight: " + e.getMessage());
                 }
@@ -101,7 +100,7 @@ public class FitChasers {
         try {
             fileHandler.loadWeightList(person);
             workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
-            ui.showMessage("Loaded " + currentMonth + " workouts.");
+            //ui.showMessage("Loaded " + currentMonth + " workouts.");
         } catch (FileNonexistent e) {
             ui.showError("Seems like this is a new month!"
                     + "\nWould you like to create new workouts for this month? (Y/N)");
@@ -110,7 +109,7 @@ public class FitChasers {
                 workoutManager.setWorkouts(new ArrayList<>(), currentMonth);
             }
             workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
-            ui.showMessage("Loaded " + currentMonth + " workouts\n");
+            //ui.showMessage("Loaded " + currentMonth + " workouts\n");
         } catch (IOException e) {
             ui.showError(e.getMessage());
         }
