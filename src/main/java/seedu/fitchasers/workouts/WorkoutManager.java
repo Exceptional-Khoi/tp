@@ -58,6 +58,7 @@ public class WorkoutManager {
      * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
+        workoutName = "";
         formatInputForWorkout(command);
         monthOfWorkout = YearMonth.from(workoutDateTime);
         if(!currentLoadedMonth.equals(monthOfWorkout)) {
@@ -99,27 +100,27 @@ public class WorkoutManager {
             return;
         }
 
-        int nIdx = command.indexOf("n/");
-        int afterN = nIdx + 2;
+        int nameIndex = command.indexOf("n/");
+        int afterNameIndex = nameIndex + 2;
 
         // Find first marker after n/
-        int dIdx = command.indexOf("d/", afterN);
-        int tIdx = command.indexOf("t/", afterN);
+        int dIndex = command.indexOf("d/", afterNameIndex);
+        int tIndex = command.indexOf("t/", afterNameIndex);
 
         // pick the nearest positive marker after n/
         int nextMarker = -1;
-        if (dIdx != -1 && tIdx != -1) {
-            nextMarker = Math.min(dIdx, tIdx);
-        } else if (dIdx != -1) {
-            nextMarker = dIdx;
-        } else if (tIdx != -1) {
-            nextMarker = tIdx;
+        if (dIndex != -1 && tIndex != -1) {
+            nextMarker = Math.min(dIndex, tIndex);
+        } else if (dIndex != -1) {
+            nextMarker = dIndex;
+        } else if (tIndex != -1) {
+            nextMarker = tIndex;
         }
 
         if (nextMarker != -1) {
-            workoutName = command.substring(afterN, nextMarker).trim();
+            workoutName = command.substring(afterNameIndex, nextMarker).trim();
         } else {
-            workoutName = command.substring(afterN).trim();
+            workoutName = command.substring(afterNameIndex).trim();
         }
 
         if (workoutName.isEmpty()) {
@@ -131,8 +132,8 @@ public class WorkoutManager {
 
         // Extract raw date/time strings if present (first token after marker)
         String dateStr = "";
-        if (dIdx != -1) {
-            String tail = command.substring(dIdx + 2).trim();
+        if (dIndex != -1) {
+            String tail = command.substring(dIndex + 2).trim();
             String[] token = tail.split("\\s+");
             if (token.length > 0) {
                 dateStr = token[0];
@@ -140,8 +141,8 @@ public class WorkoutManager {
         }
 
         String timeStr = "";
-        if (tIdx != -1) {
-            String tail = command.substring(tIdx + 2).trim();
+        if (tIndex != -1) {
+            String tail = command.substring(tIndex + 2).trim();
             String[] toks = tail.split("\\s+");
             if (toks.length > 0){
                 timeStr = toks[0];

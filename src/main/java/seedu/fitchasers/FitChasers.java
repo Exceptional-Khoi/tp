@@ -51,7 +51,6 @@ public class FitChasers {
 
     public static void main(String[] args) throws IOException {
         initVariables(savedName, fileHandler, ui);
-        weightManager= new WeightManager(person);
         ui.showGreeting();
 
         while (isRunning) {
@@ -378,6 +377,7 @@ public class FitChasers {
         workoutManager = new WorkoutManager(tagger, fileHandler);
         try {
             fileHandler.loadWeightList(person);
+            weightManager= new WeightManager(person);
             workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
         } catch (IOException e) {
             ui.showError(e.getMessage());
