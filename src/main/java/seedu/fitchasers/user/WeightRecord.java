@@ -12,10 +12,7 @@ public class WeightRecord implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /** The weight in kilograms */
-    private final double weight;
-
-    /** The date when this weight was recorded */
+    private double weight;
     private final LocalDate date;
 
     public WeightRecord(double weight, LocalDate date) {
@@ -25,6 +22,10 @@ public class WeightRecord implements Serializable {
 
     public double getWeight() {
         return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
     }
 
     public LocalDate getDate() {

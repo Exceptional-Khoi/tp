@@ -149,7 +149,7 @@ public class FileHandler {
         Path filePath = dataDir.resolve("weight.dat");
         try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
             out.writeObject(person.getWeightHistory());
-            ui.showMessage("Saved " + person.getWeightHistory().size() + " weight entries for " + person.getName());
+            //ui.showMessage("Saved " + person.getWeightHistory().size() + " weight entries for " + person.getName());
         }
     }
 
@@ -170,13 +170,13 @@ public class FileHandler {
         ensureDataDir();
         Path filePath = dataDir.resolve("weight.dat");
         if (Files.notExists(filePath)) {
-            ui.showMessage("No previous weight data found for " + person.getName());
+            //ui.showMessage("No previous weight data found for " + person.getName());
             return;
         }
         try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
             List<WeightRecord> list = (List<WeightRecord>) in.readObject();
             person.setWeightHistory(new ArrayList<>(list));
-            ui.showMessage("Loaded " + list.size() + " weight entries for " + person.getName());
+            //ui.showMessage("Loaded " + list.size() + " weight entries for " + person.getName() + ".");
         } catch (ClassNotFoundException e) {
             throw new IOException("WeightRecord class not found", e);
         }
