@@ -222,7 +222,9 @@ public class FileHandler {
     public Double[] loadGoal() throws IOException {
         ensureDataDir();
         Path filePath = dataDir.resolve("goal.dat");
-        if (Files.notExists(filePath)) return null;
+        if (Files.notExists(filePath)) {
+            return null;
+        }
 
         try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
             double goal = in.readDouble();
