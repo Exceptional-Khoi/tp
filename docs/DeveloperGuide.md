@@ -79,8 +79,6 @@ Our target users include:
 
 ### Value proposition
 
-{Describe the value proposition: what problem does it solve?}
-
 FitChasers provides an intuitive, local, and command-based way to track your workouts and progress over time.
 Unlike most fitness apps that require constant internet access or sign-ins, FitChasers focuses on simplicity and data ownership.
 It helps users build consistency by making fitness tracking fast and rewarding, using summaries and visualization features.
@@ -140,40 +138,70 @@ The component handles:
 * Tag generation and management integration
 * Workout deletion and viewing
 
+## WeightManager Component
+**API**: [`WeightManager.java`](https://github.com/AY2526S1-CS2113-W14-3/tp/blob/master/src/main/java/seedu/fitchasers/user/WeightManager.java)
+
+The `WeightManager` component handles all operations related to recording, viewing, and managing
+a user's weight and goal weight. It works together with the `Person` entity to maintain a complete
+history of weight entries.
+
+![Alt text](docs/diagrams/WeightManager_Class_Diagram.png "Basic Architecture")
+
+### Overview
+WeightManager handles:
+* Adding a new weight (optionally with a specified date; defaults to today)
+* Viewing all recorded weights
+* Validation and error handling for invalid input
+
+## GoalWeightTracker Component
+**API**: [`GoalWeightTracker.java`](https://github.com/AY2526S1-CS2113-W14-3/tp/blob/master/src/main/java/seedu/fitchasers/user/GoalWeightTracker.java)
+
+The `GoalWeightTracker` component handles the user's target goal weight. It works together with the `FileHandler` to persist goal data and provides feedback comparing the goal with the user's latest recorded weight.
+
+![Alt text](docs/diagrams/GoalWeightTracker_Class_Diagram.png "Basic Architecture")
+
+### Overview
+`GoalWeightTracker` handles:
+* Setting a target goal weight
+* Viewing the current goal weight
+* Comparing the current weight with the goal and showing progress
+* Persisting goal weight data
+* Validating input and handling invalid entries
+
 
 
 ## Glossary
 
 Mainstream OS: Windows, Linux, Unix, MacOS
 
-| Term                         | Definition                                                                                     |
-| ---------------------------- | ---------------------------------------------------------------------------------------------- |
-| **Active Workout**           | The workout session that is currently in progress.                                             |
-| **Command**                  | A user instruction starting with a verb (e.g., `/add_weight`, `/create_workout`, `/view_log`). |
-| **Completed Workout**        | A workout session that has been ended and saved to history.                                    |
-| **Date format**              | `dd/MM/yy`, e.g., `26/10/25` (used with `d/`).                                                 |
-| **Exercise**                 | A specific physical activity performed during a workout (e.g., bench press, push-ups, squats). |
-| **FileHandler**              | Component responsible for persistence (reading/writing app data on disk).                      |
-| **FitChasers (app)**         | The main application that wires UI, logic, and storage; runs the command loop.                 |
-| **Manager**                  | Service object that encapsulates a feature area (e.g., `WeightManager`, `WorkoutManager`).     |
-| **Modality**                 | The type of exercise (e.g., cardio, strength).                                                 |
-| **Muscle Group**             | The primary muscles targeted by an exercise (e.g., legs, chest).                               |
-| **Parameter token / Prefix** | Short marker introducing an argument (e.g., `n/` name, `d/` date, `t/` time, `w/` weight).     |
-| **Parsing**                  | Converting raw command text into a structured request (command + arguments).                   |
-| **Persistence**              | Saving/loading data between runs (handled by `FileHandler`).                                   |
-| **Person**                   | Domain entity representing the user; owns profile and histories.                               |
-| **Prompt**                   | The UI input line where the user types commands.                                               |
-| **Repetition (Rep)**         | A single complete motion of an exercise.                                                       |
-| **Set (workout)**            | A group of consecutive repetitions of an exercise (e.g., “Set 2 → Reps: 14”).                  |
-| **Storage**                  | The persistence layer; the files managed by `FileHandler`.                                     |
-| **Tag**                      | A label assigned to workouts for categorization (e.g., `cardio`, `strength`).                  |
-| **Time format**              | `HHmm` 24-hour time for `t/` tokens (e.g., `1900` = 7:00 PM).                                  |
-| **UI**                       | Presentation layer handling all user I/O (printing messages, reading input).                   |
-| **Validation**               | Checks that inputs satisfy constraints (e.g., numeric weight, date not in the future).         |
-| **ViewLog**                  | Component that formats and displays logs/history for the user.                                 |
-| **WeightManager**            | Feature service for creating, validating, and listing weight entries.                          |
-| **WeightRecord**             | Domain object holding a single weight entry (value + date).                                    |
-| **Workout**                  | A session of physical exercise consisting of various exercises and sets.                       |
+| Term                         | Definition                                                                                                             |
+|------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| **Active Workout**           | The workout session that is currently in progress.                                                                     |
+| **Command**                  | A user instruction starting with a verb (e.g., `/add_weight`, `/create_workout`, `/view_log`).                         |
+| **Completed Workout**        | A workout session that has been ended and saved to history.                                                            |
+| **Date format**              | `dd/MM/yy`, e.g., `26/10/25` (used with `d/`).                                                                         |
+| **Exercise**                 | A specific physical activity performed during a workout (e.g., bench press, push-ups, squats).                         |
+| **FileHandler**              | Component responsible for persistence (reading/writing app data on disk).                                              |
+| **FitChasers (app)**         | The main application that wires UI, logic, and storage; runs the command loop.                                         |
+| **Manager**                  | Service object that encapsulates a feature area (e.g., `WeightManager`, `WorkoutManager`).                             |
+| **Modality**                 | The type of exercise (e.g., cardio, strength).                                                                         |
+| **Muscle Group**             | The primary muscles targeted by an exercise (e.g., legs, chest).                                                       |
+| **Parameter token / Prefix** | Short marker introducing an argument (e.g., `n/` name, `d/` date, `t/` time, `w/` weight).                             |
+| **Parsing**                  | Converting raw command text into a structured request (command + arguments).                                           |
+| **Persistence**              | Saving/loading data between runs (handled by `FileHandler`).                                                           |
+| **Person**                   | Domain entity representing the user; owns profile and histories.                                                       |
+| **Prompt**                   | The UI input line where the user types commands.                                                                       |
+| **Repetition (Rep)**         | A single complete motion of an exercise.                                                                               |
+| **Set (workout)**            | A group of consecutive repetitions of an exercise (e.g., “Set 2 → Reps: 14”).                                          |
+| **Storage**                  | The persistence layer; the files managed by `FileHandler`.                                                             |
+| **Tag**                      | A label assigned to workouts for categorization (e.g., `cardio`, `strength`).                                          |
+| **Time format**              | `HHmm` 24-hour time for `t/` tokens (e.g., `1900` = 7:00 PM).                                                          |
+| **UI**                       | Presentation layer handling all user I/O (printing messages, reading input).                                           |
+| **Validation**               | Checks that inputs satisfy constraints (e.g., numeric weight, date not in the future).                                 |
+| **ViewLog**                  | Component that formats and displays logs/history for the user.                                                         |
+| **WeightManager**            | Manages creating, validating, storing, and listing weight entries. Works with the `Person` entity to maintain history. |
+| **WeightRecord**             | Represents a single weight entry with a numeric value and associated date.                                             |
+| **Workout**                  | A session of physical exercise consisting of various exercises and sets.                                               |
 
 # Instructions for manual testing
 ## Help
@@ -209,35 +237,37 @@ rn n/Ana   → success
 ### Error Cases
 
 ```
-/my_name           → error (missing n/)
-/my_name n/       → error (empty name)
-/my_name n/<31+ chars> → error (name too long; max 30)
+/rename                 → error (missing n/)
+/rename n/              → error (empty name)
+/rename n/<31+ chars>   → error (name too long; max 30)
 ```
 
 **Usage:** `/rename n/<name>` (alias: `rn`)
 
 ---
 
-## Weights
+## Add Weight
 
 ### Success Cases
 
 ```
-/add_weight w/70.5 d/23/10/25 → success
-
-aw w/70.5 d/23/10/25 → success
+/add_weight w/70.5 d/23/10/25   → Weight successfully recorded
+aw w/70.5 d/23/10/25            → Weight successfully recorded
+/add_weight w/70.5              → Weight successfully recorded (date defaults to today)
+aw w/70.5                       → Weight successfully recorded (date defaults to today)
 ```
 
 ### Error Cases
 
 ```
-/add_weight w/invalid d/23/10/25     → error (invalid weight)
-/add_weight w/70.5 d/invalid/date    → error (invalid date)
-/add_weight w/ d/23/10/25            → error (missing weight value)
-/add_weight w/70.5 d/<future date>   → error (date cannot be in the future)
+/add_weight w/invalid d/23/10/25     → Error: invalid weight value
+/add_weight w/70.5 d/invalid/date    → Error: invalid date format
+/add_weight w/ d/23/10/25            → Error: missing weight value
+/add_weight w/70.5 d/<future date>   → Error: date cannot be in the future
 ```
 
-**Usage:** `/add_weight w/<weight> d/<dd/MM/yy>` (alias: `aw`)
+**Usage:** `/add_weight w/<weight> [d/<dd/MM/yy>]` (alias: `aw`)
+
 
 ---
 
@@ -246,18 +276,58 @@ aw w/70.5 d/23/10/25 → success
 ### Success Cases
 
 ```
-/view_weight → shows weight history and graph
-
-vw           → shows weight history and graph
+/view_weight   → Displays all recorded weights with dates and a simple progress graph
+vw             → Displays all recorded weights with dates and a simple progress graph
 ```
 
 ### Error Cases
 
 ```
-(none; if no data) → "<name> has no weight records yet."
+/view_weight or vw → "<name> has no weight records yet."  (if no weight entries exist)
 ```
 
 **Usage:** `/view_weight` (alias: `vw`)
+
+---
+
+## Set Goal Weight
+
+### Success Cases
+
+```
+/set_goal w/60    → success (sets goal weight to 60 kg)
+sg w/60           → success (sets goal weight to 60 kg)
+```
+
+### Error Cases
+
+```
+/set_goal w/       → error (missing weight value)
+/set_goal w/abc    → error (invalid weight; must be a number)
+/set_goal w/-5     → error (weight must be positive)
+```
+
+**Usage:** `/set_goal w/<target_weight>` (alias: `sg`)
+
+---
+
+## View Goal Weight
+
+### Success Cases
+
+```
+/view_goal   → shows current goal weight, e.g., "Your goal weight is 60 kg"
+vg           → shows current goal weight, e.g., "Your goal weight is 60 kg"
+```
+
+### Error Cases
+
+```
+/view_goal   → if no goal set, outputs: "No goal weight set yet."
+vg           → if no goal set, outputs: "No goal weight set yet."
+```
+
+**Usage:** `/view_goal` (alias: `vg`)
 
 ---
 
