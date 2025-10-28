@@ -9,6 +9,7 @@ import seedu.fitchasers.gym.StaticGymData;
 import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Modality;
 import seedu.fitchasers.tagger.MuscleGroup;
+import seedu.fitchasers.user.GoalWeightTracker;
 import seedu.fitchasers.user.Person;
 import seedu.fitchasers.user.WeightManager;
 import seedu.fitchasers.workouts.Workout;
@@ -48,6 +49,7 @@ public class FitChasers {
     private static String argumentStr;
     private static String input;
     private static WeightManager weightManager;
+    private static GoalWeightTracker goalTracker;
 
     public static void main(String[] args) throws IOException {
         initVariables();
@@ -88,6 +90,16 @@ public class FitChasers {
                 case "/view_weight":
                 case "vw":
                     viewWeightMethod(weightManager);
+                    break;
+
+                case "/set_goal":
+                case "sg":
+                    goalTracker.handleSetGoal(argumentStr);
+                    break;
+
+                case "/view_goal":
+                case "vg":
+                    goalTracker.handleViewGoal(person.getLatestWeight());
                     break;
 
                 case "/create_workout":
@@ -431,5 +443,6 @@ public class FitChasers {
         }
 
         viewLog = new ViewLog(ui, workoutManager, fileHandler);
+        goalTracker = new GoalWeightTracker();
     }
 }
