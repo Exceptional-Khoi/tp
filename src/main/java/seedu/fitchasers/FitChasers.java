@@ -36,20 +36,361 @@ public class FitChasers {
      *
      * @param args command line arguments (not used)
      */
-    public static void main(String[] args) throws IOException {
-        UI ui = new UI();
-        FileHandler fileHandler = new FileHandler();
+    private static Person person;
+    private static final String savedName = null;
+    private static final UI ui = new UI();
+    private static final FileHandler fileHandler = new FileHandler();
+    private static final YearMonth currentMonth = YearMonth.now();
+    private static ViewLog viewLog;
+    private static DefaultTagger tagger = new DefaultTagger();
+    private static List<Gym> gyms = StaticGymData.getNusGyms();
+    private static WorkoutManager workoutManager;
+    private static boolean isRunning = true;
+    private static String command;
+    private static String argumentStr;
+    private static String input;
+    private static WeightManager weightManager;
 
+    public static void main(String[] args) throws IOException {
+        initVariables(savedName, fileHandler, ui);
+        weightManager= new WeightManager(person);
         ui.showGreeting();
 
-        String savedName = null;
+        while (isRunning) {
+            input = ui.readCommand();
+            if (input == null) {
+                break;
+            }
+            if (input.trim().isEmpty()) {
+                continue;
+            }
+
+            String[] parts = input.trim().split("\\s+", 2);
+            command = parts[0].toLowerCase();
+            argumentStr = (parts.length > 1) ? parts[1].trim() : "";
+
+            try {
+                switch (command) {
+
+                case "/help":
+                case "h":
+                    ui.showHelp();
+                    break;
+
+                case "/rename": {
+                    renameMethod();
+                    break;
+                }
+
+                case "/add_weight":
+                case "aw":
+                    weightManager.addWeight(argumentStr);
+                    // Format: /add_weight w/WEIGHT d/DATE
+                    break;
+
+                case "/view_weight":
+                case "vw":
+                    viewWeightMethod(weightManager);
+                    break;
+
+                case "/create_workout":
+                case "cw":
+                    // Format: /create_workout n/NAME d/DD/MM/YY t/HHmm
+                    workoutManager.addWorkout(argumentStr);
+                    break;
+
+                case "/add_exercise":
+                case "ae":
+                    // Format: /add_exercise n/NAME r/REPS
+                    workoutManager.addExercise(argumentStr);
+                    break;
+
+                case "/add_modality_tag":
+                case "amot": {
+                    amotMethod();
+                    break;
+                }
+
+                case "/add_muscle_tag":
+                case "amt": {
+                    amtMethod();
+                    break;
+                }
+
+
+                case "/gym_where":
+                case "gw":{
+                    gwMethod();
+                    break;
+                }
+
+                case "/gym_page":
+                case "gp": {
+                    gpMethod();
+                    break;
+                }
+
+                case "/override_workout_tag":
+                case "owt": {
+                    owtMethod();
+                    break;
+                }
+
+                case "/add_set":
+                case "as":
+                    // Format: /add_set r/REPS
+                    workoutManager.addSet(argumentStr);
+                    break;
+
+                case "/end_workout":
+                case "ew":
+                    // Format: /end_workout d/DD/MM/YY t/HHmm
+                    workoutManager.endWorkout(ui, argumentStr);
+                    break;
+
+                case "/view_log":
+                case "vl":
+                    try{
+                        viewLog.render(argumentStr);
+                    }catch (IndexOutOfBoundsException e){
+                        ui.showError(e.getMessage());
+                    }
+                    break;
+
+                case "/open":
+                case "o":
+                    viewLog.openByIndex(Integer.parseInt(argumentStr));
+                    break;
+
+                case "/del_workout":
+                case "d":
+                    delMethod();
+                    break;
+
+                case "/exit":
+                case "e":
+                    exitMethod();
+                    break;
+
+                default:
+                    ui.showError("That's not a thing, bestie. Try /help or h for the real moves!");
+                    break;
+                }
+            } catch (Exception e) {
+                ui.showError("Something went wrong in main: " + e.getMessage());
+            }
+        }
+    }
+
+    private static void exitMethod() {
+        ui.showMessage("Saving your progress...");
+        try {
+            fileHandler.saveWeightList(person);
+            ui.showExitMessage();
+        } catch (IOException e) {
+            ui.showError("Failed to save workouts before exit.");
+        }
+        isRunning = false;
+    }
+
+    private static void delMethod() throws InvalidCommandException, IOException {
+        // Format: /del_workout WORKOUT_NAME
+        if(argumentStr.isEmpty()){
+            throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
+                    "Please enter a valid command.");
+        } else if (argumentStr.contains("d/")) {
+            workoutManager.interactiveDeleteWorkout(argumentStr, ui);
+        } else{
+            workoutManager.deleteWorkout(argumentStr);
+        }
+    }
+
+    private static void owtMethod() {
+        // Parse parameters
+        String[] params = argumentStr.split("\\s+");
+        Integer workoutId = null;
+        String newTag = null;
+
+        for (String param : params) {
+            if (param.startsWith("id/")) {
+                try {
+                    workoutId = Integer.parseInt(param.substring(3));
+                } catch (NumberFormatException e) {
+                    ui.showMessage("Invalid workout ID.");
+                    break;
+                }
+            } else if (param.startsWith("newTag/")) {
+                newTag = param.substring(7);
+            }
+        }
+
+        if (workoutId != null && newTag != null) {
+            // Update in memory
+            workoutManager.overrideWorkoutTags(workoutId, newTag);
+            // Save changes persistently immediately after update
+            try {
+                fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
+                ui.showMessage("Workout tags saved successfully.");
+            } catch (IOException e) {
+                ui.showMessage("Error saving workout data: " + e.getMessage());
+            }
+        } else {
+            ui.showMessage("Usage: /override_workout_tag id/WORKOUT_ID newTag/NEW_TAG");
+        }
+    }
+
+    private static void gpMethod() {
+        try {
+            String trimmedArg = argumentStr.trim();
+            if (trimmedArg.startsWith("p/") && trimmedArg.length() > 2) {
+                String pageNumStr = trimmedArg.substring(2).trim();
+                int pageNum = Integer.parseInt(pageNumStr);
+                if (pageNum >= 1 && pageNum <= gyms.size()) {
+                    Gym gym = gyms.get(pageNum - 1);
+                    String table = EquipmentDisplay.showEquipmentForSingleGym(gym);
+                    ui.showMessage(table);
+                } else {
+                    ui.showMessage("Invalid page number. Please enter a number between 1 and "
+                            + gyms.size());
+                }
+            } else {
+                ui.showMessage("Usage: /gym_page p/page_number (e.g. /gym_page p/1)");
+            }
+        } catch (NumberFormatException e) {
+            ui.showMessage("Usage: /gym_page page_number (must be an integer)");
+        }
+    }
+
+    private static void gwMethod() {
+        String trimmedArg = argumentStr.trim();
+        try {
+            // Only proceed if argument starts with "n/"
+            if (trimmedArg.startsWith("n/") && trimmedArg.length() > 2) {
+                Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
+                if (!gymsToSuggest.isEmpty()) {
+                    ui.showMessage("You can do this workout at: " + String.join(", ",
+                            gymsToSuggest));
+                } else {
+                    ui.showMessage("Sorry, no gyms found for that exercise.");
+                }
+            } else {
+                ui.showMessage("Usage: /gym_where n/exercise_name");
+            }
+        } catch (Exception e) {
+            ui.showMessage("An error occurred while searching for gyms. Please check your input " +
+                    "and try again.");
+        }
+    }
+
+    private static void amtMethod() {
+        // Example: /add_muscle_tag m=legs k=lunges
+        String[] params = argumentStr.split("\\s+");
+        String mus = null;
+        String keyword = null;
+        for (String param : params) {
+            if (param.startsWith("m/")) {
+                mus = param.substring(2).toUpperCase();
+            }
+            if (param.startsWith("k/")) {
+                keyword = param.substring(2).toLowerCase();
+            }
+        }
+        if (mus != null && keyword != null) {
+            tagger.addMuscleKeyword(MuscleGroup.valueOf(mus), keyword);
+            for (Workout w : workoutManager.getWorkouts()) {
+                Set<String> updatedTags = tagger.suggest(w);
+                w.setAutoTags(updatedTags);
+                ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
+            }
+            ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
+        } else {
+            ui.showMessage("Usage: /add_muscle_tag m/LEGS/ CHEST/... k/keyword");
+        }
+    }
+
+    private static void amotMethod() {
+        String[] params = argumentStr.split("\\s+");
+        String mod = null;
+        String keyword = null;
+        for (String param : params) {
+            if (param.startsWith("m/")) {
+                mod = param.substring(2).toUpperCase();
+            }
+            if (param.startsWith("k/")) {
+                keyword = param.substring(2).toLowerCase();
+            }
+        }
+        if (mod != null && keyword != null) {
+            tagger.addModalityKeyword(Modality.valueOf(mod), keyword);
+            for (Workout w : workoutManager.getWorkouts()) {
+                Set<String> updatedTags = tagger.suggest(w);
+                w.setAutoTags(updatedTags);
+                ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
+            }
+            ui.showMessage("Added keyword " + keyword + " to modality " + mod);
+        } else {
+            ui.showMessage("Usage: /add_modality_tag m/(CARDIO/ STRENGTH) k/keyword");
+        }
+    }
+
+    private static void viewWeightMethod(WeightManager weightManager) {
+        if (person.getWeightHistorySize() == 0) {
+            ui.showMessage(person.getName() + " has no weight records yet.");
+            return;
+        }
+        weightManager.viewWeights();
+        person.displayWeightGraphWithDates();
+    }
+
+    private static void renameMethod() {
+        if (argumentStr == null || !argumentStr.startsWith("n/")) {
+            ui.showMessage("Usage: /my_name n/YourName");
+            return;
+        }
+        String newName = argumentStr.substring(2).trim();
+        if (newName.isEmpty()) {
+            ui.showMessage("Usage: /my_name n/YourName");
+            ui.showMessage("You didn’t enter any name after 'n/'. Example: /my_name n/Nary");
+            return;
+        }
+
+        if (newName.length() > 30) {
+            ui.showMessage("Name is too long. Maximum is 30 characters.");
+            return;
+        }
+
+        if (!newName.matches("^[a-zA-Z0-9 _-]+$")) {
+            ui.showMessage("Name can only contain letters, numbers, spaces, " +
+                    "underscores (_), or dashes (-).");
+            return;
+        }
+
+        person.setName(newName);
+        ui.showMessage("Alright, I'll call you " + newName + " from now on.");
+
+        try {
+            fileHandler.saveUserName(person);
+            ui.showMessage("Your new name has been saved.");
+        } catch (IOException e) {
+            ui.showError("Failed to save username: " + e.getMessage());
+        }
+    }
+
+    private static void initVariables(String savedName, FileHandler fileHandler, UI ui) throws IOException {
+        workoutManager = new WorkoutManager(tagger, fileHandler);
+        try {
+            fileHandler.loadWeightList(person);
+            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
+        } catch (IOException e) {
+            ui.showError(e.getMessage());
+        }
+        fileHandler.initIndex();
+        viewLog = new ViewLog(ui, workoutManager, fileHandler);
         try {
             savedName = fileHandler.loadUserName();
         } catch (IOException e) {
             ui.showError("Error reading saved username: " + e.getMessage());
         }
-
-        Person person;
         if (savedName != null) {
             person = new Person(savedName);
             ui.showMessage("Welcome back, " + savedName + "!");
@@ -86,321 +427,6 @@ public class FitChasers {
                 fileHandler.saveUserName(person);
             } catch (IOException e) {
                 ui.showError("Failed to save username: " + e.getMessage());
-            }
-        }
-
-        WeightManager weightManager = new WeightManager(person);
-        YearMonth currentMonth = YearMonth.now();
-        ViewLog viewLog;
-        List<Gym> gyms = StaticGymData.getNusGyms();
-        DefaultTagger tagger = new DefaultTagger();
-        WorkoutManager workoutManager = new WorkoutManager(tagger, fileHandler);
-        fileHandler.initIndex();
-
-        try {
-            fileHandler.loadWeightList(person);
-            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
-            //ui.showMessage("Loaded " + currentMonth + " workouts.");
-        } catch (FileNonexistent e) {
-            ui.showError("Seems like this is a new month!"
-                    + "\nWould you like to create new workouts for this month? (Y/N)");
-            if (ui.confirmationMessage()) {
-                fileHandler.saveMonthList(currentMonth, new ArrayList<>());
-                workoutManager.setWorkouts(new ArrayList<>(), currentMonth);
-            }
-            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
-            //ui.showMessage("Loaded " + currentMonth + " workouts\n");
-        } catch (IOException e) {
-            ui.showError(e.getMessage());
-        }
-
-        viewLog = new ViewLog(ui, workoutManager, fileHandler);
-
-        boolean isRunning = true;
-
-        while (isRunning) {
-            String input = ui.readCommand();
-            if (input == null) {
-                break;
-            }
-            if (input.trim().isEmpty()) {
-                continue;
-            }
-
-            String[] parts = input.trim().split("\\s+", 2);
-            String command = parts[0].toLowerCase();
-            String argumentStr = (parts.length > 1) ? parts[1].trim() : "";
-
-            try {
-                switch (command) {
-
-                case "/help":
-                case "h":
-                    ui.showHelp();
-                    break;
-
-                case "/my_name":
-                case "n": {
-                    if (argumentStr == null || !argumentStr.startsWith("n/")) {
-                        ui.showMessage("Usage: /my_name n/YourName");
-                        break;
-                    }
-                    String newName = argumentStr.substring(2).trim();
-                    if (newName.isEmpty()) {
-                        ui.showMessage("Usage: /my_name n/YourName");
-                        ui.showMessage("You didn’t enter any name after 'n/'. Example: /my_name n/Nary");
-                        break;
-                    }
-
-                    if (newName.length() > 30) {
-                        ui.showMessage("Name is too long. Maximum is 30 characters.");
-                        break;
-                    }
-
-                    if (!newName.matches("^[a-zA-Z0-9 _-]+$")) {
-                        ui.showMessage("Name can only contain letters, numbers, spaces, " +
-                                "underscores (_), or dashes (-).");
-                        break;
-                    }
-
-                    person.setName(newName);
-                    ui.showMessage("Alright, I'll call you " + newName + " from now on.");
-
-                    try {
-                        fileHandler.saveUserName(person);
-                        ui.showMessage("Your new name has been saved.");
-                    } catch (IOException e) {
-                        ui.showError("Failed to save username: " + e.getMessage());
-                    }
-                    break;
-                }
-
-                case "/add_weight":
-                case "aw":
-                    weightManager.addWeight(argumentStr);
-                    // Format: /add_weight w/WEIGHT d/DATE
-                    break;
-
-                case "/view_weight":
-                case "vw":
-                    if (person.getWeightHistorySize() == 0) {
-                        ui.showMessage(person.getName() + " has no weight records yet.");
-                        break;
-                    }
-                    weightManager.viewWeights();
-                    person.displayWeightGraphWithDates();
-                    break;
-
-                case "/create_workout":
-                case "cw":
-                    // Format: /create_workout n/NAME d/DD/MM/YY t/HHmm
-                    workoutManager.addWorkout(argumentStr);
-                    break;
-
-                case "/add_exercise":
-                case "ae":
-                    // Format: /add_exercise n/NAME r/REPS
-                    workoutManager.addExercise(argumentStr);
-                    break;
-
-                case "/add_modality_tag":
-                case "amot": {
-
-                    String[] params = argumentStr.split("\\s+");
-                    String mod = null;
-                    String keyword = null;
-                    for (String param : params) {
-                        if (param.startsWith("m/")) {
-                            mod = param.substring(2).toUpperCase();
-                        }
-                        if (param.startsWith("k/")) {
-                            keyword = param.substring(2).toLowerCase();
-                        }
-                    }
-                    if (mod != null && keyword != null) {
-                        tagger.addModalityKeyword(Modality.valueOf(mod), keyword);
-                        for (Workout w : workoutManager.getWorkouts()) {
-                            Set<String> updatedTags = tagger.suggest(w);
-                            w.setAutoTags(updatedTags);
-                            ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
-                        }
-                        ui.showMessage("Added keyword " + keyword + " to modality " + mod);
-                    } else {
-                        ui.showMessage("Usage: /add_modality_tag m/(CARDIO/ STRENGTH) k/keyword");
-                    }
-                    break;
-                }
-
-                case "/add_muscle_tag":
-                case "amt": {
-                    // Example: /add_muscle_tag m=legs k=lunges
-                    String[] params = argumentStr.split("\\s+");
-                    String mus = null;
-                    String keyword = null;
-                    for (String param : params) {
-                        if (param.startsWith("m/")) {
-                            mus = param.substring(2).toUpperCase();
-                        }
-                        if (param.startsWith("k/")) {
-                            keyword = param.substring(2).toLowerCase();
-                        }
-                    }
-                    if (mus != null && keyword != null) {
-                        tagger.addMuscleKeyword(MuscleGroup.valueOf(mus), keyword);
-                        for (Workout w : workoutManager.getWorkouts()) {
-                            Set<String> updatedTags = tagger.suggest(w);
-                            w.setAutoTags(updatedTags);
-                            ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
-                        }
-                        ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
-                    } else {
-                        ui.showMessage("Usage: /add_muscle_tag m/LEGS/ CHEST/... k/keyword");
-                    }
-                    break;
-                }
-
-
-                case "/gym_where":
-                case "gw":{
-                    String trimmedArg = argumentStr.trim();
-                    try {
-                        // Only proceed if argument starts with "n/"
-                        if (trimmedArg.startsWith("n/") && trimmedArg.length() > 2) {
-                            Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
-                            if (!gymsToSuggest.isEmpty()) {
-                                ui.showMessage("You can do this workout at: " + String.join(", ",
-                                        gymsToSuggest));
-                            } else {
-                                ui.showMessage("Sorry, no gyms found for that exercise.");
-                            }
-                        } else {
-                            ui.showMessage("Usage: /gym_where n/exercise_name");
-                        }
-                    } catch (Exception e) {
-                        ui.showMessage("An error occurred while searching for gyms. Please check your input " +
-                                "and try again.");
-                    }
-                    break;
-                }
-
-                case "/gym_page":
-                case "gp": {
-                    try {
-                        String trimmedArg = argumentStr.trim();
-                        if (trimmedArg.startsWith("p/") && trimmedArg.length() > 2) {
-                            String pageNumStr = trimmedArg.substring(2).trim();
-                            int pageNum = Integer.parseInt(pageNumStr);
-                            if (pageNum >= 1 && pageNum <= gyms.size()) {
-                                Gym gym = gyms.get(pageNum - 1);
-                                String table = EquipmentDisplay.showEquipmentForSingleGym(gym);
-                                ui.showMessage(table);
-                            } else {
-                                ui.showMessage("Invalid page number. Please enter a number between 1 and "
-                                        + gyms.size());
-                            }
-                        } else {
-                            ui.showMessage("Usage: /gym_page p/page_number (e.g. /gym_page p/1)");
-                        }
-                    } catch (NumberFormatException e) {
-                        ui.showMessage("Usage: /gym_page page_number (must be an integer)");
-                    }
-                    break;
-                }
-
-                case "/override_workout_tag":
-                case "owt": {
-                    // Parse parameters
-                    String[] params = argumentStr.split("\\s+");
-                    Integer workoutId = null;
-                    String newTag = null;
-
-                    for (String param : params) {
-                        if (param.startsWith("id/")) {
-                            try {
-                                workoutId = Integer.parseInt(param.substring(3));
-                            } catch (NumberFormatException e) {
-                                ui.showMessage("Invalid workout ID.");
-                                break;
-                            }
-                        } else if (param.startsWith("newTag/")) {
-                            newTag = param.substring(7);
-                        }
-                    }
-
-                    if (workoutId != null && newTag != null) {
-                        // Update in memory
-                        workoutManager.overrideWorkoutTags(workoutId, newTag);
-                        // Save changes persistently immediately after update
-                        try {
-                            fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-                            ui.showMessage("Workout tags saved successfully.");
-                        } catch (IOException e) {
-                            ui.showMessage("Error saving workout data: " + e.getMessage());
-                        }
-                    } else {
-                        ui.showMessage("Usage: /override_workout_tag id/WORKOUT_ID newTag/NEW_TAG");
-                    }
-
-                    break;
-                }
-
-                case "/add_set":
-                case "as":
-                    // Format: /add_set r/REPS
-                    workoutManager.addSet(argumentStr);
-                    break;
-
-                case "/end_workout":
-                case "ew":
-                    // Format: /end_workout d/DD/MM/YY t/HHmm
-                    workoutManager.endWorkout(ui, argumentStr);
-                    break;
-
-                case "/view_log":
-                case "vl":
-                    try{
-                        viewLog.render(argumentStr);
-                    }catch (IndexOutOfBoundsException e){
-                        ui.showError(e.getMessage());
-                    }
-                    break;
-
-                case "/open":
-                case "o":
-                    viewLog.openByIndex(Integer.parseInt(argumentStr));
-                    break;
-
-                case "/del_workout":
-                case "d":
-                    // Format: /del_workout WORKOUT_NAME
-                    if(argumentStr.isEmpty()){
-                        throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
-                                "Please enter a valid command.");
-                    } else if (argumentStr.contains("d/")) {
-                        workoutManager.interactiveDeleteWorkout(argumentStr, ui);
-                    } else{
-                        workoutManager.deleteWorkout(argumentStr);
-                    }
-                    break;
-
-                case "/exit":
-                case "e":
-                    ui.showMessage("Saving your progress...");
-                    try {
-                        fileHandler.saveWeightList(person);
-                        ui.showExitMessage();
-                    } catch (IOException e) {
-                        ui.showError("Failed to save workouts before exit.");
-                    }
-                    isRunning = false;
-                    break;
-
-                default:
-                    ui.showError("That's not a thing, bestie. Try /help or h for the real moves!");
-                    break;
-                }
-            } catch (Exception e) {
-                ui.showError("Something went wrong: " + e.getMessage());
             }
         }
     }
