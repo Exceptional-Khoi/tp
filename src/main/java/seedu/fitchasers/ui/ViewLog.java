@@ -270,7 +270,7 @@ public class ViewLog {
 
     private static String formatDayMon(LocalDateTime dt) {
         if (dt == null) {
-            return "Unknown date";
+            return "Unended";
         }
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
         int day = dt.getDayOfMonth();
@@ -280,7 +280,7 @@ public class ViewLog {
 
     private static String formatLong(LocalDateTime dt) {
         if (dt == null) {
-            return "Unknown date";
+            return "Unended";
         }
         String dow = dt.getDayOfWeek().getDisplayName(TextStyle.FULL, Locale.ENGLISH);
         int d = dt.getDayOfMonth();

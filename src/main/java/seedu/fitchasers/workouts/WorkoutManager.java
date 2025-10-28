@@ -59,12 +59,12 @@ public class WorkoutManager {
      * @param command the full user command containing workout details
      */
     public void addWorkout(String command) {
+        workoutName = "";
         try {
             formatInputForWorkout(command);
         } catch (InvalidArgumentInput e) {
             return;
         }
-        workoutName = "";
         monthOfWorkout = YearMonth.from(workoutDateTime);
         if(!currentLoadedMonth.equals(monthOfWorkout)) {
             setWorkouts(fileHandler.getWorkoutsForMonth(monthOfWorkout), monthOfWorkout);
@@ -90,7 +90,6 @@ public class WorkoutManager {
 
     private void formatInputForWorkout(String command) throws InvalidArgumentInput {
         assert workouts != null : "workouts list should be initialized";
-
         if (currentWorkout != null) {
             ui.showMessage("You currently have an active workout: '"
                     + currentWorkout.getWorkoutName() + "'.");
@@ -102,7 +101,7 @@ public class WorkoutManager {
 
         if (command == null || !command.contains("n/")) {
             ui.showMessage("Invalid format. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
-            return;
+            throw new InvalidArgumentInput("");
         }
 
         int nameIndex = command.indexOf("n/");
@@ -130,7 +129,7 @@ public class WorkoutManager {
 
         if (workoutName.isEmpty()) {
             ui.showMessage("Workout name cannot be empty. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
-            return;
+            throw new InvalidArgumentInput("");
         }
 
         assert !workoutName.isEmpty() : "workoutName should be non-empty after validation";
@@ -168,7 +167,7 @@ public class WorkoutManager {
                 date = LocalDate.parse(dateStr, dateFmt);
             } catch (Exception ex) {
                 ui.showMessage("Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -177,7 +176,7 @@ public class WorkoutManager {
                 time = LocalTime.parse(timeStr, timeFmt);
             } catch (Exception ex) {
                 ui.showMessage("Invalid time. Use t/HHmm (e.g., t/1905).");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -189,7 +188,7 @@ public class WorkoutManager {
                 date = LocalDate.now();
             } else {
                 ui.showMessage("Please provide a date in format d/DD/MM/YY.");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -200,7 +199,7 @@ public class WorkoutManager {
                 time = LocalTime.now();
             } else {
                 ui.showMessage("Please provide a time in format t/HHmm.");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
         workoutDateTime = LocalDateTime.of(date, time);
@@ -209,7 +208,7 @@ public class WorkoutManager {
             ui.showMessage("The date you entered (" + date.format(dateFmt) + ") is in the future. Are you sure? (Y/N)");
             if (!ui.confirmationMessage()) {
                 ui.showMessage("Please re-enter the correct date.");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -217,7 +216,7 @@ public class WorkoutManager {
             ui.showMessage("The time you entered (" + time.format(timeFmt) + ") is in the future. Are you sure? (Y/N)");
             if (!ui.confirmationMessage()) {
                 ui.showMessage("Please re-enter the correct time.");
-                return;
+                throw new InvalidArgumentInput("");
             }
         }
 
@@ -234,7 +233,7 @@ public class WorkoutManager {
                             "Continue anyway? (Y/N)");
                     if (!ui.confirmationMessage()) {
                         ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
-                        return;
+                        throw new InvalidArgumentInput("");
                     }
                     break;
                 }
