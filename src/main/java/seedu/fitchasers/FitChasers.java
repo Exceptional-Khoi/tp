@@ -10,6 +10,7 @@ import seedu.fitchasers.gym.StaticGymData;
 import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Modality;
 import seedu.fitchasers.tagger.MuscleGroup;
+import seedu.fitchasers.user.GoalWeightTracker;
 import seedu.fitchasers.user.Person;
 import seedu.fitchasers.user.WeightManager;
 import seedu.fitchasers.workouts.Workout;
@@ -90,6 +91,7 @@ public class FitChasers {
         }
 
         WeightManager weightManager = new WeightManager(person);
+        GoalWeightTracker goalTracker = new GoalWeightTracker();
         YearMonth currentMonth = YearMonth.now();
         ViewLog viewLog;
         List<Gym> gyms = StaticGymData.getNusGyms();
@@ -189,6 +191,16 @@ public class FitChasers {
                     }
                     weightManager.viewWeights();
                     person.displayWeightGraphWithDates();
+                    break;
+
+                case "/set_goal":
+                case "sg":
+                    goalTracker.handleSetGoal(argumentStr);
+                    break;
+
+                case "/view_goal":
+                case "vg":
+                    goalTracker.handleViewGoal(person.getLatestWeight());
                     break;
 
                 case "/create_workout":
