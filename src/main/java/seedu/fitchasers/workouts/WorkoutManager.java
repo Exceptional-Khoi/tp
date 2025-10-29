@@ -32,6 +32,12 @@ public class WorkoutManager {
     private static final int ARRAY_OFFSET = 1;
     private static final int MAX_EXERCISE_NAME_LEN = 32;
     private static final int MAX_REPS = 1000;
+    private static final Pattern NAME_ALLOWED = Pattern.compile("[A-Za-z0-9 _-]+");
+    private static final Pattern NAME_ILLEGAL_FINDER = Pattern.compile("[^A-Za-z0-9 _-]");
+    private static final Pattern BOUND_PREFIX = Pattern.compile("(^|\\s)([A-Za-z])/");
+    private static final Pattern NEXT_PREFIX = Pattern.compile("\\s+[A-Za-z]/");
+    private static final Pattern REPS_TOKEN = Pattern.compile("^\\d{1,4}$");
+
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
@@ -43,12 +49,6 @@ public class WorkoutManager {
     private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
     private final Set<YearMonth> loadedMonths = new HashSet<>();
     private final FileHandler fileHandler;
-
-    private static final Pattern NAME_ALLOWED = Pattern.compile("[A-Za-z0-9 _-]+");
-    private static final Pattern NAME_ILLEGAL_FINDER = Pattern.compile("[^A-Za-z0-9 _-]");
-    private static final Pattern BOUND_PREFIX = Pattern.compile("(^|\\s)([A-Za-z])/");
-    private static final Pattern NEXT_PREFIX = Pattern.compile("\\s+[A-Za-z]/");
-    private static final Pattern REPS_TOKEN = Pattern.compile("^\\d{1,4}$");
 
     private static final DateTimeFormatter DATE_FMT =
             DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
@@ -857,7 +857,10 @@ public class WorkoutManager {
     private static int countToken(String s, String token) {
         int count = 0;
         int idx = 0;
-        while ((idx = s.indexOf(token, idx)) != -1) { count++; idx += token.length(); }
+        while ((idx = s.indexOf(token, idx)) != -1) {
+            count++;
+            idx += token.length();
+        }
         return count;
     }
 
