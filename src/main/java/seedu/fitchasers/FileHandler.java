@@ -8,6 +8,8 @@ import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.Exercise;
 
 import java.io.FileWriter;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -46,7 +48,7 @@ public class FileHandler {
     private final Path workoutDir = FILE_PATH.resolve("workouts");
     private final UI ui = new UI();
     private final Map<YearMonth, ArrayList<Workout>> arrayByMonth = new HashMap<>();
-    private final Set<YearMonth> onDiskMonths = new HashSet<>(); // discovered from directory
+    private final Set<YearMonth> onDiskMonths = new HashSet<>();
 
     /**
      * Initilize index for lazy loading
@@ -58,13 +60,23 @@ public class FileHandler {
         try (var stream = Files.list(FILE_PATH)) {
             stream.map(p -> p.getFileName().toString())
                     .filter(n -> n.startsWith("workouts_") && n.endsWith(".dat"))
-                    .map(n -> n.substring(9, 16))           // "YYYY-MM"
+                    .map(n -> n.substring(9, 16))
                     .forEach(s -> onDiskMonths.add(YearMonth.parse(s)));
         }
     }
 
     public Map<YearMonth, ArrayList<Workout>> getArrayByMonth() {
         return arrayByMonth;
+    }
+
+    public ArrayList<Workout> getWorkoutsForMonth(YearMonth targetMonth) {
+        return arrayByMonth.computeIfAbsent(targetMonth, month -> {
+            try {
+                return loadMonthList(month);
+            } catch (Exception e) {
+                return new ArrayList<>();
+            }
+        });
     }
 
     /**
@@ -86,13 +98,13 @@ public class FileHandler {
      * @throws IOException if saving fails
      */
     public void saveMonthList(YearMonth month, ArrayList<Workout> list) throws IOException {
-        try{
+        try {
             ensureDataDir();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        String filename = String.format("workouts_%s.dat", month); // e.g., workouts_2025-06.dat
+        String filename = String.format("workouts_%s.dat", month);
         Path filePath = workoutDir.resolve(filename);
 
         try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
@@ -160,106 +172,135 @@ public class FileHandler {
             } else if (line.startsWith("END_WORKOUT")) {
                 currentWorkout = null;
             }
-        }
-
-        ui.showMessage("Loaded " + workoutManager.getWorkouts().size() + " workout(s) from file.");
-    }
-
-    /**
-     * Saves all workout data to save.txt in the specified format.
-     * <p>
-     * Each save overwrites the entire file.
-     *
-     * @param workouts list of workouts to be saved
-     * @throws IOException if writing fails
-     */
-    public void saveFile(Person person, List<Workout> workouts) throws IOException {
-        ensureDataDir();
-        try (FileWriter fw = new FileWriter(FILE_PATH.toFile())) {
-            fw.write("USER | " + person.getName() + "\n");
-            for (Workout w : workouts) {
-                fw.write("WORKOUT | " + w.getWorkoutName() + " | " + w.getDuration() + "\n");
-                for (Exercise ex : w.getExercises()) {
-                    StringBuilder setsStr = new StringBuilder();
-                    for (int i = 0; i < ex.getSets().size(); i++) {
-                        setsStr.append(ex.getSets().get(i));
-                        if (i < ex.getSets().size() - 1) {
-                            setsStr.append(",");
-                        }
-                    }
-                    fw.write("EXERCISE | " + ex.getName() + " | " + setsStr + "\n");
-                }
-
-                Set<String>workoutTags = w.getAllTags();
-                StringBuilder setsStr = new StringBuilder();
-
-                for (String workoutTag : workoutTags){
-                    setsStr.append(workoutTag);
-                    setsStr.append(",");
-                }
-                fw.write("TAGS | " + setsStr + '\n');
-                fw.write("END_WORKOUT\n");
+        Path filePath = dataDir.resolve("weight.txt");
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+            for (WeightRecord wr : person.getWeightHistory()) {
+                writer.write(wr.getDate() + "," + wr.getWeight());
+                writer.newLine();
             }
         }
-        ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
+    }
+        /**
+         * Saves all workout data to save.txt in the specified format.
+         * <p>
+         * Each save overwrites the entire file.
+         *
+         * @param workouts list of workouts to be saved
+         * @throws IOException if writing fails
+         */
+        public void saveFile(Person person, List<Workout> workouts) throws IOException {
+            ensureDataDir();
+            try (FileWriter fw = new FileWriter(FILE_PATH.toFile())) {
+                fw.write("USER | " + person.getName() + "\n");
+                for (Workout w : workouts) {
+                    fw.write("WORKOUT | " + w.getWorkoutName() + " | " + w.getDuration() + "\n");
+                    for (Exercise ex : w.getExercises()) {
+                        StringBuilder setsStr = new StringBuilder();
+                        for (int i = 0; i < ex.getSets().size(); i++) {
+                            setsStr.append(ex.getSets().get(i));
+                            if (i < ex.getSets().size() - 1) {
+                                setsStr.append(",");
+                            }
+                        }
+                        fw.write("EXERCISE | " + ex.getName() + " | " + setsStr + "\n");
+                    }
+
+                    Set<String>workoutTags = w.getAllTags();
+                    StringBuilder setsStr = new StringBuilder();
+
+                    for (String workoutTag : workoutTags){
+                        setsStr.append(workoutTag);
+                        setsStr.append(",");
+                    }
+                    fw.write("TAGS | " + setsStr + '\n');
+                    fw.write("END_WORKOUT\n");
+                }
+            }
+            ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
+        }
+    /**
+     * Loads previously saved weight entries for the given person from a text file.
+     *
+     * @param person the {@link Person} whose weight history will be loaded
+     * @throws IOException if an I/O error occurs while reading the file
+     */
+    public void loadWeightList(Person person) throws IOException {
+        ensureDataDir();
+        Path filePath = dataDir.resolve("weight.txt");
+        if (Files.notExists(filePath)) {
+            return;
+        }
+
+        List<WeightRecord> list = new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                LocalDate date = LocalDate.parse(parts[0]);
+                double weight = Double.parseDouble(parts[1]);
+                list.add(new WeightRecord(weight, date));
+            }
+        }
+        person.setWeightHistory(list);
+    }
+
+    // ----------------- Goal -----------------
+    /**
+     * Saves the user's goal weight and the date it was set to a text file named {@code goal.txt}.
+     *
+     * @param goalWeight the target goal weight to be saved (in kilograms)
+     * @param setDate    the {@link LocalDate} when the goal weight was set
+     * @throws IOException if an I/O error occurs while writing to the file
+     */
+    public void saveGoal(double goalWeight, LocalDate setDate) throws IOException {
+        ensureDataDir();
+        Path filePath = dataDir.resolve("goal.txt");
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+            writer.write(goalWeight + "," + setDate);
+        }
     }
 
     /**
-     * Loads the saved goal weight and the date it was set from the data file {@code goal.dat}.
-     * <p>
-     * If the file does not exist, this method returns {@code null}.
-     * Otherwise, it reads two values in the following order:
-     * <ul>
-     *     <li>The goal weight as a {@code double}</li>
-     *     <li>The date the goal was set, represented as a {@code long} epoch day value</li>
-     * </ul>
-     * The method then returns both values as an array of {@link Double} objects,
-     * where index 0 is the goal weight, and index 1 is the epoch day of the goal date.
-     * </p>
+     * Loads the saved goal weight and the date it was set from the text file {@code goal.txt}.
      *
      * @return a {@code Double[]} array containing [goalWeight, epochDay], or {@code null} if no data file exists
-     * @throws IOException if an I/O error occurs while reading from the file
+     * @throws IOException if an I/O error occurs while reading the file
      */
     public Double[] loadGoal() throws IOException {
         ensureDataDir();
-        Path filePath = FILE_PATH.resolve("goal.dat");
+        Path filePath = dataDir.resolve("goal.txt");
         if (Files.notExists(filePath)) {
             return null;
         }
 
-        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
-            double goal = in.readDouble();
-            long epochDay = in.readLong();
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+            String[] parts = reader.readLine().split(",");
+            double goal = Double.parseDouble(parts[0]);
+            long epochDay = LocalDate.parse(parts[1]).toEpochDay();
             return new Double[]{goal, (double) epochDay};
         }
     }
 
     // ----------------- Username -----------------
     /**
-     * Saves the person's name to a file for future sessions.
+     * Saves the person's name to a text file for future sessions.
      */
     public void saveUserName(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = FILE_PATH.resolve("username.dat");
-        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-            out.writeObject(person.getName());
-        }
+        Path filePath = dataDir.resolve("username.txt");
+        Files.writeString(filePath, person.getName());
     }
 
     /**
-     * Loads the saved username from file.
+     * Loads the saved username from text file.
      * Returns null if file doesn't exist.
      */
     public String loadUserName() throws IOException {
         ensureDataDir();
-        Path filePath = FILE_PATH.resolve("username.dat");
+        Path filePath = FILE_PATH.resolve("username.txt");
         if (Files.notExists(filePath)) {
             return null;
         }
-        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
-            return (String) in.readObject();
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Failed to read username from file", e);
-        }
+        return Files.readString(filePath).trim();
     }
 }

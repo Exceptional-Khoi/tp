@@ -399,11 +399,13 @@ public class FitChasers {
             // Prompt for name if not saved
             ui.showMessage("Before we begin, please enter your name.");
             String userName = ui.enterName();
-            while (userName == null || userName.trim().isEmpty()) {
-                ui.showMessage("Name cannot be empty. Please enter your name:");
-                userName = ui.enterName();
+            person = new Person(userName);
+            try {
+                fileHandler.saveUserName(person);
+                ui.showMessage("Your name has been saved.");
+            } catch (IOException e) {
+                ui.showError("Failed to save username: " + e.getMessage());
             }
-            person = new Person(userName.trim());
 
             // Prompt for initial weight
             double initialWeight = ui.enterWeight();
@@ -422,7 +424,7 @@ public class FitChasers {
                 }
             }
 
-            ui.showMessage("Nice to meet you, " + person.getName() + "/hhkhjg! Let's get started!");
+            ui.showMessage("Nice to meet you, " + person.getName() + " Let's get started!");
 
             try {
                 fileHandler.saveUserName(person);

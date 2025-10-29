@@ -55,10 +55,24 @@ public class UI {
             if (name == null) {
                 return null;
             }
-            if (!name.trim().isEmpty()) {
-                return name.trim();
+            name = name.trim();
+
+            if (name.isEmpty()) {
+                showError("Name cannot be empty. Please try again!");
+                continue;
             }
-            showError("Name cannot be empty. Please try again!");
+
+            if (name.length() > 30) {
+                showError("Name is too long. Maximum is 30 characters.");
+                continue;
+            }
+
+            if (!name.matches("^[a-zA-Z0-9 _-]+$")) {
+                showError("Name can only contain letters, numbers, spaces, underscores (_), or dashes (-).");
+                continue;
+            }
+
+            return name;
         }
     }
 
