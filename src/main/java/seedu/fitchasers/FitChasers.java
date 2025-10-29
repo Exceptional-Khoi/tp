@@ -266,26 +266,22 @@ public class FitChasers {
                 return;
             }
 
-            // NOW modify after confirmation
             workoutManager.overrideWorkoutTags(workout, newTag);
 
-// Save changes persistently immediately after update
+
             try {
-                // 1. Persist current workouts to file
                 fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
 
-                // 2. Reload persisted workouts into manager (optional if your object already reflects changes)
                 ArrayList<Workout> reloadedWorkouts = fileHandler.getWorkoutsForMonth(currentMonth);
                 workoutManager.setWorkouts(reloadedWorkouts);
 
-                // 3. Display tag changes for the (already modified) workout object
-                Workout updatedWorkout = workout; // This is the object you just updated
+
+                Workout updatedWorkout = workout;
                 String newTagsDisplay = updatedWorkout.getAllTags().toString();
 
                 ui.showMessage("✓ Workout tags updated successfully.");
                 ui.showMessage("  New tags: " + newTagsDisplay);
 
-                // 4. Show warnings for overridden tags if any
                 Set<String> conflicts = workoutManager.checkForOverriddenTags(updatedWorkout);
                 if (!conflicts.isEmpty()) {
                     ui.showMessage("⚠️ WARNING: These manual tags override auto-tags: " + conflicts);
@@ -314,14 +310,12 @@ public class FitChasers {
                     return;
                 }
 
-                // Try to parse as number first
                 try {
                     int pageNum = Integer.parseInt(input);
                     if (pageNum >= 1 && pageNum <= gyms.size()) {
                         selectedGym = gyms.get(pageNum - 1);
                     }
                 } catch (NumberFormatException e) {
-                    // Not a number, try gym name
                     selectedGym = findGymByName(input);
                 }
 
@@ -361,7 +355,6 @@ public class FitChasers {
     private static void gwMethod() {
         String trimmedArg = argumentStr.trim();
         try {
-            // Only proceed if argument starts with "n/"
             if (trimmedArg.startsWith("n/") && trimmedArg.length() > 2) {
                 Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
                 if (!gymsToSuggest.isEmpty()) {
@@ -417,7 +410,8 @@ public class FitChasers {
                     ui.showMessage("⚠️ Error saving changes: " + e.getMessage());
                 }
             } catch (IllegalArgumentException e) {
-                ui.showMessage("❌ Invalid muscle group. Valid options: LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE");
+                ui.showMessage("❌ Invalid muscle group. Valid options: LEGS, POSTERIOR_CHAIN, CHEST, BACK, " +
+                        "SHOULDERS, ARMS, CORE");
                 return;
             }
         } else {

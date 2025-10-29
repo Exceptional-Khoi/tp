@@ -47,6 +47,10 @@ public class WorkoutManager {
         this.currentLoadedMonth = YearMonth.now();
     }
 
+    public void setWorkouts(ArrayList<Workout> workouts) {
+        this.workouts = workouts;
+    }
+
     public void setWorkouts(ArrayList<Workout> workouts, YearMonth monthOfArrayList) {
         this.workouts = workouts;
         currentLoadedMonth = monthOfArrayList;
@@ -286,10 +290,6 @@ public class WorkoutManager {
      */
     public ArrayList<Workout> getWorkouts() {
         return workouts;
-    }
-
-    public void setWorkouts(ArrayList<Workout> workouts) {
-        this.workouts = workouts;
     }
 
     /**
