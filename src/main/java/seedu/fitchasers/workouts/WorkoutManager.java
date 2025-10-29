@@ -37,6 +37,11 @@ public class WorkoutManager {
     private static final Pattern BOUND_PREFIX = Pattern.compile("(^|\\s)([A-Za-z])/");
     private static final Pattern NEXT_PREFIX = Pattern.compile("\\s+[A-Za-z]/");
     private static final Pattern REPS_TOKEN = Pattern.compile("^\\d{1,4}$");
+    private static final DateTimeFormatter DATE_FMT =
+            DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
+    private static final DateTimeFormatter TIME_FMT =
+            DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
+
 
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
@@ -49,11 +54,6 @@ public class WorkoutManager {
     private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
     private final Set<YearMonth> loadedMonths = new HashSet<>();
     private final FileHandler fileHandler;
-
-    private static final DateTimeFormatter DATE_FMT =
-            DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
-    private static final DateTimeFormatter TIME_FMT =
-            DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
 
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
         this.tagger = tagger;
@@ -710,9 +710,6 @@ public class WorkoutManager {
             ui.showMessage("No active workout.");
             return;
         }
-        final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy").
-                withResolverStyle(ResolverStyle.SMART);
-        final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
 
         String args = (initialArgs == null) ? "" : initialArgs.trim();
 
@@ -735,7 +732,7 @@ public class WorkoutManager {
         }
 
         // Reject any other boundary flags (only d/ and t/ allowed)
-        java.util.regex.Matcher stray = BOUND_PREFIX.matcher(args);
+        Matcher stray = BOUND_PREFIX.matcher(args);
         while (stray.find()) {
             char p = stray.group(2).charAt(0); // letter before '/'
             if (p != 'd' && p != 't') {
@@ -775,7 +772,7 @@ public class WorkoutManager {
         // Validate provided pieces first
         if (!dateStr.isEmpty()) {
             try {
-                date = LocalDate.parse(dateStr, dateFmt);
+                date = LocalDate.parse(dateStr, DATE_FMT);
             } catch (Exception ex) {
                 ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
                 ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
@@ -784,7 +781,7 @@ public class WorkoutManager {
         }
         if (!timeStr.isEmpty()) {
             try {
-                time = LocalTime.parse(timeStr, timeFmt);
+                time = LocalTime.parse(timeStr, TIME_FMT);
             } catch (Exception ex) {
                 ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
                 ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
@@ -794,7 +791,7 @@ public class WorkoutManager {
 
         // Prompt ONLY for missing pieces
         if (date == null) {
-            String todayStr = LocalDate.now().format(dateFmt);
+            String todayStr = LocalDate.now().format(DATE_FMT);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 date = LocalDate.now();
@@ -804,7 +801,7 @@ public class WorkoutManager {
             }
         }
         if (time == null) {
-            String nowStr = LocalTime.now().format(timeFmt);
+            String nowStr = LocalTime.now().format(TIME_FMT);
             ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 time = LocalTime.now();
