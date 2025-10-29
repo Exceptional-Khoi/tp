@@ -647,8 +647,12 @@ public class WorkoutManager {
 
     public String getConflictingModality(Workout w) {
         Set<String> autoTags = w.getAutoTags();
-        if (autoTags.contains("cardio")) return "cardio";
-        if (autoTags.contains("strength")) return "strength";
+        if (autoTags.contains("cardio")) {
+            return "cardio";
+        }
+        if (autoTags.contains("strength")) {
+            return "strength";
+        }
         return null;
     }
 

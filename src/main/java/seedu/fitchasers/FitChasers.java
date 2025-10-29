@@ -252,22 +252,57 @@ public class FitChasers {
     private static void gpMethod() {
         try {
             String trimmedArg = argumentStr.trim();
+            Gym selectedGym = null;
+
             if (trimmedArg.startsWith("p/") && trimmedArg.length() > 2) {
-                String pageNumStr = trimmedArg.substring(2).trim();
-                int pageNum = Integer.parseInt(pageNumStr);
-                if (pageNum >= 1 && pageNum <= gyms.size()) {
-                    Gym gym = gyms.get(pageNum - 1);
-                    String table = EquipmentDisplay.showEquipmentForSingleGym(gym);
-                    ui.showMessage(table);
+                String input = trimmedArg.substring(2).trim();
+                if (input.isEmpty()) {  // ADD THIS
+                    ui.showMessage("Please provide a gym number or name.");
+                    listAvailableGyms();
+                    return;
+                }
+
+                // Try to parse as number first
+                try {
+                    int pageNum = Integer.parseInt(input);
+                    if (pageNum >= 1 && pageNum <= gyms.size()) {
+                        selectedGym = gyms.get(pageNum - 1);
+                    }
+                } catch (NumberFormatException e) {
+                    // Not a number, try gym name
+                    selectedGym = findGymByName(input);
+                }
+
+                if (selectedGym != null) {
+                    EquipmentDisplay.showEquipmentForSingleGym(selectedGym);
                 } else {
-                    ui.showMessage("Invalid page number. Please enter a number between 1 and "
-                            + gyms.size());
+                    ui.showMessage("Invalid gym. Use number (1-" + gyms.size() + ") or gym name (e.g., SRC Gym)");
+                    listAvailableGyms();
                 }
             } else {
-                ui.showMessage("Usage: /gym_page p/page_number (e.g. /gym_page p/1)");
+                ui.showMessage("Usage: /gym_page p/page_number_or_gym_name");
+                ui.showMessage("Example: /gym_page p/1 OR /gym_page p/SRC Gym");
+                listAvailableGyms();
             }
-        } catch (NumberFormatException e) {
-            ui.showMessage("Usage: /gym_page page_number (must be an integer)");
+        } catch (Exception e) {
+            ui.showMessage("Error: " + e.getMessage());
+        }
+    }
+
+    private static Gym findGymByName(String gymName) {
+        String searchName = gymName.toLowerCase().trim();
+        for (Gym gym : gyms) {
+            if (gym.getName().toLowerCase().contains(searchName)) {
+                return gym;
+            }
+        }
+        return null;
+    }
+
+    private static void listAvailableGyms() {
+        ui.showMessage("Available gyms:");
+        for (int i = 0; i < gyms.size(); i++) {
+            ui.showMessage("  " + (i + 1) + ". " + gyms.get(i).getName());
         }
     }
 
@@ -312,7 +347,12 @@ public class FitChasers {
                 w.setAutoTags(updatedTags);
                 ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
             }
-            ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
+            try {
+                fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
+                ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
+            } catch (IOException e) {
+                ui.showMessage("⚠️ Error saving changes: " + e.getMessage());
+            }
         } else {
             ui.showMessage("Usage: /add_muscle_tag m/LEGS/ CHEST/... k/keyword");
         }
@@ -458,7 +498,7 @@ public class FitChasers {
                 }
             }
 
-            ui.showMessage("Nice to meet you, " + person.getName() + "/hhkhjg! Let's get started!");
+            ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started!");
 
             try {
                 fileHandler.saveUserName(person);
