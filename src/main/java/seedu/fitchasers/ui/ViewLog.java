@@ -78,8 +78,8 @@ public class ViewLog {
     public void render(String args) throws InvalidArgumentInput {
         Parsed p = parseArgs(args);
 
+        // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
         ArrayList<Workout> monthList = fileHandler.getWorkoutsForMonth(p.ym);
-
         ArrayList<Workout> sorted = new ArrayList<>(monthList);
         sorted.sort(Comparator.comparing(
                 Workout::getWorkoutEndDateTime,
@@ -163,7 +163,7 @@ public class ViewLog {
         String dateLong = formatLong(workout.getWorkoutEndDateTime());
         String dur = formatDuration(workout.getDuration());
         StringBuilder sb = new StringBuilder();
-        sb.append("—".repeat(60)).append('\n');
+        sb.append("~".repeat(60)).append('\n');
         sb.append(String.format("#%d  %s%n", id, safe(workout.getWorkoutName())));
         sb.append("Date     : ").append(dateLong).append('\n');
         sb.append("Duration : ").append(dur).append('\n');
