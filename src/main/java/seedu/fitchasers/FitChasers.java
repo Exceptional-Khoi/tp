@@ -17,6 +17,7 @@ import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.IOException;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -331,14 +332,49 @@ public class FitChasers {
         }
         if (mod != null && keyword != null) {
             tagger.addModalityKeyword(Modality.valueOf(mod), keyword);
+
+            // Check ONLY workouts that contain this keyword
+            StringBuilder conflicts = new StringBuilder();
+            List<Workout> affectedWorkouts = new ArrayList<>();
+
             for (Workout w : workoutManager.getWorkouts()) {
+                String workoutText = w.getWorkoutName().toLowerCase();
+                if (workoutText.contains(keyword.toLowerCase())) {
+                    affectedWorkouts.add(w);
+
+                    // Check if this specific workout has conflict
+                    if (workoutManager.hasConflictingModality(w, mod)) {
+                        String existing = workoutManager.getConflictingModality(w);
+                        conflicts.append("\n  - ").append(w.getWorkoutName())
+                                .append(" is already tagged to ").append(existing);
+                    }
+                }
+            }
+
+            // If there ARE conflicts, BLOCK the operation
+            if (conflicts.length() > 0) {
+                ui.showMessage("❌ CANNOT ADD KEYWORD: Conflicting modality tags detected:");
+                ui.showMessage(conflicts.toString());
+                ui.showMessage("\nTo change these tags, first remove the old keyword or manually edit the tag.");
+                return; // EXIT - don't proceed
+            }
+
+            // ONLY retag the affected workouts (no conflicts)
+            for (Workout w : affectedWorkouts) {
                 Set<String> updatedTags = tagger.suggest(w);
                 w.setAutoTags(updatedTags);
-                ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
+                ui.showMessage("Retagged: " + w.getWorkoutName() + " → " + updatedTags);
             }
-            ui.showMessage("Added keyword " + keyword + " to modality " + mod);
+
+            try {
+                fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
+                ui.showMessage("✓ Added keyword '" + keyword + "' to modality " + mod);
+            } catch (IOException e) {
+                ui.showMessage("⚠️  Error saving changes: " + e.getMessage());
+            }
+
         } else {
-            ui.showMessage("Usage: /add_modality_tag m/(CARDIO/ STRENGTH) k/keyword");
+            ui.showMessage("Usage: /add_modality_tag m/(CARDIO/STRENGTH) k/keyword");
         }
     }
 

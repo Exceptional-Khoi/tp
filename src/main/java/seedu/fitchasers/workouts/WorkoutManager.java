@@ -632,6 +632,27 @@ public class WorkoutManager {
         workout.setAutoTags(new LinkedHashSet<>());
     }
 
+    public boolean hasConflictingModality(Workout w, String newModality) {
+        Set<String> autoTags = w.getAutoTags();
+        String mod = newModality.toLowerCase();
+
+        if (mod.equals("strength")) {
+            return autoTags.contains("cardio");
+        } else if (mod.equals("cardio")) {
+            return autoTags.contains("strength");
+        }
+
+        return false;
+    }
+
+    public String getConflictingModality(Workout w) {
+        Set<String> autoTags = w.getAutoTags();
+        if (autoTags.contains("cardio")) return "cardio";
+        if (autoTags.contains("strength")) return "strength";
+        return null;
+    }
+
+
     /**
      * Ends the current workout session by recording the end time and calculating duration.
      * <p>
