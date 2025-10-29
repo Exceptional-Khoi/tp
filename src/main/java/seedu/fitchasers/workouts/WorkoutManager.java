@@ -2,6 +2,7 @@ package seedu.fitchasers.workouts;
 
 import seedu.fitchasers.FileHandler;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
+import seedu.fitchasers.tagger.Modality;
 import seedu.fitchasers.tagger.Tagger;
 import seedu.fitchasers.ui.UI;
 
@@ -285,6 +286,10 @@ public class WorkoutManager {
      */
     public ArrayList<Workout> getWorkouts() {
         return workouts;
+    }
+
+    public void setWorkouts(ArrayList<Workout> workouts) {
+        this.workouts = workouts;
     }
 
     /**
@@ -621,28 +626,36 @@ public class WorkoutManager {
      * Overrides the manual tags of a workout with a new single tag and clears all auto tags.
      * This effectively replaces any existing manual and automatic tags with the specified tag.
      *
-     * @param workoutId the ID/index of the workout to update (1-based index assumed)
      * @param newTag the new tag to set as the manual tag for the workout
      */
-    public void overrideWorkoutTags(int workoutId, String newTag) {
-        Workout workout = workouts.get(workoutId - 1);
+    public void overrideWorkoutTags(Workout workout, String newTag) {
         Set<String> newTagsSet = new LinkedHashSet<>();
         newTagsSet.add(newTag.toLowerCase().trim());
         workout.setManualTags(newTagsSet);
         workout.setAutoTags(new LinkedHashSet<>());
     }
 
-    public boolean hasConflictingModality(Workout w, String newModality) {
-        Set<String> autoTags = w.getAutoTags();
-        String mod = newModality.toLowerCase();
-
-        if (mod.equals("strength")) {
-            return autoTags.contains("cardio");
-        } else if (mod.equals("cardio")) {
-            return autoTags.contains("strength");
+    public boolean hasConflictingModality(Workout w, String mod) {
+        Set<String> tags = w.getAllTags();
+        for (String tag : tags) {
+            if (!tag.equalsIgnoreCase(mod) && isModalityTag(tag)) {
+                return true;
+            }
         }
-
         return false;
+    }
+
+    public Set<String> checkForOverriddenTags(Workout w) {
+        return w.getConflictingTags();
+    }
+
+    private boolean isModalityTag(String tag) {
+        try {
+            Modality.valueOf(tag.toUpperCase());
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
     }
 
     public String getConflictingModality(Workout w) {

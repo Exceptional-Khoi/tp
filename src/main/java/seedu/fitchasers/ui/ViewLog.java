@@ -26,6 +26,16 @@ public class ViewLog {
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
     private List<Workout> lastFilteredSorted = List.of();
 
+    private static class DisplayWorkout {
+        Workout workout;
+        int originalIndex;  // Original index in the main workouts list (1-based for display)
+
+        DisplayWorkout(Workout w, int idx) {
+            this.workout = w;
+            this.originalIndex = idx;  // idx should be 1-based already
+        }
+    }
+
     public ViewLog(UI ui, WorkoutManager workoutManager) {
         ViewLog.ui = ui;
         this.workoutManager = workoutManager;
@@ -68,27 +78,36 @@ public class ViewLog {
     public void render(String args) throws InvalidArgumentInput {
         Parsed p = parseArgs(args);
 
-        // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
         ArrayList<Workout> monthList = fileHandler.getWorkoutsForMonth(p.ym);
+
         ArrayList<Workout> sorted = new ArrayList<>(monthList);
         sorted.sort(Comparator.comparing(
                 Workout::getWorkoutEndDateTime,
                 Comparator.nullsLast(Comparator.naturalOrder())
-        ).reversed());
+        ).thenComparing(
+                Workout::getWorkoutStartDateTime,
+                Comparator.nullsLast(Comparator.naturalOrder())
+        ));  // ← NO .reversed()
 
-        this.lastFilteredSorted = sorted; // for /open <ID>
+        ArrayList<DisplayWorkout> displayList = new ArrayList<>();
+        for (int i = 0; i < sorted.size(); i++) {
+            displayList.add(new DisplayWorkout(sorted.get(i), i + 1));  // IDs 1, 2, 3, 4, 5 in order
+        }
 
-        int totalPages = computeTotalPages(sorted.size(), pageSize);
+        this.lastFilteredSorted = sorted;  // ✅ Store the sorted list
+
+
+        int totalPages = computeTotalPages(displayList.size(), pageSize);
         int current = ensureValidPage(p.page);
 
         int start = (current - 1) * pageSize;
-        int end = Math.min(start + pageSize, sorted.size());
+        int end = Math.min(start + pageSize, displayList.size());
 
         StringBuilder buf = new StringBuilder();
         buf.append(String.format("Workouts for %s (%d total) — Page %d/%d%n",
-                p.ym, sorted.size(), current, Math.max(1, totalPages)));
+                p.ym, displayList.size(), current, Math.max(1, totalPages)));
 
-        if (sorted.isEmpty()) {
+        if (displayList.isEmpty()) {
             buf.append("No workouts this month.");
             ui.showMessage(buf.toString());
             return;
@@ -99,17 +118,36 @@ public class ViewLog {
         }
 
         for (int i = start; i < end; i++) {
-            Workout w = sorted.get(i);
-            int rowNum = i + 1; // 1-based across the month
+            DisplayWorkout dw = displayList.get(i);
             if (p.detailed) {
-                buf.append(renderDetailedRow(rowNum, w));
+                buf.append(renderDetailedRow(dw.originalIndex, dw.workout));
             } else {
-                buf.append(renderCompactRow(rowNum, w));
+                buf.append(renderCompactRow(dw.originalIndex, dw.workout));
             }
         }
 
         buf.append("Tip: /view_log -m 10 2 (next page Oct), /view_log --search run, /open <ID>.");
         ui.showMessage(buf.toString());
+    }
+    public Workout getWorkoutByDisplayId(int displayId, YearMonth month) {
+        // Fetch and sort on demand if needed
+        if (lastFilteredSorted.isEmpty()) {
+            ArrayList<Workout> monthList = fileHandler.getWorkoutsForMonth(month);
+            ArrayList<Workout> sorted = new ArrayList<>(monthList);
+            sorted.sort(Comparator.comparing(
+                    Workout::getWorkoutEndDateTime,
+                    Comparator.nullsLast(Comparator.naturalOrder())
+            ).thenComparing(
+                    Workout::getWorkoutStartDateTime,
+                    Comparator.nullsLast(Comparator.naturalOrder())
+            ));
+            this.lastFilteredSorted = sorted;
+        }
+
+        if (displayId <= 0 || displayId > lastFilteredSorted.size()) {
+            return null;
+        }
+        return lastFilteredSorted.get(displayId - 1);
     }
 
     private String renderCompactRow(int id, Workout w) {
@@ -137,10 +175,12 @@ public class ViewLog {
     /* ------------------------------ Commands API ----------------------------- */
 
     public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput {
-        int i = oneBasedIndex - ARRAY_INDEX_OFFSET;
-        if (i < 0 || i >= lastFilteredSorted.size()) {
+        int i = oneBasedIndex - ARRAY_INDEX_OFFSET;  // Convert to 0-based
+
+        if (i < 0 || i >= workoutManager.getWorkoutSize()) {
             throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
         }
+
         ui.displayDetailsOfWorkout(lastFilteredSorted.get(i));
     }
 

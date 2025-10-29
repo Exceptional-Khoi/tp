@@ -227,7 +227,7 @@ public class FitChasers {
                     workoutId = Integer.parseInt(param.substring(3));
                 } catch (NumberFormatException e) {
                     ui.showMessage("Invalid workout ID.");
-                    break;
+                    return;
                 }
             } else if (param.startsWith("newTag/")) {
                 newTag = param.substring(7);
@@ -235,19 +235,71 @@ public class FitChasers {
         }
 
         if (workoutId != null && newTag != null) {
-            // Update in memory
-            workoutManager.overrideWorkoutTags(workoutId, newTag);
-            // Save changes persistently immediately after update
+            // ✅ Validate empty tag
+            if (newTag.trim().isEmpty()) {
+                ui.showMessage("❌ Tag cannot be empty.");
+                return;
+            }
+
+            // Validate workout ID
+            if (workoutId <= 0 || workoutId > workoutManager.getWorkouts().size()) {
+                ui.showMessage("❌ Invalid workout ID. Use valid ID between 1 and " +
+                        workoutManager.getWorkouts().size());
+                return;
+            }
+
+            Workout workout = viewLog.getWorkoutByDisplayId(workoutId, currentMonth);
+            if (workout == null) {
+                ui.showMessage("❌ Invalid workout ID.");
+                return;
+            }
+
+            String oldTags = workout.getAllTags().toString();
+
+            // ✅ ASK FOR CONFIRMATION BEFORE CHANGING
+            ui.showMessage("Current tags: " + oldTags);
+            ui.showMessage("Change to: " + newTag + "?");
+            ui.showMessage("Are you sure? (y/n)");
+
+            if (!ui.confirmationMessage()) {
+                ui.showMessage("Tag change cancelled.");
+                return;
+            }
+
+            // NOW modify after confirmation
+            workoutManager.overrideWorkoutTags(workout, newTag);
+
+// Save changes persistently immediately after update
             try {
+                // 1. Persist current workouts to file
                 fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-                ui.showMessage("Workout tags saved successfully.");
+
+                // 2. Reload persisted workouts into manager (optional if your object already reflects changes)
+                ArrayList<Workout> reloadedWorkouts = fileHandler.getWorkoutsForMonth(currentMonth);
+                workoutManager.setWorkouts(reloadedWorkouts);
+
+                // 3. Display tag changes for the (already modified) workout object
+                Workout updatedWorkout = workout; // This is the object you just updated
+                String newTagsDisplay = updatedWorkout.getAllTags().toString();
+
+                ui.showMessage("✓ Workout tags updated successfully.");
+                ui.showMessage("  New tags: " + newTagsDisplay);
+
+                // 4. Show warnings for overridden tags if any
+                Set<String> conflicts = workoutManager.checkForOverriddenTags(updatedWorkout);
+                if (!conflicts.isEmpty()) {
+                    ui.showMessage("⚠️ WARNING: These manual tags override auto-tags: " + conflicts);
+                }
+
             } catch (IOException e) {
                 ui.showMessage("Error saving workout data: " + e.getMessage());
             }
+
         } else {
             ui.showMessage("Usage: /override_workout_tag id/WORKOUT_ID newTag/NEW_TAG");
         }
     }
+
 
     private static void gpMethod() {
         try {
@@ -328,7 +380,6 @@ public class FitChasers {
     }
 
     private static void amtMethod() {
-        // Example: /add_muscle_tag m=legs k=lunges
         String[] params = argumentStr.split("\\s+");
         String mus = null;
         String keyword = null;
@@ -340,28 +391,46 @@ public class FitChasers {
                 keyword = param.substring(2).toLowerCase();
             }
         }
+        if (mus != null && mus.trim().isEmpty()) {
+            ui.showMessage("❌ Muscle cannot be empty. Use: LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE");
+            return;
+        }
+
+        if (keyword != null && keyword.trim().isEmpty()) {
+            ui.showMessage("❌ Keyword cannot be empty. Example: /add_muscle_tag m/CARDIO k/running");
+            return;
+        }
         if (mus != null && keyword != null) {
-            tagger.addMuscleKeyword(MuscleGroup.valueOf(mus), keyword);
-            for (Workout w : workoutManager.getWorkouts()) {
-                Set<String> updatedTags = tagger.suggest(w);
-                w.setAutoTags(updatedTags);
-                ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
-            }
             try {
-                fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-                ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
-            } catch (IOException e) {
-                ui.showMessage("⚠️ Error saving changes: " + e.getMessage());
+                MuscleGroup muscleGroup = MuscleGroup.valueOf(mus);
+                tagger.addMuscleKeyword(muscleGroup, keyword);
+
+                for (Workout w : workoutManager.getWorkouts()) {
+                    Set<String> updatedTags = tagger.suggest(w);
+                    w.setAutoTags(updatedTags);
+                    ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
+                }
+                try {
+                    fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
+                    ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
+                } catch (IOException e) {
+                    ui.showMessage("⚠️ Error saving changes: " + e.getMessage());
+                }
+            } catch (IllegalArgumentException e) {
+                ui.showMessage("❌ Invalid muscle group. Valid options: LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE");
+                return;
             }
         } else {
             ui.showMessage("Usage: /add_muscle_tag m/LEGS/ CHEST/... k/keyword");
         }
     }
 
+
     private static void amotMethod() {
         String[] params = argumentStr.split("\\s+");
         String mod = null;
         String keyword = null;
+
         for (String param : params) {
             if (param.startsWith("m/")) {
                 mod = param.substring(2).toUpperCase();
@@ -370,47 +439,60 @@ public class FitChasers {
                 keyword = param.substring(2).toLowerCase();
             }
         }
+
+        if (mod != null && mod.trim().isEmpty()) {
+            ui.showMessage("❌ Modality cannot be empty. Use: CARDIO or STRENGTH");
+            return;
+        }
+
+        if (keyword != null && keyword.trim().isEmpty()) {
+            ui.showMessage("❌ Keyword cannot be empty. Example: /add_modality_tag m/CARDIO k/running");
+            return;
+        }
+
         if (mod != null && keyword != null) {
-            tagger.addModalityKeyword(Modality.valueOf(mod), keyword);
+            try {
+                Modality modality = Modality.valueOf(mod);
+                tagger.addModalityKeyword(modality, keyword);
 
-            // Check ONLY workouts that contain this keyword
-            StringBuilder conflicts = new StringBuilder();
-            List<Workout> affectedWorkouts = new ArrayList<>();
+                // Check ONLY workouts that contain this keyword
+                StringBuilder conflicts = new StringBuilder();
+                List<Workout> affectedWorkouts = new ArrayList<>();
 
-            for (Workout w : workoutManager.getWorkouts()) {
-                String workoutText = w.getWorkoutName().toLowerCase();
-                if (workoutText.contains(keyword.toLowerCase())) {
-                    affectedWorkouts.add(w);
-
-                    // Check if this specific workout has conflict
-                    if (workoutManager.hasConflictingModality(w, mod)) {
-                        String existing = workoutManager.getConflictingModality(w);
-                        conflicts.append("\n  - ").append(w.getWorkoutName())
-                                .append(" is already tagged to ").append(existing);
+                for (Workout w : workoutManager.getWorkouts()) {
+                    String workoutText = w.getWorkoutName().toLowerCase();
+                    if (workoutText.contains(keyword.toLowerCase())) {
+                        affectedWorkouts.add(w);
+                        if (workoutManager.hasConflictingModality(w, mod)) {
+                            String existing = workoutManager.getConflictingModality(w);
+                            conflicts.append("\n - ").append(w.getWorkoutName())
+                                    .append(" is already tagged to ").append(existing);
+                        }
                     }
                 }
-            }
 
-            // If there ARE conflicts, BLOCK the operation
-            if (conflicts.length() > 0) {
-                ui.showMessage("❌ CANNOT ADD KEYWORD: Conflicting modality tags detected:");
-                ui.showMessage(conflicts.toString());
-                ui.showMessage("\nTo change these tags, first remove the old keyword or manually edit the tag.");
-                return; // EXIT - don't proceed
-            }
+                if (conflicts.length() > 0) {
+                    ui.showMessage("❌ CANNOT ADD KEYWORD: Conflicting modality tags detected:");
+                    ui.showMessage(conflicts.toString());
+                    ui.showMessage("\nTo change these tags, first remove the old keyword or manually edit the tag.");
+                    return;
+                }
 
-            // ONLY retag the affected workouts (no conflicts)
-            for (Workout w : affectedWorkouts) {
-                Set<String> updatedTags = tagger.suggest(w);
-                w.setAutoTags(updatedTags);
-                ui.showMessage("Retagged: " + w.getWorkoutName() + " → " + updatedTags);
-            }
+                for (Workout w : affectedWorkouts) {
+                    Set<String> updatedTags = tagger.suggest(w);
+                    w.setAutoTags(updatedTags);
+                    ui.showMessage("Retagged: " + w.getWorkoutName() + " → " + updatedTags);
+                }
 
-            try {
-                fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-                ui.showMessage("✓ Added keyword '" + keyword + "' to modality " + mod);
-            } catch (IOException e) {
-                ui.showMessage("⚠️  Error saving changes: " + e.getMessage());
+                try {
+                    fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
+                    ui.showMessage("✓ Added keyword '" + keyword + "' to modality " + mod);
+                } catch (IOException e) {
+                    ui.showMessage("⚠️ Error saving changes: " + e.getMessage());
+                }
+            } catch (IllegalArgumentException e) {
+                ui.showMessage("❌ Invalid modality. Valid options: CARDIO, STRENGTH");
+                return;
             }
 
         } else {
