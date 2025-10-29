@@ -18,6 +18,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Manages workout sessions for the FitChasers application.
@@ -27,6 +29,8 @@ import java.util.Set;
  */
 public class WorkoutManager {
     private static final int ARRAY_OFFSET = 1;
+    private static final int MAX_EXERCISE_NAME_LEN = 32;
+    private static final int MAX_REPS = 1000;
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
     private final UI ui = new UI();
@@ -38,6 +42,12 @@ public class WorkoutManager {
     private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
     private final Set<YearMonth> loadedMonths = new HashSet<>();
     private final FileHandler fileHandler;
+
+    private static final Pattern NAME_ALLOWED = Pattern.compile("[A-Za-z0-9 _-]+");
+    private static final Pattern NAME_ILLEGAL_FINDER = Pattern.compile("[^A-Za-z0-9 _-]");
+    private static final Pattern BOUND_PREFIX = Pattern.compile("(^|\\s)([A-Za-z])/");
+    private static final Pattern NEXT_PREFIX = Pattern.compile("\\s+[nr]/");
+    private static final Pattern REPS_TOKEN = Pattern.compile("^\\d{1,4}$");
 
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
         this.tagger = tagger;
@@ -66,11 +76,11 @@ public class WorkoutManager {
             return;
         }
         monthOfWorkout = YearMonth.from(workoutDateTime);
-        if(!currentLoadedMonth.equals(monthOfWorkout)) {
+        if (!currentLoadedMonth.equals(monthOfWorkout)) {
             setWorkouts(fileHandler.getWorkoutsForMonth(monthOfWorkout), monthOfWorkout);
         }
 
-        try{
+        try {
             Workout newWorkout = new Workout(workoutName, workoutDateTime);
 
             // merge auto-tags if you have a tagger
@@ -79,9 +89,8 @@ public class WorkoutManager {
             workouts.add(newWorkout);
             currentWorkout = newWorkout;
             ui.showMessage("New workout sesh incoming!");
-            ui.showMessage("Tags generated for workout: " + suggestedTags + "\n"
-                            + "Added workout: " + workoutName);
-            fileHandler.saveMonthList(currentLoadedMonth,workouts);
+            ui.showMessage("Tags generated for workout: " + suggestedTags + "\n" + "Added workout: " + workoutName);
+            fileHandler.saveMonthList(currentLoadedMonth, workouts);
 
         } catch (Exception e) {
             ui.showMessage("Something went wrong creating the workout. Please try again.");
@@ -91,8 +100,7 @@ public class WorkoutManager {
     private void formatInputForWorkout(String command) throws InvalidArgumentInput {
         assert workouts != null : "workouts list should be initialized";
         if (currentWorkout != null) {
-            ui.showMessage("You currently have an active workout: '"
-                    + currentWorkout.getWorkoutName() + "'.");
+            ui.showMessage("You currently have an active workout: '" + currentWorkout.getWorkoutName() + "'.");
             ui.showMessage("Please end the active workout first with: /end_workout d/DD/MM/YY t/HHmm");
             throw new InvalidArgumentInput("");
         }
@@ -148,16 +156,14 @@ public class WorkoutManager {
         if (tIndex != -1) {
             String tail = command.substring(tIndex + 2).trim();
             String[] toks = tail.split("\\s+");
-            if (toks.length > 0){
+            if (toks.length > 0) {
                 timeStr = toks[0];
             }
         }
 
         // Strict formatters & validate provided pieces first
-        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
-                .withResolverStyle(ResolverStyle.SMART);
-        DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
-                .withResolverStyle(ResolverStyle.SMART);
+        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
+        DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
 
         LocalDate date = null;
         LocalTime time = null;
@@ -228,9 +234,7 @@ public class WorkoutManager {
                 LocalTime existingTime = existingStart.toLocalTime();
 
                 if (existingDate.equals(date) && existingTime.equals(time)) {
-                    ui.showMessage("A workout already exists at this date and time ("
-                            + existingDate.format(dateFmt) + " " + existingTime.format(timeFmt) + "). " +
-                            "Continue anyway? (Y/N)");
+                    ui.showMessage("A workout already exists at this date and time (" + existingDate.format(dateFmt) + " " + existingTime.format(timeFmt) + "). " + "Continue anyway? (Y/N)");
                     if (!ui.confirmationMessage()) {
                         ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
                         throw new InvalidArgumentInput("");
@@ -295,11 +299,10 @@ public class WorkoutManager {
     public void deleteWorkout(String name) throws IOException {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
-                ui.showMessage("Deleting " + w.getWorkoutName() + " | " +
-                        w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type y/yes to confirm)");
+                ui.showMessage("Deleting " + w.getWorkoutName() + " | " + w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type y/yes to confirm)");
                 if (ui.confirmationMessage()) {
                     workouts.remove(w);
-                    fileHandler.saveMonthList(currentLoadedMonth,workouts);
+                    fileHandler.saveMonthList(currentLoadedMonth, workouts);
                     ui.showMessage("Workout deleted successfully!");
                 } else {
                     ui.showMessage("Okay, I didn’t delete it.");
@@ -321,7 +324,7 @@ public class WorkoutManager {
         if (ui.confirmationMessage()) {
             ui.showMessage("Deleted workout: " + w.getWorkoutName());
             workouts.remove(index);
-            fileHandler.saveMonthList(currentLoadedMonth,workouts);
+            fileHandler.saveMonthList(currentLoadedMonth, workouts);
         } else {
             ui.showMessage("Okay, deletion aborted.");
         }
@@ -357,84 +360,90 @@ public class WorkoutManager {
         }
 
         String s = args.trim();
+
+        if (s.isEmpty()) {
+            ui.showMessage("Missing information. Use: /add_exercise n/NAME r/REPS");
+            ui.showMessage("NAME: letters/digits/space/-/_ (max 32)\nREPS: 1–1000");
+            return;
+        }
+
+        // Must have exactly one n/ and one r/
+        if (countToken(s, "n/") != 1 || countToken(s, "r/") != 1) {
+            ui.showMessage("Please provide exactly one n/ and one r/ in this order: n/NAME r/REPS");
+            return;
+        }
+
+        // Enforce order n/ ... r/
         int nIdx = s.indexOf("n/");
-        if (nIdx == -1) {
-            ui.showMessage("Missing name. Use: /add_exercise n/NAME r/REPS (e.g., /add_exercise n/PushUp r/12)");
-            return;
-        }
-
         int rIdx = s.indexOf("r/");
-
-        // n/ must come before r/ if r/ exists
-        if (rIdx != -1 && rIdx < nIdx) {
-            ui.showMessage("Invalid order. Put r/ after n/. Example: /add_exercise n/PushUp r/12");
+        if (nIdx == -1 || rIdx == -1 || rIdx < nIdx) {
+            ui.showMessage("Order must be n/ then r/. Example: /add_exercise n/Bench Press r/12");
             return;
         }
 
-        // Extract name candidate (text between n/ and r/ if r/ exists, else to end)
-        int nameStart = nIdx + 2;
-        int nameEnd = (rIdx != -1) ? rIdx : s.length();
+        // Extract name slice (raw + trimmed), then validate name BEFORE scanning for other prefixes
+        Slice nameSlice = extractSlice(s, nIdx);
+        String name = nameSlice.valueTrimmed;
 
-        if (nameStart >= s.length() || nameStart >= nameEnd) {
-            // n/ immediately followed by r/ -> invalid format
-            if (rIdx == nameStart) {
-                ui.showMessage("Invalid format. Put a space after the name. Example: /add_exercise n/PushUp r/12");
-            } else {
-                ui.showMessage("Missing name. Use: /add_exercise n/NAME r/REPS (e.g., /add_exercise n/PushUp r/12)");
+        // Specific, user-friendly name errors
+        if (name.trim().isEmpty()) {
+            ui.showMessage("Exercise name is missing after n/. Example: n/Bench Press");
+            return;
+        }
+        if (name.length() > MAX_EXERCISE_NAME_LEN) {
+            ui.showMessage("Name too long (" + name.length() + "). Max allowed is " + MAX_EXERCISE_NAME_LEN + " characters.");
+            return;
+        }
+        if (!NAME_ALLOWED.matcher(name).matches()) {
+            Character bad = findFirstIllegalNameChar(name);
+            if (bad != null) {
+                // Show the first problematic character clearly, including slashes
+                String shown = (bad == '\\') ? "\\\\" : String.valueOf(bad);
+                ui.showMessage("“" + shown + "” is not allowed in the exercise name.");
             }
+            ui.showMessage("Allowed characters: letters, digits, spaces, hyphen (-), underscore (_).");
             return;
         }
 
-        String between = s.substring(nameStart, nameEnd);
-        String name = between.trim();
+        // Now extract reps slice
+        Slice repsSlice = extractSlice(s, rIdx);
 
-        if (name.isEmpty()) {
-            ui.showMessage("Missing name. Use: /add_exercise n/NAME r/REPS (e.g., /add_exercise n/PushUp r/12)");
+        // If there are spaces immediately after r/, guide them explicitly
+        if (!repsSlice.valueRaw.isEmpty() && Character.isWhitespace(repsSlice.valueRaw.charAt(0))) {
+            ui.showMessage("Remove spaces between r/ and the number. Example: r/12 (not r/ 12)");
             return;
         }
 
-        if (rIdx - 1 >= 0 && !Character.isWhitespace(s.charAt(rIdx - 1))) {
-            ui.showMessage("Add a space between the name and r/. Example: /add_exercise n/PushUp r/12");
+        String repsStr = repsSlice.valueTrimmed;
+        Integer reps = parseRepsSafe(repsStr);
+        if (reps == null) {
+            ui.showMessage("Invalid reps. Use a whole number between 1 and 1000. Example: r/12");
             return;
         }
 
-        // Ensure r/ is present
-        if (rIdx == -1) {
-            ui.showMessage("Missing reps. Use: /add_exercise n/NAME r/REPS (e.g., /add_exercise n/PushUp r/12)");
+        // No extra junk after reps
+        if (!onlyWhitespaceAfter(s, repsSlice.endIndex)) {
+            ui.showMessage("Unexpected text after reps. Use exactly: /add_exercise n/NAME r/REPS");
             return;
         }
 
-        // Extract reps token (first token after r/)
-        int repsStart = rIdx + 2;
-        if (repsStart >= s.length()) {
-            ui.showMessage("REPS missing. Example: /add_exercise n/PushUp r/12");
-            return;
-        }
-        String afterR = s.substring(repsStart).trim();
-        if (afterR.isEmpty()) {
-            ui.showMessage("REPS missing. Example: /add_exercise n/PushUp r/12");
-            return;
-        }
-        String[] token = afterR.split("\\s+");
-        String repsStr = token[0];
+        // Also check there are no stray flag-like prefixes OUTSIDE the parsed ranges
+        // (ignore n/.. inside [nIdx, nameSlice.endIndex) and r/.. inside [rIdx, repsSlice.endIndex))
+        Matcher stray = BOUND_PREFIX.matcher(s);
+        while (stray.find()) {
+            int pos = stray.start(2);
+            char p = stray.group(2).charAt(0);
 
-        // Validate reps (positive integer)
-        int reps;
-        try {
-            if (!repsStr.matches("\\d+")) {
-                throw new NumberFormatException();
+            boolean insideName = pos >= nIdx && pos < nameSlice.endIndex;
+            boolean insideReps = pos >= rIdx && pos < repsSlice.endIndex;
+
+            if (!insideName && !insideReps) {
+                if (p != 'n' && p != 'r') {
+                    ui.showMessage("Unsupported flag \"" + p + "/\" found. Only n/ and r/ are allowed.");
+                    return;
+                }
             }
-            reps = Integer.parseInt(repsStr);
-            if (reps <= 0) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-            ui.showMessage("REPS must be a positive integer. Example: /add_exercise n/PushUp r/12");
-            return;
         }
-
-        assert name != null && !name.isEmpty() : "Parsed exercise name should be non-empty";
-        assert reps > 0 : "Parsed reps should be positive";
 
         Exercise exercise = new Exercise(name, reps);
         currentWorkout.addExercise(exercise);
@@ -458,60 +467,62 @@ public class WorkoutManager {
 
         Exercise currentExercise = currentWorkout.getCurrentExercise();
         if (currentExercise == null) {
-            ui.showMessage("No exercise found. Use /add_exercise first.");
+            ui.showMessage("No exercises yet. Add an exercise first with /add_exercise n/NAME r/REPS");
             return;
         }
 
+        assert !(currentWorkout.getExercises().isEmpty() && currentExercise != null)
+                : "Invariant violated: empty list but currentExercise not null";
+
         if (args == null || args.trim().isEmpty()) {
-            ui.showMessage("Missing REPS. Use: /add_set r/REPS (e.g., /add_set r/15)");
+            ui.showMessage("Missing information. Use: /add_set r/REPS");
+            ui.showMessage("REPS: 1–1000");
             return;
         }
 
         String s = args.trim();
+
+        // Exactly one r/ and NO other flags at token boundaries
+        if (countToken(s, "r/") != 1) {
+            ui.showMessage("Provide exactly one r/. Usage: /add_set r/REPS");
+            return;
+        }
+
+        // Reject any other boundary flags like n/, x/, etc.
+        java.util.regex.Matcher stray = BOUND_PREFIX.matcher(s);
+        while (stray.find()) {
+            char p = stray.group(2).charAt(0); // letter before '/'
+            if (p != 'r') {
+                ui.showMessage("Only r/ is allowed for this command. Usage: /add_set r/REPS");
+                return;
+            }
+        }
+
+        // Extract reps
         int rIdx = s.indexOf("r/");
-        if (rIdx == -1) {
-            ui.showMessage("Missing REPS. Use: /add_set r/REPS (e.g., /add_set r/15)");
+        Slice repsSlice = extractSlice(s, rIdx);
+
+        // If user typed spaces right after r/, treat as a generic invalid reps format (no niche msg)
+        if (!repsSlice.valueRaw.isEmpty() && Character.isWhitespace(repsSlice.valueRaw.charAt(0))) {
+            ui.showMessage("Invalid reps. Use a whole number between 1 and 1000. Example: /add_set r/15");
             return;
         }
 
-        // After r/, there must be a number immediately
-        int repsStart = rIdx + 2;
-        if (repsStart >= s.length()) {
-            ui.showMessage("REPS missing. Example: /add_set r/15");
-            return;
-        }
-        if (Character.isWhitespace(s.charAt(repsStart))) {
-            // explicitly reject "r/ 12"
-            ui.showMessage("Do not put a space between r/ and the number. Example: /add_set r/15");
+        String repsStr = repsSlice.valueTrimmed;
+        Integer reps = parseRepsSafe(repsStr);
+        if (reps == null) {
+            ui.showMessage("Invalid reps. Use a whole number between 1 and 1000. Example: /add_set r/15");
             return;
         }
 
-        // Extract the reps token (first token after r/)
-        String afterR = s.substring(repsStart);
-        String[] token = afterR.split("\\s+");
-        String repsStr = token[0];
-
-        if (token.length > 1) {
-            ui.showMessage("Too many arguments after REPS. Example: /add_set r/15");
-            return;
-        }
-
-        // Validate reps (positive integer)
-        int reps;
-        try {
-            if (!repsStr.matches("\\d+")) {
-                throw new NumberFormatException();
-            }
-            reps = Integer.parseInt(repsStr);
-            if (reps <= 0) {
-                throw new NumberFormatException();
-            }
-        } catch (NumberFormatException e) {
-            ui.showMessage("REPS must be a positive integer. Example: /add_set r/15");
+        // No extra junk after reps (e.g., "r/ 1 2", "r/12 extra")
+        if (!onlyWhitespaceAfter(s, repsSlice.endIndex)) {
+            ui.showMessage("Unexpected text after reps. Use exactly: /add_set r/REPS");
             return;
         }
 
         currentExercise.addSet(reps);
+
         ui.showMessage("Adding a new set to your exercise!");
         ui.showMessage("Added set to exercise:\n" + currentExercise.toDetailedString());
     }
@@ -528,8 +539,7 @@ public class WorkoutManager {
         for (int i = 0; i < workouts.size(); i++) {
             Workout w = workouts.get(i);
             ui.showMessage("------------------------------------------------");
-            ui.showMessage("[" + (i + ARRAY_OFFSET) + "]: " + w.getWorkoutName() +
-                    " | " + w.getDuration() + " Min");
+            ui.showMessage("[" + (i + ARRAY_OFFSET) + "]: " + w.getWorkoutName() + " | " + w.getDuration() + " Min");
 
             if (w.getExercises().isEmpty()) {
                 ui.showMessage("     No exercises added yet.");
@@ -553,11 +563,7 @@ public class WorkoutManager {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < list.size(); i++) {
             Workout w = list.get(i);
-            sb.append(i + 1)
-                    .append(". ")
-                    .append(w.getWorkoutName())
-                    .append(" - ")
-                    .append(w.getWorkoutDateString());
+            sb.append(i + 1).append(". ").append(w.getWorkoutName()).append(" - ").append(w.getWorkoutDateString());
 
             if (i < list.size() - 1) {
                 sb.append('\n');
@@ -612,7 +618,7 @@ public class WorkoutManager {
         for (int i = indicesToDelete.size() - 1; i >= 0; i--) {
             Workout w = targetList.get(indicesToDelete.get(i));
             workouts.remove(w);
-            fileHandler.saveMonthList(currentLoadedMonth,workouts);
+            fileHandler.saveMonthList(currentLoadedMonth, workouts);
             ui.showMessage("Delete: " + w.getWorkoutName());
         }
     }
@@ -622,7 +628,7 @@ public class WorkoutManager {
      * This effectively replaces any existing manual and automatic tags with the specified tag.
      *
      * @param workoutId the ID/index of the workout to update (1-based index assumed)
-     * @param newTag the new tag to set as the manual tag for the workout
+     * @param newTag    the new tag to set as the manual tag for the workout
      */
     public void overrideWorkoutTags(int workoutId, String newTag) {
         Workout workout = workouts.get(workoutId - 1);
@@ -648,10 +654,8 @@ public class WorkoutManager {
             ui.showMessage("No active workout.");
             return;
         }
-        final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
-                .withResolverStyle(ResolverStyle.SMART);
-        final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
-                .withResolverStyle(ResolverStyle.SMART);
+        final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
+        final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
 
         String args = (initialArgs == null) ? "" : initialArgs.trim();
 
@@ -659,21 +663,53 @@ public class WorkoutManager {
         String dateStr = "";
         String timeStr = "";
 
+        // Must have exactly one d/ and one t/
+        if (countToken(args, "d/") != 1 || countToken(args, "t/") != 1) {
+            ui.showMessage("Provide exactly one d/ and one t/ in this order: d/DATE t/TIME");
+            return;
+        }
+
+        // Enforce order: d/ before t/
         int dIdx = args.indexOf("d/");
         int tIdx = args.indexOf("t/");
-        if (dIdx != -1) {
-            String tail = args.substring(dIdx + 2).trim();
-            String[] toks = tail.split("\\s+");
-            if (toks.length > 0) {
-                dateStr = toks[0].trim();
+        if (dIdx == -1 || tIdx == -1 || tIdx < dIdx) {
+            ui.showMessage("Order must be d/ then t/. Example: /end_workout d/29/10/25 t/1800");
+            return;
+        }
+
+        // Reject any other boundary flags (only d/ and t/ allowed)
+        java.util.regex.Matcher stray = BOUND_PREFIX.matcher(args);
+        while (stray.find()) {
+            char p = stray.group(2).charAt(0); // letter before '/'
+            if (p != 'd' && p != 't') {
+                ui.showMessage("Only d/ and t/ are allowed. Usage: /end_workout d/DD/MM/YY t/HHmm");
+                return;
             }
         }
-        if (tIdx != -1) {
-            String tail = args.substring(tIdx + 2).trim();
-            String[] toks = tail.split("\\s+");
-            if (toks.length > 0) {
-                timeStr = toks[0].trim();
-            }
+
+        // Extract date and time slices
+        Slice dateSlice = extractSlice(args, dIdx);
+        Slice timeSlice = extractSlice(args, tIdx);
+
+        // If user typed spaces immediately after d/ or t/, treat as invalid format (reuse your generic msgs)
+        if (!dateSlice.valueRaw.isEmpty() && Character.isWhitespace(dateSlice.valueRaw.charAt(0))) {
+            ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
+            ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+            return;
+        }
+        if (!timeSlice.valueRaw.isEmpty() && Character.isWhitespace(timeSlice.valueRaw.charAt(0))) {
+            ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
+            ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+            return;
+        }
+
+        dateStr = dateSlice.valueTrimmed;
+        timeStr = timeSlice.valueTrimmed;
+
+        // No extra junk after t/
+        if (!onlyWhitespaceAfter(args, timeSlice.endIndex)) {
+            ui.showMessage("Unexpected text after time. Use exactly: /end_workout d/DD/MM/YY t/HHmm");
+            return;
         }
 
         LocalDate date = null;
@@ -743,9 +779,74 @@ public class WorkoutManager {
         }
 
         ui.showMessage("Workout wrapped! Time to refuel!");
-        ui.showMessage(String.format("Workout '%s' ended. Duration: %d minute(s).",
-                currentWorkout.getWorkoutName(), duration));
+        ui.showMessage(String.format("Workout '%s' ended. Duration: %d minute(s).", currentWorkout.getWorkoutName(), duration));
 
         currentWorkout = null;
+    }
+
+    // Small holder for token extraction
+    private static final class Slice {
+        final String valueTrimmed;
+        final int endIndex;       // end position in original string (exclusive)
+        final String valueRaw;    // substring between token and next prefix/end (untrimmed)
+        Slice(String valueTrimmed, String valueRaw, int endIndex) {
+            this.valueTrimmed = valueTrimmed;
+            this.valueRaw = valueRaw;
+            this.endIndex = endIndex;
+        }
+    }
+
+    // Count occurrences of a token like "n/" or "r/"
+    private static int countToken(String s, String token) {
+        int count = 0, idx = 0;
+        while ((idx = s.indexOf(token, idx)) != -1) { count++; idx += token.length(); }
+        return count;
+    }
+
+    // Extract the slice for a token (e.g., starting at index of 'n' in "n/..."),
+    // capturing the raw substring and where it ends in the original string.
+    private static Slice extractSlice(String s, int tokenStart) {
+        int valueStart = tokenStart + 2;
+        if (valueStart > s.length()) return new Slice("", "", valueStart);
+
+        Matcher m = NEXT_PREFIX.matcher(s);
+        int next = -1;
+        while (m.find()) {
+            int boundaryStart = m.start();
+            if (boundaryStart > valueStart) {
+                next = boundaryStart;
+                break;
+            }
+        }
+
+        String raw = (next == -1) ? s.substring(valueStart) : s.substring(valueStart, next);
+        return new Slice(raw.trim(), raw, (next == -1 ? s.length() : next));
+    }
+
+
+    private static boolean isValidName(String name) {
+        if (name == null) return false;
+        String t = name.trim();
+        if (t.isEmpty() || t.length() > MAX_EXERCISE_NAME_LEN) return false;
+        return NAME_ALLOWED.matcher(t).matches();
+    }
+
+    private static Character findFirstIllegalNameChar(String name) {
+        Matcher m = NAME_ILLEGAL_FINDER.matcher(name);
+        return m.find() ? name.charAt(m.start()) : null;
+    }
+
+    // Safe parse reps: only digits, length<=4, range 1..MAX_REPS
+    private static Integer parseRepsSafe(String repsStr) {
+        String t = repsStr.trim();
+        if (!REPS_TOKEN.matcher(t).matches()) return null;
+        int val = Integer.parseInt(t);
+        if (val < 1 || val > MAX_REPS) return null;
+        return val;
+    }
+
+    private static boolean onlyWhitespaceAfter(String s, int endIndex) {
+        for (int i = endIndex; i < s.length(); i++) if (!Character.isWhitespace(s.charAt(i))) return false;
+        return true;
     }
 }
