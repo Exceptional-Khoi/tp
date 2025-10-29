@@ -301,13 +301,13 @@ public class WorkoutManager {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
                 ui.showMessage("Deleting " + w.getWorkoutName() + " | " +
-                        w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type y/yes to confirm)");
+                        w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type Y confirm)");
                 if (ui.confirmationMessage()) {
                     workouts.remove(w);
                     fileHandler.saveMonthList(currentLoadedMonth,workouts);
                     ui.showMessage("Workout deleted successfully!");
                 } else {
-                    ui.showMessage("Okay, I didn’t delete it.");
+                    ui.showMessage("Okay, I didn't delete it.");
                 }
                 return;
             }
@@ -737,7 +737,6 @@ public class WorkoutManager {
             }
         }
 
-        // Prompt ONLY for missing pieces
         if (date == null) {
             String todayStr = LocalDate.now().format(dateFmt);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
