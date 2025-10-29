@@ -85,7 +85,7 @@ public class ViewLog {
         int end = Math.min(start + pageSize, sorted.size());
 
         StringBuilder buf = new StringBuilder();
-        buf.append(String.format("Workouts for %s (%d total) — Page %d/%d%n",
+        buf.append(String.format("Workouts for %s (%d total) - Page %d/%d%n",
                 p.ym, sorted.size(), current, Math.max(1, totalPages)));
 
         if (sorted.isEmpty()) {
@@ -125,7 +125,7 @@ public class ViewLog {
         String dateLong = formatLong(workout.getWorkoutEndDateTime());
         String dur = formatDuration(workout.getDuration());
         StringBuilder sb = new StringBuilder();
-        sb.append("—".repeat(60)).append('\n');
+        sb.append("~".repeat(60)).append('\n');
         sb.append(String.format("#%d  %s%n", id, safe(workout.getWorkoutName())));
         sb.append("Date     : ").append(dateLong).append('\n');
         sb.append("Duration : ").append(dur).append('\n');

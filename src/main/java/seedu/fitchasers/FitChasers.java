@@ -52,6 +52,7 @@ public class FitChasers {
     private static GoalWeightTracker goalTracker;
 
     public static void main(String[] args) throws IOException {
+        ui.printLeftHeader();
         initVariables();
         ui.showGreeting();
 
