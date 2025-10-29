@@ -72,11 +72,16 @@ public class WorkoutManager {
     }
 
     /**
-     * Creates and adds a new workout to the list.
+     * Adds a new workout session from the user's command input.
      * <p>
-     * Expected format: /create_workout n/NAME d/DD/MM/YY t/HHmm
+     * Parses the command to extract the workout name, date, and time, then creates
+     * a new Workout object. If the workout belongs to a different month, the method
+     * loads that month's data first. It also generates suggested tags and saves
+     * the workout to file.
+     * <p>
+     * Displays messages to the user and handles invalid or missing input safely.
      *
-     * @param command the full user command containing workout details
+     * @param command The full user command, for example "/create_workout n/PushDay d/20/10/25 t/1900".
      */
     public void addWorkout(String command) {
         workoutName = "";
@@ -107,6 +112,19 @@ public class WorkoutManager {
         }
     }
 
+    /**
+     * Parses and validates the user's workout creation command.
+     * <p>
+     * Extracts the workout name, date, and time from the command string.
+     * Prompts the user if date or time is missing, confirms if inputs are in the future,
+     * and checks for duplicate workouts at the same date and time.
+     * <p>
+     * Updates internal fields with validated data and throws an exception if
+     * the command format or values are invalid.
+     *
+     * @param command The full user command, e.g. "/create_workout n/PushDay d/20/10/25 t/1900".
+     * @throws InvalidArgumentInput if the input format or values are invalid.
+     */
     private void formatInputForWorkout(String command) throws InvalidArgumentInput {
         assert workouts != null : "workouts list should be initialized";
         if (currentWorkout != null) {
@@ -886,7 +904,11 @@ public class WorkoutManager {
     }
 
     private static boolean onlyWhitespaceAfter(String s, int endIndex) {
-        for (int i = endIndex; i < s.length(); i++) if (!Character.isWhitespace(s.charAt(i))) return false;
+        for (int i = endIndex; i < s.length(); i++) {
+            if (!Character.isWhitespace(s.charAt(i))) {
+                return false;
+            }
+        }
         return true;
     }
 }
