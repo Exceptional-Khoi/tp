@@ -1,9 +1,11 @@
 package seedu.fitchasers.ui;
 import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.WorkoutManager;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
@@ -25,11 +27,6 @@ public class ViewLog {
 
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
     private List<Workout> lastFilteredSorted = List.of();
-
-    public ViewLog(UI ui, WorkoutManager workoutManager) {
-        ViewLog.ui = ui;
-        this.workoutManager = workoutManager;
-    }
 
     public ViewLog(UI ui, WorkoutManager workoutManager, FileHandler fileHandler) {
         ViewLog.ui = ui;
@@ -65,11 +62,11 @@ public class ViewLog {
      * @param args raw argument string after the command name
      * @throws InvalidArgumentInput if flags or numbers are invalid
      */
-    public void render(String args) throws InvalidArgumentInput {
+    public void render(String args) throws InvalidArgumentInput, FileNonexistent, IOException {
         Parsed p = parseArgs(args);
 
         // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
-        ArrayList<Workout> monthList = fileHandler.getWorkoutsForMonth(p.ym);
+        ArrayList<Workout> monthList = fileHandler.loadMonthList(p.ym);
         ArrayList<Workout> sorted = new ArrayList<>(monthList);
         sorted.sort(Comparator.comparing(
                 Workout::getWorkoutEndDateTime,

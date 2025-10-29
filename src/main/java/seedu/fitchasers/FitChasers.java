@@ -1,5 +1,6 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.ui.ViewLog;
 import seedu.fitchasers.exceptions.InvalidCommandException;
@@ -17,6 +18,7 @@ import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.IOException;
 import java.time.YearMonth;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -438,10 +440,12 @@ public class FitChasers {
         fileHandler.initIndex();
 
         try {
-            fileHandler.loadFileContentArray(person);
-            workoutManager.setWorkouts(fileHandler.loadFileContentArray(currentMonth), currentMonth);
+            fileHandler.loadWeightList(person);
+            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
         } catch (IOException e) {
             ui.showError(e.getMessage());
+        } catch (FileNonexistent e) {
+            fileHandler.saveMonthList(currentMonth, new ArrayList<>());
         }
 
         viewLog = new ViewLog(ui, workoutManager, fileHandler);

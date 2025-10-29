@@ -1,5 +1,6 @@
 package seedu.fitchasers.workouts;
 
+import seedu.fitchasers.exceptions.WorkoutNotEnded;
 import seedu.fitchasers.ui.UI;
 
 import java.time.Duration;
@@ -18,8 +19,8 @@ public class Workout {
     private final ArrayList<Exercise> exercises = new ArrayList<>();
     private String workoutName;
     private int duration = 0;
-    private LocalDateTime workoutStartDateTime;
-    private LocalDateTime workoutEndDateTime;
+    private LocalDateTime workoutStartDateTime = null;
+    private LocalDateTime workoutEndDateTime = null;
     private Exercise currentExercise = null;
     private Set<String> manualTags = new LinkedHashSet<>(); // tags the user edits manually
     private Set<String> autoTags = new LinkedHashSet<>();
@@ -147,10 +148,15 @@ public class Workout {
         this.workoutStartDateTime = workoutStartDateTime;
     }
 
+//    public LocalDateTime getWorkoutEndDateTime() throws WorkoutNotEnded {
+//        if (workoutEndDateTime == null) {
+//            throw new WorkoutNotEnded("Workout has not ended! Please end it with /end_workout");
+//        }
+//        return workoutEndDateTime;
+//    }
     public LocalDateTime getWorkoutEndDateTime() {
         return workoutEndDateTime;
     }
-
     public String getWorkoutDateString(){
         return formatWorkoutDate(workoutStartDateTime);
     }

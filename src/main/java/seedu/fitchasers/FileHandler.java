@@ -1,26 +1,27 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.exceptions.FileNonexistent;
+import seedu.fitchasers.exceptions.WorkoutNotEnded;
 import seedu.fitchasers.ui.UI;
-import seedu.fitchasers.workouts.WorkoutManager;
 import seedu.fitchasers.user.Person;
 import seedu.fitchasers.user.WeightRecord;
-import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.Exercise;
+import seedu.fitchasers.workouts.Workout;
 
-import java.io.FileWriter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,39 +45,37 @@ import java.util.Set;
 
 public class FileHandler {
 
-    private final Path FILE_PATH = Paths.get("data");
-    private final Path workoutDir = FILE_PATH.resolve("workouts");
+    private final Path DATA_DIRECTORY = Paths.get("data");
+    private final Path workoutDir = DATA_DIRECTORY.resolve("workouts");
     private final UI ui = new UI();
     private final Map<YearMonth, ArrayList<Workout>> arrayByMonth = new HashMap<>();
     private final Set<YearMonth> onDiskMonths = new HashSet<>();
 
     /**
-     * Initilize index for lazy loading
-     *
-     * @throws IOException if directory or file creation fails
+     * Initialize index for lazy loading.
      */
     public void initIndex() throws IOException {
         ensureDataDir();
-        try (var stream = Files.list(FILE_PATH)) {
+        onDiskMonths.clear();
+        try (var stream = Files.list(workoutDir)) {
             stream.map(p -> p.getFileName().toString())
-                    .filter(n -> n.startsWith("workouts_") && n.endsWith(".dat"))
-                    .map(n -> n.substring(9, 16))
-                    .forEach(s -> onDiskMonths.add(YearMonth.parse(s)));
+                    .filter(n -> n.startsWith("workouts_"))
+                    .forEach(name -> {
+                        if (name.endsWith(".txt")) {
+                            String ym = name.substring("workouts_".length(), "workouts_".length() + 7);
+                            try {
+                                onDiskMonths.add(YearMonth.parse(ym));
+                            } catch (Exception ignore) {
+                                System.out.println("Skipping workout " + name
+                                        + " because file does not conform to standards ");
+                            }
+                        }
+                    });
         }
     }
 
     public Map<YearMonth, ArrayList<Workout>> getArrayByMonth() {
         return arrayByMonth;
-    }
-
-    public ArrayList<Workout> getWorkoutsForMonth(YearMonth targetMonth) {
-        return arrayByMonth.computeIfAbsent(targetMonth, month -> {
-            try {
-                return loadMonthList(month);
-            } catch (Exception e) {
-                return new ArrayList<>();
-            }
-        });
     }
 
     /**
@@ -85,9 +84,10 @@ public class FileHandler {
      * @throws IOException if directory or file creation fails
      */
     private void ensureDataDir() throws IOException {
-        Files.createDirectories(FILE_PATH);
+        Files.createDirectories(DATA_DIRECTORY);
         Files.createDirectories(workoutDir);
     }
+
 
     // ----------------- Workout -----------------
     /**
@@ -98,126 +98,250 @@ public class FileHandler {
      * @throws IOException if saving fails
      */
     public void saveMonthList(YearMonth month, ArrayList<Workout> list) throws IOException {
-        try {
-            ensureDataDir();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        ensureDataDir();
 
-        String filename = String.format("workouts_%s.dat", month);
+        String filename = String.format("workouts_%s.txt", month); // e.g., workouts_2025-10.txt
         Path filePath = workoutDir.resolve(filename);
 
-        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-            out.writeObject(list);
-            ui.showMessage("Saved " + list.size() + " workouts for " + month + ".");
+        try (BufferedWriter bw = Files.newBufferedWriter(filePath, StandardCharsets.UTF_8)) {
+            for (Workout w : list) {
+                writeWorkoutBlock(bw, w);
+                bw.newLine();
+            }
         }
+
+        ui.showMessage("Saved " + list.size() + " workouts for " + month + " (text format).");
     }
 
-    /**
-     * Loads all workout and exercise data from save.txt into the given WorkoutManager.
-     * <p>
-     * Expected format:
-     * WORKOUT | Name | Duration
-     * EXERCISE | Name | reps,reps,reps
-     * END_WORKOUT
-     *
-     * @param workoutManager the WorkoutManager to populate
-     * @throws IOException if reading the save file fails
-     */
-    public void loadFileContentArray(YearMonth targetMonth,WorkoutManager workoutManager, Person person) throws IOException {
+    public boolean checkFileExists(YearMonth month) throws IOException {
         ensureDataDir();
-        List<String> lines = Files.readAllLines(FILE_PATH);
-
-        Workout currentWorkout = null;
-
-        for (String line : lines) {
-            if (line.startsWith("USER")) {
-                try {
-                    String[] parts = line.split("\\|");
-                    if (parts.length < 2) {
-                        throw new IllegalArgumentException("Malformed USER line: " + line);
-                    }
-                    String userName = parts[1].trim();
-                    person.setName(userName);
-                } catch (Exception e) {
-                    ui.showError("Failed to read user name from save file. Using default name instead.");
-                }
-
-            } else if (line.startsWith("WORKOUT")) {
-                try {
-                    String[] parts = line.split("\\|");
-                    String name = parts[1].trim();
-                    int duration = Integer.parseInt(parts[2].trim());
-                    currentWorkout = new Workout(name, duration);
-                    workoutManager.getWorkouts().add(currentWorkout);
-                } catch (Exception e) {
-                    ui.showMessage("Skipping malformed workout entry: " + line);
-                }
-
-            } else if (line.startsWith("EXERCISE") && currentWorkout != null) {
-                try {
-                    String[] parts = line.split("\\|");
-                    String exName = parts[1].trim();
-                    String[] repsList = parts[2].trim().split(",");
-
-                    Exercise exercise = new Exercise(exName, Integer.parseInt(repsList[0]));
-                    for (int i = 1; i < repsList.length; i++) {
-                        exercise.addSet(Integer.parseInt(repsList[i]));
-                    }
-                    currentWorkout.addExercise(exercise);
-                } catch (Exception e) {
-                    ui.showMessage("Skipping malformed exercise entry: " + line);
-                }
-
-            } else if (line.startsWith("END_WORKOUT")) {
-                currentWorkout = null;
-            }
-        Path filePath = dataDir.resolve("weight.txt");
-        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
-            for (WeightRecord wr : person.getWeightHistory()) {
-                writer.write(wr.getDate() + "," + wr.getWeight());
-                writer.newLine();
-            }
-        }
+        Path txt = workoutDir.resolve(String.format("workouts_%s.txt", month));
+        return Files.exists(txt);
     }
-        /**
-         * Saves all workout data to save.txt in the specified format.
-         * <p>
-         * Each save overwrites the entire file.
-         *
-         * @param workouts list of workouts to be saved
-         * @throws IOException if writing fails
-         */
-        public void saveFile(Person person, List<Workout> workouts) throws IOException {
-            ensureDataDir();
-            try (FileWriter fw = new FileWriter(FILE_PATH.toFile())) {
-                fw.write("USER | " + person.getName() + "\n");
-                for (Workout w : workouts) {
-                    fw.write("WORKOUT | " + w.getWorkoutName() + " | " + w.getDuration() + "\n");
-                    for (Exercise ex : w.getExercises()) {
-                        StringBuilder setsStr = new StringBuilder();
-                        for (int i = 0; i < ex.getSets().size(); i++) {
-                            setsStr.append(ex.getSets().get(i));
-                            if (i < ex.getSets().size() - 1) {
-                                setsStr.append(",");
-                            }
-                        }
-                        fw.write("EXERCISE | " + ex.getName() + " | " + setsStr + "\n");
-                    }
+    /**
+     * Loads the given month's workouts from the human-readable text file.
+     * If .txt is absent but legacy .dat exists, migrate once: load .dat, save as .txt, return data.
+     */
+    public ArrayList<Workout> loadMonthList(YearMonth month) throws IOException, FileNonexistent {
+        Path txt = workoutDir.resolve(String.format("workouts_%s.txt", month));
+        if (checkFileExists(month)) {
+            return readMonthFromTxt(txt);
+        }
 
-                    Set<String>workoutTags = w.getAllTags();
-                    StringBuilder setsStr = new StringBuilder();
+        throw new FileNonexistent("No save file found for " + month);
+    }
 
-                    for (String workoutTag : workoutTags){
-                        setsStr.append(workoutTag);
-                        setsStr.append(",");
+    private void writeWorkoutBlock(BufferedWriter bw, Workout workout) throws IOException {
+        final String name = workout.getWorkoutName();
+        final int duration = workout.getDuration();
+        final LocalDateTime start = workout.getWorkoutStartDateTime();
+        final Set<String> tags = workout.getAllTags();
+        String endTime;
+        final List<Exercise> exercises  = workout.getExercises();
+//        try{
+//            endTime = workout.getWorkoutEndDateTime().toString();
+//        }catch(WorkoutNotEnded e){
+//            System.out.println("Workout not ended! Saving it as 'Unended");
+//            endTime = "Unended";
+//        }
+        if( workout.getWorkoutEndDateTime() == null){
+            endTime = "Unended";
+        }
+        else {
+            endTime = workout.getWorkoutEndDateTime().toString();
+        }
+        bw.write("WORKOUT");
+        bw.newLine();
+        bw.write("Name: " + name);
+        bw.newLine();
+        bw.write("Start: " + start);
+        bw.newLine();
+        bw.write("End: " + endTime);
+        bw.newLine();
+        bw.write("DurationMin: " + duration);
+        bw.newLine();
+        bw.write("Tags: ");
+        for(String tag : tags){
+            bw.write(tag);
+            bw.write(',');
+        }
+        bw.newLine();
+        bw.write("EXERCISES:");
+        bw.newLine();
+        for (Exercise exercise : exercises) {
+            for (int i = 0; i < exercise.getSets().size(); i++) {
+                String exerciseName = exercise.getName();
+                bw.write("  - " + exerciseName + " | " + exercise.getSets().get(i));
+                bw.newLine();
+            }
+        }
+        bw.write("END_WORKOUT"); bw.newLine();
+    }
+
+    private ArrayList<Workout> readMonthFromTxt(Path txt) throws IOException {
+        ArrayList<Workout> list = new ArrayList<>();
+        try (BufferedReader br = Files.newBufferedReader(txt, StandardCharsets.UTF_8)) {
+            String line;
+            List<String> block = new ArrayList<>();
+            while ((line = br.readLine()) != null) {
+                String trimmed = line.trim();
+                if (trimmed.isEmpty() || trimmed.startsWith("#")) {
+                    continue; // ignore empties/comments
+                }
+                if ("WORKOUT".equals(trimmed)) {
+                    block.clear();
+                }
+                block.add(line);
+                if ("END_WORKOUT".equals(trimmed)) {
+                    Workout w = parseWorkoutBlock(block);
+                    if (w != null) {
+                        list.add(w);
                     }
-                    fw.write("TAGS | " + setsStr + '\n');
-                    fw.write("END_WORKOUT\n");
+                    block.clear();
                 }
             }
-            ui.showMessage("Successfully saved " + workouts.size() + " workout(s) to file.");
         }
+        return list;
+    }
+
+    private Workout parseWorkoutBlock(List<String> lines) {
+        String name = null;
+        LocalDateTime start = null;
+        LocalDateTime end = null;
+        Integer duration = null;
+        Set<String> tags = new HashSet<>();
+        List<SetLine> setLines = new ArrayList<>();
+
+        boolean inSets = false;
+
+        for (String raw : lines) {
+            String line = raw.trim();
+            if (line.equals("WORKOUT") || line.equals("END_WORKOUT")) {
+                continue;
+            }
+
+            if (line.startsWith("Name:")) {
+                name = line.substring(5).trim();
+                continue;
+            }
+
+            if (line.startsWith("Start:")) {
+                String v = line.substring(6).trim();
+                try {
+                    if (!v.isEmpty()) start = LocalDateTime.parse(v);
+                }catch(Throwable e){
+                    startErrorHandling();
+                }
+                continue;
+            }
+
+            if (line.startsWith("End:")) {
+                String v = line.substring(4).trim();
+                try{
+                    if (!v.isEmpty()) end = LocalDateTime.parse(v);
+                }catch(Throwable e){
+                    endErrorHandling();
+                }
+                continue;
+            }
+
+            if (line.startsWith("DurationMin:")) {
+                String durationString = line.substring("DurationMin:".length()).trim();
+                try {
+                    duration = Integer.parseInt(durationString);
+                } catch (NumberFormatException ignore) {
+                    durationErrorHandling();
+                }
+                continue;
+            }
+
+            if (line.startsWith("Tags:")) {
+                tags = parseTagList(line.substring("Tags:".length()).trim());
+                continue;
+            }
+
+            if (line.startsWith("Sets:")) {
+                inSets = true;
+                continue;
+            }
+
+            if (inSets && line.startsWith("- ")) {
+                // "- Name | 12"
+                String body = line.substring(2).trim();
+                String[] parts = body.split("\\|", 2);
+                String setName = parts[0].trim();
+                Integer reps = null;
+                if (parts.length == 2) {
+                    String repStr = parts[1].trim();
+                    if (!repStr.isEmpty()) {
+                        try {
+                            reps = Integer.parseInt(repStr);
+                        } catch (NumberFormatException e) {
+                            setsErrorHandling();
+                        }
+                    }
+                }
+                setLines.add(new SetLine(setName, reps));
+            }
+        }
+
+        // Instantiate Workout with parsed values.
+        Workout w = new Workout(name, start, end); // e.g., ctor computes duration
+        w.setManualTags(tags); //#TODO edit
+        // Add sets
+        for (SetLine s : setLines) {
+            final String n = s.name == null ? "" : s.name;
+            final Integer r = s.reps == null ? 0 : s.reps;
+            w.addExercise(new Exercise(n, r));
+        }
+        return w;
+    }
+
+    private Set<String> parseTagList(String raw) {
+        Set<String> out = new LinkedHashSet<>();
+        if (raw == null || raw.isEmpty()) {
+            return out;
+        }
+        for (String part : raw.split(",")) {
+            String t = part.trim();
+            if (!t.isEmpty()) {
+                out.add(t);
+            }
+        }
+        return out;
+    }
+
+    private record SetLine(String name, Integer reps) {
+    }
+
+    //TODO edit the return types of all these
+    /** Ask the user to input a valid Start date-time and return it. */
+    private java.time.LocalDateTime startErrorHandling() {
+        ui.showMessage("⚠️ Invalid Start date/time found in file.");
+        //return promptDateTime("Enter Start date-time (e.g. 2025-10-29T18:05 or 2025-10-29 18:05): ");
+        return LocalDateTime.now();
+    }
+
+    /** Ask the user to input a valid End date-time and return it. */
+    private java.time.LocalDateTime endErrorHandling() {
+        ui.showMessage("⚠️ Invalid End date/time found in file.");
+        //return promptDateTime("Enter End date-time (e.g. 2025-10-29T18:05 or 2025-10-29 18:05): ");
+        return LocalDateTime.now();
+    }
+
+    /** Ask the user to enter a valid positive integer duration in minutes and return it. */
+    private int durationErrorHandling() {
+        ui.showMessage("⚠️ Invalid Duration (minutes) found in file.");
+        //return promptInt("Enter duration in minutes (positive integer): ", 1, Integer.MAX_VALUE);
+        return -1;
+    }
+
+    /** Ask the user to enter a valid integer reps (≥ 0) for a set and return it. */
+    private int setsErrorHandling() {
+        ui.showMessage("⚠️ Invalid reps value found in file.");
+        //return promptInt("Enter number of reps (integer ≥ 0): ", 0, Integer.MAX_VALUE);
+        return -1;
+    }
     /**
      * Loads previously saved weight entries for the given person from a text file.
      *
@@ -226,7 +350,7 @@ public class FileHandler {
      */
     public void loadWeightList(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("weight.txt");
+        Path filePath = DATA_DIRECTORY.resolve("weight.txt");
         if (Files.notExists(filePath)) {
             return;
         }
@@ -254,12 +378,30 @@ public class FileHandler {
      */
     public void saveGoal(double goalWeight, LocalDate setDate) throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("goal.txt");
+        Path filePath = DATA_DIRECTORY.resolve("goal.txt");
         try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
             writer.write(goalWeight + "," + setDate);
         }
     }
 
+    // ----------------- Weight -----------------
+
+    /**
+     * Saves all weight entries of the given person into a text file.
+     *
+     * @param person the {@link Person} whose weight history will be saved
+     * @throws IOException if an I/O error occurs while creating directories or writing the file
+     */
+    public void saveWeightList(Person person) throws IOException {
+        ensureDataDir();
+        Path filePath = DATA_DIRECTORY.resolve("weight.txt");
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+            for (WeightRecord wr : person.getWeightHistory()) {
+                writer.write(wr.getDate() + "," + wr.getWeight());
+                writer.newLine();
+            }
+        }
+    }
     /**
      * Loads the saved goal weight and the date it was set from the text file {@code goal.txt}.
      *
@@ -268,7 +410,7 @@ public class FileHandler {
      */
     public Double[] loadGoal() throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("goal.txt");
+        Path filePath = DATA_DIRECTORY.resolve("goal.txt");
         if (Files.notExists(filePath)) {
             return null;
         }
@@ -287,7 +429,7 @@ public class FileHandler {
      */
     public void saveUserName(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("username.txt");
+        Path filePath = DATA_DIRECTORY.resolve("username.txt");
         Files.writeString(filePath, person.getName());
     }
 
@@ -297,7 +439,7 @@ public class FileHandler {
      */
     public String loadUserName() throws IOException {
         ensureDataDir();
-        Path filePath = FILE_PATH.resolve("username.txt");
+        Path filePath = DATA_DIRECTORY.resolve("username.txt");
         if (Files.notExists(filePath)) {
             return null;
         }

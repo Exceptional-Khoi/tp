@@ -1,6 +1,7 @@
 package seedu.fitchasers.workouts;
 
 import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.tagger.Tagger;
 import seedu.fitchasers.ui.UI;
@@ -36,8 +37,15 @@ public class WorkoutManager {
     private YearMonth monthOfWorkout;
     private YearMonth currentLoadedMonth;
     private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
-    private final Set<YearMonth> loadedMonths = new HashSet<>();
     private final FileHandler fileHandler;
+    private int nameIndex;
+    private int afterNameIndex = 2;
+    private LocalDate date = null;
+    private LocalTime time = null;
+    private DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
+            .withResolverStyle(ResolverStyle.SMART);
+    private DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
+            .withResolverStyle(ResolverStyle.SMART);
 
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
         this.tagger = tagger;
@@ -58,7 +66,7 @@ public class WorkoutManager {
      *
      * @param command the full user command containing workout details
      */
-    public void addWorkout(String command) {
+    public void addWorkout(String command) throws FileNonexistent, IOException {
         workoutName = "";
         try {
             formatInputForWorkout(command);
@@ -67,7 +75,7 @@ public class WorkoutManager {
         }
         monthOfWorkout = YearMonth.from(workoutDateTime);
         if(!currentLoadedMonth.equals(monthOfWorkout)) {
-            setWorkouts(fileHandler.getWorkoutsForMonth(monthOfWorkout), monthOfWorkout);
+            setWorkouts(fileHandler.loadMonthList(monthOfWorkout), monthOfWorkout);
         }
 
         try{
@@ -88,7 +96,7 @@ public class WorkoutManager {
         }
     }
 
-    private void formatInputForWorkout(String command) throws InvalidArgumentInput {
+    private void formatInputForWorkout(String command) throws InvalidArgumentInput, IOException {
         assert workouts != null : "workouts list should be initialized";
         if (currentWorkout != null) {
             ui.showMessage("You currently have an active workout: '"
@@ -104,121 +112,19 @@ public class WorkoutManager {
             throw new InvalidArgumentInput("");
         }
 
-        int nameIndex = command.indexOf("n/");
-        int afterNameIndex = nameIndex + 2;
+        nameIndex = command.indexOf("n/");
+        afterNameIndex += nameIndex;
 
         // Find first marker after n/
         int dIndex = command.indexOf("d/", afterNameIndex);
         int tIndex = command.indexOf("t/", afterNameIndex);
-
         // pick the nearest positive marker after n/
-        int nextMarker = -1;
-        if (dIndex != -1 && tIndex != -1) {
-            nextMarker = Math.min(dIndex, tIndex);
-        } else if (dIndex != -1) {
-            nextMarker = dIndex;
-        } else if (tIndex != -1) {
-            nextMarker = tIndex;
-        }
-
-        if (nextMarker != -1) {
-            workoutName = command.substring(afterNameIndex, nextMarker).trim();
-        } else {
-            workoutName = command.substring(afterNameIndex).trim();
-        }
-
-        if (workoutName.isEmpty()) {
-            ui.showMessage("Workout name cannot be empty. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
-            throw new InvalidArgumentInput("");
-        }
-
-        assert !workoutName.isEmpty() : "workoutName should be non-empty after validation";
-
-        // Extract raw date/time strings if present (first token after marker)
-        String dateStr = "";
-        if (dIndex != -1) {
-            String tail = command.substring(dIndex + 2).trim();
-            String[] token = tail.split("\\s+");
-            if (token.length > 0) {
-                dateStr = token[0];
-            }
-        }
-
-        String timeStr = "";
-        if (tIndex != -1) {
-            String tail = command.substring(tIndex + 2).trim();
-            String[] toks = tail.split("\\s+");
-            if (toks.length > 0){
-                timeStr = toks[0];
-            }
-        }
-
-        // Strict formatters & validate provided pieces first
-        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
-                .withResolverStyle(ResolverStyle.SMART);
-        DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
-                .withResolverStyle(ResolverStyle.SMART);
-
-        LocalDate date = null;
-        LocalTime time = null;
-
-        if (!dateStr.isEmpty()) {
-            try {
-                date = LocalDate.parse(dateStr, dateFmt);
-            } catch (Exception ex) {
-                ui.showMessage("Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
-                throw new InvalidArgumentInput("");
-            }
-        }
-
-        if (!timeStr.isEmpty()) {
-            try {
-                time = LocalTime.parse(timeStr, timeFmt);
-            } catch (Exception ex) {
-                ui.showMessage("Invalid time. Use t/HHmm (e.g., t/1905).");
-                throw new InvalidArgumentInput("");
-            }
-        }
-
-        // Prompt ONLY for missing ones
-        if (date == null) {
-            String todayStr = LocalDate.now().format(dateFmt);
-            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
-            if (ui.confirmationMessage()) {
-                date = LocalDate.now();
-            } else {
-                ui.showMessage("Please provide a date in format d/DD/MM/YY.");
-                throw new InvalidArgumentInput("");
-            }
-        }
-
-        if (time == null) {
-            String nowStr = LocalTime.now().format(timeFmt);
-            ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
-            if (ui.confirmationMessage()) {
-                time = LocalTime.now();
-            } else {
-                ui.showMessage("Please provide a time in format t/HHmm.");
-                throw new InvalidArgumentInput("");
-            }
-        }
+        workoutName = extractWorkoutNameFromRaw(command, dIndex, tIndex);
+        date = extractDateFromRaw(command, dIndex);
+        time = extractTimeFromRaw(command, tIndex);
+        promptIfDateOrTimeMissing();
         workoutDateTime = LocalDateTime.of(date, time);
-
-        if (date.isAfter(LocalDate.now())) {
-            ui.showMessage("The date you entered (" + date.format(dateFmt) + ") is in the future. Are you sure? (Y/N)");
-            if (!ui.confirmationMessage()) {
-                ui.showMessage("Please re-enter the correct date.");
-                throw new InvalidArgumentInput("");
-            }
-        }
-
-        if (date.isEqual(LocalDate.now()) && time.isAfter(LocalTime.now())) {
-            ui.showMessage("The time you entered (" + time.format(timeFmt) + ") is in the future. Are you sure? (Y/N)");
-            if (!ui.confirmationMessage()) {
-                ui.showMessage("Please re-enter the correct time.");
-                throw new InvalidArgumentInput("");
-            }
-        }
+        checkPastFutureDate(date, dateFmt, time, timeFmt);
 
         // Check if any existing workout already has the same date/time
         for (Workout w : workouts) {
@@ -240,6 +146,118 @@ public class WorkoutManager {
             }
         }
         workoutDateTime = LocalDateTime.of(date, time);
+    }
+
+    public String extractWorkoutNameFromRaw(String command, int dIndex, int tIndex) throws InvalidArgumentInput {
+        String workoutName;
+        int nextMarker = -1;
+        if (dIndex != -1 && tIndex != -1) {
+            nextMarker = Math.min(dIndex, tIndex);
+        } else if (dIndex != -1) {
+            nextMarker = dIndex;
+        } else if (tIndex != -1) {
+            nextMarker = tIndex;
+        }
+
+        if (nextMarker != -1) {
+            workoutName = command.substring(afterNameIndex, nextMarker).trim();
+        } else {
+            workoutName = command.substring(afterNameIndex).trim();
+        }
+
+        if (workoutName.isEmpty()) {
+            ui.showMessage("Workout name cannot be empty. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
+            throw new InvalidArgumentInput("");
+        }
+        return workoutName;
+    }
+
+    public LocalTime extractTimeFromRaw(String command, int tIndex) throws InvalidArgumentInput {
+        String timeStr = "";
+        LocalTime time = null;
+        if (tIndex != -1) {
+            String tail = command.substring(tIndex + 2).trim();
+            String[] toks = tail.split("\\s+");
+            if (toks.length > 0){
+                timeStr = toks[0];
+            }
+        }
+        if (!timeStr.isEmpty()) {
+            try {
+                time = LocalTime.parse(timeStr, timeFmt);
+            } catch (Exception ex) {
+                ui.showMessage("Invalid time. Use t/HHmm (e.g., t/1905).");
+                throw new InvalidArgumentInput("");
+            }
+        }
+        return time;
+    }
+
+    public LocalDate extractDateFromRaw(String command, int dIndex) throws InvalidArgumentInput {
+        String dateStr = "";
+        LocalDate date = null;
+        if (dIndex != -1) {
+            String tail = command.substring(dIndex + 2).trim();
+            String[] token = tail.split("\\s+");
+            if (token.length > 0) {
+                dateStr = token[0];
+            }
+        }
+
+        if (!dateStr.isEmpty()) {
+            try {
+                date = LocalDate.parse(dateStr, dateFmt);
+            } catch (Exception ex) {
+                ui.showMessage("Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
+                throw new InvalidArgumentInput("");
+            }
+        }
+        return date;
+    }
+
+    private void promptIfDateOrTimeMissing() throws InvalidArgumentInput {
+        if (date == null) {
+            String todayStr = LocalDate.now().format(dateFmt);
+            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
+            if (ui.confirmationMessage()) {
+                date = LocalDate.now();
+            } else {
+                ui.showMessage("Please provide a date in format d/DD/MM/YY.");
+                throw new InvalidArgumentInput("");
+            }
+        }
+
+        if (time == null) {
+            String nowStr = LocalTime.now().format(timeFmt);
+            ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
+            if (ui.confirmationMessage()) {
+                time = LocalTime.now();
+            } else {
+                ui.showMessage("Please provide a time in format t/HHmm.");
+                throw new InvalidArgumentInput("");
+            }
+        }
+    }
+
+    private void checkPastFutureDate(LocalDate date, DateTimeFormatter dateFmt, LocalTime time, DateTimeFormatter timeFmt) throws InvalidArgumentInput, IOException {
+        if (date.isAfter(LocalDate.now())) {
+            ui.showMessage("The date you entered (" + date.format(dateFmt) + ") is in the future. Are you sure? (Y/N)");
+            if (!ui.confirmationMessage()) {
+                ui.showMessage("Please re-enter the correct date.");
+                throw new InvalidArgumentInput("");
+            }
+            if (!fileHandler.checkFileExists(YearMonth.from(date))){
+                fileHandler.saveMonthList(YearMonth.from(date),new ArrayList<>());
+            }
+        }
+
+        if (date.isEqual(LocalDate.now()) && time.isAfter(LocalTime.now())) {
+            ui.showMessage("The time you entered (" + time.format(timeFmt) + ") is in the future. Are you sure? (Y/N)");
+            if (!ui.confirmationMessage()) {
+                ui.showMessage("Please re-enter the correct time.");
+                throw new InvalidArgumentInput("");
+            }
+        }
     }
 
     /**
