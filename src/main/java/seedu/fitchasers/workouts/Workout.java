@@ -2,7 +2,6 @@ package seedu.fitchasers.workouts;
 
 import seedu.fitchasers.ui.UI;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
@@ -14,7 +13,7 @@ import java.util.Set;
 /**
  * Represents a workout session containing a name, duration, start/end times, and a list of exercises.
  */
-public class Workout implements Serializable {
+public class Workout {
     private static final UI ui = new UI();
     private final ArrayList<Exercise> exercises = new ArrayList<>();
     private String workoutName;

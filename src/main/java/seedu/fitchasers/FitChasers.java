@@ -436,8 +436,8 @@ public class FitChasers {
         fileHandler.initIndex();
 
         try {
-            fileHandler.loadWeightList(person);
-            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
+            fileHandler.loadFileContentArray(person);
+            workoutManager.setWorkouts(fileHandler.loadFileContentArray(currentMonth), currentMonth);
         } catch (IOException e) {
             ui.showError(e.getMessage());
         }
