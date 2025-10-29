@@ -6,6 +6,8 @@ import seedu.fitchasers.user.Person;
 import seedu.fitchasers.user.WeightRecord;
 import seedu.fitchasers.workouts.Workout;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -37,14 +39,13 @@ import java.util.Set;
  * EXERCISE | Bench Press | 12,10,8
  * END_WORKOUT
  */
-
 public class FileHandler {
 
     private final Path dataDir = Paths.get("data");
     private final Path workoutDir = dataDir.resolve("workouts");
     private final UI ui = new UI();
     private final Map<YearMonth, ArrayList<Workout>> arrayByMonth = new HashMap<>();
-    private final Set<YearMonth> onDiskMonths = new HashSet<>(); // discovered from directory
+    private final Set<YearMonth> onDiskMonths = new HashSet<>();
 
     /**
      * Initilize index for lazy loading
@@ -56,7 +57,7 @@ public class FileHandler {
         try (var stream = Files.list(dataDir)) {
             stream.map(p -> p.getFileName().toString())
                     .filter(n -> n.startsWith("workouts_") && n.endsWith(".dat"))
-                    .map(n -> n.substring(9, 16))           // "YYYY-MM"
+                    .map(n -> n.substring(9, 16))
                     .forEach(s -> onDiskMonths.add(YearMonth.parse(s)));
         }
     }
@@ -74,6 +75,7 @@ public class FileHandler {
             }
         });
     }
+
     /**
      * Ensures that the save file and its parent directory exist.
      *
@@ -93,13 +95,13 @@ public class FileHandler {
      * @throws IOException if saving fails
      */
     public void saveMonthList(YearMonth month, ArrayList<Workout> list) throws IOException {
-        try{
+        try {
             ensureDataDir();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        String filename = String.format("workouts_%s.dat", month); // e.g., workouts_2025-06.dat
+        String filename = String.format("workouts_%s.dat", month);
         Path filePath = workoutDir.resolve(filename);
 
         try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
@@ -136,59 +138,51 @@ public class FileHandler {
 
     // ----------------- Weight -----------------
     /**
-     * Saves all weight entries of the given person into a serialized file.
-     * <p>
-     * The file is stored inside the {@link #dataDir} directory, with the filename format:
-     * "weight_&lt;PersonName&gt;.dat". If the data directory does not exist, it will be created automatically.
-     * </p>
+     * Saves all weight entries of the given person into a text file.
      *
      * @param person the {@link Person} whose weight history will be saved
      * @throws IOException if an I/O error occurs while creating directories or writing the file
      */
     public void saveWeightList(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("weight.dat");
-        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-            out.writeObject(person.getWeightHistory());
-            //ui.showMessage("Saved " + person.getWeightHistory().size() + " weight entries for " + person.getName());
+        Path filePath = dataDir.resolve("weight.txt");
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+            for (WeightRecord wr : person.getWeightHistory()) {
+                writer.write(wr.getDate() + "," + wr.getWeight());
+                writer.newLine();
+            }
         }
     }
 
     /**
-     * Loads previously saved weight entries for the given person from a serialized file.
-     * <p>
-     * The file is expected to be located inside the {@link #dataDir} directory, with the filename format:
-     * "weight_&lt;PersonName&gt;.dat". If no file is found, the method will simply show a message and return.
-     * The loaded entries are set into the {@link Person}'s weight history.
-     * </p>
+     * Loads previously saved weight entries for the given person from a text file.
      *
      * @param person the {@link Person} whose weight history will be loaded
-     * @throws IOException if an I/O error occurs while reading the file or if the {@link WeightRecord} class
-     *                     cannot be found during deserialization
+     * @throws IOException if an I/O error occurs while reading the file
      */
-    @SuppressWarnings("unchecked")
     public void loadWeightList(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("weight.dat");
+        Path filePath = dataDir.resolve("weight.txt");
         if (Files.notExists(filePath)) {
-            //ui.showMessage("No previous weight data found for " + person.getName());
             return;
         }
-        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
-            List<WeightRecord> list = (List<WeightRecord>) in.readObject();
-            person.setWeightHistory(new ArrayList<>(list));
-            //ui.showMessage("Loaded " + list.size() + " weight entries for " + person.getName() + ".");
-        } catch (ClassNotFoundException e) {
-            throw new IOException("WeightRecord class not found", e);
+
+        List<WeightRecord> list = new ArrayList<>();
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split(",");
+                LocalDate date = LocalDate.parse(parts[0]);
+                double weight = Double.parseDouble(parts[1]);
+                list.add(new WeightRecord(weight, date));
+            }
         }
+        person.setWeightHistory(list);
     }
 
+    // ----------------- Goal -----------------
     /**
-     * Saves the user's goal weight and the date it was set to a data file named {@code goal.dat}.
-     * <p>
-     * The file is stored inside the application's data directory, created automatically if it does not exist.
-     * This method overwrites any existing goal data.
-     * </p>
+     * Saves the user's goal weight and the date it was set to a text file named {@code goal.txt}.
      *
      * @param goalWeight the target goal weight to be saved (in kilograms)
      * @param setDate    the {@link LocalDate} when the goal weight was set
@@ -196,69 +190,53 @@ public class FileHandler {
      */
     public void saveGoal(double goalWeight, LocalDate setDate) throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("goal.dat");
-        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-            out.writeDouble(goalWeight);
-            out.writeLong(setDate.toEpochDay());
+        Path filePath = dataDir.resolve("goal.txt");
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath)) {
+            writer.write(goalWeight + "," + setDate);
         }
     }
 
     /**
-     * Loads the saved goal weight and the date it was set from the data file {@code goal.dat}.
-     * <p>
-     * If the file does not exist, this method returns {@code null}.
-     * Otherwise, it reads two values in the following order:
-     * <ul>
-     *     <li>The goal weight as a {@code double}</li>
-     *     <li>The date the goal was set, represented as a {@code long} epoch day value</li>
-     * </ul>
-     * The method then returns both values as an array of {@link Double} objects,
-     * where index 0 is the goal weight, and index 1 is the epoch day of the goal date.
-     * </p>
+     * Loads the saved goal weight and the date it was set from the text file {@code goal.txt}.
      *
      * @return a {@code Double[]} array containing [goalWeight, epochDay], or {@code null} if no data file exists
-     * @throws IOException if an I/O error occurs while reading from the file
+     * @throws IOException if an I/O error occurs while reading the file
      */
     public Double[] loadGoal() throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("goal.dat");
+        Path filePath = dataDir.resolve("goal.txt");
         if (Files.notExists(filePath)) {
             return null;
         }
 
-        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
-            double goal = in.readDouble();
-            long epochDay = in.readLong();
+        try (BufferedReader reader = Files.newBufferedReader(filePath)) {
+            String[] parts = reader.readLine().split(",");
+            double goal = Double.parseDouble(parts[0]);
+            long epochDay = LocalDate.parse(parts[1]).toEpochDay();
             return new Double[]{goal, (double) epochDay};
         }
     }
 
     // ----------------- Username -----------------
     /**
-     * Saves the person's name to a file for future sessions.
+     * Saves the person's name to a text file for future sessions.
      */
     public void saveUserName(Person person) throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("username.dat");
-        try (ObjectOutputStream out = new ObjectOutputStream(Files.newOutputStream(filePath))) {
-            out.writeObject(person.getName());
-        }
+        Path filePath = dataDir.resolve("username.txt");
+        Files.writeString(filePath, person.getName());
     }
 
     /**
-     * Loads the saved username from file.
+     * Loads the saved username from text file.
      * Returns null if file doesn't exist.
      */
     public String loadUserName() throws IOException {
         ensureDataDir();
-        Path filePath = dataDir.resolve("username.dat");
+        Path filePath = dataDir.resolve("username.txt");
         if (Files.notExists(filePath)) {
             return null;
         }
-        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(filePath))) {
-            return (String) in.readObject();
-        } catch (ClassNotFoundException e) {
-            throw new IOException("Failed to read username from file", e);
-        }
+        return Files.readString(filePath).trim();
     }
 }
