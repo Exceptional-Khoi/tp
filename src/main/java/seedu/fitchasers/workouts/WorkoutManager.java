@@ -46,8 +46,13 @@ public class WorkoutManager {
     private static final Pattern NAME_ALLOWED = Pattern.compile("[A-Za-z0-9 _-]+");
     private static final Pattern NAME_ILLEGAL_FINDER = Pattern.compile("[^A-Za-z0-9 _-]");
     private static final Pattern BOUND_PREFIX = Pattern.compile("(^|\\s)([A-Za-z])/");
-    private static final Pattern NEXT_PREFIX = Pattern.compile("\\s+[nr]/");
+    private static final Pattern NEXT_PREFIX = Pattern.compile("\\s+[A-Za-z]/");
     private static final Pattern REPS_TOKEN = Pattern.compile("^\\d{1,4}$");
+
+    private static final DateTimeFormatter DATE_FMT =
+            DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
+    private static final DateTimeFormatter TIME_FMT =
+            DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
 
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
         this.tagger = tagger;
@@ -143,7 +148,8 @@ public class WorkoutManager {
         assert !workoutName.isEmpty() : "workoutName should be non-empty after validation";
 
         // Extract raw date/time strings if present (first token after marker)
-        String dateStr = "";
+        String dateStr = "", timeStr = "";
+
         if (dIndex != -1) {
             String tail = command.substring(dIndex + 2).trim();
             String[] token = tail.split("\\s+");
@@ -152,7 +158,6 @@ public class WorkoutManager {
             }
         }
 
-        String timeStr = "";
         if (tIndex != -1) {
             String tail = command.substring(tIndex + 2).trim();
             String[] toks = tail.split("\\s+");
@@ -161,16 +166,12 @@ public class WorkoutManager {
             }
         }
 
-        // Strict formatters & validate provided pieces first
-        DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
-        DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
-
         LocalDate date = null;
         LocalTime time = null;
 
         if (!dateStr.isEmpty()) {
             try {
-                date = LocalDate.parse(dateStr, dateFmt);
+                date = LocalDate.parse(dateStr, DATE_FMT);
             } catch (Exception ex) {
                 ui.showMessage("Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
                 throw new InvalidArgumentInput("");
@@ -179,7 +180,7 @@ public class WorkoutManager {
 
         if (!timeStr.isEmpty()) {
             try {
-                time = LocalTime.parse(timeStr, timeFmt);
+                time = LocalTime.parse(timeStr, TIME_FMT);
             } catch (Exception ex) {
                 ui.showMessage("Invalid time. Use t/HHmm (e.g., t/1905).");
                 throw new InvalidArgumentInput("");
@@ -188,7 +189,7 @@ public class WorkoutManager {
 
         // Prompt ONLY for missing ones
         if (date == null) {
-            String todayStr = LocalDate.now().format(dateFmt);
+            String todayStr = LocalDate.now().format(DATE_FMT);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 date = LocalDate.now();
@@ -199,7 +200,7 @@ public class WorkoutManager {
         }
 
         if (time == null) {
-            String nowStr = LocalTime.now().format(timeFmt);
+            String nowStr = LocalTime.now().format(TIME_FMT);
             ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 time = LocalTime.now();
@@ -208,10 +209,9 @@ public class WorkoutManager {
                 throw new InvalidArgumentInput("");
             }
         }
-        workoutDateTime = LocalDateTime.of(date, time);
 
         if (date.isAfter(LocalDate.now())) {
-            ui.showMessage("The date you entered (" + date.format(dateFmt) + ") is in the future. Are you sure? (Y/N)");
+            ui.showMessage("The date you entered (" + date.format(DATE_FMT) + ") is in the future. Are you sure? (Y/N)");
             if (!ui.confirmationMessage()) {
                 ui.showMessage("Please re-enter the correct date.");
                 throw new InvalidArgumentInput("");
@@ -219,7 +219,7 @@ public class WorkoutManager {
         }
 
         if (date.isEqual(LocalDate.now()) && time.isAfter(LocalTime.now())) {
-            ui.showMessage("The time you entered (" + time.format(timeFmt) + ") is in the future. Are you sure? (Y/N)");
+            ui.showMessage("The time you entered (" + time.format(TIME_FMT) + ") is in the future. Are you sure? (Y/N)");
             if (!ui.confirmationMessage()) {
                 ui.showMessage("Please re-enter the correct time.");
                 throw new InvalidArgumentInput("");
@@ -234,7 +234,7 @@ public class WorkoutManager {
                 LocalTime existingTime = existingStart.toLocalTime();
 
                 if (existingDate.equals(date) && existingTime.equals(time)) {
-                    ui.showMessage("A workout already exists at this date and time (" + existingDate.format(dateFmt) + " " + existingTime.format(timeFmt) + "). " + "Continue anyway? (Y/N)");
+                    ui.showMessage("A workout already exists at this date and time (" + existingDate.format(DATE_FMT) + " " + existingTime.format(TIME_FMT) + "). " + "Continue anyway? (Y/N)");
                     if (!ui.confirmationMessage()) {
                         ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
                         throw new InvalidArgumentInput("");
@@ -361,12 +361,6 @@ public class WorkoutManager {
 
         String s = args.trim();
 
-        if (s.isEmpty()) {
-            ui.showMessage("Missing information. Use: /add_exercise n/NAME r/REPS");
-            ui.showMessage("NAME: letters/digits/space/-/_ (max 32)\nREPS: 1–1000");
-            return;
-        }
-
         // Must have exactly one n/ and one r/
         if (countToken(s, "n/") != 1 || countToken(s, "r/") != 1) {
             ui.showMessage("Please provide exactly one n/ and one r/ in this order: n/NAME r/REPS");
@@ -390,18 +384,15 @@ public class WorkoutManager {
             ui.showMessage("Exercise name is missing after n/. Example: n/Bench Press");
             return;
         }
-        if (name.length() > MAX_EXERCISE_NAME_LEN) {
-            ui.showMessage("Name too long (" + name.length() + "). Max allowed is " + MAX_EXERCISE_NAME_LEN + " characters.");
-            return;
-        }
-        if (!NAME_ALLOWED.matcher(name).matches()) {
+        if (!isValidName(name)) {
             Character bad = findFirstIllegalNameChar(name);
             if (bad != null) {
-                // Show the first problematic character clearly, including slashes
                 String shown = (bad == '\\') ? "\\\\" : String.valueOf(bad);
                 ui.showMessage("“" + shown + "” is not allowed in the exercise name.");
+            } else {
+                ui.showMessage("Name too long or invalid.");
             }
-            ui.showMessage("Allowed characters: letters, digits, spaces, hyphen (-), underscore (_).");
+            ui.showMessage("Allowed characters: letters, digits, spaces, hyphen (-), underscore (_). Max 32 chars.");
             return;
         }
 
@@ -555,7 +546,7 @@ public class WorkoutManager {
         }
     }
 
-    public void showWorkoutsWIthIndices(ArrayList<Workout> list) {
+    public void showWorkoutsWithIndices(ArrayList<Workout> list) {
         if (list.isEmpty()) {
             ui.showMessage("No workouts recorded for this selection!");
             return;
@@ -594,7 +585,7 @@ public class WorkoutManager {
             return;
         }
 
-        showWorkoutsWIthIndices(targetList);
+        showWorkoutsWithIndices(targetList);
         String selection = ui.enterSelection();
 
         String[] tokens = selection.split("\\s+");
@@ -784,7 +775,6 @@ public class WorkoutManager {
         currentWorkout = null;
     }
 
-    // Small holder for token extraction
     private static final class Slice {
         final String valueTrimmed;
         final int endIndex;       // end position in original string (exclusive)
@@ -806,14 +796,14 @@ public class WorkoutManager {
     // Extract the slice for a token (e.g., starting at index of 'n' in "n/..."),
     // capturing the raw substring and where it ends in the original string.
     private static Slice extractSlice(String s, int tokenStart) {
-        int valueStart = tokenStart + 2;
+        int valueStart = tokenStart + 2; // skip "x/"
         if (valueStart > s.length()) return new Slice("", "", valueStart);
 
         Matcher m = NEXT_PREFIX.matcher(s);
         int next = -1;
         while (m.find()) {
-            int boundaryStart = m.start();
-            if (boundaryStart > valueStart) {
+            int boundaryStart = m.start(); // includes the whitespace before the next token
+            if (boundaryStart > valueStart) { // ensure it's after our value actually begins
                 next = boundaryStart;
                 break;
             }
@@ -825,9 +815,13 @@ public class WorkoutManager {
 
 
     private static boolean isValidName(String name) {
-        if (name == null) return false;
+        if (name == null) {
+            return false;
+        }
         String t = name.trim();
-        if (t.isEmpty() || t.length() > MAX_EXERCISE_NAME_LEN) return false;
+        if (t.isEmpty() || t.length() > MAX_EXERCISE_NAME_LEN) {
+            return false;
+        }
         return NAME_ALLOWED.matcher(t).matches();
     }
 
@@ -839,9 +833,13 @@ public class WorkoutManager {
     // Safe parse reps: only digits, length<=4, range 1..MAX_REPS
     private static Integer parseRepsSafe(String repsStr) {
         String t = repsStr.trim();
-        if (!REPS_TOKEN.matcher(t).matches()) return null;
+        if (!REPS_TOKEN.matcher(t).matches()) {
+            return null;
+        }
         int val = Integer.parseInt(t);
-        if (val < 1 || val > MAX_REPS) return null;
+        if (val < 1 || val > MAX_REPS) {
+            return null;
+        }
         return val;
     }
 
