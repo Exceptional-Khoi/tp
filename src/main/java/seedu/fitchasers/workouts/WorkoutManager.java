@@ -171,7 +171,8 @@ public class WorkoutManager {
         assert !workoutName.isEmpty() : "workoutName should be non-empty after validation";
 
         // Extract raw date/time strings if present (first token after marker)
-        String dateStr = "", timeStr = "";
+        String dateStr = "";
+        String timeStr = "";
 
         if (dIndex != -1) {
             String tail = command.substring(dIndex + 2).trim();
@@ -234,7 +235,8 @@ public class WorkoutManager {
         }
 
         if (date.isAfter(LocalDate.now())) {
-            ui.showMessage("The date you entered (" + date.format(DATE_FMT) + ") is in the future. Are you sure? (Y/N)");
+            ui.showMessage("The date you entered (" + date.format(DATE_FMT)
+                    + ") is in the future. Are you sure? (Y/N)");
             if (!ui.confirmationMessage()) {
                 ui.showMessage("Please re-enter the correct date.");
                 throw new InvalidArgumentInput("");
@@ -242,7 +244,8 @@ public class WorkoutManager {
         }
 
         if (date.isEqual(LocalDate.now()) && time.isAfter(LocalTime.now())) {
-            ui.showMessage("The time you entered (" + time.format(TIME_FMT) + ") is in the future. Are you sure? (Y/N)");
+            ui.showMessage("The time you entered (" + time.format(TIME_FMT)
+                    + ") is in the future. Are you sure? (Y/N)");
             if (!ui.confirmationMessage()) {
                 ui.showMessage("Please re-enter the correct time.");
                 throw new InvalidArgumentInput("");
@@ -257,7 +260,8 @@ public class WorkoutManager {
                 LocalTime existingTime = existingStart.toLocalTime();
 
                 if (existingDate.equals(date) && existingTime.equals(time)) {
-                    ui.showMessage("A workout already exists at this date and time (" + existingDate.format(DATE_FMT) + " " + existingTime.format(TIME_FMT) + "). " + "Continue anyway? (Y/N)");
+                    ui.showMessage("A workout already exists at this date and time (" + existingDate.format(DATE_FMT) +
+                            " " + existingTime.format(TIME_FMT) + "). " + "Continue anyway? (Y/N)");
                     if (!ui.confirmationMessage()) {
                         ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
                         throw new InvalidArgumentInput("");
@@ -322,7 +326,8 @@ public class WorkoutManager {
     public void deleteWorkout(String name) throws IOException {
         for (Workout w : workouts) {
             if (w.getWorkoutName().equals(name)) {
-                ui.showMessage("Deleting " + w.getWorkoutName() + " | " + w.getWorkoutDateString() + "? T.T Are you sure, bestie? (Type y/yes to confirm)");
+                ui.showMessage("Deleting " + w.getWorkoutName() + " | " + w.getWorkoutDateString() +
+                        "? T.T Are you sure, bestie? (Type y/yes to confirm)");
                 if (ui.confirmationMessage()) {
                     workouts.remove(w);
                     fileHandler.saveMonthList(currentLoadedMonth, workouts);
@@ -705,7 +710,8 @@ public class WorkoutManager {
             ui.showMessage("No active workout.");
             return;
         }
-        final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
+        final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy").
+                withResolverStyle(ResolverStyle.SMART);
         final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
 
         String args = (initialArgs == null) ? "" : initialArgs.trim();
@@ -830,7 +836,8 @@ public class WorkoutManager {
         }
 
         ui.showMessage("Workout wrapped! Time to refuel!");
-        ui.showMessage(String.format("Workout '%s' ended. Duration: %d minute(s).", currentWorkout.getWorkoutName(), duration));
+        ui.showMessage(String.format("Workout '%s' ended. Duration: %d minute(s).",
+                currentWorkout.getWorkoutName(), duration));
 
         currentWorkout = null;
     }
@@ -848,7 +855,8 @@ public class WorkoutManager {
 
     // Count occurrences of a token like "n/" or "r/"
     private static int countToken(String s, String token) {
-        int count = 0, idx = 0;
+        int count = 0;
+        int idx = 0;
         while ((idx = s.indexOf(token, idx)) != -1) { count++; idx += token.length(); }
         return count;
     }
@@ -857,7 +865,9 @@ public class WorkoutManager {
     // capturing the raw substring and where it ends in the original string.
     private static Slice extractSlice(String s, int tokenStart) {
         int valueStart = tokenStart + 2; // skip "x/"
-        if (valueStart > s.length()) return new Slice("", "", valueStart);
+        if (valueStart > s.length()){
+            return new Slice("", "", valueStart);
+        }
 
         Matcher m = NEXT_PREFIX.matcher(s);
         int next = -1;
