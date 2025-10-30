@@ -54,7 +54,7 @@ public class FileHandler {
     /**
      * Initialize index for lazy loading.
      */
-    public void initIndex() throws IOException {
+    public void initIndex() throws IOException, FileNonexistent {
         ensureDataDir();
         onDiskMonths.clear();
         try (var stream = Files.list(workoutDir)) {
@@ -260,12 +260,12 @@ public class FileHandler {
                 continue;
             }
 
-            if (line.startsWith("Sets:")) {
+            if (line.startsWith("EXERCISES:")) {
                 inSets = true;
                 continue;
             }
 
-            if (inSets && line.startsWith("- ")) {
+            if (inSets && line.startsWith("-")) {
                 // "- Name | 12"
                 String body = line.substring(2).trim();
                 String[] parts = body.split("\\|", 2);
