@@ -1,6 +1,7 @@
 package seedu.fitchasers;
 
 import seedu.fitchasers.exceptions.FileNonexistent;
+import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.ui.ViewLog;
 import seedu.fitchasers.exceptions.InvalidCommandException;
@@ -53,11 +54,15 @@ public class FitChasers {
     private static WeightManager weightManager;
     private static GoalWeightTracker goalTracker;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, FileNonexistent {
         ui.printLeftHeader();
         initVariables();
         ui.showGreeting();
-
+        try {
+            viewLog.render(argumentStr);
+        } catch (IndexOutOfBoundsException | InvalidArgumentInput e) {
+            ui.showError(e.getMessage());
+        }
         while (isRunning) {
             input = ui.readCommand();
             if (input == null) {
@@ -541,7 +546,7 @@ public class FitChasers {
         }
     }
 
-    private static void initVariables() throws IOException {
+    private static void initVariables() throws IOException, FileNonexistent {
         try {
             savedName = fileHandler.loadUserName();
         } catch (IOException e) {

@@ -1,6 +1,5 @@
 package seedu.fitchasers.workouts;
 
-import seedu.fitchasers.exceptions.WorkoutNotEnded;
 import seedu.fitchasers.ui.UI;
 
 import java.time.Duration;

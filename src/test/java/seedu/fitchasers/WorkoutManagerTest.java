@@ -40,7 +40,7 @@ class WorkoutManagerTest {
     }
 
     @Test
-    void addExercise_validInput_addsExerciseToCurrentWorkout() {
+    void addExercise_validInput_addsExerciseToCurrentWorkout() throws IOException {
         manager.addExercise("n/PushUp r/10");
         Workout w = manager.getWorkouts().get(0);
         assertEquals(1, w.getExercises().size());
@@ -48,7 +48,7 @@ class WorkoutManagerTest {
     }
 
     @Test
-    void addSet_validInput_addsSetToCurrentExercise() {
+    void addSet_validInput_addsSetToCurrentExercise() throws IOException {
         manager.addExercise("n/Squat r/12");
         manager.addSet("r/15");
 

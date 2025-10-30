@@ -549,7 +549,7 @@ public class WorkoutManager {
      *
      * @param args the user command arguments
      */
-    public void addExercise(String args) {
+    public void addExercise(String args) throws IOException {
         if (currentWorkout == null) {
             ui.showMessage("No active workout. Use /create_workout first.");
             return;
@@ -639,7 +639,7 @@ public class WorkoutManager {
 
         Exercise exercise = new Exercise(name, reps);
         currentWorkout.addExercise(exercise);
-
+        fileHandler.saveMonthList(currentLoadedMonth,workouts);
         ui.showMessage("Adding that spicy new exercise!");
         ui.showMessage("Added exercise:\n" + exercise.toDetailedString());
     }
