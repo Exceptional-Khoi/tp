@@ -17,7 +17,7 @@ public class UI {
     private static final String RESET = "\u001B[0m";
     private static final String LIGHT_YELLOW = "\u001B[38;5;187m";
     private static final int CONSOLE_WIDTH = 150;
-    private static final String BOT_HEADER = "{^o^} FitChaser";
+    private static final String BOT_HEADER = "{^o^} FitChasers";
     private static final String BOLD_WHITE = "\u001B[1;97m";
     private static final String BOLD_RESET = "\u001B[0m";
     private static final String BOLD_BRIGHT_PURPLE = "\u001B[1;38;5;183m";
@@ -67,7 +67,7 @@ public class UI {
      * Prompts the user to enter their name.
      * Ensures that the name is not empty.
      *
-     * @return the trimmed user name, or {@code null} if input is terminated
+     * @return the trimmed username, or {@code null} if input is terminated
      */
     public String enterName() {
         while (true) {
@@ -131,7 +131,7 @@ public class UI {
      */
     public void showMessage(String message) {
         assert message != null : "Message cannot be null";
-        System.out.println(leftBubble(BOT_HEADER, message));
+        System.out.println(leftBubble(message));
     }
 
     /**
@@ -141,7 +141,7 @@ public class UI {
      */
     public void showError(String error) {
         assert error != null : "Error message cannot be null";
-        System.out.println(leftBubble(BOT_HEADER, "[Oops!] " + error));
+        System.out.println(leftBubble("[Oops!] " + error));
     }
 
     /**
@@ -188,7 +188,7 @@ public class UI {
         ~~~ USER PROFILE ~~~
         /my_name (n) n/NAME                       - Set or change your display name
         ...
-        /exit (e)                                 - Save all progress and exit the app """);
+        /exit (e)                                 - Save all progress and exit the app""");
     }
 
     /**
@@ -311,7 +311,7 @@ public class UI {
         return Math.max(0, v);
     }
 
-    private String leftBubble(String sender, String message) {
+    private String leftBubble(String message) {
         String[] rawLines = stripAnsi(message).split("\\R", -1);
         List<String> lines = new ArrayList<>();
         int contentMax = Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD - PADDING * 2);
@@ -342,7 +342,7 @@ public class UI {
     private String readInsideRightBubble(String sender, String prompt) {
         int innerWidth = Math.max(1, (int) (CONSOLE_WIDTH * 3.0 / 5) - FRAME_OVERHEAD);
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
-        int contentMax = Math.max(1, innerWidth - PADDING * 2);
+
         String top = BOLD_BRIGHT_PURPLE + "+" + "-".repeat(innerWidth) + "+" + RESET;
         String bottom = BOLD_BRIGHT_PURPLE + "+" + "-".repeat(innerWidth) + "+" + RESET;
         String leftPrefix = " ".repeat(pad) + BOLD_BRIGHT_PURPLE +

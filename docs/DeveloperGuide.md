@@ -5,7 +5,7 @@
 - [Design & Implementation](#design--implementation)
     - [Design](#design)
     - [Main Components of the Architecture](#main-components-of-the-architecture)
-    - [How the Architecture Components Interact](#how-the-architecture-components-interact)
+    - [How the Architecture Components Interact](#how-the-architecture-components-interact-with-each-other)
 - [Product Scope](#product-scope)
     - [Target User Profile](#target-user-profile)
     - [Value Proposition](#value-proposition)
@@ -44,26 +44,26 @@
 
 Follow the steps in this guide precisely. Things may not work if you deviate at some steps.
 1. Fork this repo to your own GitHub account, then clone your fork to your computer:
-```commandline
-git clone https://github.com/AY2526S1-CS2113-W14-3/tp.git
-```
+    ```commandline
+    git clone https://github.com/AY2526S1-CS2113-W14-3/tp.git
+    ```
 2. If you plan to use IntelliJ IDEA (highly recommended):
-- Configure the JDK (Java 17): Follow the guide [se-edu/guides] IDEA: Configuring the JDK to ensure IntelliJ uses JDK 17.
-- Import as a Gradle project: Follow [se-edu/guides] IDEA: Importing a Gradle project to import this project into IDEA.
+   - Configure the JDK (Java 17): Follow the guide [se-edu/guides] IDEA: Configuring the JDK to ensure IntelliJ uses JDK 17.
+   - Import as a Gradle project: Follow [se-edu/guides] IDEA: Importing a Gradle project to import this project into IDEA.
 
-**Note:** Importing a Gradle project is slightly different from importing a normal Java project.
+    **Note:** Importing a Gradle project is slightly different from importing a normal Java project.
 
 3. Verify the setup:
 
-- **Run the app:** Run the main class seedu.fitchasers.FitChasers and try a few commands:
-```commandline
+- **Run the app:** Run the main class `seedu.fitchasers.FitChasers` and try a few commands:
+```
 h (or /help)
 aw w/70.2 d/29/10/25
 cw n/Push Day d/29/10/25 t/1830
 e (to exit and save)
 ```
 - **Run the test:** Execute the test task to ensure all pass:
-```commandline
+```
 ./gradlew test
 ```
 
@@ -74,7 +74,7 @@ If using IntelliJ IDEA, follow [se-edu/guides] IDEA: Configuring the code style 
 **Tips** Optionally, follow [se-edu/guides] Using Checkstyle to enable Checkstyle in IDEA so style issues are reported as you code.
 
 #### Set up CI
-This repository already includes GitHub Actions workflow files in .github/workflows/.
+This repository already includes GitHub Actions workflow files in .gitHub/workflows/.
 When GitHub detects these, CI runs automatically for pushes to the master branch and any pull requests. No extra setup required.
 
 #### Learn the design
@@ -91,32 +91,32 @@ When you are ready to start coding, get an overview of FitChasers’ architectur
 #### Do the tutorials
 These short hands-on tutorials will help you become familiar with the codebase:
 1. Tracing code
-- Start from `FitChasers.main()` and trace a simple command like `/help`.
-- Follow how `UI.readCommand()` feeds the command loop and how handlers route to managers (e.g., `WorkoutManager`, `WeightManager`).
+   - Start from `FitChasers.main()` and trace a simple command like `/help`.
+   - Follow how `UI.readCommand()` feeds the command loop and how handlers route to managers (e.g., `WorkoutManager`, `WeightManager`).
 2. Adding a new command
-- Add a new command keyword (e.g., `/stats`) to the `switch (command)` in FitChasers.
-- Parse flags using the existing pattern (e.g., `n/`, `d/`, `t/`).
-- Implement the feature in the appropriate manager (domain logic) and expose minimal UI changes (messages only).
-- Add tests for:
-  - command parsing (valid/invalid flags), 
-  - domain behavior,
-  - output messages (strip ANSI when asserting).
+   - Add a new command keyword (e.g., `/stats`) to the `switch (command)` in FitChasers.
+   - Parse flags using the existing pattern (e.g., `n/`, `d/`, `t/`).
+   - Implement the feature in the appropriate manager (domain logic) and expose minimal UI changes (messages only).
+   - Add tests for:
+     - command parsing (valid/invalid flags), 
+     - domain behavior,
+     - output messages (strip ANSI when asserting).
 3. Removing or changing fields
-- If modifying domain models (e.g., `Workout`), ensure:
-  - Serialization/deserialization in `FileHandler` remains compatible (or include a migration).
-  - UI and tagger logic are updated accordingly.
-  - Tests covering JSON persistence and rendering are updated.
+   If modifying domain models (e.g., `Workout`), ensure:
+   - Serialization/deserialization in `FileHandler` remains compatible (or include a migration).
+   - UI and tagger logic are updated accordingly.
+   - Tests covering JSON persistence and rendering are updated.
 
 That’s it — once you can launch the app, run a few commands, and pass the tests, you’re ready to contribute!
 
 ## Design & implementation
 
 ### Design
-The Architecture Diagram given above explains the high-level design of FitChaser.
+The Architecture Diagram given above explains the high-level design of FitChasers.
 Given below is a quick overview of main components and how they interact with each other.
 
 #### Main components of the architecture
-![Alt text](docs/diagrams/FitChaser_Architecture.jpg "Basic Architecture")
+![Alt text](diagrams/FitChasers_Architecture.jpg "Basic Architecture")
 FitChasers (consisting of classes FitChasers and Managers) is in charge of the app launch and shut down.
 At app launch, it initializes and loads the components and data in the correct sequence, and connects them up with each other.
 At shut down, it shuts down the other components and invokes cleanup methods where necessary.
@@ -133,7 +133,7 @@ The bulk of the app’s work is done by the following six components:
 
 #### How the architecture components interact with each other
 
-The Sequence Diagram below shows how the components interact with each other for the scenario where the user issues the command /create_workout pushup.
+The Sequence Diagram below shows how the components interact with each other for the scenario where the user issues the command `/create_workout pushup`.
 ![Alt text](../docs/diagrams/Architectural_Sequence_Diagram_CW.png "Basic Architecture Sequence Diagram")
 
 ## Product scope
@@ -158,31 +158,31 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 
 ## User Stories
 
-| Version | As a ... | I want to ... | So that I can ... |
-|----------|-----------|---------------|-------------------|
-| v1.0 | new user | see a welcome message and list of commands | know how to start using the app |
-| v1.0 | user | create a new workout with a date and time | plan and record my daily workouts |
-| v1.0 | user | add exercises to a workout | track what I am doing during my session |
-| v1.0 | user | add sets and reps for each exercise | monitor my training volume and progress |
-| v1.0 | user | delete an exercise or set | fix mistakes if I entered wrong data |
-| v1.0 | user | end my workout and record its duration | know how long I trained for each session |
-| v1.0 | user | view a log of past workouts | review my training history easily |
-| v1.1 | frequent user | record my weight by date | monitor my weight progress over time |
-| v1.1 | frequent user | view all recorded weights | observe trends and track fitness goals |
-| v1.1 | user | delete a workout | remove old or incorrect workout entries |
-| v1.1 | user | view total duration of a specific workout | evaluate how long I spent on each session |
-| v2.0 | experienced user | save and load my data automatically | continue from where I left off each time I launch the app |
-| v2.0 | user | receive error messages for invalid commands | understand what went wrong and fix it easily |
-| v2.0 | motivated user | see motivational messages after workouts | stay engaged and encouraged to continue training |
-| v2.0 | keyboard-only user | use short and consistent command prefixes | type faster without memorizing complex syntax |
-| v2.1 | user | tag my workouts with custom labels (e.g., `#strength`, `#cardio`) | categorize workouts by type or goal |
-| v2.1 | user | view only workouts with a specific tag | focus on a particular type of training session |
-| v2.1 | user | view all available tags | quickly recall which categories I’ve created |
-| v2.1 | user | remove or edit a tag from a workout | keep my tag list accurate and organized |
-| v2.1 | user | combine multiple tags in a search (e.g., `#strength #upperbody`) | filter my logs for more precise tracking |
-| v2.1 | long-term user | analyze the number of workouts per tag | understand which types of workouts I do most often |
-| v2.2 | user | filter workouts by date or name | quickly find a specific workout from my log |
-| v2.2 | user | view total training time for a given week or month | measure overall workout consistency |
+| Version | As a ...           | I want to ...                                                     | So that I can ...                                         |
+|---------|--------------------|-------------------------------------------------------------------|-----------------------------------------------------------|
+| v1.0    | new user           | see a welcome message and list of commands                        | know how to start using the app                           |
+| v1.0    | user               | create a new workout with a date and time                         | plan and record my daily workouts                         |
+| v1.0    | user               | add exercises to a workout                                        | track what I am doing during my session                   |
+| v1.0    | user               | add sets and reps for each exercise                               | monitor my training volume and progress                   |
+| v1.0    | user               | delete an exercise or set                                         | fix mistakes if I entered wrong data                      |
+| v1.0    | user               | end my workout and record its duration                            | know how long I trained for each session                  |
+| v1.0    | user               | view a log of past workouts                                       | review my training history easily                         |
+| v1.1    | frequent user      | record my weight by date                                          | monitor my weight progress over time                      |
+| v1.1    | frequent user      | view all recorded weights                                         | observe trends and track fitness goals                    |
+| v1.1    | user               | delete a workout                                                  | remove old or incorrect workout entries                   |
+| v1.1    | user               | view total duration of a specific workout                         | evaluate how long I spent on each session                 |
+| v2.0    | experienced user   | save and load my data automatically                               | continue from where I left off each time I launch the app |
+| v2.0    | user               | receive error messages for invalid commands                       | understand what went wrong and fix it easily              |
+| v2.0    | motivated user     | see motivational messages after workouts                          | stay engaged and encouraged to continue training          |
+| v2.0    | keyboard-only user | use short and consistent command prefixes                         | type faster without memorizing complex syntax             |
+| v2.1    | user               | tag my workouts with custom labels (e.g., `#strength`, `#cardio`) | categorize workouts by type or goal                       |
+| v2.1    | user               | view only workouts with a specific tag                            | focus on a particular type of training session            |
+| v2.1    | user               | view all available tags                                           | quickly recall which categories I’ve created              |
+| v2.1    | user               | remove or edit a tag from a workout                               | keep my tag list accurate and organized                   |
+| v2.1    | user               | combine multiple tags in a search (e.g., `#strength #upperbody`)  | filter my logs for more precise tracking                  |
+| v2.1    | long-term user     | analyze the number of workouts per tag                            | understand which types of workouts I do most often        |
+| v2.2    | user               | filter workouts by date or name                                   | quickly find a specific workout from my log               |
+| v2.2    | user               | view total training time for a given week or month                | measure overall workout consistency                       |
 
 ## Non-Functional Requirements
 
@@ -195,7 +195,7 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 - The system should launch without internet connectivity.
 
 ## UI Component
-The API of this component is specified in seedu.fitchasers.ui.UI.
+The API of this component is specified in `seedu.fitchasers.ui.UI`.
 
 ![img.png](img.png)
 
@@ -207,15 +207,15 @@ UI — the façade for all user I/O. Owns the `Scanner`, prints chat bubbles, an
 
 
 ###Console layout
-- Left bubble: system responses from FitChasers (sender: `{^o^} FitChaser`).
+- Left bubble: system responses from FitChasers (sender: `{^o^} FitChasers`).
 - Right bubble: user input (sender: `(You)`), with the caret located inside the right bubble.
 - Width and padding are controlled by `CONSOLE_WIDTH`, `PADDING`, and `FRAME_OVERHEAD` constants.
 
-```commandline
-{^o^} FitChaser
-+---------------------------------------------+
-|  Welcome back, Nary!                        |
-+---------------------------------------------+
+```
+{^o^} FitChasers
++-----------------------+
+|  Welcome back, Nary!  |
++-----------------------+
 
 
                                               (You)
@@ -257,14 +257,14 @@ UI itself keeps no domain state; it is a pure I/O boundary.
 
 Depends on model types for display:
 
-E.g., displayDetailsOfWorkout(Workout workout) formats fields (name, date, duration, tags, exercises) for the left bubble.
+E.g., `displayDetailsOfWorkout(Workout workout)` formats fields (name, date, duration, tags, exercises) for the left bubble.
 
 ## WorkoutManager component
 **API**: [`WorkoutManager.java`](https://github.com/AY2526S1-CS2113-W14-3/tp/blob/master/src/main/java/seedu/fitchasers/WorkoutManager.java)
 
 The `WorkoutManager` component is responsible for managing all workout-related operations in FitChasers, including 
 workout creation, exercise tracking, and workout history management.
-![Alt text](docs/diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
+![Alt text](diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
 ### Overview
 The `WorkoutManager` acts as the central controller for workout operations. It maintains a list of completed workouts 
 and tracks the current active workout session. 
@@ -282,7 +282,7 @@ The `WeightManager` component handles all operations related to recording, viewi
 a user's weight and goal weight. It works together with the `Person` entity to maintain a complete
 history of weight entries.
 
-![Alt text](docs/diagrams/WeightManager_Class_Diagram.png "Basic Architecture")
+![Alt text](diagrams/WeightManager_Class_Diagram.png "Basic Architecture")
 
 ### Overview
 WeightManager handles:
@@ -295,7 +295,7 @@ WeightManager handles:
 
 The `GoalWeightTracker` component handles the user's target goal weight. It works together with the `FileHandler` to persist goal data and provides feedback comparing the goal with the user's latest recorded weight.
 
-![Alt text](docs/diagrams/GoalWeightTracker_Class_Diagram.png "Basic Architecture")
+![Alt text](diagrams/GoalWeightTracker_Class_Diagram.png "Basic Architecture")
 
 ### Overview
 `GoalWeightTracker` handles:
@@ -309,7 +309,7 @@ The `GoalWeightTracker` component handles the user's target goal weight. It work
 
 ## Glossary
 
-Mainstream OS: Windows, Linux, Unix, MacOS
+Mainstream OS: Windows, Linux, Unix, macOS
 
 | Term                         | Definition                                                                                                             |
 |------------------------------|------------------------------------------------------------------------------------------------------------------------|
@@ -666,11 +666,13 @@ ew d/23/10/25 t/0830 → success (ends active workout)
 ### Success Cases
 
 ```
-/add_modality_tag m/CARDIO k/hiking   → success (keyword added; workouts retagged)
-amot m/CARDIO k/hiking   → success (keyword added; workouts retagged)
+`/add_modality_tag m/CARDIO k/hiking`   → success (keyword added; workouts retagged)
 
-/add_modality_tag m/STRENGTH k/deadlift → success
-amot m/STRENGTH k/deadlift → success
+`amot m/CARDIO k/hiking`   → success (keyword added; workouts retagged)
+
+`/add_modality_tag m/STRENGTH k/deadlift` → success
+
+`amot m/STRENGTH k/deadlift` → success
 ```
 
 ### Error Cases
@@ -843,7 +845,7 @@ Process:
 ### Sequence Diagram
 The following sequence diagram shows the interaction between components when a workout is created
 and tags are auto-generated:
-![Alt text](../docs/diagrams/Sequence Digram for tagging.png "Sequence Diagram for Tagging")
+![Alt text](diagrams/Sequence_Digram_for_tagging.png "Sequence Diagram for Tagging")
 ### Sequence Diagram for creating a workout
 ![Sequence diagram for creating a workout](diagrams/SD_createw.png)
 ### Sequence Diagram for adding an exercise to current workout
@@ -916,7 +918,7 @@ Cons:
 * Higher computational cost
 * Difficult to debug and test
 
-Rationale: ALternative 1 was chosen for simplicity and predictability. For a CLI Fitchaser,
+Rationale: Alternative 1 was chosen for simplicity and predictability. For a CLI `Fitchasers`,
 deterministic tagging with user-extensible keywords provides a better balance of functionality and
 maintainability than complex NLP approaches.
 
