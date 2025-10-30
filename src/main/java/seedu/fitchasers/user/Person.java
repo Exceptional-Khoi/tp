@@ -2,10 +2,14 @@ package seedu.fitchasers.user;
 
 import seedu.fitchasers.ui.UI;
 
-import java.util.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Collections;
 
 /**
  * Represents a person using the FitChasers app.
