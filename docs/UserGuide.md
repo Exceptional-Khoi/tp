@@ -6,6 +6,20 @@ FitChaser is a desktop app for managing your fitness journey, optimized for use 
 while still having the benefits of a Graphical User Interface (GUI). If you can type fast, FitChaser can help you 
 track workouts, monitor weight progress, and achieve your fitness goals faster than traditional GUI apps.
 
+### Interface Display (Console Width)
+
+FitChaser’s chat-style interface is optimized for clear and readable text bubbles within the console window.  
+The system assumes a console width of approximately 150 characters, meaning each line of text can display up to 150 visible characters before wrapping automatically.
+
+- This width defines how much text can appear in one line within chat bubbles.
+- Messages longer than this limit are automatically wrapped to the next line.
+- If your terminal window is narrower than 150 characters, the chat bubbles may wrap early or appear slightly misaligned.
+- You can resize your terminal window to ensure proper alignment.
+
+> **Notes:**  
+> The “150” refers to **the number of text characters**, not pixels.  
+> Each printed character (including spaces and punctuation) counts toward this width limit.
+
 ## Quick Start
 
 1. Ensure that you have Java 17 or above installed.
@@ -18,52 +32,102 @@ track workouts, monitor weight progress, and achieve your fitness goals faster t
    will open the help window.
 
 ## Features
-<div markdown="block" class="alert alert-info">
-**:information_source: Notes about the command format:**<br>
-
 * Words in `UPPER_CASE` are the parameters to be supplied by the user.<br>
   e.g. in `/create_workout n/NAME`, `NAME` is a parameter which can be used as `/create_workout n/Chest Day`.
-* Extraneous parameters for commands that do not take in parameters (such as `/help`, `/exit`) will be ignored.<br>
-  e.g. if the command specifies help 123, it will be interpreted as help.
-* Date format is `DD/MM/YY` (e.g., `30/10/25` for `October 30, 2025`). Time format is `HHMM` in 24-hour format 
-* (e.g., `1430` for `2:30 PM`).
-</div>
+
+[//]: # (* Extraneous parameters for commands that do not take in parameters &#40;such as `/help`, `/exit`&#41; will be ignored.<br>)
+[//]: # (  e.g. if the command specifies help 123, it will be interpreted as help.)
+
+* Date format is `DD/MM/YY` (e.g., `30/10/25` for `October 30, 2025`). 
+* Time format is `HHMM` in 24-hour format (e.g., `1430` for `2:30 PM`).
 
 ### Viewing help : `help`
 Shows a message explaining how to use FitChaser and all available commands.
 
 Format: `/help`
+
 Alternative: `h`
 
-### Setting your name : `rename`
-Sets or updates your name in FitChaser.
+### Changing Your Name : `/rename`
+This command allows you to update your display name in FitChaser. The name is saved automatically and will be shown whenever you start the program.
 
 Format: `/rename n/NAME`
 
-NAME can contain letters, numbers, spaces, underscores, and dashes (max 30 characters).
+* Must contain only letters (A–Z, a–z), numbers (0–9), spaces, underscores (_), or dashes (-).
+* Must be 1–30 characters long.
+* Cannot be empty or just whitespace.
 
 Examples:
 
-`/rename n/John Doe`
+`/rename n/Nitin`
+
+`/rename n/Nitin Ni`
 
 `/rename n/FitChaser_User-1`
 
-### Adding weight : `add_weight`
-Logs your weight on a specific date.
+### Adding weight : `/add_weight`
+Logs your weight for a specific date. You can record one or multiple weights per day to monitor changes over time.
 
-Format: `/add_weight w/WEIGHT d/DATE`
+Format: `/add_weight w/WEIGHT [d/DATE]`
 
-* WEIGHT is a numeric value (can be decimal, e.g., `75.5`).
-* DATE is in `DD/MM/YY` format.
+Rules:
 
-<div markdown="span" class="alert alert-primary">:bulb: **Tip:** You can log multiple weight entries for the 
-same date to track weight fluctuations throughout the day. </div>
+* `WEIGHT`: A numeric value (integer or decimal) in kilograms
+  - Must be between 20.0 and 500.0 (for realistic human body weight range).
+  - Only one decimal point allowed.
+  - Must not contain symbols or units (e.g., kg is not accepted).
+  - Must input weight and date respectively.
+
+
+* `DATE`: Must follow DD/MM/YY format. 
+  - Day must be `01` to `31`.
+  - Month must be `01` to `12`.
+  - Year must be two digits (e.g., `25` for 2025).
+  - Date must not be in the future relative to the system date.
+
+**Note:** You can log multiple weight entries for the same date but the application only saves the latest entry.
+
 Example:
 
 * `/add_weight w/75 d/30/10/25`
 * `/add_weight w/74.5 d/28/10/25`
 
 Alternative: `aw`
+
+### Viewing weight : `/view_weight`
+Displays your recorded weight entries in chronological order.
+
+Format: `/view_weight`
+
+**Notes:** 
+- You can log multiple weight entries for the same date but the application only saves the latest entry.
+- Extraneous parameters for commands that do not take in parameters will be ignored.<br>
+    e.g. if the command specifies /view_weight 123, it will be interpreted as /view_weight.
+
+Alternative: `vw`
+
+### Setting a goal weight: `/set_goal`
+Lets you specify a target weight to monitor your progress.
+
+Format: `/set_goal g/GOAL_WEIGHT`
+
+Rules: Same as `WEIGHT` parameter rules above.
+
+**Note:** When you set a goal, FitChaser automatically uses your latest recorded weight (the most recent `/add_weight` entry) as your starting weight.
+This ensures that your progress is calculated accurately based on your most up-to-date data.
+
+Example:
+
+* `/set_goal g/70.0`
+
+Alternative: `sg`
+
+### Viewing a goal weight: `/view_goal`
+Displays your current goal weight, your latest recorded weight, and how far you are from reaching your target.
+
+Format: `/view_goal`
+
+Alternative: `vg`
 
 ### Creating a workout : `create_workout`
 Starts a new workout session.
