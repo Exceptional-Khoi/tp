@@ -90,10 +90,25 @@ public class Workout {
      */
     public Set<String> getAllTags() {
         //return new LinkedHashSet<>(manualTags);
-        Set<String> out = new LinkedHashSet<>();
-        out.addAll(manualTags);
-        out.addAll(autoTags);
+        Set<String> out = new LinkedHashSet<>(manualTags);
+
+        // Only add autoTags that DON'T conflict with manualTags
+        for (String autoTag : autoTags) {
+            if (!manualTags.contains(autoTag)) {
+                out.add(autoTag);
+            }
+        }
         return out;
+    }
+
+    public Set<String> getConflictingTags() {
+        Set<String> conflicts = new LinkedHashSet<>();
+        for (String manualTag : manualTags) {
+            if (autoTags.contains(manualTag)) {
+                conflicts.add(manualTag);
+            }
+        }
+        return conflicts;
     }
 
     public String getWorkoutName() {
