@@ -264,13 +264,14 @@ E.g., `displayDetailsOfWorkout(Workout workout)` formats fields (name, date, dur
 
 The `WorkoutManager` component is responsible for managing all workout-related operations in FitChasers, including 
 workout creation, exercise tracking, and workout history management.
+
 ![Alt text](./diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
 ### Overview
 The `WorkoutManager` acts as the central controller for workout operations. It maintains a list of completed workouts 
 and tracks the current active workout session. 
 The component handles:
 * Creating and ending workout
-* Adding exercises and sets to activa workouts
+* Adding exercises and sets to activate workouts
 * Managing workout history and persistence
 * Tag generation and management integration
 * Workout deletion and viewing
