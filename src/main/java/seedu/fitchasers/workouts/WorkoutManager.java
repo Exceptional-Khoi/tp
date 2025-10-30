@@ -69,6 +69,15 @@ public class WorkoutManager {
         this.workoutsByMonth = fileHandler.getArrayByMonth();
         this.currentLoadedMonth = YearMonth.now();
     }
+    public void initWorkouts(){
+        for(Workout workout : this.workouts) {
+            while(workout.getWorkoutEndDateTime() ==  null){
+               ui.showMessage("Looks like you forgot to end the previous workout, please enter it now!");
+               currentWorkout = workout;
+               endWorkout(ui.readCommand());
+            }
+        }
+    }
 
     public void setWorkouts(ArrayList<Workout> workouts) {
         this.workouts = workouts;
@@ -878,7 +887,7 @@ public class WorkoutManager {
      * @param ui          UI for reading user input in the retry loop
      * @param initialArgs Initial command arguments containing end date/time details
      */
-    public void endWorkout(UI ui, String initialArgs) {
+    public void endWorkout(String initialArgs) {
         if (currentWorkout == null) {
             ui.showMessage("No active workout.");
             return;

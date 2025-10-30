@@ -1,7 +1,7 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.exceptions.CorruptedFileError;
 import seedu.fitchasers.exceptions.FileNonexistent;
-import seedu.fitchasers.exceptions.WorkoutNotEnded;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.user.Person;
 import seedu.fitchasers.user.WeightRecord;
@@ -193,8 +193,14 @@ public class FileHandler {
                 }
                 block.add(line);
                 if ("END_WORKOUT".equals(trimmed)) {
-                    Workout w = parseWorkoutBlock(block);
-                    if (w != null) {
+                    Workout w;
+                    try {
+                        w = parseWorkoutBlock(block);
+                    } catch (CorruptedFileError e) {
+                        corruptedFileErrorHandling();
+                        w = null;
+                    }
+                        if (w != null) {
                         list.add(w);
                     }
                     block.clear();
@@ -204,7 +210,7 @@ public class FileHandler {
         return list;
     }
 
-    private Workout parseWorkoutBlock(List<String> lines) {
+    private Workout parseWorkoutBlock(List<String> lines) throws CorruptedFileError {
         String name = null;
         LocalDateTime start = null;
         LocalDateTime end = null;
@@ -230,7 +236,7 @@ public class FileHandler {
                 try {
                     if (!v.isEmpty()) start = LocalDateTime.parse(v);
                 }catch(Throwable e){
-                    startErrorHandling();
+                    throw new CorruptedFileError();
                 }
                 continue;
             }
@@ -238,9 +244,16 @@ public class FileHandler {
             if (line.startsWith("End:")) {
                 String v = line.substring(4).trim();
                 try{
-                    if (!v.isEmpty()) end = LocalDateTime.parse(v);
+                    if (!v.isEmpty()){
+                        end = LocalDateTime.parse(v);
+                    }
                 }catch(Throwable e){
-                    endErrorHandling();
+                    if(v.equalsIgnoreCase("unended")){
+                        end = null;
+                    }
+                    else{
+                        throw new CorruptedFileError();
+                    }
                 }
                 continue;
             }
@@ -250,7 +263,7 @@ public class FileHandler {
                 try {
                     duration = Integer.parseInt(durationString);
                 } catch (NumberFormatException ignore) {
-                    durationErrorHandling();
+                    throw new CorruptedFileError();
                 }
                 continue;
             }
@@ -277,7 +290,7 @@ public class FileHandler {
                         try {
                             reps = Integer.parseInt(repStr);
                         } catch (NumberFormatException e) {
-                            setsErrorHandling();
+                            throw new CorruptedFileError();
                         }
                     }
                 }
@@ -314,34 +327,12 @@ public class FileHandler {
     private record SetLine(String name, Integer reps) {
     }
 
-    //TODO edit the return types of all these
-    /** Ask the user to input a valid Start date-time and return it. */
-    private java.time.LocalDateTime startErrorHandling() {
-        ui.showMessage("⚠️ Invalid Start date/time found in file.");
-        //return promptDateTime("Enter Start date-time (e.g. 2025-10-29T18:05 or 2025-10-29 18:05): ");
-        return LocalDateTime.now();
-    }
 
     /** Ask the user to input a valid End date-time and return it. */
-    private java.time.LocalDateTime endErrorHandling() {
-        ui.showMessage("⚠️ Invalid End date/time found in file.");
-        //return promptDateTime("Enter End date-time (e.g. 2025-10-29T18:05 or 2025-10-29 18:05): ");
-        return LocalDateTime.now();
+    private void corruptedFileErrorHandling() {
+        ui.showMessage("⚠️ Invalid End date/time found in file. Skipping workout");
     }
 
-    /** Ask the user to enter a valid positive integer duration in minutes and return it. */
-    private int durationErrorHandling() {
-        ui.showMessage("⚠️ Invalid Duration (minutes) found in file.");
-        //return promptInt("Enter duration in minutes (positive integer): ", 1, Integer.MAX_VALUE);
-        return -1;
-    }
-
-    /** Ask the user to enter a valid integer reps (≥ 0) for a set and return it. */
-    private int setsErrorHandling() {
-        ui.showMessage("⚠️ Invalid reps value found in file.");
-        //return promptInt("Enter number of reps (integer ≥ 0): ", 0, Integer.MAX_VALUE);
-        return -1;
-    }
     /**
      * Loads previously saved weight entries for the given person from a text file.
      *

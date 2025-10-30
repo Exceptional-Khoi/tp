@@ -63,6 +63,7 @@ public class FitChasers {
         } catch (IndexOutOfBoundsException | InvalidArgumentInput e) {
             ui.showError(e.getMessage());
         }
+        workoutManager.initWorkouts();
         while (isRunning) {
             input = ui.readCommand();
             if (input == null) {
@@ -162,7 +163,7 @@ public class FitChasers {
                 case "/end_workout":
                 case "ew":
                     // Format: /end_workout d/DD/MM/YY t/HHmm
-                    workoutManager.endWorkout(ui, argumentStr);
+                    workoutManager.endWorkout(argumentStr);
                     break;
 
                 case "/view_log":

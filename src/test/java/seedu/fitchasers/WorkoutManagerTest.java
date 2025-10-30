@@ -78,7 +78,7 @@ class WorkoutManagerTest {
                     return true;
                 }
             };
-            manager.endWorkout(dummyUI, endArgs);
+            manager.endWorkout(endArgs);
         }
 
         manager.addWorkout("n/run d/15/10/25 t/0730");
