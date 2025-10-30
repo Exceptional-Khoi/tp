@@ -85,8 +85,8 @@ public class WeightManager {
             currentUser.addWeightRecord(weightRecord);
         }
 
-        ui.showMessage("Logging your weight... don't lie to me!");
-        ui.showMessage("Recorded weight " + weightValue + " kg for " + entryDate.format(DATE_FORMAT) + ".");
+        ui.showMessage("Logging your weight... don't lie to me!\n"
+                        + "Recorded weight " + weightValue + " kg for " + entryDate.format(DATE_FORMAT) + ".");
 
         try {
             FileHandler fileHandler = new FileHandler();

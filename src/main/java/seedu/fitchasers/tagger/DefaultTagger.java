@@ -37,7 +37,13 @@ public class DefaultTagger implements Tagger {
 
     @Override
     public Set<String> suggest(Workout w) {
-        String text = ((w.getWorkoutName() == null) ? "" : w.getWorkoutName()).toLowerCase();
+        String workoutName = w.getWorkoutName();
+        String text;
+        if (workoutName != null && !workoutName.trim().isEmpty()) {
+            text = workoutName.toLowerCase();
+        } else {
+            text = "";
+        }
         Set<String> tags = new LinkedHashSet<>();
 
         // Modality
@@ -56,14 +62,6 @@ public class DefaultTagger implements Tagger {
                     tags.add(entry.getKey().name().toLowerCase().replace('_', '-'));
                 }
             }
-        }
-
-        // Custom patterns
-        if (text.contains("push")){
-            tags.add("push");
-        }
-        if (text.contains("pull")){
-            tags.add("pull");
         }
 
         return tags;

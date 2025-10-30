@@ -9,38 +9,53 @@ import java.util.Scanner;
 import java.util.Set;
 
 /**
- * The {@code UI} class handles all user interactions for the FitChaser application.
- * Combines the robustness of the classic UI logic with a modern "chat bubble" interface.
+ * Handles all user interactions for the FitChasers application.
+ * Provides an enhanced text-based interface with chat-bubble visuals
+ * for improved readability and user experience.
  */
 public class UI {
-    // ====== Color and Style Constants ======
     private static final String RESET = "\u001B[0m";
-    private static final String CYAN = "\u001B[36m";
     private static final String LIGHT_YELLOW = "\u001B[38;5;187m";
-    private static final String MAGENTA = "\u001B[35m";
-    private static final String WHITE = "\u001B[97m";
     private static final int CONSOLE_WIDTH = 150;
-
-    // Chat Bubble Layout Constants
+    private static final String BOT_HEADER = "{^o^} FitChasers";
+    private static final String BOLD_WHITE = "\u001B[1;97m";
+    private static final String BOLD_RESET = "\u001B[0m";
+    private static final String BOLD_BRIGHT_PURPLE = "\u001B[1;38;5;183m";
     private static final int PADDING = 2;
     private static final int FRAME_OVERHEAD = 6;
-
     private final Scanner scanner;
 
+    /**
+     * Constructs a {@code UI} instance and initializes the input scanner.
+     */
     public UI() {
         this.scanner = new Scanner(System.in);
     }
 
-    // -----------------------------
-    // Input
-    // -----------------------------
+    /**
+     * Prints the header of the left chat bubble.
+     */
+    public void printLeftHeader() {
+        System.out.println(LIGHT_YELLOW + BOT_HEADER + RESET);
+    }
+
+    /**
+     * Reads a general command input from the user.
+     *
+     * @return the command entered by the user
+     */
     public String readCommand() {
         return readInsideRightBubble("You", "Enter command > ");
     }
 
-
+    /**
+     * Prompts the user to enter one or more indices for deletion.
+     *
+     * @return the trimmed input string containing indices,
+     *         or {@code null} if no input is provided
+     */
     public String enterSelection() {
-        String s = readInsideRightBubble("You", "Enter the number/numbers of the workout to be deleted > ");
+        String s = readInsideRightBubble("You", "Enter the index(es) to be deleted > ");
         if (s == null || s.isEmpty()) {
             showError("No input detected.");
             return null;
@@ -48,7 +63,12 @@ public class UI {
         return s.trim();
     }
 
-
+    /**
+     * Prompts the user to enter their name.
+     * Ensures that the name is not empty.
+     *
+     * @return the trimmed username, or {@code null} if input is terminated
+     */
     public String enterName() {
         while (true) {
             String name = readInsideRightBubble("You", "Enter your name > ");
@@ -78,20 +98,20 @@ public class UI {
 
     /**
      * Prompts the user to enter their initial weight in kilograms.
-     * Ensures valid numeric input greater than zero.
+     * Validates numeric input greater than zero.
      *
-     * @return the user's initial weight as a double
+     * @return the user's initial weight as a double, or -1 if input fails
      */
     public double enterWeight() {
         double weight = -1;
         while (weight <= 0) {
             showMessage("Please enter your initial weight (in kg).");
-            System.out.print(MAGENTA + "Enter your weight > " + RESET);
-            if (!scanner.hasNextLine()) {
+            String ans = readInsideRightBubble("You", "Enter your weight > ");
+            if (ans == null) {
                 showError("No input detected. Exiting weight entry.");
                 return -1;
             }
-            String input = scanner.nextLine().trim();
+            String input = ans.trim();
             try {
                 weight = Double.parseDouble(input);
                 if (weight <= 0) {
@@ -104,19 +124,29 @@ public class UI {
         return weight;
     }
 
-    // -----------------------------
-    // Output
-    // -----------------------------
+    /**
+     * Displays a standard message inside a left-aligned chat bubble.
+     *
+     * @param message the message text to display
+     */
     public void showMessage(String message) {
         assert message != null : "Message cannot be null";
-        System.out.println(leftBubble("{^o^} FitChaser", message));
+        System.out.println(leftBubble(message));
     }
 
+    /**
+     * Displays an error message inside a left-aligned bubble.
+     *
+     * @param error the error text to display
+     */
     public void showError(String error) {
         assert error != null : "Error message cannot be null";
-        System.out.println(leftBubble("{^o^} FitChaser", "[Oops!] " + error));
+        System.out.println(leftBubble("[Oops!] " + error));
     }
 
+    /**
+     * Displays the startup greeting and introduction message.
+     */
     public void showGreeting() {
         String[] purpleShades = {
             "\u001B[38;5;93m",
@@ -125,7 +155,6 @@ public class UI {
             "\u001B[38;5;141m",
             "\u001B[38;5;147m"
         };
-
         System.out.println(purpleShades[0] +
                 " ▄▄▄▄▄▄   ▀      ▄      ▄▄▄  █                                       " + RESET);
         System.out.println(purpleShades[1] +
@@ -143,62 +172,31 @@ public class UI {
           Let's crush your fitness goals together!""");
     }
 
+    /**
+     * Displays the exit message upon program termination.
+     */
     public void showExitMessage() {
         showMessage("Catch you next time, champ — don't ghost your gains!");
     }
 
+    /**
+     * Displays the help message listing all available commands.
+     */
     public void showHelp() {
         showMessage("""
         /help (h)                                 - View all available commands
-
         ~~~ USER PROFILE ~~~
         /my_name (n) n/NAME                       - Set or change your display name
-                                                    e.g. /my_name n/Nitin
-
-        ~~~ WEIGHT TRACKING ~~~
-        /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
-                                                    e.g. /add_weight w/81.5 d/19/10/25
-        /view_weight (vw)                         - View your recorded weights and graph
-
-        ~~~ WORKOUT CREATION & LOGGING ~~~
-        /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
-                                                    e.g. /create_workout n/PushDay d/20/10/25 t/1900
-        /add_exercise (ae) n/NAME r/REPS          - Add an exercise to current workout
-                                                    e.g. /add_exercise n/Squat r/12
-        /add_set (as) r/REPS                      - Add another set to the latest exercise
-                                                    e.g. /add_set r/10
-        /end_workout (ew) d/DATE t/TIME           - End and save current workout
-                                                    e.g. /end_workout d/20/10/25 t/2030
-
-        ~~~ WORKOUT LOG MANAGEMENT ~~~
-        /view_log (vl)                            - View your workout history
-        /open (o) INDEX                           - Open detailed view of a workout
-                                                    e.g. /open 1
-        /del_workout (d) NAME                     - Delete a workout by name
-                                                    e.g. /del_workout PushDay
-        /del_workout (d) d/DATE                   - Delete a workout by date
-                                                    e.g. /del_workout d/20/10/25
-
-        ~~~ TAGGING SYSTEM ~~~
-        /add_modality_tag (amot) m/(CARDIO/STRENGTH) k/KEYWORD
-                                                    - Add a keyword for a workout modality
-                                                    e.g. /add_modality_tag m/CARDIO k/hiking
-        /add_muscle_tag (amt) m/MUSCLE k/KEYWORD  - Add a keyword for a muscle group
-                                                    e.g. /add_muscle_tag m/LEGS k/lunges
-        /override_workout_tag (owt) id/INDEX newTag/NEW_TAG
-                                                    - Manually override a workout’s tag
-                                                    e.g. /override_workout_tag id/1 newTag/LEG_DAY
-
-        ~~~ GYM FINDER ~~~
-        /gym_where (gw) n/EXERCISE                - Suggest NUS gyms with equipment for the exercise
-                                                    e.g. /gym_where n/squat
-        /gym_page (gp) p/PAGE_NUMBER              - View available NUS gym pages
-                                                    e.g. /gym_page p/1
-
-        ~~~ SYSTEM ~~~
-        /exit (e)                                 - Save all progress and exit the app """);
+        ...
+        /exit (e)                                 - Save all progress and exit the app""");
     }
 
+    /**
+     * Prompts for a yes/no confirmation from the user.
+     *
+     * @return {@code true} if confirmed (Y/Yes),
+     *         {@code false} otherwise
+     */
     public boolean confirmationMessage() {
         while (true) {
             String ans = readInsideRightBubble("You", "Confirm (Y/N) > ");
@@ -216,15 +214,18 @@ public class UI {
         }
     }
 
+    /**
+     * Displays detailed information about a given workout.
+     *
+     * @param workout the workout instance to display
+     */
     public void displayDetailsOfWorkout(Workout workout) {
         if (workout == null) {
             showError("No workout found to display.");
             return;
         }
-
         StringBuilder sb = new StringBuilder();
         sb.append("Here you go bestie! These are the workout details!\n\n");
-
         sb.append(String.format("Name       : %s%n", workout.getWorkoutName()));
         sb.append(String.format("Date       : %s%n", workout.getWorkoutDateString()));
 
@@ -259,10 +260,15 @@ public class UI {
                 sb.append(String.format("  %d. %s%n", i++, e.toString()));
             }
         }
-
         showMessage(sb.toString().trim());
     }
 
+    /**
+     * Returns the ordinal suffix for a given day.
+     *
+     * @param day the day number (1–31)
+     * @return the suffix ("st", "nd", "rd", or "th")
+     */
     public String getDaySuffix(int day) {
         assert day >= 1 && day <= 31 : "Day should be between 1 and 31";
         if (day >= 11 && day <= 13) {
@@ -276,7 +282,6 @@ public class UI {
         };
     }
 
-    // ================== Chat Bubble Logic ==================
     private static String stripAnsi(String input) {
         return input == null ? "" : input.replaceAll("\u001B\\[[;\\d]*m", "");
     }
@@ -306,32 +311,27 @@ public class UI {
         return Math.max(0, v);
     }
 
-    private String leftBubble(String sender, String message) {
+    private String leftBubble(String message) {
         String[] rawLines = stripAnsi(message).split("\\R", -1);
         List<String> lines = new ArrayList<>();
         int contentMax = Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD - PADDING * 2);
-
         for (String raw : rawLines) {
             lines.addAll(wrapLine(raw, contentMax));
         }
-
         int innerWidth = 0;
         for (String l : lines) {
             innerWidth = Math.max(innerWidth, l.length() + PADDING * 2);
         }
         innerWidth = Math.min(innerWidth, Math.max(1, CONSOLE_WIDTH - FRAME_OVERHEAD));
-
         String top = "+" + "-".repeat(clampNonNeg(innerWidth)) + "+";
         String bottom = "+" + "-".repeat(clampNonNeg(innerWidth)) + "+";
-
         StringBuilder sb = new StringBuilder();
-        sb.append(LIGHT_YELLOW).append(sender).append(RESET).append("\n");
         sb.append(top).append("\n");
         for (String l : lines) {
             int spaces = clampNonNeg(innerWidth - l.length() - PADDING);
             sb.append("|")
                     .append(" ".repeat(PADDING))
-                    .append(WHITE).append(l).append(RESET)
+                    .append(BOLD_WHITE).append(l).append(BOLD_RESET)
                     .append(" ".repeat(spaces))
                     .append("|\n");
         }
@@ -340,34 +340,26 @@ public class UI {
     }
 
     private String readInsideRightBubble(String sender, String prompt) {
-        // Bubble = 2/3 console
         int innerWidth = Math.max(1, (int) (CONSOLE_WIDTH * 3.0 / 5) - FRAME_OVERHEAD);
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
-        int contentMax = Math.max(1, innerWidth - PADDING * 2);
 
-        String top = CYAN + "+" + "-".repeat(innerWidth) + "+" + RESET;
-        String bottom = CYAN + "+" + "-".repeat(innerWidth) + "+" + RESET;
-        String leftPrefix = " ".repeat(pad) + CYAN + "|" + RESET + CYAN + " ".repeat(PADDING) + RESET;
-
-        // Header + top
+        String top = BOLD_BRIGHT_PURPLE + "+" + "-".repeat(innerWidth) + "+" + RESET;
+        String bottom = BOLD_BRIGHT_PURPLE + "+" + "-".repeat(innerWidth) + "+" + RESET;
+        String leftPrefix = " ".repeat(pad) + BOLD_BRIGHT_PURPLE +
+                "|" + RESET + BOLD_BRIGHT_PURPLE + " ".repeat(PADDING) + RESET;
         System.out.println(" ".repeat(pad) + LIGHT_YELLOW + "(" + sender + ")" + RESET);
         System.out.println(" ".repeat(pad) + top);
-
-        // In dòng prompt bên trong bubble (KHÔNG xuống dòng)
-        System.out.print(leftPrefix + prompt);
+        System.out.print(leftPrefix + BOLD_BRIGHT_PURPLE + prompt + BOLD_RESET);
         System.out.flush();
-
         if (!scanner.hasNextLine()) {
             System.out.println();
             System.out.println(" ".repeat(pad) + bottom);
             return null;
         }
-
         String input = scanner.nextLine();
         String trimmed = input.trim();
-
         System.out.println(" ".repeat(pad) + bottom);
-
+        printLeftHeader();
         return trimmed;
     }
 }
