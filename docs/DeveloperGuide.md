@@ -816,7 +816,7 @@ exercise modalities (e.g., cardio, strength) and muscle groups (e.g., legs, ches
 This enables users to quickly identify workout types and track training patterns over time.
 
 ### Class Diagram
-![Alt text](../docs/diagrams/Class_Diagram_for_tagging_2.png "Class Diagram for Tagging")
+![Alt text](./diagrams/Class_Diagram_for_tagging.png "Class Diagram for Tagging")
 
 Key Relationships:
 - Dependency: `WorkoutManager` depends on the `Tagger` interface for tag suggestion services

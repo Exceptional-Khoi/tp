@@ -1,7 +1,8 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.ui.UI;
-import seedu.fitchasers.ui.ViewLog;
+import seedu.fitchasers.workouts.ViewLog;
 import seedu.fitchasers.exceptions.InvalidCommandException;
 import seedu.fitchasers.gym.EquipmentDisplay;
 import seedu.fitchasers.gym.Gym;

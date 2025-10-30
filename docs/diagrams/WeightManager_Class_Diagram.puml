@@ -1,0 +1,75 @@
+@startuml
+title WeightManager – Class Diagram
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam ArrowColor #444
+skinparam ClassBorderColor #222
+skinparam ClassBackgroundColor #FAFAFA
+
+hide circle
+hide stereotype
+
+' ===== Classes =====
+class WeightManager {
+  -DATE_FORMAT: DateTimeFormatter <<static>>
+  -currentUser: Person
+  -ui: UI
+  --
+  +WeightManager(person: Person)
+  +addWeight(command: String): void
+  +viewWeights(): void
+  -extractBetween(text: String, start: String, end: String): String
+  -extractAfter(text: String, start: String): String
+}
+
+class Person {
+  -name: String
+  -weightHistory: ArrayList<WeightRecord>
+  --
+  +Person(name: String)
+  +getName(): String
+  +setName(name: String): void
+  +addWeightRecord(record: WeightRecord): void
+  +getWeightHistory(): List<WeightRecord>
+  +displayWeightHistory(): void
+  +getLatestWeight(): double
+  +getWeightHistorySize(): int
+  +removeLatestWeightRecord(): boolean
+  +hasWeightRecordOn(date: LocalDate): boolean
+  +updateWeightRecord(date: LocalDate, newWeight: double): void
+  +setWeightHistory(history: List<WeightRecord>): void
+}
+
+class WeightRecord {
+  -weight: double
+  -date: LocalDate
+  --
+  +WeightRecord(weight: double, date: LocalDate)
+  +getWeight(): double
+  +setWeight(weight: double): void
+  +getDate(): LocalDate
+  +toString(): String
+}
+
+class UI
+
+class FileHandler {
+  +saveWeightList(person: Person): void
+}
+
+' ===== Relationships =====
+' WeightManager holds references to Person and UI
+WeightManager --> Person : has a
+WeightManager --> UI : has a
+
+' WeightManager creates/uses FileHandler (dependency)
+WeightManager ..> FileHandler : persists weights
+
+' WeightManager uses WeightRecord to add/update records (dependency)
+WeightManager ..> WeightRecord : uses
+
+' Person owns many WeightRecord entries
+Person "1" *-- "0..*" WeightRecord : contains
+
+@enduml

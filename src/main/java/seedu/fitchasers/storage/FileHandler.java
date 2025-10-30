@@ -1,4 +1,4 @@
-package seedu.fitchasers;
+package seedu.fitchasers.storage;
 
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.exceptions.FileNonexistent;

@@ -45,7 +45,7 @@ public class UI {
      * @return the command entered by the user
      */
     public String readCommand() {
-        return readInsideRightBubble("You", "Enter command > ");
+        return readInsideRightBubble("Enter command > ");
     }
 
     /**
@@ -55,7 +55,7 @@ public class UI {
      *         or {@code null} if no input is provided
      */
     public String enterSelection() {
-        String s = readInsideRightBubble("You", "Enter the index(es) to be deleted > ");
+        String s = readInsideRightBubble("Enter the index(es) to be deleted > ");
         if (s == null || s.isEmpty()) {
             showError("No input detected.");
             return null;
@@ -71,7 +71,7 @@ public class UI {
      */
     public String enterName() {
         while (true) {
-            String name = readInsideRightBubble("You", "Enter your name > ");
+            String name = readInsideRightBubble("Enter your name > ");
             if (name == null) {
                 return null;
             }
@@ -106,7 +106,7 @@ public class UI {
         double weight = -1;
         while (weight <= 0) {
             showMessage("Please enter your initial weight (in kg).");
-            String ans = readInsideRightBubble("You", "Enter your weight > ");
+            String ans = readInsideRightBubble("Enter your weight > ");
             if (ans == null) {
                 showError("No input detected. Exiting weight entry.");
                 return -1;
@@ -199,7 +199,7 @@ public class UI {
      */
     public boolean confirmationMessage() {
         while (true) {
-            String ans = readInsideRightBubble("You", "Confirm (Y/N) > ");
+            String ans = readInsideRightBubble("Confirm (Y/N) > ");
             if (ans == null) {
                 return false;
             }
@@ -339,7 +339,7 @@ public class UI {
         return sb.toString();
     }
 
-    private String readInsideRightBubble(String sender, String prompt) {
+    private String readInsideRightBubble(String prompt) {
         int innerWidth = Math.max(1, (int) (CONSOLE_WIDTH * 3.0 / 5) - FRAME_OVERHEAD);
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
 
@@ -347,7 +347,7 @@ public class UI {
         String bottom = BOLD_BRIGHT_PURPLE + "+" + "-".repeat(innerWidth) + "+" + RESET;
         String leftPrefix = " ".repeat(pad) + BOLD_BRIGHT_PURPLE +
                 "|" + RESET + BOLD_BRIGHT_PURPLE + " ".repeat(PADDING) + RESET;
-        System.out.println(" ".repeat(pad) + LIGHT_YELLOW + "(" + sender + ")" + RESET);
+        System.out.println(" ".repeat(pad) + LIGHT_YELLOW + "(You)" + RESET);
         System.out.println(" ".repeat(pad) + top);
         System.out.print(leftPrefix + BOLD_BRIGHT_PURPLE + prompt + BOLD_RESET);
         System.out.flush();

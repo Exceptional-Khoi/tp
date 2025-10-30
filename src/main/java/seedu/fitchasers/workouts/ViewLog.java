@@ -1,7 +1,6 @@
-package seedu.fitchasers.ui;
-import seedu.fitchasers.FileHandler;
-import seedu.fitchasers.workouts.Workout;
-import seedu.fitchasers.workouts.WorkoutManager;
+package seedu.fitchasers.workouts;
+import seedu.fitchasers.storage.FileHandler;
+import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 
 import java.time.LocalDateTime;

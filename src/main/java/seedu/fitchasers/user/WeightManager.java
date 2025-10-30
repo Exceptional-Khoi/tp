@@ -1,6 +1,6 @@
 package seedu.fitchasers.user;
 
-import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.ui.UI;
 
 import java.io.IOException;

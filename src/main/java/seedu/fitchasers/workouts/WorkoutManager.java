@@ -1,6 +1,6 @@
 package seedu.fitchasers.workouts;
 
-import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.tagger.Modality;
 import seedu.fitchasers.tagger.Tagger;
