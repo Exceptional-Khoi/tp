@@ -197,16 +197,16 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 ## UI Component
 The API of this component is specified in `seedu.fitchasers.ui.UI`.
 
-![img.png](img.png)
+![Alt text](./diagrams/UI_class_diagram.png "UI class diagram")
 
 ### Structure of the UI component
 FitChasers uses a single-process, console (CLI) UI with a chat-bubble presentation. There is no JavaFX; instead, the UI renders styled text (ANSI colors, box drawing) to `System.out` and reads user input from `System.in`.
 
-###Key classes
+### Key classes
 UI — the façade for all user I/O. Owns the `Scanner`, prints chat bubbles, and provides high-level input helpers (e.g., `readCommand()`, `enterName()`, `confirmationMessage()`).
 
 
-###Console layout
+### Console layout
 - Left bubble: system responses from FitChasers (sender: `{^o^} FitChasers`).
 - Right bubble: user input (sender: `(You)`), with the caret located inside the right bubble.
 - Width and padding are controlled by `CONSOLE_WIDTH`, `PADDING`, and `FRAME_OVERHEAD` constants.
@@ -227,38 +227,21 @@ UI — the façade for all user I/O. Owns the `Scanner`, prints chat bubbles, an
 ### Responsibilities
 The UI component:
 - Executes user commands via the application loop:
-  - App (in FitChasers) calls ui.readCommand().
+  - App (in FitChasers) calls `ui.readCommand()`.
   - App parses the command and calls the appropriate domain method.
-  - App passes domain output (or exceptions) back to UI for presentation via showMessage(...) / showError(...).
-- Listens to model changes indirectly: Domain managers return updated entities/strings; UI redraws views (e.g., ViewLog.render(...) for monthly logs).
+  - App passes domain output (or exceptions) back to UI for presentation via `showMessage(...)` / `showError(...)`.
 
+- Listens to model changes indirectly:
+  - When the user performs actions (e.g., creates a new workout, deletes a log, etc.), the domain managers (like `WorkoutManager`, `WeightManager`) return updated model objects or strings describing the new state.
+  - The UI then calls rendering methods to redraw the corresponding views according to the updated data.
 
-Responsibilities
+- Holds references to logic/domain only at composition points:
+  - The UI itself stores no domain state; it acts purely as an input/output boundary.
+  - It depends on the domain model types only for displaying data.
+  - The composition points (where the UI and logic layers connect) are limited to passing model objects for display.
 
-The UI component:
-
-Executes user commands via the application loop:
-
-App (in FitChasers) calls `ui.readCommand()`.
-
-App parses the command and calls the appropriate domain method.
-
-App passes domain output (or exceptions) back to UI for presentation via `showMessage(...)` / `showError(...)`.
-
-Listens to model changes indirectly:
-
-Domain managers return updated entities/strings; UI redraws views (e.g., `ViewLog.render(...)` for monthly logs).
-
-Keeps references to logic/domain only at the composition points:
-
-ViewLog receives WorkoutManager + FileHandler (read-only usage).
-
-UI itself keeps no domain state; it is a pure I/O boundary.
-
-Depends on model types for display:
-
-E.g., `displayDetailsOfWorkout(Workout workout)` formats fields (name, date, duration, tags, exercises) for the left bubble.
-
+E.g., `displayDetailsOfWorkout(Workout workout)`. This method only formats the fields of the given Workout object and renders them inside a left-aligned chat bubble.
+The UI does not modify or store the Workout; it only displays its contents.
 ## WorkoutManager component
 **API**: [`WorkoutManager.java`](https://github.com/AY2526S1-CS2113-W14-3/tp/blob/master/src/main/java/seedu/fitchasers/WorkoutManager.java)
 

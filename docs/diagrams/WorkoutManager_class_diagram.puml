@@ -10,7 +10,6 @@ skinparam NoteBackgroundColor #fff
 skinparam NoteBorderColor #aaa
 
 hide circle
-hide stereotype
 
 ' ===== Classes & Interfaces =====
 class WorkoutManager {
