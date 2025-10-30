@@ -2,7 +2,6 @@ package seedu.fitchasers.workouts;
 
 import seedu.fitchasers.ui.UI;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.time.LocalDateTime;
@@ -14,13 +13,13 @@ import java.util.Set;
 /**
  * Represents a workout session containing a name, duration, start/end times, and a list of exercises.
  */
-public class Workout implements Serializable {
+public class Workout {
     private static final UI ui = new UI();
     private final ArrayList<Exercise> exercises = new ArrayList<>();
     private String workoutName;
     private int duration = 0;
-    private LocalDateTime workoutStartDateTime;
-    private LocalDateTime workoutEndDateTime;
+    private LocalDateTime workoutStartDateTime = null;
+    private LocalDateTime workoutEndDateTime = null;
     private Exercise currentExercise = null;
     private Set<String> manualTags = new LinkedHashSet<>(); // tags the user edits manually
     private Set<String> autoTags = new LinkedHashSet<>();
@@ -162,11 +161,9 @@ public class Workout implements Serializable {
     public void setWorkoutStartDateTime(LocalDateTime workoutStartDateTime) {
         this.workoutStartDateTime = workoutStartDateTime;
     }
-
     public LocalDateTime getWorkoutEndDateTime() {
         return workoutEndDateTime;
     }
-
     public String getWorkoutDateString(){
         return formatWorkoutDate(workoutStartDateTime);
     }

@@ -1,5 +1,7 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.exceptions.FileNonexistent;
+import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.ui.ViewLog;
 import seedu.fitchasers.exceptions.InvalidCommandException;
@@ -50,11 +52,16 @@ public class FitChasers {
     private static WeightManager weightManager;
     private static GoalWeightTracker goalTracker;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, FileNonexistent {
         ui.printLeftHeader();
         initVariables();
         ui.showGreeting();
-
+        try {
+            viewLog.render(argumentStr);
+        } catch (IndexOutOfBoundsException | InvalidArgumentInput e) {
+            ui.showError(e.getMessage());
+        }
+        workoutManager.initWorkouts();
         while (isRunning) {
             input = ui.readCommand();
             if (input == null) {
@@ -163,7 +170,7 @@ public class FitChasers {
                 case "/end_workout":
                 case "ew":
                     // Format: /end_workout d/DD/MM/YY t/HHmm
-                    workoutManager.endWorkout(ui, argumentStr);
+                    workoutManager.endWorkout(argumentStr);
                     break;
 
                 case "/view_log":
@@ -181,7 +188,7 @@ public class FitChasers {
                     break;
                 //@@author Kart04
                 case "/del_workout":
-                case "d":
+                case "dw":
                     delMethod();
                     break;
                 //@@author
@@ -211,19 +218,22 @@ public class FitChasers {
         isRunning = false;
     }
 
-    private static void delMethod() throws InvalidCommandException, IOException {
+    private static void delMethod() throws InvalidCommandException, IOException, InvalidArgumentInput, FileNonexistent {
         // Format: /del_workout WORKOUT_NAME
         if (argumentStr.isEmpty()) {
             throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
                     "Please enter a valid command.");
-        } else if (argumentStr.contains("d/")) {
-            workoutManager.interactiveDeleteWorkout(argumentStr, ui);
+        } else if (argumentStr.contains("-m")) {
+            //workoutManager.interactiveDeleteWorkout(argumentStr);
+            ViewLog.Parsed p = viewLog.parseArgs(argumentStr);
+            workoutManager.setWorkouts(fileHandler.loadMonthList(p.ym()),p.ym());
+            workoutManager.deleteWorkoutByIndex(p.extractedArg());
         } else {
             workoutManager.deleteWorkout(argumentStr);
         }
     }
 
-    private static void owtMethod() {
+    private static void owtMethod() throws FileNonexistent, IOException {
         // Parse parameters
         String[] params = argumentStr.split("\\s+");
         Integer workoutId = null;
@@ -280,7 +290,7 @@ public class FitChasers {
             try {
                 fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
 
-                ArrayList<Workout> reloadedWorkouts = fileHandler.getWorkoutsForMonth(currentMonth);
+                ArrayList<Workout> reloadedWorkouts = fileHandler.loadMonthList(currentMonth);
                 workoutManager.setWorkouts(reloadedWorkouts);
 
 
@@ -297,6 +307,8 @@ public class FitChasers {
 
             } catch (IOException e) {
                 ui.showMessage("Error saving workout data: " + e.getMessage());
+            } catch (FileNonexistent e) {
+                throw new RuntimeException(e);
             }
 
         } else {
@@ -545,7 +557,7 @@ public class FitChasers {
         }
     }
 
-    private static void initVariables() throws IOException {
+    private static void initVariables() throws IOException, FileNonexistent {
         try {
             savedName = fileHandler.loadUserName();
         } catch (IOException e) {
@@ -585,6 +597,7 @@ public class FitChasers {
             }
 
             ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started!");
+            ui.showQuickStartTutorial();
 
             try {
                 fileHandler.saveUserName(person);
@@ -599,9 +612,11 @@ public class FitChasers {
 
         try {
             fileHandler.loadWeightList(person);
-            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
+            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
         } catch (IOException e) {
             ui.showError(e.getMessage());
+        } catch (FileNonexistent e) {
+            fileHandler.saveMonthList(currentMonth, new ArrayList<>());
         }
 
         viewLog = new ViewLog(ui, workoutManager, fileHandler);

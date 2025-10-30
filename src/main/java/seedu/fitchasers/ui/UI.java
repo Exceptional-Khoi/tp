@@ -173,6 +173,52 @@ public class UI {
     }
 
     /**
+     * Shows a one-page quick-start tutorial for first-time users.
+     * Guides the user to create a workout, add an exercise, end it, and view the log.
+     */
+    public void showQuickStartTutorial() {
+        showMessage("""
+                ====================  FITCHASERS • QUICK START  ====================
+                
+                Let's get your very first workout into the log in under a minute!
+                
+                1) Create your first workout
+                   Type:
+                     /create_workout n/My First Workout!
+                   Press Enter.
+                   When prompted about date and time, type:
+                     Y
+                     Y
+                   (This accepts today's date and the current time.)
+                
+                2) Add an exercise to this workout
+                   Type:
+                     /add_exercise n/First Exercise Eva r/12
+                   Press Enter.
+                
+                3) End and save the workout
+                   Type:
+                     /end_workout
+                   Press Enter.
+                   When prompted about date and time, type:
+                     Y
+                     Y
+                   (Accept current date/time again.)
+                
+                4) View your workout history
+                   Type:
+                     /view_log
+                   Press Enter to see the workout you just created!
+                
+                --------------------------------------------------------------------
+                Tips:
+                • You can also use short aliases: /create_workout (cw), /add_exercise (ae),
+                  /end_workout (ew), /view_log (vl)
+                • Need a full command reference? Type /help
+                ====================================================================
+                """);
+    }
+    /**
      * Displays the exit message upon program termination.
      */
     public void showExitMessage() {
@@ -185,10 +231,51 @@ public class UI {
     public void showHelp() {
         showMessage("""
         /help (h)                                 - View all available commands
+
         ~~~ USER PROFILE ~~~
         /my_name (n) n/NAME                       - Set or change your display name
-        ...
-        /exit (e)                                 - Save all progress and exit the app""");
+                                                    e.g. /my_name n/Nitin
+
+        ~~~ WEIGHT TRACKING ~~~
+        /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
+                                                    e.g. /add_weight w/81.5 d/19/10/25
+        /view_weight (vw)                         - View your recorded weights and graph
+
+        ~~~ WORKOUT CREATION & LOGGING ~~~
+        /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
+                                                    e.g. /create_workout n/PushDay d/20/10/25 t/1900
+        /add_exercise (ae) n/NAME r/REPS          - Add an exercise to current workout
+                                                    e.g. /add_exercise n/Squat r/12
+        /add_set (as) r/REPS                      - Add another set to the latest exercise
+                                                    e.g. /add_set r/10
+        /end_workout (ew) d/DATE t/TIME           - End and save current workout
+                                                    e.g. /end_workout d/20/10/25 t/2030
+
+        ~~~ WORKOUT LOG MANAGEMENT ~~~
+        /view_log (vl)                            - View your workout history
+        /open (o) INDEX                           - Open detailed view of a workout
+                                                    e.g. /open 1
+        /del_workout (dw) -m [Month] [Index]      - Delete a workout by ID. ID view by view_log command
+                                                    e.g. /del_workout -m 10 5 //Deletes fifth index of Oct
+
+        ~~~ TAGGING SYSTEM ~~~
+        /add_modality_tag (amot) m/(CARDIO/STRENGTH) k/KEYWORD
+                                                    - Add a keyword for a workout modality
+                                                    e.g. /add_modality_tag m/CARDIO k/hiking
+        /add_muscle_tag (amt) m/MUSCLE k/KEYWORD  - Add a keyword for a muscle group
+                                                    e.g. /add_muscle_tag m/LEGS k/lunges
+        /override_workout_tag (owt) id/INDEX newTag/NEW_TAG
+                                                    - Manually override a workout’s tag
+                                                    e.g. /override_workout_tag id/1 newTag/LEG_DAY
+
+        ~~~ GYM FINDER ~~~
+        /gym_where (gw) n/EXERCISE                - Suggest NUS gyms with equipment for the exercise
+                                                    e.g. /gym_where n/squat
+        /gym_page (gp) p/PAGE_NUMBER              - View available NUS gym pages
+                                                    e.g. /gym_page p/1
+
+        ~~~ SYSTEM ~~~
+        /exit (e)                                 - Save all progress and exit the app """);
     }
 
     /**
