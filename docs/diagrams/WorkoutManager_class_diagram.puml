@@ -1,0 +1,60 @@
+@startuml
+title FitChasers – Core Classes (UML Class Diagram)
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam ArrowColor #444
+skinparam ClassBorderColor #222
+skinparam ClassBackgroundColor #FAFAFA
+skinparam NoteBackgroundColor #fff
+skinparam NoteBorderColor #aaa
+
+hide circle
+
+' ===== Classes & Interfaces =====
+class WorkoutManager {
+  -workouts: ArrayList<Workout>
+  -currentWorkout: Workout
+  -tagger: Tagger
+  -ui: UI
+  --
+  +addWorkout(command: String): void
+  +overrideWorkoutTags(workout: Workout, newTag: String): void
+}
+
+class Tagger <<interface>> {
+  +suggest(w: Workout): Set<String>
+}
+
+class Workout {
+  -workoutName: String
+  -duration: int
+  -workoutStartDateTime: LocalDateTime
+  -workoutEndDateTime: LocalDateTime
+  -exercises: ArrayList<Exercise>
+  -manualTags: Set<String>
+  -autoTags: Set<String>
+  --
+  +setManualTags(tags: Set<String>): void
+  +setAutoTags(tags: Set<String>): void
+  +getAllTags(): Set<String>
+  +getWorkoutName(): String
+}
+
+class Exercise {
+  -name: String
+  -sets: ArrayList<Integer>
+  --
+  +addSet(reps: int): void
+  +getName(): String
+}
+
+class UI
+
+' ===== Relationships =====
+WorkoutManager "1" *-- "0..*" Workout : manages
+WorkoutManager --> Tagger : uses
+WorkoutManager --> UI : interacts
+Workout "1" o-- "0..*" Exercise : contains
+
+@enduml

@@ -1,6 +1,6 @@
 package seedu.fitchasers.user;
 
-import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.ui.UI;
 
 import java.io.IOException;
@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
+//@@bennyy117
 /**
  * Handles the recording and viewing of weight data for a person.
  */

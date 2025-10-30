@@ -1,48 +1,15 @@
 @startuml
-' ===== Styling =====
-skinparam shadowing false
-skinparam roundcorner 12
-skinparam componentStyle rectangle
-skinparam rectangle {
-  BackgroundColor #D6F0FF
-  BorderColor #6AAFE6
-}
-skinparam arrowColor #555555
+'https://plantuml.com/sequence-diagram
 
-actor "User" as U
-artifact "Data File(s)\n(JSON/CSV/...)" as STORE #EEEEEE
+autonumber
 
-package "FitChasers App" {
-  [UI] as UI
-  [FitChaser\n(Logic)] as LOGIC
-  [FileHandler] as FH
-  [Managers\n(Workout, Weight, Tagger, Gym)] as MAN
-  [ViewLog] as VLOG
-  [Models\n(Workout, Exercise,\nTag, Person, Gym)] as MDL
-  [Commons] as COM
-}
+== Initialization ==
 
-' ===== Primary interactions =====
-U --> UI : inputs / commands
-UI --> LOGIC : dispatch actions
-LOGIC <--> FH : load/save
-FH --> STORE : read/write
+Alice -> Bob: Authentication Request
+Bob --> Alice: Authentication Response
 
-LOGIC --> VLOG : query for display
+== Repetition ==
 
-MAN --> MDL : use models instances
-VLOG <--> MAN : read entries
-
-' FileHandler cooperating with Managers for persistence
-MAN --> FH : request load & save
-LOGIC ---> MAN
-
-' UI shows ViewLog results
-VLOG --> UI : render logs
-
-legend left
-  Solid arrow  = runtime call/use
-  Double arrow = bidirectional collaboration
-  Dashed arrow = utility dependency (uses Commons)
-endlegend
+Alice -> Bob: Another authentication Request
+Alice <-- Bob: another authentication Response
 @enduml

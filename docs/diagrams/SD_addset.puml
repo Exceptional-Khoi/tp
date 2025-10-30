@@ -1,0 +1,74 @@
+
+@startuml
+title FitChasers – Sequence Diagram for "/add_set"
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequence {
+  ArrowColor #444
+  LifeLineBorderColor #444
+  LifeLineBackgroundColor #FAFAFA
+  ParticipantBorderColor #222
+  ParticipantBackgroundColor #F7F7F7
+  BoxBorderColor #AAA
+  BoxBackgroundColor #FFF
+  NoteBorderColor #AAA
+  NoteBackgroundColor #FFF
+}
+
+actor User
+boundary UI as "UI"
+control FitChasers as "FitChasers (main loop)"
+control WM as "WorkoutManager"
+entity W as "Workout"
+entity E as "Exercise"
+
+== User enters command ==
+User -> UI : enter "/add_set r/15"
+
+UI -> FitChasers : readCommand()
+activate FitChasers
+FitChasers -> WM : addSet(args="r/15")
+activate WM
+
+' --- Guards & parsing (WorkoutManager.addSet) ---
+alt No active workout (currentWorkout == null)
+  WM -> UI : showMessage("No active workout. Use /create_workout first.")
+  deactivate WM
+  deactivate FitChasers
+  return
+else Active workout exists
+  WM -> W : getCurrentExercise()
+  activate W
+  W --> WM : currentExercise (nullable)
+  deactivate W
+  alt No exercise yet (currentExercise == null)
+    WM -> UI : showMessage("No exercises yet. Add an exercise first...")
+    deactivate WM
+    deactivate FitChasers
+    return
+  else Has current exercise
+    WM -> WM : validate args\n- exactly one r/\n- parse reps 1..1000\n- no stray flags
+    alt Invalid input / bad reps
+      WM -> UI : showMessage("Invalid reps... Usage: /add_set r/REPS")
+      deactivate WM
+      deactivate FitChasers
+      return
+    else Valid reps
+      ' --- Update the current exercise ---
+      WM -> E ++ : addSet(reps=15)
+      E --> WM -- : (void)
+      ' --- Report success ---
+      WM -> UI : showMessage("Adding a new set to your exercise!")
+      WM -> UI : showMessage("Added set to exercise:\\n" + currentExercise.toDetailedString())
+    end
+  end
+end
+
+deactivate WM
+deactivate FitChasers
+
+' Optional: UI shows result back to user
+UI --> User : display success message
+
+@enduml

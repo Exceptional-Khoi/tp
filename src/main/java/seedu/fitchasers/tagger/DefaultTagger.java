@@ -6,6 +6,7 @@ import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+//@@Kart04
 public class DefaultTagger implements Tagger {
     private final EnumMap<Modality, Set<String>> modalityKeywords = new EnumMap<>(Modality.class);
     private final EnumMap<MuscleGroup, Set<String>> muscleKeywords = new EnumMap<>(MuscleGroup.class);

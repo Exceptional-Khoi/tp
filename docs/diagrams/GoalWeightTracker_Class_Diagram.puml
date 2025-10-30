@@ -1,0 +1,38 @@
+@startuml
+title GoalWeightTracker – Class Diagram
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam ArrowColor #444
+skinparam ClassBorderColor #222
+skinparam ClassBackgroundColor #FAFAFA
+
+hide circle
+hide stereotype
+
+class GoalWeightTracker {
+  -DF: DateTimeFormatter <<static>>
+  -ui: UI
+  -goalWeight: Double
+  -setDate: LocalDate
+  --
+  +GoalWeightTracker()
+  +handleSetGoal(input: String): void
+  +handleViewGoal(currentWeight: Double): void
+  -saveGoal(): void
+  -loadGoal(): void
+  +hasGoal(): boolean
+  +getGoalWeight(): double
+}
+
+class UI
+
+class FileHandler {
+  +saveGoal(goalWeight: double, setDate: LocalDate): void
+  +loadGoal(): Double[]
+}
+
+GoalWeightTracker --> UI : has a
+GoalWeightTracker ..> FileHandler : persists goal
+
+@enduml

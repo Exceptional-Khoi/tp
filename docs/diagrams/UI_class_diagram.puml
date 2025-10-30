@@ -1,0 +1,91 @@
+@startuml
+title FitChasers – UI Class Diagram
+
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam ArrowColor #444
+skinparam ClassBorderColor #222
+skinparam ClassBackgroundColor #FAFAFA
+skinparam NoteBackgroundColor #fff
+skinparam NoteBorderColor #aaa
+skinparam stereotypeFontStyle bold
+hide empty fields
+hide empty methods
+hide circle
+
+' ===== Types used by UI =====
+class Scanner
+package "seedu.fitchasers.workouts" as pkg_workouts #DDDDFF {
+  class Exercise {
+    - name: String
+    - sets: ArrayList<Integer>
+    --
+    + addSet(reps: int): void
+    + getName(): String
+    + getNumSets(): int
+    + getSets(): ArrayList<Integer>
+    + toDetailedString(): String
+    + toString(): String
+  }
+
+  class Workout {
+    - ui: UI {static}
+    - exercises: ArrayList<Exercise>
+    - workoutName: String
+    - duration: int
+    - workoutStartDateTime: LocalDateTime
+    - workoutEndDateTime: LocalDateTime
+    - currentExercise: Exercise
+    - manualTags: Set<String>
+    - autoTags: Set<String>
+    --
+    + getManualTags(): Set<String>
+    + getAutoTags(): Set<String>
+    + setManualTags(tags: Set<String>): void
+    + setAutoTags(tags: Set<String>): void
+    + getAllTags(): Set<String>
+    + getConflictingTags(): Set<String>
+    + getWorkoutName(): String
+    + setWorkoutName(workoutName: String): void
+    + getDuration(): int
+    + setDuration(duration: int): void
+    + addExercise(exercise: Exercise): void
+    + getExercises(): ArrayList<Exercise>
+    + getCurrentExercise(): Exercise
+    + getWorkoutStartDateTime(): LocalDateTime
+    + setWorkoutStartDateTime(dt: LocalDateTime): void
+    + getWorkoutEndDateTime(): LocalDateTime
+    + setWorkoutEndDateTime(dt: LocalDateTime): void
+    + getWorkoutDateString(): String
+    + calculateDuration(): int
+    + toString(): String
+    --
+    - formatWorkoutDate(dateTime: LocalDateTime): String {static}
+  }
+}
+
+' ===== UI class  =====
+class UI {
+  - scanner: Scanner
+  --
+  + printLeftHeader(): void
+  + readCommand(): String
+  + enterSelection(): String
+  + enterName(): String
+  + enterWeight(): double
+  + showMessage(message: String): void
+  + showError(error: String): void
+  + showGreeting(): void
+  + showQuickStartTutorial(): void
+  + showExitMessage(): void
+  + showHelp(): void
+  + confirmationMessage(): boolean
+  + displayDetailsOfWorkout(workout: Workout): void
+  + getDaySuffix(day: int): String
+}
+
+' ===== Relationships =====
+UI *-- Scanner
+UI ..> Workout : uses
+UI ..> Exercise : uses
+@enduml

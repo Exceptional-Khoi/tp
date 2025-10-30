@@ -1,4 +1,4 @@
-package seedu.fitchasers;
+package seedu.fitchasers.storage;
 
 import seedu.fitchasers.exceptions.CorruptedFileError;
 import seedu.fitchasers.exceptions.FileNonexistent;
@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+//@@Kart04
 /**
  * Handles the permanent storage of workout and exercise data.
  * Saves to and loads from: data/save.txt

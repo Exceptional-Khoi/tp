@@ -1,0 +1,112 @@
+
+@startuml
+title FitChasers – Sequence Diagram for "/create_workout"
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequence {
+  ArrowColor #444
+  LifeLineBorderColor #444
+  LifeLineBackgroundColor #FAFAFA
+  ParticipantBorderColor #222
+  ParticipantBackgroundColor #F7F7F7
+  BoxBorderColor #AAA
+  BoxBackgroundColor #FFF
+  NoteBorderColor #AAA
+  NoteBackgroundColor #FFF
+}
+
+actor User
+boundary UI as "UI"
+control FitChasers as "FitChasers (main loop)"
+control WM as "WorkoutManager"
+control Tagger as "Tagger"
+database FH as "FileHandler"
+entity W as "Workout"
+
+== User enters command ==
+User -> UI : enter "/create_workout n/Push Day d/23/10/25 t/1905"
+
+UI -> FitChasers : readCommand()
+activate FitChasers
+FitChasers -> WM : addWorkout(command)
+activate WM
+
+' --- Guard: disallow when a workout is active ---
+alt currentWorkout != null
+  WM -> UI : showMessage("You currently have an active workout...")\n"Please end the active workout first..."
+  deactivate WM
+  deactivate FitChasers
+  return
+else No active workout
+  ' --- Choose parser path ---
+  alt Strict path (command contains d/ or t/)
+    WM -> WM : formatInputForWorkoutStrict(command)\n- require n/, d/, t/ (in order)\n- name/date/time validation\n- reject stray flags
+    alt Invalid input
+      WM -> UI : showMessage(error)\n(throws InvalidArgumentInput)
+      deactivate WM
+      deactivate FitChasers
+      return
+    else Valid inputs
+      WM -> WM : checkPastFutureDate(date,time)\n(confirm via UI if needed)
+      alt Date in future or same-day future time
+        WM -> UI : showMessage(... "Are you sure? (Y/N)")
+        UI -> WM : confirmationMessage()
+        alt User cancels
+          WM -> UI : showMessage("Please re-enter...")
+          deactivate WM
+          deactivate FitChasers
+          return
+        end
+      end
+      WM -> WM : check duplicate start date/time among workouts\n(confirm continue)
+      alt Duplicate exists and user cancels
+        WM -> UI : showMessage("Workout creation cancelled...")
+        deactivate WM
+        deactivate FitChasers
+        return
+      end
+    end
+  else Flexible path (no d/ and t/ provided)
+    WM -> WM : formatInputForWorkout(command)\n- parse name/date/time if present\n- prompt for missing pieces
+    alt Asked to fill missing date/time
+      WM -> UI : showMessage("Use current date/time? (Y/N)")
+      UI -> WM : confirmationMessage()
+      alt User declines
+        WM -> UI : showMessage("Please provide date/time...")
+        deactivate WM
+        deactivate FitChasers
+        return
+      end
+    end
+    WM -> WM : checkPastFutureDate(date,time)\n(confirm via UI if needed)
+    WM -> WM : check duplicate start date/time\n(confirm continue)
+  end
+
+  ' --- Load month list if needed ---
+  WM -> FH : loadMonthList(YearMonth.of(date))
+  FH --> WM : workoutsForMonth
+  WM -> WM : setWorkouts(list, month)
+
+  ' --- Create workout & tag it ---
+  WM -> W ++ : new Workout(name, startDateTime)
+  W --> WM -- : workout instance
+  WM -> Tagger : suggest(workout)
+  Tagger --> WM : suggestedTags
+  WM -> W : setAutoTags(suggestedTags)
+  WM -> WM : add to workouts; currentWorkout = workout
+
+  ' --- Persist and report ---
+  WM -> FH : saveMonthList(currentMonth, workouts)
+  FH --> WM : ok
+  WM -> UI : showMessage("New workout sesh incoming!")
+  WM -> UI : showMessage("Tags generated: " + suggestedTags + "\\nAdded workout: " + name)
+end
+
+deactivate WM
+deactivate FitChasers
+
+' Optional: UI displays final confirmation to the User
+UI --> User : display success message
+
+@enduml

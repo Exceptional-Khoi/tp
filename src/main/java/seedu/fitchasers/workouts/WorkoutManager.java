@@ -1,6 +1,6 @@
 package seedu.fitchasers.workouts;
 
-import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.tagger.Modality;
@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//@@ZhongBaode
 /**
  * Manages workout sessions for the FitChasers application.
  * <p>
@@ -29,7 +30,6 @@ import java.util.regex.Pattern;
  * as well as adding exercises and sets within each workout.
  */
 public class WorkoutManager {
-    private static final int ARRAY_OFFSET = 1;
     private static final int MAX_EXERCISE_NAME_LEN = 32;
     private static final int MAX_REPS = 1000;
     private static final Pattern NAME_ALLOWED = Pattern.compile("[A-Za-z0-9 _-]+");
@@ -56,9 +56,9 @@ public class WorkoutManager {
     private int afterNameIndex = 2;
     private LocalDate date = null;
     private LocalTime time = null;
-    private DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
+    private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
             .withResolverStyle(ResolverStyle.SMART);
-    private DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
+    private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
             .withResolverStyle(ResolverStyle.SMART);
 
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
@@ -456,38 +456,6 @@ public class WorkoutManager {
         }
     }
 
-    /**
-     * Extracts text between two tokens.
-     *
-     * @param text       the full string to search
-     * @param startToken the start marker
-     * @param endToken   the end marker
-     * @return the substring found between the tokens, or an empty string if not found
-     */
-    private String extractBetween(String text, String startToken, String endToken) {
-        int start = text.indexOf(startToken) + startToken.length();
-        int end = text.indexOf(endToken);
-        if (start < startToken.length() || end == -1) {
-            return "";
-        }
-        return text.substring(start, end);
-    }
-
-    /**
-     * Extracts text after a specific token.
-     *
-     * @param text  the full string to search
-     * @param token the token to find
-     * @return the text found after the token, or an empty string if not found
-     */
-    private String extractAfter(String text, String token) {
-        int index = text.indexOf(token);
-        if (index == -1) {
-            return "";
-        }
-        return text.substring(index + token.length()).trim();
-    }
-
     public int getWorkoutSize() {
         return workouts.size();
     }
@@ -539,17 +507,6 @@ public class WorkoutManager {
         } else {
             ui.showMessage("Okay, deletion aborted.");
         }
-    }
-
-    private ArrayList<Workout> getWorkoutsByDate(LocalDate date) {
-        ArrayList<Workout> filteredWorkout = new ArrayList<>();
-        for (Workout w : workouts) {
-            LocalDateTime startDateTime = w.getWorkoutStartDateTime();
-            if (startDateTime != null && startDateTime.toLocalDate().equals(date)) {
-                filteredWorkout.add(w);
-            }
-        }
-        return filteredWorkout;
     }
 
     /**
@@ -727,106 +684,6 @@ public class WorkoutManager {
 
         ui.showMessage("Adding a new set to your exercise!");
         ui.showMessage("Added set to exercise:\n" + currentExercise.toDetailedString());
-    }
-
-    /**
-     * Displays all workouts and their exercises in a formatted list.
-     */
-    public void viewWorkouts() {
-        if (workouts.isEmpty()) {
-            ui.showMessage("No workouts recorded yet!");
-            return;
-        }
-
-        for (int i = 0; i < workouts.size(); i++) {
-            Workout w = workouts.get(i);
-            ui.showMessage("------------------------------------------------");
-            ui.showMessage("[" + (i + ARRAY_OFFSET) + "]: " + w.getWorkoutName() + " | " + w.getDuration() + " Min");
-
-            if (w.getExercises().isEmpty()) {
-                ui.showMessage("     No exercises added yet.");
-            } else {
-                for (int j = 0; j < w.getExercises().size(); j++) {
-                    Exercise ex = w.getExercises().get(j);
-                    ui.showMessage("     Exercise " + (j + 1) + ". " + ex);
-                    for (int k = 0; k < ex.getSets().size(); k++) {
-                        ui.showMessage("         Set " + (k + 1) + " -> Reps: " + ex.getSets().get(k));
-                    }
-                }
-            }
-        }
-    }
-
-    public void showWorkoutsWithIndices(ArrayList<Workout> list) {
-        if (list.isEmpty()) {
-            ui.showMessage("No workouts recorded for this selection!");
-            return;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < list.size(); i++) {
-            Workout w = list.get(i);
-            sb.append(i + 1)
-                    .append(". ")
-                    .append(w.getWorkoutName())
-                    .append(" - ")
-                    .append(w.getWorkoutDateString());
-
-            if (i < list.size() - 1) {
-                sb.append('\n');
-            }
-        }
-        ui.showMessage(sb.toString());
-    }
-
-    public void interactiveDeleteWorkout(String command) throws IOException {
-        ArrayList<Workout> targetList = workouts;
-
-        if (command.contains("")) {
-            String dateStr = extractAfter(command, "d/").trim();
-            String[] dateTokens = dateStr.split("\\s+");
-            String datePart = dateTokens[0];
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yy");
-            try {
-                LocalDate date = LocalDate.parse(datePart, formatter);
-                targetList = getWorkoutsByDate(date);
-            } catch (Exception e) {
-                ui.showError("Invalid date format! (Use d/DD/MM/YY)");
-                return;
-            }
-        }
-
-        if (targetList.isEmpty()) {
-            ui.showMessage("No workouts found for the given date.");
-            return;
-        }
-
-        showWorkoutsWithIndices(targetList);
-        String selection = ui.enterSelection();
-
-        String[] tokens = selection.split("\\s+");
-        ArrayList<Integer> indicesToDelete = new ArrayList<>();
-        for (String token : tokens) {
-            try {
-                int index = Integer.parseInt(token) - 1;
-                if (index >= 0 && index < targetList.size()) {
-                    indicesToDelete.add(index);
-                }
-            } catch (NumberFormatException ignored) {
-                ui.showError("An unexpected error occurred: " + ignored.getMessage());
-            }
-        }
-
-        if (indicesToDelete.isEmpty()) {
-            ui.showMessage("No valid indices entered. Nothing deleted.");
-            return;
-        }
-
-        for (int i = indicesToDelete.size() - 1; i >= 0; i--) {
-            Workout w = targetList.get(indicesToDelete.get(i));
-            workouts.remove(w);
-            fileHandler.saveMonthList(currentLoadedMonth,workouts);
-            ui.showMessage("Delete: " + w.getWorkoutName());
-        }
     }
 
     /**

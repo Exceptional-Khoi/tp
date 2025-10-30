@@ -1,9 +1,9 @@
-package seedu.fitchasers.ui;
-import seedu.fitchasers.FileHandler;
+package seedu.fitchasers.workouts;
+
+import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.exceptions.FileNonexistent;
-import seedu.fitchasers.workouts.Workout;
-import seedu.fitchasers.workouts.WorkoutManager;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
+import seedu.fitchasers.ui.UI;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -15,15 +15,15 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+//@@ZhongBaode
 public class ViewLog {
     public static final int MINIMUM_PAGE_SIZE = 1;
     public static final int ARRAY_INDEX_OFFSET = 1;
-    public static final int AFTER_ARG_CONST = 4;
     private static final Pattern INT = Pattern.compile("^-?\\d+$");
     private static UI ui = new UI();                         // your existing UI class
     private final WorkoutManager workoutManager;
-    private int pageSize = 10;
-    private FileHandler fileHandler;
+    private final int pageSize = 10;
+    private final FileHandler fileHandler;
 
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
     private List<Workout> lastFilteredListofWorkout = List.of();
@@ -38,19 +38,10 @@ public class ViewLog {
         }
     }
 
-    public ViewLog(UI ui, WorkoutManager workoutManager) {
-        ViewLog.ui = ui;
-        this.workoutManager = workoutManager;
-    }
-
     public ViewLog(UI ui, WorkoutManager workoutManager, FileHandler fileHandler) {
         ViewLog.ui = ui;
         this.workoutManager = workoutManager;
         this.fileHandler = fileHandler;
-    }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = Math.max(1, pageSize); //ensures extractedArg size is at least 1
     }
 
     /* ----------------------------- Core renderers ----------------------------- */
@@ -180,96 +171,6 @@ public class ViewLog {
         }
         ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(i));
     }
-
-    /*public List<Integer> searchByName(List<Workout> monthWorkouts, String query) {
-        if (query == null || query.isBlank()) {
-            return List.of();
-        }
-        String needle = query.toLowerCase();
-        List<Workout> sorted = monthWorkouts.stream()
-                .sorted(Comparator.comparing(Workout::getDateTime).reversed())
-                .toList();
-
-        this.lastFilteredListofWorkout = sorted; // set context for `/open <n>`
-        List<Integer> matches = new ArrayList<>();
-        for (int i = 0; i < sorted.size(); i++) {
-            Workout w = sorted.get(i);
-            if (safe(w.getWorkoutName()).toLowerCase().contains(needle)) {
-                matches.add(i + 1); // 1-based
-            }
-        }
-
-        // Display results
-        if (matches.isEmpty()) {
-            ui.showMessage("No workouts matched \"" + query + "\".");
-        } else {
-            ui.showMessage("Matches for \"" + query + "\":");
-            ui.showMessage(String.format("%-4s %-20s %-22s %-10s", "ID", "Date", "Name", "Duration"));
-            for (Integer idx : matches) {
-                renderCompactRow(idx, sorted.get(idx - 1));
-            }
-        }
-        return matches;
-    } */
-
-    /*public void renderByTag(List<Workout> monthWorkouts, String tag, int extractedArg, boolean detailed) {
-        if (tag == null || tag.isBlank()) {
-            ui.showMessage("Please provide a tag, e.g., /view_log --type strength");
-            return;
-        }
-        String needle = tag.toLowerCase();
-
-        List<Workout> filtered = monthWorkouts.stream()
-                .filter(w -> safe(w.getType()).equalsIgnoreCase(tag) ||
-                        getTags(w).stream().anyMatch(t -> t.equalsIgnoreCase(needle)))
-                .sorted(Comparator.comparing(Workout::getDateTime).reversed())
-                .toList();
-
-        if (filtered.isEmpty()) {
-            ui.showMessage("No workouts with tag/type \"" + tag + "\" this month.");
-            return;
-        }
-
-        this.lastFilteredListofWorkout = filtered;
-        render(filtered, extractedArg, detailed);
-    } */
-
-    /*public void renderSummary(List<Workout> monthWorkouts, Optional<String> tagOpt) {
-        List<Workout> scope = monthWorkouts;
-        if (tagOpt.isPresent()) {
-            String tag = tagOpt.get();
-            scope = monthWorkouts.stream()
-                    .filter(w -> safe(w.getType()).equalsIgnoreCase(tag) ||
-                            getTags(w).stream().anyMatch(t -> t.equalsIgnoreCase(tag)))
-                    .toList();
-            ui.showMessage("Summary for tag/type \"" + tag + "\":");
-        } else {
-            ui.showMessage("Monthly summary:");
-        }
-
-        int sessions = scope.size();
-        int totalMinutes = scope.stream().mapToInt(Workout::getDurationMinutes).sum();
-
-        ui.showMessage("Total sessions : " + sessions);
-        ui.showMessage("Total duration : " + formatDuration(totalMinutes));
-
-        // PR hooks (template) — implement when you track PRs.
-        // Example: group by workout name and show best duration/weight/etc.
-        Map<String, Integer> bestByName = new HashMap<>();
-        for (Workout w : scope) {
-            String name = safe(w.getWorkoutName());
-            // Replace with your actual PR metric (e.g., weight lifted, fastest time, etc.)
-            int metric = w.getDurationMinutes();
-            bestByName.merge(name, metric, Math::max);
-        }
-        if (!bestByName.isEmpty()) {
-            ui.showMessage("Top PRs (by duration as placeholder):");
-            bestByName.entrySet().stream()
-                    .sorted(Map.Entry.<String,Integer>comparingByValue().reversed())
-                    .limit(5)
-                    .forEach(e -> ui.showMessage(" • " + e.getKey() + " — " + e.getValue() + " min"));
-        }
-    } */
 
     /* ------------------------------ Helpers/Util ----------------------------- */
 

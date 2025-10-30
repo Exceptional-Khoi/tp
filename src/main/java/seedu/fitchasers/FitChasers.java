@@ -3,7 +3,7 @@ package seedu.fitchasers;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.ui.UI;
-import seedu.fitchasers.ui.ViewLog;
+import seedu.fitchasers.workouts.ViewLog;
 import seedu.fitchasers.exceptions.InvalidCommandException;
 import seedu.fitchasers.gym.EquipmentDisplay;
 import seedu.fitchasers.gym.Gym;
@@ -16,6 +16,7 @@ import seedu.fitchasers.user.Person;
 import seedu.fitchasers.user.WeightManager;
 import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.WorkoutManager;
+import seedu.fitchasers.storage.FileHandler;
 
 import java.io.IOException;
 import java.time.YearMonth;
@@ -253,28 +254,28 @@ public class FitChasers {
         }
 
         if (workoutId != null && newTag != null) {
-            // ✅ Validate empty tag
+            // Validate empty tag
             if (newTag.trim().isEmpty()) {
-                ui.showMessage("❌ Tag cannot be empty.");
+                ui.showMessage("Tag cannot be empty.");
                 return;
             }
 
             // Validate workout ID
             if (workoutId <= 0 || workoutId > workoutManager.getWorkouts().size()) {
-                ui.showMessage("❌ Invalid workout ID. Use valid ID between 1 and " +
+                ui.showMessage("Invalid workout ID. Use valid ID between 1 and " +
                         workoutManager.getWorkouts().size());
                 return;
             }
 
             Workout workout = viewLog.getWorkoutByDisplayId(workoutId, currentMonth);
             if (workout == null) {
-                ui.showMessage("❌ Invalid workout ID.");
+                ui.showMessage("Invalid workout ID.");
                 return;
             }
 
             String oldTags = workout.getAllTags().toString();
 
-            // ✅ ASK FOR CONFIRMATION BEFORE CHANGING
+            // ASK FOR CONFIRMATION BEFORE CHANGING
             ui.showMessage("Current tags: " + oldTags);
             ui.showMessage("Change to: " + newTag + "?");
             ui.showMessage("Are you sure? (y/n)");
@@ -302,7 +303,7 @@ public class FitChasers {
 
                 Set<String> conflicts = workoutManager.checkForOverriddenTags(updatedWorkout);
                 if (!conflicts.isEmpty()) {
-                    ui.showMessage("⚠️ WARNING: These manual tags override auto-tags: " + conflicts);
+                    ui.showMessage("WARNING: These manual tags override auto-tags: " + conflicts);
                 }
 
             } catch (IOException e) {
@@ -405,12 +406,12 @@ public class FitChasers {
             }
         }
         if (mus != null && mus.trim().isEmpty()) {
-            ui.showMessage("❌ Muscle cannot be empty. Use: LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE");
+            ui.showMessage("Muscle cannot be empty. Use: LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE");
             return;
         }
 
         if (keyword != null && keyword.trim().isEmpty()) {
-            ui.showMessage("❌ Keyword cannot be empty. Example: /add_muscle_tag m/CARDIO k/running");
+            ui.showMessage("Keyword cannot be empty. Example: /add_muscle_tag m/CARDIO k/running");
             return;
         }
         if (mus != null && keyword != null) {
@@ -427,12 +428,11 @@ public class FitChasers {
                     fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
                     ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
                 } catch (IOException e) {
-                    ui.showMessage("⚠️ Error saving changes: " + e.getMessage());
+                    ui.showMessage("Error saving changes: " + e.getMessage());
                 }
             } catch (IllegalArgumentException e) {
-                ui.showMessage("❌ Invalid muscle group. Valid options: LEGS, POSTERIOR_CHAIN, CHEST, BACK, " +
+                ui.showMessage("Invalid muscle group. Valid options: LEGS, POSTERIOR_CHAIN, CHEST, BACK, " +
                         "SHOULDERS, ARMS, CORE");
-                return;
             }
         } else {
             ui.showMessage("Usage: /add_muscle_tag m/LEGS/ CHEST/... k/keyword");
@@ -455,12 +455,12 @@ public class FitChasers {
         }
 
         if (mod != null && mod.trim().isEmpty()) {
-            ui.showMessage("❌ Modality cannot be empty. Use: CARDIO or STRENGTH");
+            ui.showMessage("Modality cannot be empty. Use: CARDIO or STRENGTH");
             return;
         }
 
         if (keyword != null && keyword.trim().isEmpty()) {
-            ui.showMessage("❌ Keyword cannot be empty. Example: /add_modality_tag m/CARDIO k/running");
+            ui.showMessage("Keyword cannot be empty. Example: /add_modality_tag m/CARDIO k/running");
             return;
         }
 
@@ -485,8 +485,8 @@ public class FitChasers {
                     }
                 }
 
-                if (conflicts.length() > 0) {
-                    ui.showMessage("❌ CANNOT ADD KEYWORD: Conflicting modality tags detected:");
+                if (!conflicts.isEmpty()) {
+                    ui.showMessage("CANNOT ADD KEYWORD: Conflicting modality tags detected:");
                     ui.showMessage(conflicts.toString());
                     ui.showMessage("\nTo change these tags, first remove the old keyword or manually edit the tag.");
                     return;
@@ -502,11 +502,10 @@ public class FitChasers {
                     fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
                     ui.showMessage("✓ Added keyword '" + keyword + "' to modality " + mod);
                 } catch (IOException e) {
-                    ui.showMessage("⚠️ Error saving changes: " + e.getMessage());
+                    ui.showMessage("Error saving changes: " + e.getMessage());
                 }
             } catch (IllegalArgumentException e) {
-                ui.showMessage("❌ Invalid modality. Valid options: CARDIO, STRENGTH");
-                return;
+                ui.showMessage("Invalid modality. Valid options: CARDIO, STRENGTH");
             }
 
         } else {

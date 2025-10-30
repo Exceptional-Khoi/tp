@@ -1,0 +1,70 @@
+
+@startuml
+title FitChasers – Sequence Diagram for "/add_exercise"
+
+skinparam shadowing false
+skinparam responseMessageBelowArrow true
+skinparam sequence {
+  ArrowColor #444
+  LifeLineBorderColor #444
+  LifeLineBackgroundColor #FAFAFA
+  ParticipantBorderColor #222
+  ParticipantBackgroundColor #F7F7F7
+  BoxBorderColor #AAA
+  BoxBackgroundColor #FFF
+  NoteBorderColor #AAA
+  NoteBackgroundColor #FFF
+}
+
+actor User
+boundary UI as "UI"
+control FitChasers as "FitChasers (main loop)"
+control WM as "WorkoutManager"
+entity W as "Workout"
+entity E as "Exercise"
+
+== User enters command ==
+User -> UI : enter "/add_exercise n/Push_Up r/12"
+
+UI -> FitChasers : readCommand()
+activate FitChasers
+FitChasers -> WM : addExercise(args="n/Push_Up r/12")
+activate WM
+
+' --- Parse & guard checks ---
+WM -> WM : validate format\nextract name & reps
+alt No active workout (currentWorkout == null)
+  WM -> UI : showMessage("No active workout. Use /create_workout first.")
+  deactivate WM
+  FitChasers <-- UI : (returns to loop)
+  deactivate FitChasers
+  return
+else Active workout exists
+  alt Invalid input (bad name/reps/flags)
+    WM -> UI : showMessage(error message)\n(e.g., \"Invalid reps...\" )
+    deactivate WM
+    FitChasers <-- UI : (returns to loop)
+    deactivate FitChasers
+    return
+  else Valid name & reps
+    ' --- Create Exercise and add to current workout ---
+    WM -> W : addExercise(exercise)
+    activate W
+    W -> E ++ : new Exercise(name=\"Push_Up\", reps=12)
+    E --> W -- : exercise instance
+    W -> W : set as current exercise
+    deactivate W
+
+    ' --- Report success ---
+    WM -> UI : showMessage("Adding that spicy new exercise!")
+    WM -> UI : showMessage("Added exercise:\\n" + exercise.toDetailedString())
+  end
+end
+
+deactivate WM
+deactivate FitChasers
+
+' Optional: outcome shown back to user
+UI --> User : display success message
+
+@enduml

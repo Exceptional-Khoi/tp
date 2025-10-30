@@ -1,6 +1,7 @@
 package seedu.fitchasers.gym;
 import java.util.List;
 
+//@@nitin19011
 public class UscGymData {
     public static Gym getGym() {
         Gym uscGym = new Gym("USC Gym");

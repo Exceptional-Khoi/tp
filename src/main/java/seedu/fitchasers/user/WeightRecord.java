@@ -3,6 +3,7 @@ package seedu.fitchasers.user;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
+//@@bennyy117
 /**
  * Represents a single weight record for a person.
  * Each record stores the weight in kilograms and the date of measurement.

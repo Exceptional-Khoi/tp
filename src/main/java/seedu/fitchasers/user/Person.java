@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Collections;
 
+//@@bennyy117
 /**
  * Represents a person using the FitChasers app.
  * Stores the person's name and their weight history.
