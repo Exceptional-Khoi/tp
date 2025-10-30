@@ -1,9 +1,11 @@
 package seedu.fitchasers.ui;
 import seedu.fitchasers.FileHandler;
+import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.WorkoutManager;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
@@ -24,7 +26,7 @@ public class ViewLog {
     private FileHandler fileHandler;
 
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
-    private List<Workout> lastFilteredSorted = List.of();
+    private List<Workout> lastFilteredListofWorkout = List.of();
 
     private static class DisplayWorkout {
         Workout workout;
@@ -48,7 +50,7 @@ public class ViewLog {
     }
 
     public void setPageSize(int pageSize) {
-        this.pageSize = Math.max(1, pageSize); //ensures page size is at least 1
+        this.pageSize = Math.max(1, pageSize); //ensures extractedArg size is at least 1
     }
 
     /* ----------------------------- Core renderers ----------------------------- */
@@ -58,47 +60,35 @@ public class ViewLog {
      * <p>
      * Supported forms:
      * <ul>
-     *   <li>/view_log -m &lt;month 1..12&gt; [page]</li>
-     *   <li>/view_log -ym &lt;year&gt; &lt;month 1..12&gt; [page]</li>
+     *   <li>/view_log -m &lt;month 1..12&gt; [extractedArg]</li>
+     *   <li>/view_log -ym &lt;year&gt; &lt;month 1..12&gt; [extractedArg]</li>
      *   <li>Optional: -d (detailed view)</li>
      * </ul>
      *
      * Examples:
      * <pre>
-     *   /view_log -m 10          // Oct (current year), page 1
-     *   /view_log -m 10 2        // Oct (current year), page 2
-     *   /view_log -ym 2024 10    // Oct 2024, page 1
-     *   /view_log -ym 2024 10 2  // Oct 2024, page 2
-     *   /view_log -m 10 -d       // Oct, detailed page 1
+     *   /view_log -m 10          // Oct (current year), extractedArg 1
+     *   /view_log -m 10 2        // Oct (current year), extractedArg 2
+     *   /view_log -ym 2024 10    // Oct 2024, extractedArg 1
+     *   /view_log -ym 2024 10 2  // Oct 2024, extractedArg 2
+     *   /view_log -m 10 -d       // Oct, detailed extractedArg 1
      * </pre>
      *
      * @param args raw argument string after the command name
      * @throws InvalidArgumentInput if flags or numbers are invalid
      */
-    public void render(String args) throws InvalidArgumentInput {
+    public void render(String args) throws InvalidArgumentInput, FileNonexistent, IOException {
         Parsed p = parseArgs(args);
 
-        // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
-        ArrayList<Workout> monthList = fileHandler.getWorkoutsForMonth(p.ym);
-        ArrayList<Workout> sorted = new ArrayList<>(monthList);
-        sorted.sort(Comparator.comparing(
-                Workout::getWorkoutEndDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ).thenComparing(
-                Workout::getWorkoutStartDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ));  // ← NO .reversed()
+        ArrayList<Workout> sorted = loadAndSortList(p.ym);
 
         ArrayList<DisplayWorkout> displayList = new ArrayList<>();
         for (int i = 0; i < sorted.size(); i++) {
             displayList.add(new DisplayWorkout(sorted.get(i), i + 1));  // IDs 1, 2, 3, 4, 5 in order
         }
 
-        this.lastFilteredSorted = sorted;  // Store the sorted list
-
-
         int totalPages = computeTotalPages(displayList.size(), pageSize);
-        int current = ensureValidPage(p.page);
+        int current = ensureValidPage(p.extractedArg);
 
         int start = (current - 1) * pageSize;
         int end = Math.min(start + pageSize, displayList.size());
@@ -126,28 +116,36 @@ public class ViewLog {
             }
         }
 
-        buf.append("Tip: /view_log -m 10 2 (next page Oct), /view_log --search run, /open <ID>.");
+        buf.append("Tip: /view_log -m 10 2 (next extractedArg Oct), /view_log --search run, /open <ID>.");
         ui.showMessage(buf.toString());
     }
-    public Workout getWorkoutByDisplayId(int displayId, YearMonth month) {
+
+    public ArrayList<Workout> loadAndSortList(YearMonth p) throws IOException, FileNonexistent {
+        // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
+        ArrayList<Workout> monthList = fileHandler.loadMonthList(p);
+        ArrayList<Workout> sorted = new ArrayList<>(monthList);
+        sorted.sort(Comparator.comparing(
+                Workout::getWorkoutEndDateTime,
+                Comparator.nullsLast(Comparator.naturalOrder())
+        ).thenComparing(
+                Workout::getWorkoutStartDateTime,
+                Comparator.nullsLast(Comparator.naturalOrder())
+        ));  // ← NO .reversed()
+
+        this.lastFilteredListofWorkout = sorted;  // Store the sorted list
+        return sorted;
+    }
+
+    public Workout getWorkoutByDisplayId(int displayId, YearMonth month) throws FileNonexistent, IOException {
         // Fetch and sort on demand if needed
-        if (lastFilteredSorted.isEmpty()) {
-            ArrayList<Workout> monthList = fileHandler.getWorkoutsForMonth(month);
-            ArrayList<Workout> sorted = new ArrayList<>(monthList);
-            sorted.sort(Comparator.comparing(
-                    Workout::getWorkoutEndDateTime,
-                    Comparator.nullsLast(Comparator.naturalOrder())
-            ).thenComparing(
-                    Workout::getWorkoutStartDateTime,
-                    Comparator.nullsLast(Comparator.naturalOrder())
-            ));
-            this.lastFilteredSorted = sorted;
+        if (lastFilteredListofWorkout.isEmpty()) {
+            loadAndSortList(month);
         }
 
-        if (displayId <= 0 || displayId > lastFilteredSorted.size()) {
+        if (displayId <= 0 || displayId > lastFilteredListofWorkout.size()) {
             return null;
         }
-        return lastFilteredSorted.get(displayId - 1);
+        return lastFilteredListofWorkout.get(displayId - 1);
     }
 
     private String renderCompactRow(int id, Workout w) {
@@ -163,7 +161,7 @@ public class ViewLog {
         String dateLong = formatLong(workout.getWorkoutEndDateTime());
         String dur = formatDuration(workout.getDuration());
         StringBuilder sb = new StringBuilder();
-        sb.append("~".repeat(60)).append('\n');
+        sb.append("—".repeat(60)).append('\n');
         sb.append(String.format("#%d  %s%n", id, safe(workout.getWorkoutName())));
         sb.append("Date     : ").append(dateLong).append('\n');
         sb.append("Duration : ").append(dur).append('\n');
@@ -180,8 +178,7 @@ public class ViewLog {
         if (i < 0 || i >= workoutManager.getWorkoutSize()) {
             throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
         }
-
-        ui.displayDetailsOfWorkout(lastFilteredSorted.get(i));
+        ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(i));
     }
 
     /*public List<Integer> searchByName(List<Workout> monthWorkouts, String query) {
@@ -193,7 +190,7 @@ public class ViewLog {
                 .sorted(Comparator.comparing(Workout::getDateTime).reversed())
                 .toList();
 
-        this.lastFilteredSorted = sorted; // set context for `/open <n>`
+        this.lastFilteredListofWorkout = sorted; // set context for `/open <n>`
         List<Integer> matches = new ArrayList<>();
         for (int i = 0; i < sorted.size(); i++) {
             Workout w = sorted.get(i);
@@ -215,7 +212,7 @@ public class ViewLog {
         return matches;
     } */
 
-    /*public void renderByTag(List<Workout> monthWorkouts, String tag, int page, boolean detailed) {
+    /*public void renderByTag(List<Workout> monthWorkouts, String tag, int extractedArg, boolean detailed) {
         if (tag == null || tag.isBlank()) {
             ui.showMessage("Please provide a tag, e.g., /view_log --type strength");
             return;
@@ -233,8 +230,8 @@ public class ViewLog {
             return;
         }
 
-        this.lastFilteredSorted = filtered;
-        render(filtered, page, detailed);
+        this.lastFilteredListofWorkout = filtered;
+        render(filtered, extractedArg, detailed);
     } */
 
     /*public void renderSummary(List<Workout> monthWorkouts, Optional<String> tagOpt) {
@@ -333,13 +330,13 @@ public class ViewLog {
         return String.format("%s %d%s of %s, %d:%02d %s", dow, d, suffix, mon, hr12, min, ampm);
     }
 
-    private record Parsed(YearMonth ym, int page, boolean detailed) {
+    public record Parsed(YearMonth ym, int extractedArg, boolean detailed) {
     }
 
     /**
      * Parses flags/args into a structured form with validation/guards.
      */
-    private Parsed parseArgs(String raw) throws InvalidArgumentInput {
+    public Parsed parseArgs(String raw) throws InvalidArgumentInput {
         YearMonth now = YearMonth.now();
         YearMonth target = now;
         int page = 1;
@@ -371,7 +368,7 @@ public class ViewLog {
                 validateMonth(month);
                 // default to current year when -m is used
                 target = YearMonth.of(now.getYear(), month);
-                // optional page next
+                // optional extractedArg next
                 if (i + 1 < tok.length && isInt(tok[i + 1])) {
                     page = readPositiveInt(tok[++i], "Page must be a positive integer.");
                 }
@@ -387,14 +384,14 @@ public class ViewLog {
                 int m = readIntArg(tok, ++i, "Missing month after year");
                 validateMonth(m);
                 target = YearMonth.of(year, m);
-                // optional page next
+                // optional extractedArg next
                 if (i + 1 < tok.length && isInt(tok[i + 1])) {
                     page = readPositiveInt(tok[++i], "Page must be a positive integer.");
                 }
                 break;
 
             default:
-                // allow trailing page as bare number (e.g., "/view_log 2")
+                // allow trailing extractedArg as bare number (e.g., "/view_log 2")
                 if (isInt(t)) {
                     page = readPositiveInt(t, "Page must be a positive integer.");
                 } else if (t.startsWith("-")) {
