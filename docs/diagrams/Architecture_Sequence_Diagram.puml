@@ -1,0 +1,77 @@
+@startuml
+' === Styling (colors roughly match your sketch: green, blue, red, brown) ===
+skinparam shadowing false
+hide footbox
+
+skinparam sequence {
+  ArrowThickness 1
+  ParticipantPadding 20
+  BoxPadding 10
+  LifelineBorderColor #999999
+  LifelineBackgroundColor #ffffff
+  ArrowColor #555555
+}
+skinparam participant {
+  FontSize 13
+  BorderColor #888888
+  BackgroundColor #ffffff
+}
+
+actor User as U
+participant "UI" as UI #84C684
+participant "Logic" as L #6BC1FF
+participant "Manager" as M #FF6B6B
+participant "Models" as MDL #F5E6A8
+participant "FileHandler" as FH #C9A57A
+
+' === Main happy path ===
+U -> UI : enter command\ncw n/PushDay d/20/10/25 t/1900
+activate UI
+
+UI -> L : parseAndCall(CMD)
+activate L
+
+L -> M : addWorkout(name,date,time)
+activate M
+
+M -> MDL : new Workout(name,date,time)
+activate MDL
+MDL --> M : Workout instance
+deactivate MDL
+
+alt valid input (format)
+M -> FH : ensureFile()\nappend(Workout)
+activate FH
+FH --> M : OK
+deactivate FH
+M --> L : Added(workoutId)
+deactivate M
+
+L --> UI : showMessage("Workout created")
+deactivate L
+
+UI --> U : "Workout 'PushDay' created ✅"
+deactivate UI
+
+' === Optional validations (reflecting your side notes) ===
+else invalid input
+
+  M --> L : Error("Invalid date/time")
+  L --> UI : showMessage(error)
+  UI --> U : show error message
+else duplicate name
+  M --> L : Error("Workout already exists")
+  L --> UI : showMessage(error)
+  UI --> U : show error message
+end
+
+' === Quick legend ===
+legend left
+  User ............ actor
+  UI .............. green lifeline (input + display)
+  Logic/FC ........ blue lifeline (command parsing)
+  Manager ......... red lifeline (orchestrates)
+  Models .......... create Workout objects
+  FileHandler ..... persist/ensure file exists
+endlegend
+@enduml
