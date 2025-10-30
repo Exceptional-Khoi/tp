@@ -77,15 +77,6 @@ class WeightManagerTest {
     }
 
     @Test
-    void addWeightMissingDate() {
-        manager.addWeight("/add_weight w/70.5 d/");
-        List<WeightRecord> history = testUser.getWeightHistory();
-        assertEquals(1, history.size(), "Should default to today if date missing");
-        assertEquals(70.5, history.get(0).getWeight());
-        assertEquals(LocalDate.now(), history.get(0).getDate());
-    }
-
-    @Test
     void addWeightExtraSpaces() {
         manager.addWeight(" /add_weight w/  72.0   d/ 17/10/25 ");
         List<WeightRecord> history = testUser.getWeightHistory();

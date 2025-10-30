@@ -36,11 +36,11 @@ public class WeightManager {
             return;
         }
 
-        String weightString = extractBetween(command, "w/", "d/");
-        String dateString = extractAfter(command, "d/");
+        String weightString = extractBetween(command);
+        String dateString = extractAfter(command);
 
         if (weightString.isEmpty()) {
-            ui.showMessage("Missing weight value. Example: /add_weight w/65");
+            ui.showMessage("Missing weight value. Example: /add_weight w/65 d/10/10/25");
             return;
         }
 
@@ -56,16 +56,23 @@ public class WeightManager {
             return;
         }
 
-        LocalDate entryDate;
         if (dateString.isEmpty()) {
-            entryDate = LocalDate.now();
-        } else {
-            try {
-                entryDate = LocalDate.parse(dateString.trim(), DATE_FORMAT);
-            } catch (DateTimeParseException e) {
-                ui.showMessage("Invalid date format. Use dd/MM/yy (e.g., 28/10/25).");
+            String todayStr = LocalDate.now().format(DATE_FORMAT);
+            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
+            if (ui.confirmationMessage()) {
+                dateString = todayStr;
+            } else {
+                ui.showMessage("Please provide a date in format dd/MM/yy.");
                 return;
             }
+        }
+
+        LocalDate entryDate;
+        try {
+            entryDate = LocalDate.parse(dateString.trim(), DATE_FORMAT);
+        } catch (DateTimeParseException e) {
+            ui.showMessage("Invalid date format. Use dd/MM/yy (e.g., 28/10/25).");
+            return;
         }
 
         // Check if date is in the future
@@ -105,23 +112,23 @@ public class WeightManager {
 
     // ----------------- Helper methods -----------------
 
-    private String extractBetween(String text, String start, String end) {
-        int startIndex = text.indexOf(start);
-        int endIndex = text.indexOf(end);
+    private String extractBetween(String text) {
+        int startIndex = text.indexOf("w/");
+        int endIndex = text.indexOf("d/");
         if (startIndex == -1) {
             return "";
         }
         if (endIndex == -1 || endIndex < startIndex) {
-            return text.substring(startIndex + start.length()).trim();
+            return text.substring(startIndex + "w/".length()).trim();
         }
-        return text.substring(startIndex + start.length(), endIndex).trim();
+        return text.substring(startIndex + "w/".length(), endIndex).trim();
     }
 
-    private String extractAfter(String text, String start) {
-        int startIndex = text.indexOf(start);
+    private String extractAfter(String text) {
+        int startIndex = text.indexOf("d/");
         if (startIndex == -1) {
             return "";
         }
-        return text.substring(startIndex + start.length()).trim();
+        return text.substring(startIndex + "d/".length()).trim();
     }
 }
