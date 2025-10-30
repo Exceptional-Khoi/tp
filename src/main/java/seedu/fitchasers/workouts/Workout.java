@@ -161,13 +161,6 @@ public class Workout {
     public void setWorkoutStartDateTime(LocalDateTime workoutStartDateTime) {
         this.workoutStartDateTime = workoutStartDateTime;
     }
-
-//    public LocalDateTime getWorkoutEndDateTime() throws WorkoutNotEnded {
-//        if (workoutEndDateTime == null) {
-//            throw new WorkoutNotEnded("Workout has not ended! Please end it with /end_workout");
-//        }
-//        return workoutEndDateTime;
-//    }
     public LocalDateTime getWorkoutEndDateTime() {
         return workoutEndDateTime;
     }

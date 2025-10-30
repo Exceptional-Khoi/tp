@@ -45,7 +45,7 @@ import java.util.Set;
 
 public class FileHandler {
 
-    private final Path DATA_DIRECTORY = Paths.get("data");
+    public static final Path DATA_DIRECTORY = Paths.get("data");
     private final Path workoutDir = DATA_DIRECTORY.resolve("workouts");
     private final UI ui = new UI();
     private final Map<YearMonth, ArrayList<Workout>> arrayByMonth = new HashMap<>();
@@ -140,16 +140,9 @@ public class FileHandler {
         final Set<String> tags = workout.getAllTags();
         String endTime;
         final List<Exercise> exercises  = workout.getExercises();
-//        try{
-//            endTime = workout.getWorkoutEndDateTime().toString();
-//        }catch(WorkoutNotEnded e){
-//            System.out.println("Workout not ended! Saving it as 'Unended");
-//            endTime = "Unended";
-//        }
         if( workout.getWorkoutEndDateTime() == null){
             endTime = "Unended";
-        }
-        else {
+        } else {
             endTime = workout.getWorkoutEndDateTime().toString();
         }
         bw.write("WORKOUT");
@@ -177,7 +170,8 @@ public class FileHandler {
                 bw.newLine();
             }
         }
-        bw.write("END_WORKOUT"); bw.newLine();
+        bw.write("END_WORKOUT");
+        bw.newLine();
     }
 
     private ArrayList<Workout> readMonthFromTxt(Path txt) throws IOException {
@@ -202,7 +196,7 @@ public class FileHandler {
                         corruptedFileErrorHandling();
                         w = null;
                     }
-                        if (w != null) {
+                    if (w != null) {
                         list.add(w);
                     }
                     block.clear();
@@ -236,7 +230,9 @@ public class FileHandler {
             if (line.startsWith("Start:")) {
                 String v = line.substring(6).trim();
                 try {
-                    if (!v.isEmpty()) start = LocalDateTime.parse(v);
+                    if (!v.isEmpty()){
+                        start = LocalDateTime.parse(v);
+                    }
                 }catch(Throwable e){
                     throw new CorruptedFileError();
                 }
@@ -252,8 +248,7 @@ public class FileHandler {
                 }catch(Throwable e){
                     if(v.equalsIgnoreCase("unended")){
                         end = null;
-                    }
-                    else{
+                    } else {
                         throw new CorruptedFileError();
                     }
                 }

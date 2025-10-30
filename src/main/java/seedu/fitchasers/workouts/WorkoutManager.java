@@ -10,7 +10,6 @@ import seedu.fitchasers.ui.UI;
 import java.io.IOException;
 import java.time.YearMonth;
 import java.time.format.ResolverStyle;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -72,9 +71,9 @@ public class WorkoutManager {
     public void initWorkouts(){
         for(Workout workout : this.workouts) {
             while(workout.getWorkoutEndDateTime() ==  null){
-               ui.showMessage("Looks like you forgot to end the previous workout, please enter it now!");
-               currentWorkout = workout;
-               endWorkout(ui.readCommand());
+                ui.showMessage("Looks like you forgot to end the previous workout, please enter it now!");
+                currentWorkout = workout;
+                endWorkout(ui.readCommand());
             }
         }
     }
@@ -232,7 +231,6 @@ public class WorkoutManager {
         }
 
         // Reject stray unsupported flags outside parsed regions
-        // (ignore n/.. in [nIdx, nameSlice.endIndex), d/.. in [dIdx, dateSlice.endIndex), t/.. in [tIdx, timeSlice.endIndex))
         Matcher stray = BOUND_PREFIX.matcher(s);
         while (stray.find()) {
             int pos = stray.start(2);
@@ -262,7 +260,9 @@ public class WorkoutManager {
         // Duplicate date/time check (unchanged from your version)
         for (Workout w : workouts) {
             LocalDateTime existingStart = w.getWorkoutStartDateTime();
-            if (existingStart == null) continue;
+            if (existingStart == null){
+                continue;
+            }
             if (existingStart.toLocalDate().equals(parsedDate)
                     && existingStart.toLocalTime().equals(parsedTime)) {
                 ui.showMessage("A workout already exists at this date and time ("
@@ -432,7 +432,9 @@ public class WorkoutManager {
         }
     }
 
-    private void checkPastFutureDate(LocalDate date, DateTimeFormatter dateFmt, LocalTime time, DateTimeFormatter timeFmt) throws InvalidArgumentInput, IOException {
+    private void checkPastFutureDate(LocalDate date, DateTimeFormatter dateFmt,
+                                     LocalTime time, DateTimeFormatter timeFmt)
+            throws InvalidArgumentInput, IOException {
         if (date.isAfter(LocalDate.now())) {
             ui.showMessage("The date you entered (" + date.format(DATE_FMT)
                     + ") is in the future. Are you sure? (Y/N)");
@@ -832,7 +834,6 @@ public class WorkoutManager {
      * Overrides the manual tags of a workout with a new single tag and clears all auto tags.
      * This effectively replaces any existing manual and automatic tags with the specified tag.
      *
-     * @param workoutId the ID/index of the workout to update (1-based index assumed)
      * @param newTag the new tag to set as the manual tag for the workout
      */
     public void overrideWorkoutTags(Workout workout, String newTag) {
@@ -884,7 +885,6 @@ public class WorkoutManager {
      * Validates that the end date and time are not before the workout's start.
      * If the user input is invalid (earlier than start), prompts for re-entry until valid.
      *
-     * @param ui          UI for reading user input in the retry loop
      * @param initialArgs Initial command arguments containing end date/time details
      */
     public void endWorkout(String initialArgs) {
@@ -923,8 +923,10 @@ public class WorkoutManager {
         }
 
         // extract slices if present
-        Slice dateSlice = null, timeSlice = null;
-        String dateStr = "", timeStr = "";
+        Slice dateSlice = null;
+        Slice timeSlice = null;
+        String dateStr = "";
+        String timeStr = "";
 
         if (dIdx != -1) {
             dateSlice = extractSlice(args, dIdx);
@@ -948,8 +950,11 @@ public class WorkoutManager {
 
         // trailing junk after the last provided token
         int lastEnd = -1;
-        if (timeSlice != null) lastEnd = timeSlice.endIndex;
-        else if (dateSlice != null) lastEnd = dateSlice.endIndex;
+        if (timeSlice != null){
+            lastEnd = timeSlice.endIndex;
+        } else if (dateSlice != null){
+            lastEnd = dateSlice.endIndex;
+        }
 
         if (lastEnd != -1 && !onlyWhitespaceAfter(args, lastEnd)) {
             ui.showMessage("Unexpected text after time/date. Use exactly: /end_workout d/DD/MM/YY t/HHmm");
