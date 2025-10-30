@@ -6,58 +6,85 @@ FitChaser is a desktop app for managing your fitness journey, optimized for use 
 while still having the benefits of a Graphical User Interface (GUI). If you can type fast, FitChaser can help you 
 track workouts, monitor weight progress, and achieve your fitness goals faster than traditional GUI apps.
 
+### Interface Display (Console Width)
+
+FitChaser’s chat-style interface is optimized for clear and readable text bubbles within the console window.  
+The system assumes a console width of approximately 150 characters, meaning each line of text can display up to 150 visible characters before wrapping automatically.
+
+- This width defines how much text can appear in one line within chat bubbles.
+- Messages longer than this limit are automatically wrapped to the next line.
+- If your terminal window is narrower than 150 characters, the chat bubbles may wrap early or appear slightly misaligned.
+- You can resize your terminal window to ensure proper alignment.
+
+> **Notes:**  
+> The `150` refers to **the number of text characters**, not pixels.  
+> Each printed character (including spaces and punctuation) counts toward this width limit.
+
 ## Quick Start
 
 1. Ensure that you have Java 17 or above installed.
-1. Down the latest version of `Fitchaser` from [here](  ).
+2. Down the latest version of `Fitchaser`.
 3. Copy the file to the folder you want to use as the home folder for your FitChaser data.
 4. Open a command terminal, cd into the folder you put the jar file in, and use the java -jar 
-   fitchaser.jar command to run the application.
+   FitChasers.jar command to run the application.
 5. On first launch, you will be prompted to enter your name and initial weight.
 6. Type the command in the command box and press Enter to execute it. e.g. typing `/help` and pressing Enter 
    will open the help window.
 
 ## Features
-<div markdown="block" class="alert alert-info">
-**:information_source: Notes about the command format:**<br>
-
 * Words in `UPPER_CASE` are the parameters to be supplied by the user.<br>
   e.g. in `/create_workout n/NAME`, `NAME` is a parameter which can be used as `/create_workout n/Chest Day`.
-* Extraneous parameters for commands that do not take in parameters (such as `/help`, `/exit`) will be ignored.<br>
-  e.g. if the command specifies help 123, it will be interpreted as help.
-* Date format is `DD/MM/YY` (e.g., `30/10/25` for `October 30, 2025`). Time format is `HHMM` in 24-hour format 
-* (e.g., `1430` for `2:30 PM`).
-</div>
 
-### Viewing help : `help`
+[//]: # (* Extraneous parameters for commands that do not take in parameters &#40;such as `/help`, `/exit`&#41; will be ignored.<br>)
+[//]: # (  e.g. if the command specifies help 123, it will be interpreted as help.)
+
+* Date format is `DD/MM/YY` (e.g., `30/10/25` for `October 30, 2025`). 
+* Time format is `HHMM` in 24-hour format (e.g., `1430` for `2:30 PM`).
+
+### Viewing help: `/help`
 Shows a message explaining how to use FitChaser and all available commands.
 
 Format: `/help`
+
 Alternative: `h`
 
-### Setting your name : `rename`
-Sets or updates your name in FitChaser.
+### Changing Your Name: `/rename`
+This command allows you to update your display name in FitChaser. The name is saved automatically and will be shown whenever you start the program.
 
 Format: `/rename n/NAME`
 
-NAME can contain letters, numbers, spaces, underscores, and dashes (max 30 characters).
+* `NAME`:
+  - Must contain only letters (A–Z, a–z), numbers (0–9), spaces, underscores (_), or dashes (-). 
+  - Must be 1–30 characters long. 
+  - Cannot be empty or just whitespace.
 
 Examples:
+- `/rename n/Nitin`
+- `/rename n/Nitin Ni`
+- `/rename n/FitChaser_User-1`
 
-`/rename n/John Doe`
+### Adding weight: `/add_weight`
+Logs your weight for a specific date. You can record one or multiple weights per day to monitor changes over time.
 
-`/rename n/FitChaser_User-1`
+Format: `/add_weight w/WEIGHT [d/DATE]`
 
-### Adding weight : `add_weight`
-Logs your weight on a specific date.
+Rules:
 
-Format: `/add_weight w/WEIGHT d/DATE`
+* `WEIGHT`: A numeric value (integer or decimal) in kilograms
+  - Must be between 20.0 and 500.0 (for realistic human body weight range).
+  - Only one decimal point allowed.
+  - Must not contain symbols or units (e.g., kg is not accepted).
+  - Must input weight and date respectively.
 
-* WEIGHT is a numeric value (can be decimal, e.g., `75.5`).
-* DATE is in `DD/MM/YY` format.
 
-<div markdown="span" class="alert alert-primary">:bulb: **Tip:** You can log multiple weight entries for the 
-same date to track weight fluctuations throughout the day. </div>
+* `DATE`: Must follow DD/MM/YY format. 
+  - Day must be `01` to `31`.
+  - Month must be `01` to `12`.
+  - Year must be two digits (e.g., `25` for 2025).
+  - Date must not be in the future relative to the system date.
+
+**Note:** You can log multiple weight entries for the same date but the application only saves the latest entry.
+
 Example:
 
 * `/add_weight w/75 d/30/10/25`
@@ -65,81 +92,110 @@ Example:
 
 Alternative: `aw`
 
-### Creating a workout : `create_workout`
+### Viewing weight: `/view_weight`
+Displays your recorded weight entries in chronological order.
+
+Format: `/view_weight`
+
+**Notes:** 
+- You can log multiple weight entries for the same date but the application only saves the latest entry.
+- Extraneous parameters for commands that do not take in parameters will be ignored.<br>
+    e.g. if the command specifies /view_weight 123, it will be interpreted as /view_weight.
+
+Alternative: `vw`
+
+### Setting a goal weight: `/set_goal`
+Lets you specify a target weight to monitor your progress.
+
+Format: `/set_goal g/GOAL_WEIGHT`
+
+Rules: Same as `WEIGHT` parameter rules above.
+
+**Note:** When you set a goal, FitChaser automatically uses your latest recorded weight (the most recent `/add_weight` entry) as your starting weight.
+This ensures that your progress is calculated accurately based on your most up-to-date data.
+
+Example:
+
+* `/set_goal g/70.0`
+
+Alternative: `sg`
+
+### Viewing a goal weight: `/view_goal`
+Displays your current goal weight, your latest recorded weight, and how far you are from reaching your target.
+
+Format: `/view_goal`
+
+Alternative: `vg`
+
+### Creating a workout: `/create_workout`
 Starts a new workout session.
 
-Format: `/create_workout n/NAME d/DATE t/TIME`
+Format: `/create_workout n/WORKOUT_NAME d/DATE t/TIME`
 
-NAME is the name of your workout (e.g., "Chest Day", "Morning Run").
+- `WORKOUT_NAME` is the name of your workout (e.g., "Chest Day", "Morning Run"). 
+  - Rules: Same as `NAME` parameter rules above.
+  - No duplicates on the same date.
+- `DATE` is in `DD/MM/YY` format. Rules: Same as `DATE` parameter rules above.
+- `TIME` is in `HHMM` format (24-hour, e.g., `1430` for 2:30 PM).
 
-DATE is in `DD/MM/YY` format.
+**Notes:** 
+- You can create multiple workouts on the same day with different times. 
+However, you cannot create 2 workouts overlap time.
+- You can only create workouts with a start time from the current time (according to your computer system).
 
-TIME is in `HHMM` format (24-hour, e.g., `1430` for 2:30 PM).
-
-<div markdown="span" class="alert alert-primary">:bulb: **Tip:** You can create multiple workouts on the same day with different times. </div>
-Examples:
+Example:
 
 * `/create_workout n/Chest Day d/30/10/25 t/1430`
 
-* `/create_workout n/Cardio Session d/30/10/25`
-
 Alternative: `cw`
 
-### Adding an exercise : add_exercise
+### Adding an exercise: `/add_exercise`
 Adds an exercise to your current workout session.
 
-Format: `/add_exercise n/NAME r/REPS`
+Format: `/add_exercise n/EXERCISE_NAME r/REPS`
 
-NAME is the exercise name.
+- `EXERCISE_NAME` is the exercise name. Rules: Same as `NAME` parameter rules above.
+- `REPS` is a number represents repetition for a set (e.g., `15`). It must be an integer less than 1000.
 
-REPS is a comma-separated list of repetitions for each set (e.g., `15,15,12`).
+Example:
 
-Examples:
-
-`/add_exercise n/Push Ups r/15,15,12`
-
-`/add_exercise n/Bench Press r/12,10,8`
-
-`/add_exercise n/Deadlift r/5`
+- `/add_exercise n/Deadlift r/5`
 
 Alternative: `ae`
 
-### Adding a set : `add_set`
+### Adding a set: `/add_set`
 Adds another set to the last exercise in your current workout.
 
 Format: `/add_set r/REPS`
 
-REPS is the number of repetitions for this set.
+- `REPS` is the number of repetitions for this set.
 
 Examples:
-
-`/add_set r/10`
-
-`/add_set r/12`
+- `/add_set r/10`
+- `/add_set r/12`
 
 Alternative: `as`
 
-### Ending a workout : `end_workout`
+### Ending a workout: `/end_workout`
 Completes your current workout session and saves it.
 
 Format: `/end_workout d/DATE t/TIME`
 
-DATE is in `DD/MM/YY` format.
+- `DATE` is in `DD/MM/YY` format. Rules: Same as `DATE` parameter rules above.
+- `TIME` is in `HHMM` format.
 
-TIME is in `HHMM` format.
+Example:
 
-Examples:
-
-`/end_workout d/30/10/25 t/1500`
+- `/end_workout d/30/10/25 t/1500`
 
 Alternative: `ew`
 
-### Adding Modality group keyword: `add_modality_tag`
+### Adding Modality group keyword: `/add_modality_tag`
 Adds a new keyword to extend the automatic tagging system for workout modalities (cardio, strength).
 
-Format: `add_modality_tag m/MODALITY k/KEYWORD`
+Format: `/add_modality_tag m/MODALITY k/KEYWORD`
 * The `MODALITY` must be either `CARDIO` or `STRENGTH`.
-* The `KEYWORD` should be lowercase and represent an exercise type (e.g., "jump_rope", "pilates").
+* The `KEYWORD` should be lowercase and represent an exercise type (e.g., "jump_rope").
   
 Valid Modalities:
 
@@ -147,17 +203,17 @@ Valid Modalities:
 
 `STRENGTH` - For strength training exercises like lifting, pressing, squatting
 
-Example of usage:
-`add_modality_tag m/CARDIO k/jump_rope`
+Examples:
 
-`add_modality_tag m/STRENGTH k/pilates`
+- `/add_modality_tag m/CARDIO k/jump_rope`
+- `/add_modality_tag m/STRENGTH k/pilates`
 
 Alternative: `amot`
 
-#### Adding Muscle Group Keywords: `add_muscle_tag`
+#### Adding Muscle Group Keywords: `/add_muscle_tag`
 Adds a new keyword to extend the automatic tagging system for muscle groups (legs, chest, back, etc.).
 
-Format: `add_muscle_tag m/MUSCLE_GROUP k/KEYWORD`
+Format: `/add_muscle_tag m/MUSCLE_GROUP k/KEYWORD`
 * The `MUSCLE_GROUP` must be one of: `LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE`.
 * The `KEYWORD` should be lowercase and represent an exercise targeting that muscle group (e.g., "lunges", "squats").
   
@@ -173,112 +229,101 @@ Valid Muscle Groups:
 
 `SHOULDERS` - Shoulder exercises like overhead press
 
-`ARMS` - Arm exercises like curls, tricep extensions
+`ARMS` - Arm exercises like curls extension
 
 `CORE` - Core exercises like planks, abs work
 
-Example of usage:
-`add_muscle_tag m/LEGS k/lunges`
-`add_muscle_tag m/CHEST k/push_ups`
+Examples:
+- `add_muscle_tag m/LEGS k/lunges`
+- `add_muscle_tag m/CHEST k/push_ups`
 
 Alternative: `amt`
 
-### Overriding Workout Tags: `override_workout_tag`
+### Overriding Workout Tags: `/override_workout_tag`
 Manually replaces the tags of a specific workout with a single new tag, clearing all auto-generated tags.
 
-Format: `override_workout_tag id/WORKOUT_ID newTag/TAG_NAME`
+Format: `/override_workout_tag id/WORKOUT_ID newTag/TAG_NAME`
 * The `WORKOUT_ID` is the index number of the workout (use `/view_log` to see IDs).
-* The `TAG_NAME` can be any custom tag (e.g., "cardio", "strength", "recovery", "custom_tag").
-* The command clear both auto-generated and manual tags, replacing them with only the specified tag.
+* The `TAG_NAME` can be any custom tag (e.g., "cardio", "strength", "recovery", "custom_tag"). Rules: Same as `NAME` parameter rules above.
+* The command clears both auto-generated and manual tags, replacing them with only the specified tag.
 * Changes are saved immediately to persistent storage.
 
 Examples:
-
-`/override_workout_tag id/1 newTag/strength`
-
-`/override_workout_tag id/3 newTag/legs`
+- `/override_workout_tag id/1 newTag/strength`
+- `/override_workout_tag id/3 newTag/legs`
 
 Alternative: `owt`
 
-### Finding gyms by exercise : `gym_where`
+### Finding gyms by exercise: `/gym_where`
 Searches for nearby NUS gyms that have equipment for a specific exercise.
 
 Format: `/gym_where n/EXERCISE_NAME`
 
-EXERCISE_NAME is the exercise you want to do.
+* `EXERCISE_NAME` is the exercise you want to do. Rules: Same as `NAME` parameter rules above.
 
 Examples:
-
-`/gym_where n/deadlift`
-
-`/gym_where n/treadmill`
+- `/gym_where n/deadlift`
+- `/gym_where n/treadmill`
 
 Alternative: `gw`
 
-### Viewing gym equipment : `gym_page`
+### Viewing gym equipment: `/gym_page`
 Shows the available equipment at a specific NUS gym.
 
 Format: `/gym_page p/PAGE_NUMBER_OR_GYM_NAME`
 
-PAGE_NUMBER_OR_GYM_NAME can be a number (1-N) or a gym name.
+* `PAGE_NUMBER_OR_GYM_NAME` can be a number (1-N) or a gym name. Rules: Same as `NAME` parameter rules above.
 
 Examples:
-
-`/gym_page p/1` - Shows equipment at the first gym
-
-`/gym_page p/SRC Gym` - Shows equipment at SRC Gym
+- `/gym_page p/1` - Shows equipment at the first gym
+- `/gym_page p/SRC Gym` - Shows equipment at SRC Gym
 
 Alternative: `gp`
 
-### Viewing workout log : `view_log`
+### Viewing workout log: `/view_log`
 Displays a list of your workouts, typically for the current month.
 
-Format: `/view_log [MONTH]`
+Format: `/view_log`
 
-MONTH is optional and in MM format.
-
-Examples:
-
-`/view_log` - Shows workouts for the current month
+**Note:** Extraneous parameters for commands that do not take in parameters will be ignored.<br>
+e.g. if the command specifies /view_weight 123, it will be interpreted as /view_weight.
 
 Alternative: `vl`
 
-### Opening a workout : `open`
+### Opening a workout: `/open`
 Opens and displays detailed information about a specific workout by its index in the current list.
 
 Format: `/open INDEX`
 
-INDEX is the number of the workout in the displayed list.
-
-The index must be a positive integer `1, 2, 3 ...`
+- `INDEX` is the number of the workout in the displayed list.
+- The index must be a positive integer `1, 2, 3 ...`
 
 Examples:
-
-`/open 1 - Opens the first workout`
-
-`/open 3 - Opens the third workout`
+- `/open 1 - Opens the first workout`
+- `/open 3 - Opens the third workout`
 
 Alternative: `o`
 
-### Deleting Workouts: del_workout
-Deletes the specified workout(s) from your workout history.
-#### Format: del_workout INDEX
-* Deletes the workout at the specified INDEX.
-* The index refers to the index number shown in the displayed workout list.
-* The index must be a positive integer 1, 2, 3, …
-* Multiple indices can be deleted by entering them separated by spaces.
+### Deleting Workouts: `/del_workout`
+Deletes the specified workout(s) from your workout history by name or by date.
 
-#### Examples:
-* `view_log` followed by `del_workout 2` deletes the 2nd workout in the address book.
-* `view_log d/24/10/25` followed by `del_workout 1` deletes the 1st workout in the results of the filtered list.
-* `del_workout 1 3 5` deletes the 1st, 3rd, and 5th workouts from the currently displayed list.
+Format: `/del_workout WORKOUT_NAME` or `/del_workout d/DATE`
 
-### Exiting the program : exit
+* `WORKOUT_NAME` is the name of your workout. Rules: Same as `NAME` parameter rules above.
+* `DATE` is in `DD/MM/YY` format. Rules: Same as `DATE` parameter rules above.
+
+Examples:
+* `/del_workout Chest Day`
+
+### Exiting the program: `/exit`
 Exits FitChaser and saves all your data.
 
 Format: `/exit`
 
 Alternative: `e`
+
+**Note:** Extraneous parameters for commands that do not take in parameters will be ignored.<br>
+e.g. if the command specifies /exit 123, it will be interpreted as /exit.
 
 ### Saving the data
 FitChaser data is saved automatically after any command that changes the data. There is no need to save manually.
@@ -296,7 +341,7 @@ saved data.
 
 **Q**: What happens if I enter an invalid date format?
 
-**A**: FitChaser will display an error message and ask you to re-enter the command with the correct `DD/MM/YY`format.
+**A**: FitChaser will display an error message and ask you to re-enter the command with the correct `DD/MM/YY` format.
 
 **Q**: Can I have multiple workouts on the same day?
 
@@ -311,29 +356,28 @@ and exercise names. You can customize keywords using /add_modality_tag and /add_
 **Q**: What are the valid values for muscle groups?
 
 **A**: The valid muscle groups are: `LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, and CORE`.
-## Command Summary
 
 ## Command Summary
 
-Action | Format, Examples
---------|------------------
-**Add Exercise** | `/add_exercise n/NAME r/REPS`<br> e.g., `/add_exercise n/Push Ups r/15,15,12`
-**Add Modality Tag** | `/add_modality_tag m/MODALITY k/KEYWORD`<br> e.g., `/add_modality_tag m/CARDIO k/running`
-**Add Muscle Tag** | `/add_muscle_tag m/MUSCLE_GROUP k/KEYWORD`<br> e.g., `/add_muscle_tag m/LEGS k/squat`
-**Add Set** | `/add_set r/REPS`<br> e.g., `/add_set r/10`
-**Add Weight** | `/add_weight w/WEIGHT d/DATE`<br> e.g., `/add_weight w/75 d/30/10/25`
-**Create Workout** | `/create_workout n/NAME d/DATE [t/TIME]`<br> e.g., `/create_workout n/Chest Day d/30/10/25 t/1430`
-**Delete Workout** | `/del_workout WORKOUT_NAME` or `/del_workout d/DATE`<br> e.g., `/del_workout Chest Day`
-**End Workout** | `/end_workout d/DATE t/TIME`<br> e.g., `/end_workout d/30/10/25 t/1500`
-**Exit** | `/exit` or `e`
-**Gym Page** | `/gym_page p/PAGE_OR_NAME`<br> e.g., `/gym_page p/1` or `/gym_page p/SRC Gym`
-**Gym Where** | `/gym_where n/EXERCISE`<br> e.g., `/gym_where n/deadlift`
-**Help** | `/help` or `h`
-**Open Workout** | `/open INDEX`<br> e.g., `/open 1`
-**Override Tag** | `/override_workout_tag id/ID newTag/TAG`<br> e.g., `/override_workout_tag id/1 newTag/strength`
-**Rename** | `/rename n/NAME`<br> e.g., `/rename n/John Doe`
-**Set Goal** | `/set_goal g/GOAL_WEIGHT`<br> e.g., `/set_goal g/70`
-**View Goal** | `/view_goal` or `vg`
-**View Log** | `/view_log [MONTH]`<br> e.g., `/view_log` or `/view_log 10`
-**View Weight** | `/view_weight` or `vw`
+| Action               | Format, Examples                                                                                |
+|----------------------|-------------------------------------------------------------------------------------------------|
+| **Add Exercise**     | `/add_exercise n/NAME r/REPS`<br>e.g., `/add_exercise n/Push Ups r/15`                          |
+| **Add Modality Tag** | `/add_modality_tag m/MODALITY k/KEYWORD`<br>e.g., `/add_modality_tag m/CARDIO k/running`        |
+| **Add Muscle Tag**   | `/add_muscle_tag m/MUSCLE_GROUP k/KEYWORD`<br>e.g., `/add_muscle_tag m/LEGS k/squat`            |
+| **Add Set**          | `/add_set r/REPS`<br>e.g., `/add_set r/10`                                                      |
+| **Add Weight**       | `/add_weight w/WEIGHT d/DATE`<br>e.g., `/add_weight w/75 d/30/10/25`                            |
+| **Create Workout**   | `/create_workout n/NAME d/DATE t/TIME`<br>e.g., `/create_workout n/Chest Day d/30/10/25 t/1430` |
+| **Delete Workout**   | `/del_workout WORKOUT_NAME` or `/del_workout d/DATE`<br>e.g., `/del_workout Chest Day`          |
+| **End Workout**      | `/end_workout d/DATE t/TIME`<br>e.g., `/end_workout d/30/10/25 t/1500`                          |
+| **Exit**             | `/exit` or `e`                                                                                  |
+| **Gym Page**         | `/gym_page p/PAGE_OR_NAME`<br>e.g., `/gym_page p/1` or `/gym_page p/SRC Gym`                    |
+| **Gym Where**        | `/gym_where n/EXERCISE`<br>e.g., `/gym_where n/deadlift`                                        |
+| **Help**             | `/help` or `h`                                                                                  |
+| **Open Workout**     | `/open INDEX`<br>e.g., `/open 1`                                                                |
+| **Override Tag**     | `/override_workout_tag id/ID newTag/TAG`<br>e.g., `/override_workout_tag id/1 newTag/strength`  |
+| **Rename**           | `/rename n/NAME`<br>e.g., `/rename n/John Doe`                                                  |
+| **Set Goal**         | `/set_goal g/GOAL_WEIGHT`<br>e.g., `/set_goal g/70`                                             |
+| **View Goal**        | `/view_goal` or `vg`                                                                            |
+| **View Log**         | `/view_log`<br>e.g., `/view_log`                                                                |
+| **View Weight**      | `/view_weight` or `vw`                                                                          |
 

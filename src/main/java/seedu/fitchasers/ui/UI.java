@@ -231,51 +231,59 @@ public class UI {
     public void showHelp() {
         showMessage("""
         /help (h)                                 - View all available commands
-
+        
         ~~~ USER PROFILE ~~~
-        /my_name (n) n/NAME                       - Set or change your display name
-                                                    e.g. /my_name n/Nitin
-
+        /rename (n) n/NAME                       - Set or change your display name
+                                                   e.g. /rename n/Nitin
+        
         ~~~ WEIGHT TRACKING ~~~
         /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
-                                                    e.g. /add_weight w/81.5 d/19/10/25
-        /view_weight (vw)                         - View your recorded weights and graph
-
+                                                   e.g. /add_weight w/75 d/30/10/25
+        /view_weight (vw)                         - View your recorded weights
+        /set_goal (sg) g/GOAL_WEIGHT              - Set a goal weight to track progress
+                                                   e.g. /set_goal g/70.0
+        /view_goal (vg)                           - View your current goal and progress
+        
         ~~~ WORKOUT CREATION & LOGGING ~~~
         /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
-                                                    e.g. /create_workout n/PushDay d/20/10/25 t/1900
+                                                   e.g. /create_workout n/Chest Day d/30/10/25 t/1430
         /add_exercise (ae) n/NAME r/REPS          - Add an exercise to current workout
-                                                    e.g. /add_exercise n/Squat r/12
+                                                   e.g. /add_exercise n/Squat r/12
         /add_set (as) r/REPS                      - Add another set to the latest exercise
-                                                    e.g. /add_set r/10
+                                                   e.g. /add_set r/10
         /end_workout (ew) d/DATE t/TIME           - End and save current workout
-                                                    e.g. /end_workout d/20/10/25 t/2030
-
+                                                   e.g. /end_workout d/30/10/25 t/1500
+        
         ~~~ WORKOUT LOG MANAGEMENT ~~~
         /view_log (vl)                            - View your workout history
         /open (o) INDEX                           - Open detailed view of a workout
-                                                    e.g. /open 1
-        /del_workout (dw) -m [Month] [Index]      - Delete a workout by ID. ID view by view_log command
-                                                    e.g. /del_workout -m 10 5 //Deletes fifth index of Oct
-
+                                                   e.g. /open 1
+        /del_workout WORKOUT_NAME or /del_workout d/DATE
+                                                   - Delete a workout by name or date
+                                                   e.g. /del_workout Chest Day
+                                                   e.g. /del_workout d/30/10/25
+        
         ~~~ TAGGING SYSTEM ~~~
-        /add_modality_tag (amot) m/(CARDIO/STRENGTH) k/KEYWORD
-                                                    - Add a keyword for a workout modality
-                                                    e.g. /add_modality_tag m/CARDIO k/hiking
-        /add_muscle_tag (amt) m/MUSCLE k/KEYWORD  - Add a keyword for a muscle group
-                                                    e.g. /add_muscle_tag m/LEGS k/lunges
-        /override_workout_tag (owt) id/INDEX newTag/NEW_TAG
-                                                    - Manually override a workout’s tag
-                                                    e.g. /override_workout_tag id/1 newTag/LEG_DAY
-
+        /add_modality_tag (amot) m/MODALITY k/KEYWORD
+                                                   - Add a keyword for a workout modality
+                                                   e.g. /add_modality_tag m/CARDIO k/running
+        /add_muscle_tag (amt) m/MUSCLE_GROUP k/KEYWORD
+                                                   - Add a keyword for a muscle group
+                                                   e.g. /add_muscle_tag m/LEGS k/lunges
+        /override_workout_tag (owt) id/INDEX newTag/TAG_NAME
+                                                   - Manually override a workout’s tag
+                                                   e.g. /override_workout_tag id/1 newTag/strength
+        
         ~~~ GYM FINDER ~~~
         /gym_where (gw) n/EXERCISE                - Suggest NUS gyms with equipment for the exercise
-                                                    e.g. /gym_where n/squat
-        /gym_page (gp) p/PAGE_NUMBER              - View available NUS gym pages
-                                                    e.g. /gym_page p/1
-
+                                                   e.g. /gym_where n/squat
+        /gym_page (gp) p/PAGE_OR_NAME             - View available NUS gym pages or by gym name
+                                                   e.g. /gym_page p/1
+                                                   e.g. /gym_page p/SRC Gym
+        
         ~~~ SYSTEM ~~~
-        /exit (e)                                 - Save all progress and exit the app """);
+        /exit (e)                                 - Save all progress and exit the app
+            """);
     }
 
     /**
