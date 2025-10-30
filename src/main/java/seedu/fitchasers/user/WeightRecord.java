@@ -1,6 +1,5 @@
 package seedu.fitchasers.user;
 
-import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -8,9 +7,7 @@ import java.time.format.DateTimeFormatter;
  * Represents a single weight record for a person.
  * Each record stores the weight in kilograms and the date of measurement.
  */
-public class WeightRecord implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+public class WeightRecord {
 
     private double weight;
     private final LocalDate date;

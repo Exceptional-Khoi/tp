@@ -24,7 +24,7 @@ import java.util.Set;
 
 /**
  * Main entry point for the FitChasers application.
- *
+ * <p>
  * Handles user input commands, delegates operations to WorkoutManager,
  * and persists data through FileHandler.
  */
@@ -33,8 +33,6 @@ public class FitChasers {
      * Starts the FitChasers program.
      * Initializes all components, loads saved data if available,
      * and processes user input until the user exits.
-     *
-     * @param args command line arguments (not used)
      */
     private static Person person;
     private static String savedName = null;
@@ -75,8 +73,17 @@ public class FitChasers {
 
                 case "/help":
                 case "h":
-                    ui.showHelp();
+                case "help": {
+                    if (!argumentStr.isEmpty()) {
+                        ui.showError("The /help command doesn't take any arguments.\n"
+                                + "Just type '/help' or 'h' to see all available commands.");
+                    } else if (command.equals("help")) {
+                        ui.showMessage("Did you mean '/help'? Type '/help' or 'h' to see all available commands.");
+                    } else {
+                        ui.showHelp();
+                    }
                     break;
+                }
 
                 case "/rename": {
                     renameMethod();

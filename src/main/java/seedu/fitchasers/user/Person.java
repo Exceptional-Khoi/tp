@@ -2,21 +2,20 @@ package seedu.fitchasers.user;
 
 import seedu.fitchasers.ui.UI;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Objects;
+import java.util.Collections;
 
 /**
  * Represents a person using the FitChasers app.
  * Stores the person's name and their weight history.
  */
-public class Person implements Serializable {
-
+public class Person {
 
     private final UI ui = new UI();
     private String name;
@@ -79,7 +78,7 @@ public class Person implements Serializable {
      * @return A List of WeightRecord objects
      */
     public List<WeightRecord> getWeightHistory() {
-        return Collections.unmodifiableList(new ArrayList<>(weightHistory));
+        return List.copyOf(weightHistory);
     }
 
 
@@ -94,7 +93,7 @@ public class Person implements Serializable {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Here's your weight, you've been killin' it lately!\n");
+        sb.append("Here's your weight, you've been killing it lately!\n");
 
         for (int i = 0; i < weightHistory.size(); i++) {
             sb.append("  ").append(weightHistory.get(i));
@@ -148,7 +147,7 @@ public class Person implements Serializable {
 
         // Sort records by date ascending
         List<WeightRecord> sortedRecords = new ArrayList<>(weightHistory);
-        sortedRecords.sort((r1, r2) -> r1.getDate().compareTo(r2.getDate()));
+        sortedRecords.sort(Comparator.comparing(WeightRecord::getDate));
 
         List<Double> weights = new ArrayList<>();
         List<String> dates = new ArrayList<>();
@@ -164,9 +163,9 @@ public class Person implements Serializable {
             return;
         }
 
-        final int height = 10;
-        final int spacing = 12;
-        final int maxWidthColumns = 12;
+        int height = 10;
+        int spacing = 12;
+        int maxWidthColumns = 12;
 
         List<Double> displayWeights = new ArrayList<>();
         List<String> displayDates = new ArrayList<>();
@@ -187,11 +186,13 @@ public class Person implements Serializable {
         double max = Collections.max(displayWeights);
         int width = (displayWeights.size() - 1) * spacing + 1;
 
+        if (min == max) {
+            max = min + 1;
+        }
+
         char[][] grid = new char[height][width];
         for (int i = 0; i < height; i++) {
-            for (int j = 0; j < width; j++) {
-                grid[i][j] = ' ';
-            }
+            Arrays.fill(grid[i], ' ');
         }
 
         int[] y = new int[displayWeights.size()];
@@ -217,7 +218,6 @@ public class Person implements Serializable {
             }
         }
 
-
         boolean[][] isWeightPoint = new boolean[height][width];
         for (int i = 0; i < displayWeights.size(); i++) {
             int x = i * spacing;
@@ -227,7 +227,6 @@ public class Person implements Serializable {
                 isWeightPoint[yy][x] = true;
             }
         }
-
 
         final String reset = "\u001B[0m";
         final String orange = "\u001B[1m\u001B[38;5;208m";
@@ -252,6 +251,7 @@ public class Person implements Serializable {
         for (int i = 0; i < height; i++) {
             double label = max - (max - min) * i / (height - 1);
             System.out.printf("%6.1f | ", label);
+            System.out.print(" ");
             for (int j = 0; j < width; j++) {
                 if (isWeightPoint[i][j]) {
                     System.out.print(orange + "\u25CF" + reset);
@@ -262,13 +262,11 @@ public class Person implements Serializable {
             System.out.println();
         }
 
-
         System.out.print("        ");
         for (int j = 0; j < width + 4; j++) {
             System.out.print('_');
         }
         System.out.println();
-
 
         System.out.print("        ");
         for (int i = 0; i < displayDates.size(); i++) {

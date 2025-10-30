@@ -94,7 +94,7 @@ public class ViewLog {
             displayList.add(new DisplayWorkout(sorted.get(i), i + 1));  // IDs 1, 2, 3, 4, 5 in order
         }
 
-        this.lastFilteredSorted = sorted;  // ✅ Store the sorted list
+        this.lastFilteredSorted = sorted;  // Store the sorted list
 
 
         int totalPages = computeTotalPages(displayList.size(), pageSize);

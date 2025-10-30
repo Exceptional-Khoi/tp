@@ -116,7 +116,7 @@ The Architecture Diagram given above explains the high-level design of FitChaser
 Given below is a quick overview of main components and how they interact with each other.
 
 #### Main components of the architecture
-![Alt text](diagrams/FitChasers_Architecture.jpg "Basic Architecture")
+![Alt text](./diagrams/FitChasers_Architecture.jpg "Basic Architecture")
 FitChasers (consisting of classes FitChasers and Managers) is in charge of the app launch and shut down.
 At app launch, it initializes and loads the components and data in the correct sequence, and connects them up with each other.
 At shut down, it shuts down the other components and invokes cleanup methods where necessary.
@@ -134,7 +134,7 @@ The bulk of the app’s work is done by the following six components:
 #### How the architecture components interact with each other
 
 The Sequence Diagram below shows how the components interact with each other for the scenario where the user issues the command `/create_workout pushup`.
-![Alt text](../docs/diagrams/Architectural_Sequence_Diagram_CW.png "Basic Architecture Sequence Diagram")
+![Alt text](./diagrams/Architectural_Sequence_Diagram_CW.png "Basic Architecture Sequence Diagram")
 
 ## Product scope
 ### Target user profile
@@ -264,13 +264,14 @@ E.g., `displayDetailsOfWorkout(Workout workout)` formats fields (name, date, dur
 
 The `WorkoutManager` component is responsible for managing all workout-related operations in FitChasers, including 
 workout creation, exercise tracking, and workout history management.
-![Alt text](diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
+
+![Alt text](./diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
 ### Overview
 The `WorkoutManager` acts as the central controller for workout operations. It maintains a list of completed workouts 
 and tracks the current active workout session. 
 The component handles:
 * Creating and ending workout
-* Adding exercises and sets to activa workouts
+* Adding exercises and sets to activate workouts
 * Managing workout history and persistence
 * Tag generation and management integration
 * Workout deletion and viewing
@@ -282,7 +283,7 @@ The `WeightManager` component handles all operations related to recording, viewi
 a user's weight and goal weight. It works together with the `Person` entity to maintain a complete
 history of weight entries.
 
-![Alt text](diagrams/WeightManager_Class_Diagram.png "Basic Architecture")
+![Alt text](./diagrams/WeightManager_Class_Diagram.png "Basic Architecture")
 
 ### Overview
 WeightManager handles:
@@ -295,7 +296,7 @@ WeightManager handles:
 
 The `GoalWeightTracker` component handles the user's target goal weight. It works together with the `FileHandler` to persist goal data and provides feedback comparing the goal with the user's latest recorded weight.
 
-![Alt text](diagrams/GoalWeightTracker_Class_Diagram.png "Basic Architecture")
+![Alt text](./diagrams/GoalWeightTracker_Class_Diagram.png "Basic Architecture")
 
 ### Overview
 `GoalWeightTracker` handles:
@@ -368,7 +369,7 @@ h     → shows all commands
 ```
 /rename n/Nitin → success (name saved)
 
-rn n/Ana   → success
+rn n/Ana        → success
 ```
 
 ### Error Cases
@@ -473,9 +474,9 @@ vg           → if no goal set, outputs: "No goal weight set yet."
 ### Success Cases
 
 ```
-/create_workout n/Push d/23/10/25 t/0700 → success (active workout created)
+/create_workout n/Push d/23/10/25 t/0700    → success (active workout created)
 
-cw n/Push d/23/10/25 t/0700 → success (active workout created)
+cw n/Push d/23/10/25 t/0700                 → success (active workout created)
 ```
 
 ### Error Cases
@@ -503,20 +504,20 @@ cw n/Push d/23/10/25 t/0700 → success (active workout created)
 ```
 /add_exercise n/PushUp r/12 → success (adds exercise to active workout)
 
-ae n/PushUp r/12 → success (adds exercise to active workout)
+ae n/PushUp r/12            → success (adds exercise to active workout)
 ```
 
 ### Error Cases
 
 ```
-/add_exercise                 → error (missing n/ and r/)
-/add_exercise n/PushUp        → error (missing r/)
-/add_exercise n/PushUpr/12    → error (needs space before r/)
-/add_exercise n/ r/12         → error (empty name)
-/add_exercise n/PushUp r/x12  → error (invalid reps)
+/add_exercise                   → error (missing n/ and r/)
+/add_exercise n/PushUp          → error (missing r/)
+/add_exercise n/PushUpr/12      → error (needs space before r/)
+/add_exercise n/ r/12           → error (empty name)
+/add_exercise n/PushUp r/x12    → error (invalid reps)
 
 [no active workout]
-/add_exercise n/PushUp r/12  → error (no active workout)
+/add_exercise n/PushUp r/12     → error (no active workout)
 ```
 
 **Usage:** `/add_exercise n/<exercise_name> r/<reps>` (alias: `ae`)
@@ -528,9 +529,9 @@ ae n/PushUp r/12 → success (adds exercise to active workout)
 ### Success Cases
 
 ```
-/add_set r/15 → success (appends set to latest exercise)
+/add_set r/15   → success (appends set to latest exercise)
 
-as r/15 → success (appends set to latest exercise)
+as r/15         → success (appends set to latest exercise)
 ```
 
 ### Error Cases
@@ -556,9 +557,9 @@ as r/15 → success (appends set to latest exercise)
 ### Success Cases
 
 ```
-/end_workout d/23/10/25 t/0830 → success (ends active workout)
+/end_workout d/23/10/25 t/0830  → success (ends active workout)
 
-ew d/23/10/25 t/0830 → success (ends active workout)
+ew d/23/10/25 t/0830            → success (ends active workout)
 ```
 
 ### Error Cases
@@ -584,15 +585,15 @@ ew d/23/10/25 t/0830 → success (ends active workout)
 ### Success Cases
 
 ```
-/view_log            → success (current month, page 1)
+/view_log               → success (current month, page 1)
 
-/view_log -m 10      → success (Oct of current year, page 1)
+/view_log -m 10         → success (Oct of current year, page 1)
 
-/view_log -m 10 2    → success (Oct, page 2)
+/view_log -m 10 2       → success (Oct, page 2)
 
-/view_log -ym 2024 10 → success (Oct 2024, page 1)
+/view_log -ym 2024 10   → success (Oct 2024, page 1)
 
-/view_log -m 10 -d   → success (detailed view)
+/view_log -m 10 -d      → success (detailed view)
 ```
 
 ### Error Cases
@@ -620,7 +621,7 @@ ew d/23/10/25 t/0830 → success (ends active workout)
 
 ```
 /view_log
-/open 1    → success (opens the 1st listed workout)
+/open 1         → success (opens the 1st listed workout)
 ```
 
 ### Error Cases
@@ -666,13 +667,13 @@ ew d/23/10/25 t/0830 → success (ends active workout)
 ### Success Cases
 
 ```
-`/add_modality_tag m/CARDIO k/hiking`   → success (keyword added; workouts retagged)
+`/add_modality_tag m/CARDIO k/hiking`       → success (keyword added; workouts retagged)
 
-`amot m/CARDIO k/hiking`   → success (keyword added; workouts retagged)
+`amot m/CARDIO k/hiking`                    → success (keyword added; workouts retagged)
 
-`/add_modality_tag m/STRENGTH k/deadlift` → success
+`/add_modality_tag m/STRENGTH k/deadlift`   → success
 
-`amot m/STRENGTH k/deadlift` → success
+`amot m/STRENGTH k/deadlift`                → success
 ```
 
 ### Error Cases
@@ -693,11 +694,11 @@ ew d/23/10/25 t/0830 → success (ends active workout)
 ### Success Cases
 
 ```
-/add_muscle_tag m/LEGS k/lunges   → success (keyword added; workouts retagged)
-amt m/LEGS k/lunges   → success (keyword added; workouts retagged)
+/add_muscle_tag m/LEGS k/lunges     → success (keyword added; workouts retagged)
+amt m/LEGS k/lunges                 → success (keyword added; workouts retagged)
 
-/add_muscle_tag m/CHEST k/bench   → success
-amt m/CHEST k/bench   → success
+/add_muscle_tag m/CHEST k/bench     → success
+amt m/CHEST k/bench                 → success
 ```
 
 ### Error Cases
@@ -718,9 +719,9 @@ amt m/CHEST k/bench   → success
 ### Success Cases
 
 ```
-/override_workout_tag id/1 newTag/LEG_DAY → success (tag updated & saved)
+/override_workout_tag id/1 newTag/LEG_DAY   → success (tag updated & saved)
 
-owt id/1 newTag/LEG_DAY → success (tag updated & saved)
+owt id/1 newTag/LEG_DAY                     → success (tag updated & saved)
 ```
 
 ### Error Cases
@@ -816,7 +817,7 @@ exercise modalities (e.g., cardio, strength) and muscle groups (e.g., legs, ches
 This enables users to quickly identify workout types and track training patterns over time.
 
 ### Class Diagram
-![Alt text](../docs/diagrams/Class_Diagram_for_tagging_2.png "Class Diagram for Tagging")
+![Alt text](./diagrams/Class_Diagram_for_tagging_2.png "Class Diagram for Tagging")
 
 Key Relationships:
 - Dependency: `WorkoutManager` depends on the `Tagger` interface for tag suggestion services
@@ -845,13 +846,13 @@ Process:
 ### Sequence Diagram
 The following sequence diagram shows the interaction between components when a workout is created
 and tags are auto-generated:
-![Alt text](diagrams/Sequence_Digram_for_tagging.png "Sequence Diagram for Tagging")
+![Alt text](./diagrams/Sequence_Digram_for_tagging.png "Sequence Diagram for Tagging")
 ### Sequence Diagram for creating a workout
-![Sequence diagram for creating a workout](diagrams/SD_createw.png)
+![Sequence diagram for creating a workout](./diagrams/SD_createw.png)
 ### Sequence Diagram for adding an exercise to current workout
-![Sequence diagram for adding an exercise](diagrams/SD_addex.png)
+![Sequence diagram for adding an exercise](./diagrams/SD_addex.png)
 ### Sequence Diagram for adding a set to the current exercise 
-![Sequence diagram for adding a set](diagrams/SD_addset.png)
+![Sequence diagram for adding a set](./diagrams/SD_addset.png)
 ### Manual Tag Method
 #### Adding modality keywords
 Users can extend the `DefaultTagger`'s keyword dictionary using the `/add_modality_tag` command.
