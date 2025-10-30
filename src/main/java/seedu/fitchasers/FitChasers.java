@@ -73,8 +73,17 @@ public class FitChasers {
 
                 case "/help":
                 case "h":
-                    ui.showHelp();
+                case "help": {
+                    if (!argumentStr.isEmpty()) {
+                        ui.showError("The /help command doesn't take any arguments.\n"
+                                + "Just type '/help' or 'h' to see all available commands.");
+                    } else if (command.equals("help")) {
+                        ui.showMessage("Did you mean '/help'? Type '/help' or 'h' to see all available commands.");
+                    } else {
+                        ui.showHelp();
+                    }
                     break;
+                }
 
                 case "/rename": {
                     renameMethod();

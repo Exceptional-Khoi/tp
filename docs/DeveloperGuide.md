@@ -71,7 +71,8 @@ e (to exit and save)
 
 #### Configure the coding style
 If using IntelliJ IDEA, follow [se-edu/guides] IDEA: Configuring the code style to match the project’s conventions (indentation, imports, wrapping, etc.).
-**Tips** Optionally, follow [se-edu/guides] Using Checkstyle to enable Checkstyle in IDEA so style issues are reported as you code.
+
+**Tips:** Optionally, follow [se-edu/guides] Using Checkstyle to enable Checkstyle in IDEA so style issues are reported as you code.
 
 #### Set up CI
 This repository already includes GitHub Actions workflow files in .github/workflows/.
@@ -107,7 +108,7 @@ These short hands-on tutorials will help you become familiar with the codebase:
   - UI and tagger logic are updated accordingly.
   - Tests covering JSON persistence and rendering are updated.
 
-That’s it — once you can launch the app, run a few commands, and pass the tests, you’re ready to contribute!
+That’s it - once you can launch the app, run a few commands, and pass the tests, you’re ready to contribute!
 
 ## Design & implementation
 
@@ -282,7 +283,7 @@ The `WeightManager` component handles all operations related to recording, viewi
 a user's weight and goal weight. It works together with the `Person` entity to maintain a complete
 history of weight entries.
 
-![Alt text](docs/diagrams/WeightManager_Class_Diagram.png "Basic Architecture")
+![Alt text](./diagrams/WeightManager_Class_Diagram.png)
 
 ### Overview
 WeightManager handles:
@@ -295,7 +296,7 @@ WeightManager handles:
 
 The `GoalWeightTracker` component handles the user's target goal weight. It works together with the `FileHandler` to persist goal data and provides feedback comparing the goal with the user's latest recorded weight.
 
-![Alt text](docs/diagrams/GoalWeightTracker_Class_Diagram.png "Basic Architecture")
+![Alt text](./diagrams/GoalWeightTracker_Class_Diagram.png)
 
 ### Overview
 `GoalWeightTracker` handles:

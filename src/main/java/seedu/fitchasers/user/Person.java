@@ -2,7 +2,6 @@ package seedu.fitchasers.user;
 
 import seedu.fitchasers.ui.UI;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -15,8 +14,7 @@ import java.time.format.DateTimeFormatter;
  * Represents a person using the FitChasers app.
  * Stores the person's name and their weight history.
  */
-public class Person implements Serializable {
-
+public class Person {
 
     private final UI ui = new UI();
     private String name;
