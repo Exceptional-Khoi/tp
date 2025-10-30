@@ -24,7 +24,7 @@ import java.util.Set;
 
 /**
  * Main entry point for the FitChasers application.
- *
+ * <p>
  * Handles user input commands, delegates operations to WorkoutManager,
  * and persists data through FileHandler.
  */
@@ -33,8 +33,6 @@ public class FitChasers {
      * Starts the FitChasers program.
      * Initializes all components, loads saved data if available,
      * and processes user input until the user exits.
-     *
-     * @param args command line arguments (not used)
      */
     private static Person person;
     private static String savedName = null;
