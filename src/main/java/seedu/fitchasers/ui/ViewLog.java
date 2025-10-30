@@ -131,10 +131,10 @@ public class ViewLog {
         buf.append("Tip: /view_log -m 10 2 (next page Oct), /view_log --search run, /open <ID>.");
         ui.showMessage(buf.toString());
     }
-    public Workout getWorkoutByDisplayId(int displayId, YearMonth month) {
+    public Workout getWorkoutByDisplayId(int displayId, YearMonth month) throws FileNonexistent, IOException {
         // Fetch and sort on demand if needed
         if (lastFilteredSorted.isEmpty()) {
-            ArrayList<Workout> monthList = fileHandler.getWorkoutsForMonth(month);
+            ArrayList<Workout> monthList = fileHandler.loadMonthList(month);
             ArrayList<Workout> sorted = new ArrayList<>(monthList);
             sorted.sort(Comparator.comparing(
                     Workout::getWorkoutEndDateTime,

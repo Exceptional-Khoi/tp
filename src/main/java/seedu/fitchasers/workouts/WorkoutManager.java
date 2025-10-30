@@ -94,7 +94,11 @@ public class WorkoutManager {
     public void addWorkout(String command) throws FileNonexistent, IOException {
         workoutName = "";
         try {
-            formatInputForWorkout(command);
+            if(command.contains("d/") || command.contains("t/")) {
+                formatInputForWorkoutStrict(command);
+            } else {
+                formatInputForWorkout(command);
+            }
         } catch (InvalidArgumentInput e) {
             return;
         }
@@ -120,7 +124,149 @@ public class WorkoutManager {
             ui.showMessage("Something went wrong creating the workout. Please try again.");
         }
     }
+    /**
+     * Strict parser for /create_workout that enforces:
+     * - exactly one n/, one d/, one t/
+     * - order n/ then d/ then t/
+     * - name character policy identical to addExercise
+     * - no spaces immediately after d/ or t/
+     * - no extra garbage after time
+     * - no unsupported flags
+     */
+    private void formatInputForWorkoutStrict(String command) throws InvalidArgumentInput, IOException {
+        assert workouts != null : "workouts list should be initialized";
 
+        if (currentWorkout != null) {
+            ui.showMessage("You currently have an active workout: '" + currentWorkout.getWorkoutName() + "'.");
+            ui.showMessage("Please end the active workout first with: /end_workout d/DD/MM/YY t/HHmm");
+            throw new InvalidArgumentInput("");
+        }
+
+        if (command == null || command.isBlank()) {
+            ui.showMessage("Missing information. Use: /create_workout n/NAME d/DD/MM/YY t/HHmm");
+            throw new InvalidArgumentInput("");
+        }
+
+        final String s = command.trim();
+
+        // Must have exactly one n/, one d/, one t/
+        if (countToken(s, "n/") != 1 || countToken(s, "d/") != 1 || countToken(s, "t/") != 1) {
+            ui.showMessage("Please provide exactly one n/, one d/, and one t/ in this order: n/NAME d/DATE t/TIME");
+            throw new InvalidArgumentInput("");
+        }
+
+        // Enforce order n/ ... d/ ... t/
+        final int nIdx = s.indexOf("n/");
+        final int dIdx = s.indexOf("d/");
+        final int tIdx = s.indexOf("t/");
+        if (nIdx < 0 || dIdx < 0 || tIdx < 0 || !(nIdx < dIdx && dIdx < tIdx)) {
+            ui.showMessage("Order must be n/ then d/ then t/. Example: /create_workout n/Push Day d/20/10/25 t/1900");
+            throw new InvalidArgumentInput("");
+        }
+
+        // ---- Extract and validate name (exactly like addExercise) ----
+        Slice nameSlice = extractSlice(s, nIdx);
+        String name = nameSlice.valueTrimmed;
+
+        if (name.isEmpty()) {
+            ui.showMessage("Workout name is missing after n/. Example: n/Leg Day");
+            throw new InvalidArgumentInput("");
+        }
+        if (!isValidName(name)) {
+            Character bad = findFirstIllegalNameChar(name);
+            if (bad != null) {
+                String shown = (bad == '\\') ? "\\\\" : String.valueOf(bad);
+                ui.showMessage("“" + shown + "” is not allowed in the workout name.");
+            } else {
+                ui.showMessage("Name too long or invalid.");
+            }
+            ui.showMessage("Allowed characters: letters, digits, spaces, hyphen (-), underscore (_). Max 32 chars.");
+            throw new InvalidArgumentInput("");
+        }
+
+        // ---- Extract and validate date ----
+        Slice dateSlice = extractSlice(s, dIdx);
+
+        if (!dateSlice.valueRaw.isEmpty() && Character.isWhitespace(dateSlice.valueRaw.charAt(0))) {
+            ui.showMessage("Remove spaces between d/ and the date. Example: d/23/10/25 (not d/ 23/10/25)");
+            throw new InvalidArgumentInput("");
+        }
+
+        LocalDate parsedDate;
+        try {
+            parsedDate = LocalDate.parse(dateSlice.valueTrimmed, DATE_FMT);
+        } catch (Exception ex) {
+            ui.showMessage("Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
+            throw new InvalidArgumentInput("");
+        }
+
+        // ---- Extract and validate time ----
+        Slice timeSlice = extractSlice(s, tIdx);
+
+        if (!timeSlice.valueRaw.isEmpty() && Character.isWhitespace(timeSlice.valueRaw.charAt(0))) {
+            ui.showMessage("Remove spaces between t/ and the time. Example: t/1905 (not t/ 1905)");
+            throw new InvalidArgumentInput("");
+        }
+
+        LocalTime parsedTime;
+        try {
+            parsedTime = LocalTime.parse(timeSlice.valueTrimmed, TIME_FMT);
+        } catch (Exception ex) {
+            ui.showMessage("Invalid time. Use t/HHmm (e.g., t/1905).");
+            throw new InvalidArgumentInput("");
+        }
+
+        // No extra junk after time
+        if (!onlyWhitespaceAfter(s, timeSlice.endIndex)) {
+            ui.showMessage("Unexpected text after time. Use exactly: /create_workout n/NAME d/DD/MM/YY t/HHmm");
+            throw new InvalidArgumentInput("");
+        }
+
+        // Reject stray unsupported flags outside parsed regions
+        // (ignore n/.. in [nIdx, nameSlice.endIndex), d/.. in [dIdx, dateSlice.endIndex), t/.. in [tIdx, timeSlice.endIndex))
+        Matcher stray = BOUND_PREFIX.matcher(s);
+        while (stray.find()) {
+            int pos = stray.start(2);
+            char p = stray.group(2).charAt(0);
+
+            boolean inName = pos >= nIdx && pos < nameSlice.endIndex;
+            boolean inDate = pos >= dIdx && pos < dateSlice.endIndex;
+            boolean inTime = pos >= tIdx && pos < timeSlice.endIndex;
+
+            if (!inName && !inDate && !inTime) {
+                if (p != 'n' && p != 'd' && p != 't') {
+                    ui.showMessage("Unsupported flag \"" + p + "/\" found. Only n/, d/, and t/ are allowed.");
+                    throw new InvalidArgumentInput("");
+                }
+            }
+        }
+
+        // Finalize fields
+        this.workoutName = name;
+        this.date = parsedDate;
+        this.time = parsedTime;
+        this.workoutDateTime = LocalDateTime.of(parsedDate, parsedTime);
+
+        // Future/past confirmations + month file bootstrap (reuse your existing logic)
+        checkPastFutureDate(parsedDate, DATE_FMT, parsedTime, TIME_FMT);
+
+        // Duplicate date/time check (unchanged from your version)
+        for (Workout w : workouts) {
+            LocalDateTime existingStart = w.getWorkoutStartDateTime();
+            if (existingStart == null) continue;
+            if (existingStart.toLocalDate().equals(parsedDate)
+                    && existingStart.toLocalTime().equals(parsedTime)) {
+                ui.showMessage("A workout already exists at this date and time ("
+                        + existingStart.toLocalDate().format(DATE_FMT) + " "
+                        + existingStart.toLocalTime().format(TIME_FMT) + "). Continue anyway? (Y/N)");
+                if (!ui.confirmationMessage()) {
+                    ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
+                    throw new InvalidArgumentInput("");
+                }
+                break;
+            }
+        }
+    }
     /**
      * Parses and validates the user's workout creation command.
      * <p>
@@ -721,7 +867,6 @@ public class WorkoutManager {
         return null;
     }
 
-
     /**
      * Ends the current workout session by recording the end time and calculating duration.
      * <p>
@@ -741,63 +886,71 @@ public class WorkoutManager {
 
         String args = (initialArgs == null) ? "" : initialArgs.trim();
 
-        // Extract raw tokens
-        String dateStr = "";
-        String timeStr = "";
-
-        // Must have exactly one d/ and one t/
-        if (countToken(args, "d/") != 1 || countToken(args, "t/") != 1) {
-            ui.showMessage("Provide exactly one d/ and one t/ in this order: d/DATE t/TIME");
+        // allow 0 or 1 of each; reject duplicates
+        int dCount = countToken(args, "d/");
+        int tCount = countToken(args, "t/");
+        if (dCount > 1 || tCount > 1) {
+            ui.showMessage("Too many date/time flags. Use at most one d/ and one t/.");
+            ui.showMessage("Usage: /end_workout d/DD/MM/YY t/HHmm");
             return;
         }
 
-        // Enforce order: d/ before t/
         int dIdx = args.indexOf("d/");
         int tIdx = args.indexOf("t/");
-        if (dIdx == -1 || tIdx == -1 || tIdx < dIdx) {
+        // enforce order only if both provided
+        if (dIdx != -1 && tIdx != -1 && tIdx < dIdx) {
             ui.showMessage("Order must be d/ then t/. Example: /end_workout d/29/10/25 t/1800");
             return;
         }
 
-        // Reject any other boundary flags (only d/ and t/ allowed)
+        // reject any other flags like n/, r/, x/, etc.
         Matcher stray = BOUND_PREFIX.matcher(args);
         while (stray.find()) {
-            char p = stray.group(2).charAt(0); // letter before '/'
+            char p = stray.group(2).charAt(0);
             if (p != 'd' && p != 't') {
                 ui.showMessage("Only d/ and t/ are allowed. Usage: /end_workout d/DD/MM/YY t/HHmm");
                 return;
             }
         }
 
-        // Extract date and time slices
-        Slice dateSlice = extractSlice(args, dIdx);
-        Slice timeSlice = extractSlice(args, tIdx);
+        // extract slices if present
+        Slice dateSlice = null, timeSlice = null;
+        String dateStr = "", timeStr = "";
 
-        // If user typed spaces immediately after d/ or t/, treat as invalid format (reuse your generic msgs)
-        if (!dateSlice.valueRaw.isEmpty() && Character.isWhitespace(dateSlice.valueRaw.charAt(0))) {
-            ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
-            ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-            return;
-        }
-        if (!timeSlice.valueRaw.isEmpty() && Character.isWhitespace(timeSlice.valueRaw.charAt(0))) {
-            ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
-            ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
-            return;
+        if (dIdx != -1) {
+            dateSlice = extractSlice(args, dIdx);
+            if (!dateSlice.valueRaw.isEmpty() && Character.isWhitespace(dateSlice.valueRaw.charAt(0))) {
+                ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
+                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                return;
+            }
+            dateStr = dateSlice.valueTrimmed;
         }
 
-        dateStr = dateSlice.valueTrimmed;
-        timeStr = timeSlice.valueTrimmed;
+        if (tIdx != -1) {
+            timeSlice = extractSlice(args, tIdx);
+            if (!timeSlice.valueRaw.isEmpty() && Character.isWhitespace(timeSlice.valueRaw.charAt(0))) {
+                ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
+                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                return;
+            }
+            timeStr = timeSlice.valueTrimmed;
+        }
 
-        // No extra junk after t/
-        if (!onlyWhitespaceAfter(args, timeSlice.endIndex)) {
-            ui.showMessage("Unexpected text after time. Use exactly: /end_workout d/DD/MM/YY t/HHmm");
+        // trailing junk after the last provided token
+        int lastEnd = -1;
+        if (timeSlice != null) lastEnd = timeSlice.endIndex;
+        else if (dateSlice != null) lastEnd = dateSlice.endIndex;
+
+        if (lastEnd != -1 && !onlyWhitespaceAfter(args, lastEnd)) {
+            ui.showMessage("Unexpected text after time/date. Use exactly: /end_workout d/DD/MM/YY t/HHmm");
             return;
         }
 
         LocalDate date = null;
         LocalTime time = null;
 
-        // Validate provided pieces first
+        // validate provided pieces
         if (!dateStr.isEmpty()) {
             try {
                 date = LocalDate.parse(dateStr, DATE_FMT);
@@ -817,7 +970,7 @@ public class WorkoutManager {
             }
         }
 
-        // Prompt ONLY for missing pieces
+        // prompt ONLY for missing pieces
         if (date == null) {
             String todayStr = LocalDate.now().format(DATE_FMT);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
@@ -838,6 +991,7 @@ public class WorkoutManager {
                 return;
             }
         }
+
 
         LocalDateTime endDateTime = LocalDateTime.of(date, time).truncatedTo(ChronoUnit.MINUTES);
         LocalDateTime startTime = currentWorkout.getWorkoutStartDateTime().truncatedTo(ChronoUnit.MINUTES);

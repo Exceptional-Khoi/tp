@@ -217,7 +217,7 @@ public class FitChasers {
         }
     }
 
-    private static void owtMethod() {
+    private static void owtMethod() throws FileNonexistent, IOException {
         // Parse parameters
         String[] params = argumentStr.split("\\s+");
         Integer workoutId = null;
@@ -274,7 +274,7 @@ public class FitChasers {
             try {
                 fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
 
-                ArrayList<Workout> reloadedWorkouts = fileHandler.getWorkoutsForMonth(currentMonth);
+                ArrayList<Workout> reloadedWorkouts = fileHandler.loadMonthList(currentMonth);
                 workoutManager.setWorkouts(reloadedWorkouts);
 
 
@@ -291,6 +291,8 @@ public class FitChasers {
 
             } catch (IOException e) {
                 ui.showMessage("Error saving workout data: " + e.getMessage());
+            } catch (FileNonexistent e) {
+                throw new RuntimeException(e);
             }
 
         } else {
