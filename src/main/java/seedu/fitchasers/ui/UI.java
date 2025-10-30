@@ -283,7 +283,7 @@ public class UI {
         
         ~~~ SYSTEM ~~~
         /exit (e)                                 - Save all progress and exit the app
-        """);
+            """);
     }
 
     /**
