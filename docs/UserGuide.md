@@ -1,14 +1,14 @@
 # User Guide
 
 ## Introduction
-### FitChaser User Guide
-FitChaser is a desktop app for managing your fitness journey, optimized for use via a Command Line Interface (CLI) 
-while still having the benefits of a Graphical User Interface (GUI). If you can type fast, FitChaser can help you 
+### FitChasers User Guide
+FitChasers is a desktop app for managing your fitness journey, optimized for use via a Command Line Interface (CLI) 
+while still having the benefits of a Graphical User Interface (GUI). If you can type fast, ss can help you 
 track workouts, monitor weight progress, and achieve your fitness goals faster than traditional GUI apps.
 
 ### Interface Display (Console Width)
 
-FitChaser’s chat-style interface is optimized for clear and readable text bubbles within the console window.  
+FitChasers' chat-style interface is optimized for clear and readable text bubbles within the console window.  
 The system assumes a console width of approximately 150 characters, meaning each line of text can display up to 150 visible characters before wrapping automatically.
 
 - This width defines how much text can appear in one line within chat bubbles.
@@ -23,8 +23,8 @@ The system assumes a console width of approximately 150 characters, meaning each
 ## Quick Start
 
 1. Ensure that you have Java 17 or above installed.
-2. Down the latest version of `Fitchaser`.
-3. Copy the file to the folder you want to use as the home folder for your FitChaser data.
+2. Down the latest version of `FitChasers`.
+3. Copy the file to the folder you want to use as the home folder for your FitChasers data.
 4. Open a command terminal, cd into the folder you put the jar file in, and use the java -jar 
    FitChasers.jar command to run the application.
 5. On first launch, you will be prompted to enter your name and initial weight.
@@ -42,14 +42,14 @@ The system assumes a console width of approximately 150 characters, meaning each
 * Time format is `HHMM` in 24-hour format (e.g., `1430` for `2:30 PM`).
 
 ### Viewing help: `/help`
-Shows a message explaining how to use FitChaser and all available commands.
+Shows a message explaining how to use FitChasers and all available commands.
 
 Format: `/help`
 
 Alternative: `h`
 
 ### Changing Your Name: `/rename`
-This command allows you to update your display name in FitChaser. The name is saved automatically and will be shown whenever you start the program.
+This command allows you to update your display name in FitChasers. The name is saved automatically and will be shown whenever you start the program.
 
 Format: `/rename n/NAME`
 
@@ -316,7 +316,7 @@ Examples:
 * `/del_workout Chest Day`
 
 ### Exiting the program: `/exit`
-Exits FitChaser and saves all your data.
+Exits FitChasers and saves all your data.
 
 Format: `/exit`
 
@@ -326,31 +326,31 @@ Alternative: `e`
 e.g. if the command specifies /exit 123, it will be interpreted as /exit.
 
 ### Saving the data
-FitChaser data is saved automatically after any command that changes the data. There is no need to save manually.
+FitChasers data is saved automatically after any command that changes the data. There is no need to save manually.
 
-Data is organized by month and stored in the data/ folder in your FitChaser home directory.
+Data is organized by month and stored in the data/ folder in your FitChasers home directory.
 
 
 ## FAQ
 
 **Q**: How do I transfer my data to another computer? 
 
-**A**: Install FitChaser on the other computer and copy the entire data/ folder from your current FitChaser home 
-directory to the new computer's FitChaser installation. The next time you run FitChaser, it will load all your 
+**A**: Install FitChasers on the other computer and copy the entire data/ folder from your current FitChasers home 
+directory to the new computer's FitChasers installation. The next time you run FitChasers, it will load all your 
 saved data.
 
 **Q**: What happens if I enter an invalid date format?
 
-**A**: FitChaser will display an error message and ask you to re-enter the command with the correct `DD/MM/YY` format.
+**A**: FitChasers will display an error message and ask you to re-enter the command with the correct `DD/MM/YY` format.
 
 **Q**: Can I have multiple workouts on the same day?
 
-**A**: Yes! FitChaser allows you to create and save multiple workouts on the same date. You can even specify 
+**A**: Yes! FitChasers allows you to create and save multiple workouts on the same date. You can even specify 
 different times for each workout.
 
 **Q**: How are tags automatically assigned?
 
-**A**: FitChaser uses keyword matching to automatically assign modality and muscle group tags based on your workout 
+**A**: FitChasers uses keyword matching to automatically assign modality and muscle group tags based on your workout 
 and exercise names. You can customize keywords using /add_modality_tag and /add_muscle_tag commands.
 
 **Q**: What are the valid values for muscle groups?
