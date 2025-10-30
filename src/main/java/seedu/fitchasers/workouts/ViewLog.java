@@ -1,8 +1,11 @@
 package seedu.fitchasers.workouts;
-import seedu.fitchasers.storage.FileHandler;
-import seedu.fitchasers.ui.UI;
-import seedu.fitchasers.exceptions.InvalidArgumentInput;
 
+import seedu.fitchasers.storage.FileHandler;
+import seedu.fitchasers.exceptions.FileNonexistent;
+import seedu.fitchasers.exceptions.InvalidArgumentInput;
+import seedu.fitchasers.ui.UI;
+
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.TextStyle;
@@ -12,18 +15,18 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
+//@@ZhongBaode
 public class ViewLog {
     public static final int MINIMUM_PAGE_SIZE = 1;
     public static final int ARRAY_INDEX_OFFSET = 1;
-    public static final int AFTER_ARG_CONST = 4;
     private static final Pattern INT = Pattern.compile("^-?\\d+$");
     private static UI ui = new UI();                         // your existing UI class
     private final WorkoutManager workoutManager;
-    private int pageSize = 10;
-    private FileHandler fileHandler;
+    private final int pageSize = 10;
+    private final FileHandler fileHandler;
 
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
-    private List<Workout> lastFilteredSorted = List.of();
+    private List<Workout> lastFilteredListofWorkout = List.of();
 
     private static class DisplayWorkout {
         Workout workout;
@@ -35,19 +38,10 @@ public class ViewLog {
         }
     }
 
-    public ViewLog(UI ui, WorkoutManager workoutManager) {
-        ViewLog.ui = ui;
-        this.workoutManager = workoutManager;
-    }
-
     public ViewLog(UI ui, WorkoutManager workoutManager, FileHandler fileHandler) {
         ViewLog.ui = ui;
         this.workoutManager = workoutManager;
         this.fileHandler = fileHandler;
-    }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = Math.max(1, pageSize); //ensures page size is at least 1
     }
 
     /* ----------------------------- Core renderers ----------------------------- */
@@ -57,47 +51,35 @@ public class ViewLog {
      * <p>
      * Supported forms:
      * <ul>
-     *   <li>/view_log -m &lt;month 1..12&gt; [page]</li>
-     *   <li>/view_log -ym &lt;year&gt; &lt;month 1..12&gt; [page]</li>
+     *   <li>/view_log -m &lt;month 1..12&gt; [extractedArg]</li>
+     *   <li>/view_log -ym &lt;year&gt; &lt;month 1..12&gt; [extractedArg]</li>
      *   <li>Optional: -d (detailed view)</li>
      * </ul>
      *
      * Examples:
      * <pre>
-     *   /view_log -m 10          // Oct (current year), page 1
-     *   /view_log -m 10 2        // Oct (current year), page 2
-     *   /view_log -ym 2024 10    // Oct 2024, page 1
-     *   /view_log -ym 2024 10 2  // Oct 2024, page 2
-     *   /view_log -m 10 -d       // Oct, detailed page 1
+     *   /view_log -m 10          // Oct (current year), extractedArg 1
+     *   /view_log -m 10 2        // Oct (current year), extractedArg 2
+     *   /view_log -ym 2024 10    // Oct 2024, extractedArg 1
+     *   /view_log -ym 2024 10 2  // Oct 2024, extractedArg 2
+     *   /view_log -m 10 -d       // Oct, detailed extractedArg 1
      * </pre>
      *
      * @param args raw argument string after the command name
      * @throws InvalidArgumentInput if flags or numbers are invalid
      */
-    public void render(String args) throws InvalidArgumentInput {
+    public void render(String args) throws InvalidArgumentInput, FileNonexistent, IOException {
         Parsed p = parseArgs(args);
 
-        // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
-        ArrayList<Workout> monthList = fileHandler.getWorkoutsForMonth(p.ym);
-        ArrayList<Workout> sorted = new ArrayList<>(monthList);
-        sorted.sort(Comparator.comparing(
-                Workout::getWorkoutEndDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ).thenComparing(
-                Workout::getWorkoutStartDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ));  // ← NO .reversed()
+        ArrayList<Workout> sorted = loadAndSortList(p.ym);
 
         ArrayList<DisplayWorkout> displayList = new ArrayList<>();
         for (int i = 0; i < sorted.size(); i++) {
             displayList.add(new DisplayWorkout(sorted.get(i), i + 1));  // IDs 1, 2, 3, 4, 5 in order
         }
 
-        this.lastFilteredSorted = sorted;  // Store the sorted list
-
-
         int totalPages = computeTotalPages(displayList.size(), pageSize);
-        int current = ensureValidPage(p.page);
+        int current = ensureValidPage(p.extractedArg);
 
         int start = (current - 1) * pageSize;
         int end = Math.min(start + pageSize, displayList.size());
@@ -125,28 +107,36 @@ public class ViewLog {
             }
         }
 
-        buf.append("Tip: /view_log -m 10 2 (next page Oct), /view_log --search run, /open <ID>.");
+        buf.append("Tip: /view_log -m 10 2 (next extractedArg Oct), /view_log --search run, /open <ID>.");
         ui.showMessage(buf.toString());
     }
-    public Workout getWorkoutByDisplayId(int displayId, YearMonth month) {
+
+    public ArrayList<Workout> loadAndSortList(YearMonth p) throws IOException, FileNonexistent {
+        // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
+        ArrayList<Workout> monthList = fileHandler.loadMonthList(p);
+        ArrayList<Workout> sorted = new ArrayList<>(monthList);
+        sorted.sort(Comparator.comparing(
+                Workout::getWorkoutEndDateTime,
+                Comparator.nullsLast(Comparator.naturalOrder())
+        ).thenComparing(
+                Workout::getWorkoutStartDateTime,
+                Comparator.nullsLast(Comparator.naturalOrder())
+        ));  // ← NO .reversed()
+
+        this.lastFilteredListofWorkout = sorted;  // Store the sorted list
+        return sorted;
+    }
+
+    public Workout getWorkoutByDisplayId(int displayId, YearMonth month) throws FileNonexistent, IOException {
         // Fetch and sort on demand if needed
-        if (lastFilteredSorted.isEmpty()) {
-            ArrayList<Workout> monthList = fileHandler.getWorkoutsForMonth(month);
-            ArrayList<Workout> sorted = new ArrayList<>(monthList);
-            sorted.sort(Comparator.comparing(
-                    Workout::getWorkoutEndDateTime,
-                    Comparator.nullsLast(Comparator.naturalOrder())
-            ).thenComparing(
-                    Workout::getWorkoutStartDateTime,
-                    Comparator.nullsLast(Comparator.naturalOrder())
-            ));
-            this.lastFilteredSorted = sorted;
+        if (lastFilteredListofWorkout.isEmpty()) {
+            loadAndSortList(month);
         }
 
-        if (displayId <= 0 || displayId > lastFilteredSorted.size()) {
+        if (displayId <= 0 || displayId > lastFilteredListofWorkout.size()) {
             return null;
         }
-        return lastFilteredSorted.get(displayId - 1);
+        return lastFilteredListofWorkout.get(displayId - 1);
     }
 
     private String renderCompactRow(int id, Workout w) {
@@ -162,7 +152,7 @@ public class ViewLog {
         String dateLong = formatLong(workout.getWorkoutEndDateTime());
         String dur = formatDuration(workout.getDuration());
         StringBuilder sb = new StringBuilder();
-        sb.append("~".repeat(60)).append('\n');
+        sb.append("—".repeat(60)).append('\n');
         sb.append(String.format("#%d  %s%n", id, safe(workout.getWorkoutName())));
         sb.append("Date     : ").append(dateLong).append('\n');
         sb.append("Duration : ").append(dur).append('\n');
@@ -179,99 +169,8 @@ public class ViewLog {
         if (i < 0 || i >= workoutManager.getWorkoutSize()) {
             throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
         }
-
-        ui.displayDetailsOfWorkout(lastFilteredSorted.get(i));
+        ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(i));
     }
-
-    /*public List<Integer> searchByName(List<Workout> monthWorkouts, String query) {
-        if (query == null || query.isBlank()) {
-            return List.of();
-        }
-        String needle = query.toLowerCase();
-        List<Workout> sorted = monthWorkouts.stream()
-                .sorted(Comparator.comparing(Workout::getDateTime).reversed())
-                .toList();
-
-        this.lastFilteredSorted = sorted; // set context for `/open <n>`
-        List<Integer> matches = new ArrayList<>();
-        for (int i = 0; i < sorted.size(); i++) {
-            Workout w = sorted.get(i);
-            if (safe(w.getWorkoutName()).toLowerCase().contains(needle)) {
-                matches.add(i + 1); // 1-based
-            }
-        }
-
-        // Display results
-        if (matches.isEmpty()) {
-            ui.showMessage("No workouts matched \"" + query + "\".");
-        } else {
-            ui.showMessage("Matches for \"" + query + "\":");
-            ui.showMessage(String.format("%-4s %-20s %-22s %-10s", "ID", "Date", "Name", "Duration"));
-            for (Integer idx : matches) {
-                renderCompactRow(idx, sorted.get(idx - 1));
-            }
-        }
-        return matches;
-    } */
-
-    /*public void renderByTag(List<Workout> monthWorkouts, String tag, int page, boolean detailed) {
-        if (tag == null || tag.isBlank()) {
-            ui.showMessage("Please provide a tag, e.g., /view_log --type strength");
-            return;
-        }
-        String needle = tag.toLowerCase();
-
-        List<Workout> filtered = monthWorkouts.stream()
-                .filter(w -> safe(w.getType()).equalsIgnoreCase(tag) ||
-                        getTags(w).stream().anyMatch(t -> t.equalsIgnoreCase(needle)))
-                .sorted(Comparator.comparing(Workout::getDateTime).reversed())
-                .toList();
-
-        if (filtered.isEmpty()) {
-            ui.showMessage("No workouts with tag/type \"" + tag + "\" this month.");
-            return;
-        }
-
-        this.lastFilteredSorted = filtered;
-        render(filtered, page, detailed);
-    } */
-
-    /*public void renderSummary(List<Workout> monthWorkouts, Optional<String> tagOpt) {
-        List<Workout> scope = monthWorkouts;
-        if (tagOpt.isPresent()) {
-            String tag = tagOpt.get();
-            scope = monthWorkouts.stream()
-                    .filter(w -> safe(w.getType()).equalsIgnoreCase(tag) ||
-                            getTags(w).stream().anyMatch(t -> t.equalsIgnoreCase(tag)))
-                    .toList();
-            ui.showMessage("Summary for tag/type \"" + tag + "\":");
-        } else {
-            ui.showMessage("Monthly summary:");
-        }
-
-        int sessions = scope.size();
-        int totalMinutes = scope.stream().mapToInt(Workout::getDurationMinutes).sum();
-
-        ui.showMessage("Total sessions : " + sessions);
-        ui.showMessage("Total duration : " + formatDuration(totalMinutes));
-
-        // PR hooks (template) — implement when you track PRs.
-        // Example: group by workout name and show best duration/weight/etc.
-        Map<String, Integer> bestByName = new HashMap<>();
-        for (Workout w : scope) {
-            String name = safe(w.getWorkoutName());
-            // Replace with your actual PR metric (e.g., weight lifted, fastest time, etc.)
-            int metric = w.getDurationMinutes();
-            bestByName.merge(name, metric, Math::max);
-        }
-        if (!bestByName.isEmpty()) {
-            ui.showMessage("Top PRs (by duration as placeholder):");
-            bestByName.entrySet().stream()
-                    .sorted(Map.Entry.<String,Integer>comparingByValue().reversed())
-                    .limit(5)
-                    .forEach(e -> ui.showMessage(" • " + e.getKey() + " — " + e.getValue() + " min"));
-        }
-    } */
 
     /* ------------------------------ Helpers/Util ----------------------------- */
 
@@ -332,13 +231,13 @@ public class ViewLog {
         return String.format("%s %d%s of %s, %d:%02d %s", dow, d, suffix, mon, hr12, min, ampm);
     }
 
-    private record Parsed(YearMonth ym, int page, boolean detailed) {
+    public record Parsed(YearMonth ym, int extractedArg, boolean detailed) {
     }
 
     /**
      * Parses flags/args into a structured form with validation/guards.
      */
-    private Parsed parseArgs(String raw) throws InvalidArgumentInput {
+    public Parsed parseArgs(String raw) throws InvalidArgumentInput {
         YearMonth now = YearMonth.now();
         YearMonth target = now;
         int page = 1;
@@ -370,7 +269,7 @@ public class ViewLog {
                 validateMonth(month);
                 // default to current year when -m is used
                 target = YearMonth.of(now.getYear(), month);
-                // optional page next
+                // optional extractedArg next
                 if (i + 1 < tok.length && isInt(tok[i + 1])) {
                     page = readPositiveInt(tok[++i], "Page must be a positive integer.");
                 }
@@ -386,14 +285,14 @@ public class ViewLog {
                 int m = readIntArg(tok, ++i, "Missing month after year");
                 validateMonth(m);
                 target = YearMonth.of(year, m);
-                // optional page next
+                // optional extractedArg next
                 if (i + 1 < tok.length && isInt(tok[i + 1])) {
                     page = readPositiveInt(tok[++i], "Page must be a positive integer.");
                 }
                 break;
 
             default:
-                // allow trailing page as bare number (e.g., "/view_log 2")
+                // allow trailing extractedArg as bare number (e.g., "/view_log 2")
                 if (isInt(t)) {
                     page = readPositiveInt(t, "Page must be a positive integer.");
                 } else if (t.startsWith("-")) {

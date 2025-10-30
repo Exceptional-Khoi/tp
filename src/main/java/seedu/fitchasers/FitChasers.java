@@ -1,6 +1,7 @@
 package seedu.fitchasers;
 
-import seedu.fitchasers.storage.FileHandler;
+import seedu.fitchasers.exceptions.FileNonexistent;
+import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.workouts.ViewLog;
 import seedu.fitchasers.exceptions.InvalidCommandException;
@@ -15,6 +16,7 @@ import seedu.fitchasers.user.Person;
 import seedu.fitchasers.user.WeightManager;
 import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.WorkoutManager;
+import seedu.fitchasers.storage.FileHandler;
 
 import java.io.IOException;
 import java.time.YearMonth;
@@ -51,11 +53,16 @@ public class FitChasers {
     private static WeightManager weightManager;
     private static GoalWeightTracker goalTracker;
 
-    public static void main(String[] args) throws IOException {
+    public static void main(String[] args) throws IOException, FileNonexistent {
         ui.printLeftHeader();
         initVariables();
         ui.showGreeting();
-
+        try {
+            viewLog.render(argumentStr);
+        } catch (IndexOutOfBoundsException | InvalidArgumentInput e) {
+            ui.showError(e.getMessage());
+        }
+        workoutManager.initWorkouts();
         while (isRunning) {
             input = ui.readCommand();
             if (input == null) {
@@ -164,7 +171,7 @@ public class FitChasers {
                 case "/end_workout":
                 case "ew":
                     // Format: /end_workout d/DD/MM/YY t/HHmm
-                    workoutManager.endWorkout(ui, argumentStr);
+                    workoutManager.endWorkout(argumentStr);
                     break;
 
                 case "/view_log":
@@ -182,7 +189,7 @@ public class FitChasers {
                     break;
                 //@@author Kart04
                 case "/del_workout":
-                case "d":
+                case "dw":
                     delMethod();
                     break;
                 //@@author
@@ -212,19 +219,22 @@ public class FitChasers {
         isRunning = false;
     }
 
-    private static void delMethod() throws InvalidCommandException, IOException {
+    private static void delMethod() throws InvalidCommandException, IOException, InvalidArgumentInput, FileNonexistent {
         // Format: /del_workout WORKOUT_NAME
         if (argumentStr.isEmpty()) {
             throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
                     "Please enter a valid command.");
-        } else if (argumentStr.contains("d/")) {
-            workoutManager.interactiveDeleteWorkout(argumentStr, ui);
+        } else if (argumentStr.contains("-m")) {
+            //workoutManager.interactiveDeleteWorkout(argumentStr);
+            ViewLog.Parsed p = viewLog.parseArgs(argumentStr);
+            workoutManager.setWorkouts(fileHandler.loadMonthList(p.ym()),p.ym());
+            workoutManager.deleteWorkoutByIndex(p.extractedArg());
         } else {
             workoutManager.deleteWorkout(argumentStr);
         }
     }
 
-    private static void owtMethod() {
+    private static void owtMethod() throws FileNonexistent, IOException {
         // Parse parameters
         String[] params = argumentStr.split("\\s+");
         Integer workoutId = null;
@@ -244,28 +254,28 @@ public class FitChasers {
         }
 
         if (workoutId != null && newTag != null) {
-            // ✅ Validate empty tag
+            // Validate empty tag
             if (newTag.trim().isEmpty()) {
-                ui.showMessage("❌ Tag cannot be empty.");
+                ui.showMessage("Tag cannot be empty.");
                 return;
             }
 
             // Validate workout ID
             if (workoutId <= 0 || workoutId > workoutManager.getWorkouts().size()) {
-                ui.showMessage("❌ Invalid workout ID. Use valid ID between 1 and " +
+                ui.showMessage("Invalid workout ID. Use valid ID between 1 and " +
                         workoutManager.getWorkouts().size());
                 return;
             }
 
             Workout workout = viewLog.getWorkoutByDisplayId(workoutId, currentMonth);
             if (workout == null) {
-                ui.showMessage("❌ Invalid workout ID.");
+                ui.showMessage("Invalid workout ID.");
                 return;
             }
 
             String oldTags = workout.getAllTags().toString();
 
-            // ✅ ASK FOR CONFIRMATION BEFORE CHANGING
+            // ASK FOR CONFIRMATION BEFORE CHANGING
             ui.showMessage("Current tags: " + oldTags);
             ui.showMessage("Change to: " + newTag + "?");
             ui.showMessage("Are you sure? (y/n)");
@@ -281,7 +291,7 @@ public class FitChasers {
             try {
                 fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
 
-                ArrayList<Workout> reloadedWorkouts = fileHandler.getWorkoutsForMonth(currentMonth);
+                ArrayList<Workout> reloadedWorkouts = fileHandler.loadMonthList(currentMonth);
                 workoutManager.setWorkouts(reloadedWorkouts);
 
 
@@ -293,11 +303,13 @@ public class FitChasers {
 
                 Set<String> conflicts = workoutManager.checkForOverriddenTags(updatedWorkout);
                 if (!conflicts.isEmpty()) {
-                    ui.showMessage("⚠️ WARNING: These manual tags override auto-tags: " + conflicts);
+                    ui.showMessage("WARNING: These manual tags override auto-tags: " + conflicts);
                 }
 
             } catch (IOException e) {
                 ui.showMessage("Error saving workout data: " + e.getMessage());
+            } catch (FileNonexistent e) {
+                throw new RuntimeException(e);
             }
 
         } else {
@@ -394,12 +406,12 @@ public class FitChasers {
             }
         }
         if (mus != null && mus.trim().isEmpty()) {
-            ui.showMessage("❌ Muscle cannot be empty. Use: LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE");
+            ui.showMessage("Muscle cannot be empty. Use: LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE");
             return;
         }
 
         if (keyword != null && keyword.trim().isEmpty()) {
-            ui.showMessage("❌ Keyword cannot be empty. Example: /add_muscle_tag m/CARDIO k/running");
+            ui.showMessage("Keyword cannot be empty. Example: /add_muscle_tag m/CARDIO k/running");
             return;
         }
         if (mus != null && keyword != null) {
@@ -416,12 +428,11 @@ public class FitChasers {
                     fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
                     ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
                 } catch (IOException e) {
-                    ui.showMessage("⚠️ Error saving changes: " + e.getMessage());
+                    ui.showMessage("Error saving changes: " + e.getMessage());
                 }
             } catch (IllegalArgumentException e) {
-                ui.showMessage("❌ Invalid muscle group. Valid options: LEGS, POSTERIOR_CHAIN, CHEST, BACK, " +
+                ui.showMessage("Invalid muscle group. Valid options: LEGS, POSTERIOR_CHAIN, CHEST, BACK, " +
                         "SHOULDERS, ARMS, CORE");
-                return;
             }
         } else {
             ui.showMessage("Usage: /add_muscle_tag m/LEGS/ CHEST/... k/keyword");
@@ -444,12 +455,12 @@ public class FitChasers {
         }
 
         if (mod != null && mod.trim().isEmpty()) {
-            ui.showMessage("❌ Modality cannot be empty. Use: CARDIO or STRENGTH");
+            ui.showMessage("Modality cannot be empty. Use: CARDIO or STRENGTH");
             return;
         }
 
         if (keyword != null && keyword.trim().isEmpty()) {
-            ui.showMessage("❌ Keyword cannot be empty. Example: /add_modality_tag m/CARDIO k/running");
+            ui.showMessage("Keyword cannot be empty. Example: /add_modality_tag m/CARDIO k/running");
             return;
         }
 
@@ -474,8 +485,8 @@ public class FitChasers {
                     }
                 }
 
-                if (conflicts.length() > 0) {
-                    ui.showMessage("❌ CANNOT ADD KEYWORD: Conflicting modality tags detected:");
+                if (!conflicts.isEmpty()) {
+                    ui.showMessage("CANNOT ADD KEYWORD: Conflicting modality tags detected:");
                     ui.showMessage(conflicts.toString());
                     ui.showMessage("\nTo change these tags, first remove the old keyword or manually edit the tag.");
                     return;
@@ -491,11 +502,10 @@ public class FitChasers {
                     fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
                     ui.showMessage("✓ Added keyword '" + keyword + "' to modality " + mod);
                 } catch (IOException e) {
-                    ui.showMessage("⚠️ Error saving changes: " + e.getMessage());
+                    ui.showMessage("Error saving changes: " + e.getMessage());
                 }
             } catch (IllegalArgumentException e) {
-                ui.showMessage("❌ Invalid modality. Valid options: CARDIO, STRENGTH");
-                return;
+                ui.showMessage("Invalid modality. Valid options: CARDIO, STRENGTH");
             }
 
         } else {
@@ -546,7 +556,7 @@ public class FitChasers {
         }
     }
 
-    private static void initVariables() throws IOException {
+    private static void initVariables() throws IOException, FileNonexistent {
         try {
             savedName = fileHandler.loadUserName();
         } catch (IOException e) {
@@ -586,6 +596,7 @@ public class FitChasers {
             }
 
             ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started!");
+            ui.showQuickStartTutorial();
 
             try {
                 fileHandler.saveUserName(person);
@@ -600,9 +611,11 @@ public class FitChasers {
 
         try {
             fileHandler.loadWeightList(person);
-            workoutManager.setWorkouts(fileHandler.getWorkoutsForMonth(currentMonth), currentMonth);
+            workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
         } catch (IOException e) {
             ui.showError(e.getMessage());
+        } catch (FileNonexistent e) {
+            fileHandler.saveMonthList(currentMonth, new ArrayList<>());
         }
 
         viewLog = new ViewLog(ui, workoutManager, fileHandler);

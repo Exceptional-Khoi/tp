@@ -3,6 +3,7 @@ package seedu.fitchasers.gym;
 import java.util.List;
 import java.util.ArrayList;
 
+//@@nitin19011
 public class StaticGymData {
     public static List<Gym> getNusGyms() {
         List<Gym> gyms = new ArrayList<>();

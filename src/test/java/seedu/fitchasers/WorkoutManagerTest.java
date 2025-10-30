@@ -2,6 +2,7 @@ package seedu.fitchasers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.tagger.DefaultTagger;
@@ -26,7 +27,7 @@ class WorkoutManagerTest {
     private WorkoutManager manager;
 
     @BeforeEach
-    void setup() {
+    void setup() throws FileNonexistent, IOException {
         Tagger tagger = new DefaultTagger();
         FileHandler fileHandler = new FileHandler();
         manager = new WorkoutManager(tagger, fileHandler);
@@ -40,7 +41,7 @@ class WorkoutManagerTest {
     }
 
     @Test
-    void addExercise_validInput_addsExerciseToCurrentWorkout() {
+    void addExercise_validInput_addsExerciseToCurrentWorkout() throws IOException {
         manager.addExercise("n/PushUp r/10");
         Workout w = manager.getWorkouts().get(0);
         assertEquals(1, w.getExercises().size());
@@ -48,7 +49,7 @@ class WorkoutManagerTest {
     }
 
     @Test
-    void addSet_validInput_addsSetToCurrentExercise() {
+    void addSet_validInput_addsSetToCurrentExercise() throws IOException {
         manager.addExercise("n/Squat r/12");
         manager.addSet("r/15");
 
@@ -78,7 +79,7 @@ class WorkoutManagerTest {
                     return true;
                 }
             };
-            manager.endWorkout(dummyUI, endArgs);
+            manager.endWorkout(endArgs);
         }
 
         manager.addWorkout("n/run d/15/10/25 t/0730");

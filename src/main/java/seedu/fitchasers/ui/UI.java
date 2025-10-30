@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+//@@Exceptional-Khoi
 /**
  * Handles all user interactions for the FitChasers application.
  * Provides an enhanced text-based interface with chat-bubble visuals
@@ -173,6 +174,52 @@ public class UI {
     }
 
     /**
+     * Shows a one-page quick-start tutorial for first-time users.
+     * Guides the user to create a workout, add an exercise, end it, and view the log.
+     */
+    public void showQuickStartTutorial() {
+        showMessage("""
+                ====================  FITCHASERS • QUICK START  ====================
+                
+                Let's get your very first workout into the log in under a minute!
+                
+                1) Create your first workout
+                   Type:
+                     /create_workout n/My First Workout!
+                   Press Enter.
+                   When prompted about date and time, type:
+                     Y
+                     Y
+                   (This accepts today's date and the current time.)
+                
+                2) Add an exercise to this workout
+                   Type:
+                     /add_exercise n/First Exercise Eva r/12
+                   Press Enter.
+                
+                3) End and save the workout
+                   Type:
+                     /end_workout
+                   Press Enter.
+                   When prompted about date and time, type:
+                     Y
+                     Y
+                   (Accept current date/time again.)
+                
+                4) View your workout history
+                   Type:
+                     /view_log
+                   Press Enter to see the workout you just created!
+                
+                --------------------------------------------------------------------
+                Tips:
+                • You can also use short aliases: /create_workout (cw), /add_exercise (ae),
+                  /end_workout (ew), /view_log (vl)
+                • Need a full command reference? Type /help
+                ====================================================================
+                """);
+    }
+    /**
      * Displays the exit message upon program termination.
      */
     public void showExitMessage() {
@@ -209,10 +256,8 @@ public class UI {
         /view_log (vl)                            - View your workout history
         /open (o) INDEX                           - Open detailed view of a workout
                                                     e.g. /open 1
-        /del_workout (d) NAME                     - Delete a workout by name
-                                                    e.g. /del_workout PushDay
-        /del_workout (d) d/DATE                   - Delete a workout by date
-                                                    e.g. /del_workout d/20/10/25
+        /del_workout (dw) -m [Month] [Index]      - Delete a workout by ID. ID view by view_log command
+                                                    e.g. /del_workout -m 10 5 //Deletes fifth index of Oct
 
         ~~~ TAGGING SYSTEM ~~~
         /add_modality_tag (amot) m/(CARDIO/STRENGTH) k/KEYWORD
