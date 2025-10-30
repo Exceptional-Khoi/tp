@@ -188,7 +188,7 @@ public class FitChasers {
                     break;
                 //@@author Kart04
                 case "/del_workout":
-                case "d":
+                case "dw":
                     delMethod();
                     break;
                 //@@author
@@ -218,13 +218,16 @@ public class FitChasers {
         isRunning = false;
     }
 
-    private static void delMethod() throws InvalidCommandException, IOException {
+    private static void delMethod() throws InvalidCommandException, IOException, InvalidArgumentInput, FileNonexistent {
         // Format: /del_workout WORKOUT_NAME
         if (argumentStr.isEmpty()) {
             throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
                     "Please enter a valid command.");
-        } else if (argumentStr.contains("d/")) {
-            workoutManager.interactiveDeleteWorkout(argumentStr, ui);
+        } else if (argumentStr.contains("-m")) {
+            //workoutManager.interactiveDeleteWorkout(argumentStr);
+            ViewLog.Parsed p = viewLog.parseArgs(argumentStr);
+            workoutManager.setWorkouts(fileHandler.loadMonthList(p.ym()),p.ym());
+            workoutManager.deleteWorkoutByIndex(p.extractedArg());
         } else {
             workoutManager.deleteWorkout(argumentStr);
         }
@@ -594,6 +597,7 @@ public class FitChasers {
             }
 
             ui.showMessage("Nice to meet you, " + person.getName() + "! Let's get started!");
+            ui.showQuickStartTutorial();
 
             try {
                 fileHandler.saveUserName(person);

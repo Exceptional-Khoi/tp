@@ -49,7 +49,6 @@ public class WorkoutManager {
     private final Tagger tagger;
     private LocalDateTime workoutDateTime;
     private String workoutName;
-    private YearMonth monthOfWorkout;
     private YearMonth currentLoadedMonth;
     private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
     private final FileHandler fileHandler;
@@ -110,7 +109,7 @@ public class WorkoutManager {
         } catch (InvalidArgumentInput e) {
             return;
         }
-        monthOfWorkout = YearMonth.from(workoutDateTime);
+        YearMonth monthOfWorkout = YearMonth.from(workoutDateTime);
         if(!currentLoadedMonth.equals(monthOfWorkout)) {
             setWorkouts(fileHandler.loadMonthList(monthOfWorkout), monthOfWorkout);
         }
@@ -779,10 +778,10 @@ public class WorkoutManager {
         ui.showMessage(sb.toString());
     }
 
-    public void interactiveDeleteWorkout(String command, UI ui) throws IOException {
+    public void interactiveDeleteWorkout(String command) throws IOException {
         ArrayList<Workout> targetList = workouts;
 
-        if (command.contains("d/")) {
+        if (command.contains("")) {
             String dateStr = extractAfter(command, "d/").trim();
             String[] dateTokens = dateStr.split("\\s+");
             String datePart = dateTokens[0];
