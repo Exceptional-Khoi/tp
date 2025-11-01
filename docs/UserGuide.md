@@ -324,6 +324,7 @@ Format: `/del_workout WORKOUT_NAME` or `/del_workout d/DATE`
 
 Examples:
 * `/del_workout Chest Day`
+* `/del_workout d/30/10/25`
 
 ### Exiting the program: `/exit`
 Exits FitChasers and saves all your data.
