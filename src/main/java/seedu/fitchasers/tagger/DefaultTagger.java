@@ -25,7 +25,7 @@ public class DefaultTagger implements Tagger {
                 "leg", "squat", "hamstring", "quad", "calf", "leg day"
         )));
         muscleKeywords.put(MuscleGroup.POSTERIOR_CHAIN, new LinkedHashSet<>(Set.of("deadlift")));
-        muscleKeywords.put(MuscleGroup.CHEST, new LinkedHashSet<>(Set.of("bench", "push-up")));
+        muscleKeywords.put(MuscleGroup.CHEST, new LinkedHashSet<>(Set.of("bench", "push-up", "chest")));
         muscleKeywords.put(MuscleGroup.BACK, new LinkedHashSet<>(Set.of(
                 "row", "pull-up", "lat", "back", "lift", "swim"
         )));
