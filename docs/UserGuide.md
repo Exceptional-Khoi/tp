@@ -259,6 +259,7 @@ Alternative: `owt`
 Searches for nearby NUS gyms that have equipment for a specific exercise.
 
 Format: `/gym_where n/EXERCISE_NAME`
+* Ensure workout has ended before you modify the workout tag.
 
 * `EXERCISE_NAME` is the exercise you want to do. Rules: Same as `NAME` parameter rules above.
 
