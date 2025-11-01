@@ -113,7 +113,7 @@ public class FileHandler {
             }
         }
 
-        ui.showMessage("Saved " + list.size() + " workouts for " + month + " (text format).");
+        ui.showMessage("Saved " + list.size() + " workouts for " + month);
     }
 
     public boolean checkFileExists(YearMonth month) throws IOException {

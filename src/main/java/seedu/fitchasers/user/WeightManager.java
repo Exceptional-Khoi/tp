@@ -48,9 +48,8 @@ public class WeightManager {
         double weightValue;
         try {
             weightValue = Double.parseDouble(weightString.trim());
-            if (weightValue <= 0) {
-                ui.showMessage("Weight must be a positive number.");
-                return;
+            if (!isValidWeight(weightValue)) {
+                return; // error message handled in helper
             }
         } catch (NumberFormatException e) {
             ui.showMessage("Invalid weight. Please enter a number (e.g., 65 or 65.5).");
@@ -131,5 +130,25 @@ public class WeightManager {
             return "";
         }
         return text.substring(startIndex + "d/".length()).trim();
+    }
+
+    /**
+     * Validates that the weight is a positive number within a realistic range.
+     *
+     * @param weight the weight value to validate
+     * @return true if valid, false otherwise (also prints error messages)
+     */
+    public boolean isValidWeight(double weight) {
+        if (weight <= 0) {
+            ui.showMessage("Weight must be a positive number.");
+            return false;
+        }
+
+        if (weight < 20 || weight > 500) {
+            ui.showMessage("Weight must be between 20 kg and 500 kg.");
+            return false;
+        }
+
+        return true;
     }
 }

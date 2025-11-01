@@ -2,6 +2,7 @@ package seedu.fitchasers.ui;
 
 import seedu.fitchasers.workouts.Exercise;
 import seedu.fitchasers.workouts.Workout;
+import seedu.fitchasers.user.WeightManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -103,26 +104,26 @@ public class UI {
      *
      * @return the user's initial weight as a double, or -1 if input fails
      */
-    public double enterWeight() {
+    public double enterWeight(WeightManager weightManager) {
         double weight = -1;
-        while (weight <= 0) {
+        while (true) {
             showMessage("Please enter your initial weight (in kg).");
             String ans = readInsideRightBubble("Enter your weight > ");
             if (ans == null) {
                 showError("No input detected. Exiting weight entry.");
                 return -1;
             }
+
             String input = ans.trim();
             try {
                 weight = Double.parseDouble(input);
-                if (weight <= 0) {
-                    showError("Weight must be a positive number. Try again!");
+                if (weightManager.isValidWeight(weight)) {
+                    return weight;
                 }
             } catch (NumberFormatException e) {
                 showError("Invalid number. Please enter a valid weight (e.g., 60.5).");
             }
         }
-        return weight;
     }
 
     /**
@@ -234,7 +235,7 @@ public class UI {
         /help (h)                                 - View all available commands
         
         ~~~ USER PROFILE ~~~
-        /rename (n) n/NAME                       - Set or change your display name
+        /rename (rn) n/NAME                       - Set or change your display name
                                                    e.g. /rename n/Nitin
         
         ~~~ WEIGHT TRACKING ~~~

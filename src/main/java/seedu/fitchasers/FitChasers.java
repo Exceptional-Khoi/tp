@@ -69,6 +69,7 @@ public class FitChasers {
                 break;
             }
             if (input.trim().isEmpty()) {
+                ui.showMessage("Please enter a command, or type /help or h for options.");
                 continue;
             }
 
@@ -93,10 +94,10 @@ public class FitChasers {
                     break;
                 }
 
-                case "/rename": {
+                case "/rename":
+                case "rn":
                     renameMethod();
                     break;
-                }
 
                 case "/add_weight":
                 case "aw":
@@ -142,7 +143,6 @@ public class FitChasers {
                     amtMethod();
                     break;
                 }
-
 
                 case "/gym_where":
                 case "gw": {
@@ -579,15 +579,14 @@ public class FitChasers {
             }
 
             // Prompt for initial weight
-            double initialWeight = ui.enterWeight();
+            WeightManager tempWeightManager = new WeightManager(person);
+            double initialWeight = ui.enterWeight(tempWeightManager);
             if (initialWeight > 0) {
-                WeightManager weightManager = new WeightManager(person);
-
                 String todayStr = java.time.LocalDate.now()
                         .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
                 String command = "w/" + initialWeight + " d/" + todayStr;
 
-                weightManager.addWeight(command);
+                tempWeightManager.addWeight(command);
                 try {
                     fileHandler.saveWeightList(person);
                 } catch (IOException e) {
