@@ -122,7 +122,8 @@ public class WorkoutManager {
             return;
         }
         YearMonth monthOfWorkout = YearMonth.from(workoutDateTime);
-        System.out.println("[DEBUG] addWorkout: parsed workoutName='" + workoutName + "' workoutDateTime=" + workoutDateTime
+        System.out.println("[DEBUG] addWorkout: parsed workoutName='" + workoutName + "' workoutDateTime="
+                + workoutDateTime
                 + " currentLoadedMonth=" + currentLoadedMonth + " monthOfWorkout=" + monthOfWorkout);
 
         if (!currentLoadedMonth.equals(monthOfWorkout)) {
@@ -140,7 +141,8 @@ public class WorkoutManager {
             // Only load if valid
             System.out.println("[DEBUG] addWorkout: loading month list for: " + monthOfWorkout);
             setWorkouts(fileHandler.loadMonthList(monthOfWorkout), monthOfWorkout);
-            System.out.println("[DEBUG] addWorkout: after load, workouts.size()=" + (workouts == null ? "null" : workouts.size()));
+            System.out.println("[DEBUG] addWorkout: after load, workouts.size()=" + (workouts == null ? "null"
+                    : workouts.size()));
         }
 
         // Reject if the new start time falls inside any existing workout on the same day
