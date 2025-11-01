@@ -125,6 +125,18 @@ public class WorkoutManager {
             setWorkouts(fileHandler.loadMonthList(monthOfWorkout), monthOfWorkout);
         }
 
+            // Reject if the new start time falls inside any existing workout on the same day
+            Workout conflict = findOverlappingWorkout(workoutDateTime);
+            if (conflict != null) {
+                LocalDateTime s = conflict.getWorkoutStartDateTime();
+                LocalDateTime e = conflict.getWorkoutEndDateTime();
+                String startStr = s.toLocalTime().format(TIME_FMT);
+                String endStr = (e == null) ? "ongoing" : e.toLocalTime().format(TIME_FMT);
+                ui.showMessage("[Error] Cannot create overlapping workout. "
+                        + "Conflicts with \"" + conflict.getWorkoutName() + "\" (" + startStr + "–" + endStr + ").");
+                return;
+            }
+
         try {
             Workout newWorkout = new Workout(workoutName, workoutDateTime);
 
@@ -984,4 +996,40 @@ public class WorkoutManager {
         }
         return true;
     }
+
+    /**
+     * Finds an existing workout that the given start time would overlap with.
+     * Overlap rule: same calendar day AND existingStart <= newStart < existingEnd.
+     * If an existing workout has no end time, treat it as ongoing (i.e., overlap if newStart >= existingStart).
+     *
+     * @param newStart proposed start time for the new workout
+     * @return the conflicting workout, or null if none
+     */
+    private Workout findOverlappingWorkout(LocalDateTime newStart) {
+        for (Workout w : workouts) {
+            LocalDateTime s = w.getWorkoutStartDateTime();
+            if (s == null) {
+                continue;
+            }
+            if (!s.toLocalDate().equals(newStart.toLocalDate())) {
+                continue; // only compare within the same day
+            }
+
+            LocalDateTime e = w.getWorkoutEndDateTime();
+            if (e == null) {
+                // treat as ongoing session from s onwards
+                if (!newStart.isBefore(s)) {
+                    return w;
+                }
+            } else {
+                // overlap if s <= newStart < e
+                boolean startsDuring = !newStart.isBefore(s) && newStart.isBefore(e);
+                if (startsDuring) {
+                    return w;
+                }
+            }
+        }
+        return null;
+    }
+
 }
