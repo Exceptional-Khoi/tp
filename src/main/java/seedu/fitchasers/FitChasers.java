@@ -578,15 +578,14 @@ public class FitChasers {
             }
 
             // Prompt for initial weight
-            double initialWeight = ui.enterWeight();
+            WeightManager tempWeightManager = new WeightManager(person);
+            double initialWeight = ui.enterWeight(tempWeightManager);
             if (initialWeight > 0) {
-                WeightManager weightManager = new WeightManager(person);
-
                 String todayStr = java.time.LocalDate.now()
                         .format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
                 String command = "w/" + initialWeight + " d/" + todayStr;
 
-                weightManager.addWeight(command);
+                tempWeightManager.addWeight(command);
                 try {
                     fileHandler.saveWeightList(person);
                 } catch (IOException e) {

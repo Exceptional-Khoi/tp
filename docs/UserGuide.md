@@ -74,7 +74,9 @@ Rules:
 
 * `WEIGHT`: A numeric value (integer or decimal) in kilograms
   - Must be between 20.0 and 500.0 (for realistic human body weight range).
-  - Only one decimal point allowed.
+  - All weights are rounded up to 1 decimal place. 
+  - Due to floating-point precision in Java, extremely close values such as 19.999999999999999 or 500.000000000000001 
+  will be rounded into the valid range and accepted. This behaviour is expected and does not affect normal usage.
   - Must not contain symbols or units (e.g., kg is not accepted).
   - Must input weight and date respectively.
 
