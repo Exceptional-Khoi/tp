@@ -53,6 +53,8 @@ This command allows you to update your display name in FitChasers. The name is s
 
 Format: `/rename n/NAME`
 
+Alternative: `rn`
+
 * `NAME`:
   - Must contain only letters (A–Z, a–z), numbers (0–9), spaces, underscores (_), or dashes (-). 
   - Must be 1–30 characters long. 

@@ -93,10 +93,10 @@ public class FitChasers {
                     break;
                 }
 
-                case "/rename": {
+                case "/rename":
+                case "rn":
                     renameMethod();
                     break;
-                }
 
                 case "/add_weight":
                 case "aw":
@@ -142,7 +142,6 @@ public class FitChasers {
                     amtMethod();
                     break;
                 }
-
 
                 case "/gym_where":
                 case "gw": {

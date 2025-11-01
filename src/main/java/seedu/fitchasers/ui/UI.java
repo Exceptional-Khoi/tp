@@ -234,7 +234,7 @@ public class UI {
         /help (h)                                 - View all available commands
         
         ~~~ USER PROFILE ~~~
-        /rename (n) n/NAME                       - Set or change your display name
+        /rename (rn) n/NAME                       - Set or change your display name
                                                    e.g. /rename n/Nitin
         
         ~~~ WEIGHT TRACKING ~~~
