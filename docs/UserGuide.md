@@ -241,7 +241,7 @@ Examples:
 Alternative: `amt`
 
 ### Overriding Workout Tags: `/override_workout_tag`
-Manually replaces the tags of a specific workout with a single new tag, clearing all auto-generated tags.
+Manually replaces the tags of a specific workout with a single new tag, clearing all auto-generated tags and manual tags.
 
 Format: `/override_workout_tag id/WORKOUT_ID newTag/TAG_NAME`
 * The `WORKOUT_ID` is the index number of the workout (use `/view_log` to see IDs).
