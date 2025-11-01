@@ -124,18 +124,18 @@ public class WorkoutManager {
             // Only load if valid
             setWorkouts(fileHandler.loadMonthList(monthOfWorkout), monthOfWorkout);
         }
+        // Reject if the new start time falls inside any existing workout on the same day
 
-            // Reject if the new start time falls inside any existing workout on the same day
-            Workout conflict = findOverlappingWorkout(workoutDateTime);
-            if (conflict != null) {
-                LocalDateTime s = conflict.getWorkoutStartDateTime();
-                LocalDateTime e = conflict.getWorkoutEndDateTime();
-                String startStr = s.toLocalTime().format(TIME_FMT);
-                String endStr = (e == null) ? "ongoing" : e.toLocalTime().format(TIME_FMT);
-                ui.showMessage("[Error] Cannot create overlapping workout. "
-                        + "Conflicts with \"" + conflict.getWorkoutName() + "\" (" + startStr + "–" + endStr + ").");
-                return;
-            }
+        Workout conflict = findOverlappingWorkout(workoutDateTime);
+        if (conflict != null) {
+            LocalDateTime s = conflict.getWorkoutStartDateTime();
+            LocalDateTime e = conflict.getWorkoutEndDateTime();
+            String startStr = s.toLocalTime().format(TIME_FMT);
+            String endStr = (e == null) ? "ongoing" : e.toLocalTime().format(TIME_FMT);
+            ui.showMessage("[Error] Cannot create overlapping workout. "
+                    + "Conflicts with \"" + conflict.getWorkoutName() + "\" (" + startStr + "–" + endStr + ").");
+            return;
+        }
 
         try {
             Workout newWorkout = new Workout(workoutName, workoutDateTime);
@@ -758,16 +758,6 @@ public class WorkoutManager {
 
     /**
      * Ends the current workout session by recording the end time and calculating duration.
-     * <p>
-     * Accepts user input in the format: /end_workout d/DD/MM/YY t/HHmm
-     * If either date or time is missing, uses the current date or time as default.
-     * Validates that the end date and time are not before the workout's start.
-     * If the user input is invalid (earlier than start), prompts for re-entry until valid.
-     *
-     * @param initialArgs Initial command arguments containing end date/time details
-     */
-    /**
-     * Ends the current workout session by recording the end time and calculating duration.
      * Usage: /end_workout d/DD/MM/YY t/HHmm
      * - Allows at most one d/ and one t/ (order: d/ then t/ if both present)
      * - Prompts for missing date/time (defaults to now with confirmation)
@@ -812,8 +802,10 @@ public class WorkoutManager {
         }
 
         // extract slices if present
-        Slice dateSlice = null, timeSlice = null;
-        String dateStr = "", timeStr = "";
+        Slice dateSlice = null;
+        Slice timeSlice = null;
+        String dateStr = "";
+        String timeStr = "";
 
         if (dIdx != -1) {
             dateSlice = extractSlice(args, dIdx);
@@ -899,10 +891,16 @@ public class WorkoutManager {
 
         // --- Overlap guard against later workouts on the SAME DAY ---
         for (Workout w : workouts) {
-            if (w == currentWorkout) continue;
+            if (w == currentWorkout){
+                continue;
+            }
             LocalDateTime otherStart = w.getWorkoutStartDateTime();
-            if (otherStart == null) continue;
-            if (!otherStart.toLocalDate().equals(startTime.toLocalDate())) continue;
+            if (otherStart == null){
+                continue;
+            }
+            if (!otherStart.toLocalDate().equals(startTime.toLocalDate())){
+                continue;
+            }
 
             // conflict if another workout starts at/after our start and before our proposed end
             if (!otherStart.isBefore(startTime) && otherStart.isBefore(proposedEnd)) {
