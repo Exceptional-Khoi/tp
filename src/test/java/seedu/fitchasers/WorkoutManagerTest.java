@@ -31,7 +31,7 @@ class WorkoutManagerTest {
         Tagger tagger = new DefaultTagger();
         FileHandler fileHandler = new FileHandler();
         manager = new WorkoutManager(tagger, fileHandler);
-        manager.addWorkout("n/TestWorkout d/24/10/25 t/1400");
+        manager.addWorkout("n/TestWorkout d/01/11/25 t/1400");
     }
 
     @Test
@@ -82,7 +82,7 @@ class WorkoutManagerTest {
             manager.endWorkout(endArgs);
         }
 
-        manager.addWorkout("n/run d/15/10/25 t/0730");
+        manager.addWorkout("n/run d/01/11/25 t/0730");
 
         assertEquals(2, manager.getWorkouts().size());
         assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
