@@ -134,6 +134,24 @@ public class FileHandler {
         throw new FileNonexistent("No save file found for " + month);
     }
 
+    /**
+     * Gets the workouts for a specific month from disk.
+     * This bypasses the cache and always reads fresh data from the file.
+     *
+     * @param month the YearMonth to load workouts for
+     * @return a fresh ArrayList of workouts for that month
+     * @throws IOException if reading fails
+     * @throws FileNonexistent if no file exists for that month
+     */
+    public ArrayList<Workout> getWorkoutsForMonth(YearMonth month) throws IOException, FileNonexistent {
+        // Always read directly from file, don't use cache
+        Path txt = workoutDir.resolve(String.format("workouts_%s.txt", month));
+        if (!checkFileExists(month)) {
+            throw new FileNonexistent("No save file found for " + month);
+        }
+        return readMonthFromTxt(txt);  // Always fresh from disk
+    }
+
     private void writeWorkoutBlock(BufferedWriter bw, Workout workout) throws IOException {
         final String name = workout.getWorkoutName();
         final int duration = workout.getDuration();

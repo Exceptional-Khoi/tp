@@ -273,10 +273,9 @@ public class FitChasers {
                 return;
             }
 
-            String oldTags = workout.getAllTags().toString();
+            Set<String> oldTags = workout.getAllTags();
 
-            // ASK FOR CONFIRMATION BEFORE CHANGING
-            ui.showMessage("Current tags: " + oldTags);
+            ui.showMessage("Current tags: " + String.join(", ", oldTags));
             ui.showMessage("Change to: " + newTag + "?");
             ui.showMessage("Are you sure? (y/n)");
 
@@ -285,23 +284,33 @@ public class FitChasers {
                 return;
             }
 
+            Set<String> autoTagsThatWillBeOverridden = tagger.suggest(workout);
+            if (!autoTagsThatWillBeOverridden.isEmpty()) {
+                ui.showMessage("⚠️ WARNING: This will override auto generated tags: " + String.join(", ",
+                        autoTagsThatWillBeOverridden));
+                ui.showMessage("Continue with override? (y/n)");
+
+                if (!ui.confirmationMessage()) {
+                    ui.showMessage("Override cancelled.");
+                    return;
+                }
+            }
+
             workoutManager.overrideWorkoutTags(workout, newTag);
+
 
 
             try {
                 fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
 
-                ArrayList<Workout> reloadedWorkouts = fileHandler.loadMonthList(currentMonth);
+                ArrayList<Workout> reloadedWorkouts = fileHandler.getWorkoutsForMonth(currentMonth);
                 workoutManager.setWorkouts(reloadedWorkouts);
 
-
-                Workout updatedWorkout = workout;
-                String newTagsDisplay = updatedWorkout.getAllTags().toString();
-
                 ui.showMessage("✓ Workout tags updated successfully.");
-                ui.showMessage("  New tags: " + newTagsDisplay);
+                ui.showMessage("  New tags: " + newTag);
 
-                Set<String> conflicts = workoutManager.checkForOverriddenTags(updatedWorkout);
+                Set<String> conflicts = workoutManager.checkForOverriddenTags(reloadedWorkouts.get(workoutId - 1));
+
                 if (!conflicts.isEmpty()) {
                     ui.showMessage("WARNING: These manual tags override auto-tags: " + conflicts);
                 }

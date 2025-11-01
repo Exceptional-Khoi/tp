@@ -154,9 +154,11 @@ public class WorkoutManager {
             workouts.add(newWorkout);
             currentWorkout = newWorkout;
             ui.showMessage("New workout sesh incoming!");
-            ui.showMessage("Tags generated for workout: " + suggestedTags + "\n"
-                    + "Added workout: " + workoutName);
-            fileHandler.saveMonthList(currentLoadedMonth, workouts);
+            ui.showMessage("Tags generated for workout: " + (suggestedTags == null || suggestedTags.isEmpty()
+                    ? "none"
+                    : String.join(", ", suggestedTags)) + "\n"
+                            + "Added workout: " + workoutName);
+            fileHandler.saveMonthList(currentLoadedMonth,workouts);
 
         } catch (Exception e) {
             ui.showMessage("Something went wrong creating the workout. Please try again.");

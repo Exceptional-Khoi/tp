@@ -78,10 +78,11 @@ Rules:
   - Due to floating-point precision in Java, extremely close values such as 19.999999999999999 or 500.000000000000001 
   will be rounded into the valid range and accepted. This behaviour is expected and does not affect normal usage.
   - Must not contain symbols or units (e.g., kg is not accepted).
-  - Must input weight and date respectively.
+  - Must input weight.
 
 
 * `DATE`: Must follow DD/MM/YY format. 
+  - Defaults to today's date if not provided.
   - Day must be `01` to `31`.
   - Month must be `01` to `12`.
   - Year must be two digits (e.g., `25` for 2025).
@@ -240,13 +241,13 @@ Valid Muscle Groups:
 `CORE` - Core exercises like planks, abs work
 
 Examples:
-- `add_muscle_tag m/LEGS k/lunges`
-- `add_muscle_tag m/CHEST k/push_ups`
+- `/add_muscle_tag m/LEGS k/lunges`
+- `/add_muscle_tag m/CHEST k/push_ups`
 
 Alternative: `amt`
 
 ### Overriding Workout Tags: `/override_workout_tag`
-Manually replaces the tags of a specific workout with a single new tag, clearing all auto-generated tags.
+Manually replaces the tags of a specific workout with a single new tag, clearing all auto-generated tags and manual tags.
 
 Format: `/override_workout_tag id/WORKOUT_ID newTag/TAG_NAME`
 * The `WORKOUT_ID` is the index number of the workout (use `/view_log` to see IDs).
@@ -264,6 +265,7 @@ Alternative: `owt`
 Searches for nearby NUS gyms that have equipment for a specific exercise.
 
 Format: `/gym_where n/EXERCISE_NAME`
+* Ensure workout has ended before you modify the workout tag.
 
 * `EXERCISE_NAME` is the exercise you want to do. Rules: Same as `NAME` parameter rules above.
 
@@ -291,8 +293,17 @@ Displays a list of your workouts, typically for the current month.
 
 Format: `/view_log`
 
-**Note:** Extraneous parameters for commands that do not take in parameters will be ignored.<br>
-e.g. if the command specifies /view_weight 123, it will be interpreted as /view_weight.
+Parameters:
+* -m Month [PAGE] - View workouts for a specific month in the current year
+  * `MONTH` must be `1-12` (e.g., 10 for October)
+  * Optional `PAGE` for pagination (default is page 1)
+* `-ym YEAR MONTH [PAGE]` - View workouts for a specific year and month
+  * `YEAR` must be a two-digit year (e.g.`25` for 2025)
+  * `MONTH` must be `1-12`
+* `[PAGE]` - Navigate to a specific page of the current month's workouts
+  * `PAGE` must be a positive integer
+* `-d` - Display workouts in detailed view with full exercise information
+Default Behavior: When called without parameters, shows the current month's workouts (page 1).
 
 Alternative: `vl`
 
@@ -320,6 +331,7 @@ Format: `/del_workout WORKOUT_NAME` or `/del_workout d/DATE`
 
 Examples:
 * `/del_workout Chest Day`
+* `/del_workout d/30/10/25`
 
 ### Exiting the program: `/exit`
 Exits FitChasers and saves all your data.
