@@ -74,7 +74,7 @@ Rules:
   - Must be between 20.0 and 500.0 (for realistic human body weight range).
   - Only one decimal point allowed.
   - Must not contain symbols or units (e.g., kg is not accepted).
-  - Must input weight and date respectively.
+  - Must input weight.
 
 
 * `DATE`: Must follow DD/MM/YY format. 
@@ -235,8 +235,8 @@ Valid Muscle Groups:
 `CORE` - Core exercises like planks, abs work
 
 Examples:
-- `add_muscle_tag m/LEGS k/lunges`
-- `add_muscle_tag m/CHEST k/push_ups`
+- `/add_muscle_tag m/LEGS k/lunges`
+- `/add_muscle_tag m/CHEST k/push_ups`
 
 Alternative: `amt`
 
