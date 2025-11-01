@@ -285,8 +285,17 @@ Displays a list of your workouts, typically for the current month.
 
 Format: `/view_log`
 
-**Note:** Extraneous parameters for commands that do not take in parameters will be ignored.<br>
-e.g. if the command specifies /view_weight 123, it will be interpreted as /view_weight.
+Parameters:
+* -m Month [PAGE] - View workouts for a specific month in the current year
+  * `MONTH` must be `1-12` (e.g., 10 for October)
+  * Optional `PAGE` for pagination (default is page 1)
+* `-ym YEAR MONTH [PAGE]` - View workouts for a specific year and month
+  * `YEAR` must be a two-digit year (e.g.`25` for 2025)
+  * `MONTH` must be `1-12`
+* `[PAGE]` - Navigate to a specific page of the current month's workouts
+  * `PAGE` must be a positive integer
+* `-d` - Display workouts in detailed view with full exercise information
+Default Behavior: When called without parameters, shows the current month's workouts (page 1).
 
 Alternative: `vl`
 
