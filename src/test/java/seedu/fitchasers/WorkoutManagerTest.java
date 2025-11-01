@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.storage.FileHandler;
-import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Tagger;
 import seedu.fitchasers.workouts.Exercise;
@@ -15,21 +14,52 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import java.lang.reflect.Field;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class WorkoutManagerTest {
 
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yy");
+    private static final DateTimeFormatter TIME_FMT = DateTimeFormatter.ofPattern("HHmm");
     private WorkoutManager manager;
+    /** Use the manager's currentLoadedMonth so dates always match CI environment */
+    private static String dateInLoadedMonth(WorkoutManager m) {
+        try {
+            Field f = m.getClass().getDeclaredField("currentLoadedMonth");
+            f.setAccessible(true);
+            YearMonth ym = (YearMonth) f.get(m);
+            LocalDate d = ym.atDay(1); // 01 of that month
+            return d.format(DATE_FMT);
+        } catch (Exception e) {
+            // Fallback: today (still stable in most envs)
+            return LocalDate.now().format(DATE_FMT);
+        }
+    }
 
-    private static String today() {
-        return LocalDate.now().format(DATE_FMT);
+    /** If there's an active workout, end it 1 minute later so it gets saved to the list */
+    private static void endIfActive(WorkoutManager m) throws Exception {
+        Field f = m.getClass().getDeclaredField("currentWorkout");
+        f.setAccessible(true);
+        Object cw = f.get(m);
+        if (cw != null) {
+            LocalDateTime start = (LocalDateTime) cw.getClass()
+                    .getMethod("getWorkoutStartDateTime").invoke(cw);
+            LocalDateTime end = start.plusMinutes(1);
+            String args = "d/" + end.format(DATE_FMT) + " t/" + end.format(TIME_FMT);
+            m.endWorkout(args);
+        }
+    }
+
+    /** Get the active (current) workout via reflection to assert exercises/sets without persisting */
+    private static Workout current(WorkoutManager m) throws Exception {
+        Field f = m.getClass().getDeclaredField("currentWorkout");
+        f.setAccessible(true);
+        return (Workout) f.get(m);
     }
 
     @BeforeEach
@@ -37,29 +67,39 @@ class WorkoutManagerTest {
         Tagger tagger = new DefaultTagger();
         FileHandler fileHandler = new FileHandler();
         manager = new WorkoutManager(tagger, fileHandler);
-        manager.addWorkout("n/TestWorkout d/" + today() + " t/1400");
+
+        String d = dateInLoadedMonth(manager);
+        manager.addWorkout("n/TestWorkout d/" + d + " t/1400");
     }
 
     @Test
-    void addWorkout_validInput_addsWorkoutToList() {
+    void addWorkout_validInput_addsWorkoutToList() throws Exception {
+        // Persist first so it appears in the stored list
+        endIfActive(manager);
+
         assertEquals(1, manager.getWorkouts().size());
         assertEquals("TestWorkout", manager.getWorkouts().get(0).getWorkoutName());
     }
 
     @Test
-    void addExercise_validInput_addsExerciseToCurrentWorkout() throws IOException {
+    void addExercise_validInput_addsExerciseToCurrentWorkout() throws Exception {
         manager.addExercise("n/PushUp r/10");
-        Workout w = manager.getWorkouts().get(0);
+
+        // Check the active workout (not the saved list)
+        Workout w = current(manager);
+        assertNotNull(w, "Expected an active workout after addWorkout");
         assertEquals(1, w.getExercises().size());
         assertEquals("PushUp", w.getExercises().get(0).getName());
     }
 
     @Test
-    void addSet_validInput_addsSetToCurrentExercise() throws IOException {
+    void addSet_validInput_addsSetToCurrentExercise() throws Exception {
         manager.addExercise("n/Squat r/12");
         manager.addSet("r/15");
 
-        Workout w = manager.getWorkouts().get(0);
+        // Still in the active workout
+        Workout w = current(manager);
+        assertNotNull(w, "Expected an active workout after addWorkout");
         Exercise ex = w.getExercises().get(0);
         assertEquals(2, ex.getNumSets());
         assertEquals(15, ex.getSets().get(1));
@@ -67,39 +107,24 @@ class WorkoutManagerTest {
 
     @Test
     void addWorkout_validInput_addsWorkoutToCurrentSet() throws Exception {
-        java.lang.reflect.Field field = manager.getClass().getDeclaredField("currentWorkout");
-        field.setAccessible(true);
-        Object current = field.get(manager);
-        if (current != null) {
-            LocalDateTime start = (LocalDateTime) current.getClass()
-                    .getMethod("getWorkoutStartDateTime")
-                    .invoke(current);
-            LocalDateTime end = start.plusMinutes(1);
+        // End the first workout so it's saved into the list
+        endIfActive(manager);
 
-            String endArgs = String.format("d/%s t/%s",
-                    end.format(DateTimeFormatter.ofPattern("dd/MM/yy")),
-                    end.format(DateTimeFormatter.ofPattern("HHmm")));
+        String d = dateInLoadedMonth(manager);
+        manager.addWorkout("n/run d/" + d + " t/0730");
 
-            UI dummyUI = new UI() {
-                @Override public boolean confirmationMessage() {
-                    return true;
-                }
-            };
-            manager.endWorkout(endArgs);
-        }
-
-        manager.addWorkout("n/run d/" + today() + " t/0730");
+        // End the second one too so list has 2
+        endIfActive(manager);
 
         assertEquals(2, manager.getWorkouts().size());
         assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
     }
 
-
     @Test
     void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() throws IOException {
         manager.deleteWorkout("run");
         assertThrows(IndexOutOfBoundsException.class,
-                ()-> manager.getWorkouts().get(1));
+                () -> manager.getWorkouts().get(1));
     }
 
     @Test
@@ -114,5 +139,4 @@ class WorkoutManagerTest {
 
         System.setOut(System.out); // reset stdout
     }
-
 }
