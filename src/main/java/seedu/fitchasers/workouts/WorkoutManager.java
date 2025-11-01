@@ -286,7 +286,7 @@ public class WorkoutManager {
         this.workoutDateTime = LocalDateTime.of(parsedDate, parsedTime);
 
         // Future/past confirmations + month file bootstrap (reuse your existing logic)
-        checkPastFutureDate(parsedDate, DATE_FMT, parsedTime, TIME_FMT);
+        checkPastFutureDate(parsedDate,parsedTime);
 
         // Duplicate date/time check (unchanged from your version)
         for (Workout w : workouts) {
@@ -349,7 +349,7 @@ public class WorkoutManager {
         time = extractTimeFromRaw(command, tIndex);
         promptIfDateOrTimeMissing();
         workoutDateTime = LocalDateTime.of(date, time);
-        checkPastFutureDate(date, dateFmt, time, timeFmt);
+        checkPastFutureDate(date, time);
 
         // Check if any existing workout already has the same date/time
         for (Workout w : workouts) {
@@ -464,8 +464,7 @@ public class WorkoutManager {
         }
     }
 
-    private void checkPastFutureDate(LocalDate date, DateTimeFormatter dateFmt,
-                                     LocalTime time, DateTimeFormatter timeFmt)
+    private void checkPastFutureDate(LocalDate date, LocalTime time)
             throws InvalidArgumentInput, IOException {
         if (date.isAfter(LocalDate.now())) {
             ui.showMessage("The date you entered (" + date.format(DATE_FMT)

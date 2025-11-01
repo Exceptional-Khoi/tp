@@ -11,9 +11,7 @@ import seedu.fitchasers.workouts.Exercise;
 import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.WorkoutManager;
 
-//import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-//import java.io.PrintStream;
 
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
@@ -21,7 +19,6 @@ import java.time.format.DateTimeFormatter;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-//import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WorkoutManagerTest {
     //methodName_whatIsTheConditionYouAreTesting_Outcome(If 2 Paths Can Exclude)
