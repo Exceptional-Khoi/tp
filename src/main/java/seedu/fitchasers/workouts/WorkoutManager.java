@@ -110,22 +110,14 @@ public class WorkoutManager {
         workoutName = "";
         try {
             if (command.contains("d/") || command.contains("t/")) {
-                System.out.println("[DEBUG] addWorkout: using strict parser for command: " + command);
                 formatInputForWorkoutStrict(command);
             } else {
-                System.out.println("[DEBUG] addWorkout: using lenient parser for command: " + command);
                 formatInputForWorkout(command);
             }
         } catch (InvalidArgumentInput e) {
-            System.out.println("[DEBUG] addWorkout: parsing threw InvalidArgumentInput; aborting add. command="
-                    + command + " parsedName=" + workoutName + " parsedDateTime=" + workoutDateTime);
             return;
         }
         YearMonth monthOfWorkout = YearMonth.from(workoutDateTime);
-        System.out.println("[DEBUG] addWorkout: parsed workoutName='" + workoutName + "' workoutDateTime="
-                + workoutDateTime
-                + " currentLoadedMonth=" + currentLoadedMonth + " monthOfWorkout=" + monthOfWorkout);
-
         if (!currentLoadedMonth.equals(monthOfWorkout)) {
             // Check if workout month is before the month app was first started
             if (monthOfWorkout.isBefore(currentLoadedMonth)) {
@@ -134,15 +126,11 @@ public class WorkoutManager {
                         + currentLoadedMonth.getMonth().name().toLowerCase().substring(1)
                         + " of " + currentLoadedMonth.getYear() + ".");
                 ui.showMessage("Please start your fitness logging from then!");
-                System.out.println("[DEBUG] addWorkout: rejecting because monthOfWorkout is before currentLoadedMonth");
                 return; // stop creating workout
             }
 
             // Only load if valid
-            System.out.println("[DEBUG] addWorkout: loading month list for: " + monthOfWorkout);
             setWorkouts(fileHandler.loadMonthList(monthOfWorkout), monthOfWorkout);
-            System.out.println("[DEBUG] addWorkout: after load, workouts.size()=" + (workouts == null ? "null"
-                    : workouts.size()));
         }
 
         // Reject if the new start time falls inside any existing workout on the same day
@@ -154,7 +142,6 @@ public class WorkoutManager {
             String endStr = (e == null) ? "ongoing" : e.toLocalTime().format(TIME_FMT);
             ui.showMessage("[Error] Cannot create overlapping workout. "
                     + "Conflicts with \"" + conflict.getWorkoutName() + "\" (" + startStr + "–" + endStr + ").");
-            System.out.println("[DEBUG] addWorkout: found conflicting workout: " + conflict.getWorkoutName());
             return;
         }
 
@@ -166,7 +153,6 @@ public class WorkoutManager {
             newWorkout.setAutoTags(suggestedTags);
             workouts.add(newWorkout);
             currentWorkout = newWorkout;
-            System.out.println("[DEBUG] addWorkout: added new workout; workouts.size() now=" + workouts.size());
             ui.showMessage("New workout sesh incoming!");
             ui.showMessage("Tags generated for workout: " + suggestedTags + "\n"
                     + "Added workout: " + workoutName);
@@ -174,7 +160,6 @@ public class WorkoutManager {
 
         } catch (Exception e) {
             ui.showMessage("Something went wrong creating the workout. Please try again.");
-            System.out.println("[DEBUG] addWorkout: exception while creating/saving workout: " + e.getMessage());
         }
     }
 
