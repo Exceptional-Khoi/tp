@@ -24,15 +24,14 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WorkoutManagerTest {
-    //methodName_whatIsTheConditionYouAreTesting_Outcome(If 2 Paths Can Exclude)
+
     private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yy");
+    private WorkoutManager manager;
 
     private static String today() {
         return LocalDate.now().format(DATE_FMT);
     }
 
-    private WorkoutManager manager;
-    
     @BeforeEach
     void setup() throws FileNonexistent, IOException {
         Tagger tagger = new DefaultTagger();
