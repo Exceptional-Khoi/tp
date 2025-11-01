@@ -15,6 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -25,13 +26,19 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class WorkoutManagerTest {
     //methodName_whatIsTheConditionYouAreTesting_Outcome(If 2 Paths Can Exclude)
     private WorkoutManager manager;
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd/MM/yy");
+
+    private static String today() {
+        return LocalDate.now().format(DATE_FMT);
+    }
+
 
     @BeforeEach
     void setup() throws FileNonexistent, IOException {
         Tagger tagger = new DefaultTagger();
         FileHandler fileHandler = new FileHandler();
         manager = new WorkoutManager(tagger, fileHandler);
-        manager.addWorkout("n/TestWorkout d/01/11/25 t/1400");
+        manager.addWorkout("n/TestWorkout d/" + today() + " t/1400");
     }
 
     @Test
@@ -82,7 +89,7 @@ class WorkoutManagerTest {
             manager.endWorkout(endArgs);
         }
 
-        manager.addWorkout("n/run d/01/11/25 t/0730");
+        manager.addWorkout("n/run d/" + today() + " t/0730");
 
         assertEquals(2, manager.getWorkouts().size());
         assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
