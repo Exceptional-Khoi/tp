@@ -766,13 +766,23 @@ public class WorkoutManager {
      *
      * @param initialArgs Initial command arguments containing end date/time details
      */
+    /**
+     * Ends the current workout session by recording the end time and calculating duration.
+     * Usage: /end_workout d/DD/MM/YY t/HHmm
+     * - Allows at most one d/ and one t/ (order: d/ then t/ if both present)
+     * - Prompts for missing date/time (defaults to now with confirmation)
+     * - Validates end > start
+     * - Rejects if the end time would overlap another workout that starts on the same day:
+     *   otherStart in [current.start, proposedEnd)
+     */
     public void endWorkout(String initialArgs) {
         if (currentWorkout == null) {
             ui.showMessage("No active workout.");
             return;
         }
 
-        String args = (initialArgs == null) ? "" : initialArgs.trim();
+        final String usage = "Please enter: /end_workout d/DD/MM/YY t/HHmm";
+        final String args = (initialArgs == null) ? "" : initialArgs.trim();
 
         // allow 0 or 1 of each; reject duplicates
         int dCount = countToken(args, "d/");
@@ -802,16 +812,14 @@ public class WorkoutManager {
         }
 
         // extract slices if present
-        Slice dateSlice = null;
-        Slice timeSlice = null;
-        String dateStr = "";
-        String timeStr = "";
+        Slice dateSlice = null, timeSlice = null;
+        String dateStr = "", timeStr = "";
 
         if (dIdx != -1) {
             dateSlice = extractSlice(args, dIdx);
             if (!dateSlice.valueRaw.isEmpty() && Character.isWhitespace(dateSlice.valueRaw.charAt(0))) {
                 ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
-                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                ui.showMessage(usage);
                 return;
             }
             dateStr = dateSlice.valueTrimmed;
@@ -821,35 +829,29 @@ public class WorkoutManager {
             timeSlice = extractSlice(args, tIdx);
             if (!timeSlice.valueRaw.isEmpty() && Character.isWhitespace(timeSlice.valueRaw.charAt(0))) {
                 ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
-                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                ui.showMessage(usage);
                 return;
             }
             timeStr = timeSlice.valueTrimmed;
         }
 
         // trailing junk after the last provided token
-        int lastEnd = -1;
-        if (timeSlice != null){
-            lastEnd = timeSlice.endIndex;
-        } else if (dateSlice != null){
-            lastEnd = dateSlice.endIndex;
-        }
-
+        int lastEnd = (timeSlice != null) ? timeSlice.endIndex : (dateSlice != null ? dateSlice.endIndex : -1);
         if (lastEnd != -1 && !onlyWhitespaceAfter(args, lastEnd)) {
             ui.showMessage("Unexpected text after time/date. Use exactly: /end_workout d/DD/MM/YY t/HHmm");
             return;
         }
 
+        // parse provided parts
         LocalDate date = null;
         LocalTime time = null;
 
-        // validate provided pieces
         if (!dateStr.isEmpty()) {
             try {
                 date = LocalDate.parse(dateStr, DATE_FMT);
             } catch (Exception ex) {
                 ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
-                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                ui.showMessage(usage);
                 return;
             }
         }
@@ -858,19 +860,19 @@ public class WorkoutManager {
                 time = LocalTime.parse(timeStr, TIME_FMT);
             } catch (Exception ex) {
                 ui.showMessage("[Error] Invalid time. Use t/HHmm (e.g., t/1905).");
-                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                ui.showMessage(usage);
                 return;
             }
         }
 
-        // prompt ONLY for missing pieces
+        // prompt ONLY for missing pieces (same UX as your create flow)
         if (date == null) {
             String todayStr = LocalDate.now().format(DATE_FMT);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
             if (ui.confirmationMessage()) {
                 date = LocalDate.now();
             } else {
-                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                ui.showMessage(usage);
                 return;
             }
         }
@@ -880,22 +882,45 @@ public class WorkoutManager {
             if (ui.confirmationMessage()) {
                 time = LocalTime.now();
             } else {
-                ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+                ui.showMessage(usage);
                 return;
             }
         }
 
-
-        LocalDateTime endDateTime = LocalDateTime.of(date, time).truncatedTo(ChronoUnit.MINUTES);
+        // compute & validate chronology
+        LocalDateTime proposedEnd = LocalDateTime.of(date, time).truncatedTo(ChronoUnit.MINUTES);
         LocalDateTime startTime = currentWorkout.getWorkoutStartDateTime().truncatedTo(ChronoUnit.MINUTES);
 
-        if (!endDateTime.isAfter(startTime)) {
+        if (!proposedEnd.isAfter(startTime)) {
             ui.showMessage("End time must be after the start time of the workout!");
-            ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm");
+            ui.showMessage(usage);
             return;
         }
 
-        currentWorkout.setWorkoutEndDateTime(endDateTime);
+        // --- Overlap guard against later workouts on the SAME DAY ---
+        for (Workout w : workouts) {
+            if (w == currentWorkout) continue;
+            LocalDateTime otherStart = w.getWorkoutStartDateTime();
+            if (otherStart == null) continue;
+            if (!otherStart.toLocalDate().equals(startTime.toLocalDate())) continue;
+
+            // conflict if another workout starts at/after our start and before our proposed end
+            if (!otherStart.isBefore(startTime) && otherStart.isBefore(proposedEnd)) {
+                String startStr = otherStart.toLocalTime().format(TIME_FMT);
+                LocalDateTime otherEndDT = w.getWorkoutEndDateTime();
+                String endStr = (otherEndDT == null)
+                        ? "ongoing"
+                        : otherEndDT.toLocalTime().format(TIME_FMT);
+
+                ui.showMessage("[Error] End time overlaps another workout: \""
+                        + w.getWorkoutName() + "\" (" + startStr + "–" + endStr + ").");
+                ui.showMessage("Please enter a valid date and time");
+                return;
+            }
+        }
+
+        // persist
+        currentWorkout.setWorkoutEndDateTime(proposedEnd);
         int duration = currentWorkout.calculateDuration();
         currentWorkout.setDuration(duration);
 
