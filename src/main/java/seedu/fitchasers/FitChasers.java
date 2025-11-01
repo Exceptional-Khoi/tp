@@ -69,6 +69,7 @@ public class FitChasers {
                 break;
             }
             if (input.trim().isEmpty()) {
+                ui.showMessage("Please enter a command, or type /help or h for options.");
                 continue;
             }
 

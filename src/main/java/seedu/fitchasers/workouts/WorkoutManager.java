@@ -110,7 +110,18 @@ public class WorkoutManager {
             return;
         }
         YearMonth monthOfWorkout = YearMonth.from(workoutDateTime);
-        if(!currentLoadedMonth.equals(monthOfWorkout)) {
+        if (!currentLoadedMonth.equals(monthOfWorkout)) {
+            // Check if workout month is before the month app was first started
+            if (monthOfWorkout.isBefore(currentLoadedMonth)) {
+                ui.showMessage("FitChasers was first booted on "
+                        + currentLoadedMonth.getMonth().name().toLowerCase().substring(0, 1).toUpperCase()
+                        + currentLoadedMonth.getMonth().name().toLowerCase().substring(1)
+                        + " of " + currentLoadedMonth.getYear() + ".");
+                ui.showMessage("Please start your fitness logging from then!");
+                return; // stop creating workout
+            }
+
+            // Only load if valid
             setWorkouts(fileHandler.loadMonthList(monthOfWorkout), monthOfWorkout);
         }
 

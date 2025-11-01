@@ -146,6 +146,7 @@ Format: `/create_workout n/WORKOUT_NAME d/DATE t/TIME`
 - You can create multiple workouts on the same day with different times. 
 However, you cannot create 2 workouts overlap time.
 - You can only create workouts with a start time from the current time (according to your computer system).
+- FitChasers only operates for workout logs dated between the month of activation in 2025 and December 2099.
 
 Example:
 
