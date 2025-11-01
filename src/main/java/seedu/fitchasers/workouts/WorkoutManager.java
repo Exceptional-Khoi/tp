@@ -23,6 +23,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //@@ZhongBaode
+
 /**
  * Manages workout sessions for the FitChasers application.
  * <p>
@@ -67,9 +68,10 @@ public class WorkoutManager {
         this.workoutsByMonth = fileHandler.getArrayByMonth();
         this.currentLoadedMonth = YearMonth.now();
     }
-    public void initWorkouts(){
-        for(Workout workout : this.workouts) {
-            while(workout.getWorkoutEndDateTime() ==  null){
+
+    public void initWorkouts() {
+        for (Workout workout : this.workouts) {
+            while (workout.getWorkoutEndDateTime() == null) {
                 ui.showMessage("Looks like you forgot to end the previous workout, please enter it now!");
                 currentWorkout = workout;
                 endWorkout(ui.readCommand());
@@ -99,9 +101,15 @@ public class WorkoutManager {
      * @param command The full user command, for example "/create_workout n/PushDay d/20/10/25 t/1900".
      */
     public void addWorkout(String command) throws FileNonexistent, IOException {
+
+        // ensure workouts is not null before adding
+        if (workouts == null) {
+            workouts = new ArrayList<>();
+        }
+
         workoutName = "";
         try {
-            if(command.contains("d/") || command.contains("t/")) {
+            if (command.contains("d/") || command.contains("t/")) {
                 formatInputForWorkoutStrict(command);
             } else {
                 formatInputForWorkout(command);
@@ -124,8 +132,8 @@ public class WorkoutManager {
             // Only load if valid
             setWorkouts(fileHandler.loadMonthList(monthOfWorkout), monthOfWorkout);
         }
-        // Reject if the new start time falls inside any existing workout on the same day
 
+        // Reject if the new start time falls inside any existing workout on the same day
         Workout conflict = findOverlappingWorkout(workoutDateTime);
         if (conflict != null) {
             LocalDateTime s = conflict.getWorkoutStartDateTime();
@@ -147,13 +155,14 @@ public class WorkoutManager {
             currentWorkout = newWorkout;
             ui.showMessage("New workout sesh incoming!");
             ui.showMessage("Tags generated for workout: " + suggestedTags + "\n"
-                            + "Added workout: " + workoutName);
-            fileHandler.saveMonthList(currentLoadedMonth,workouts);
+                    + "Added workout: " + workoutName);
+            fileHandler.saveMonthList(currentLoadedMonth, workouts);
 
         } catch (Exception e) {
             ui.showMessage("Something went wrong creating the workout. Please try again.");
         }
     }
+
     /**
      * Strict parser for /create_workout that enforces:
      * - exactly one n/, one d/, one t/
@@ -282,7 +291,7 @@ public class WorkoutManager {
         // Duplicate date/time check (unchanged from your version)
         for (Workout w : workouts) {
             LocalDateTime existingStart = w.getWorkoutStartDateTime();
-            if (existingStart == null){
+            if (existingStart == null) {
                 continue;
             }
             if (existingStart.toLocalDate().equals(parsedDate)
@@ -298,6 +307,7 @@ public class WorkoutManager {
             }
         }
     }
+
     /**
      * Parses and validates the user's workout creation command.
      * <p>
@@ -464,8 +474,8 @@ public class WorkoutManager {
                 ui.showMessage("Please re-enter the correct date.");
                 throw new InvalidArgumentInput("");
             }
-            if (!fileHandler.checkFileExists(YearMonth.from(date))){
-                fileHandler.saveMonthList(YearMonth.from(date),new ArrayList<>());
+            if (!fileHandler.checkFileExists(YearMonth.from(date))) {
+                fileHandler.saveMonthList(YearMonth.from(date), new ArrayList<>());
             }
         }
 
@@ -629,7 +639,7 @@ public class WorkoutManager {
 
         Exercise exercise = new Exercise(name, reps);
         currentWorkout.addExercise(exercise);
-        fileHandler.saveMonthList(currentLoadedMonth,workouts);
+        fileHandler.saveMonthList(currentLoadedMonth, workouts);
         ui.showMessage("Adding that spicy new exercise!");
         ui.showMessage("Added exercise:\n" + exercise.toDetailedString());
     }
@@ -763,7 +773,7 @@ public class WorkoutManager {
      * - Prompts for missing date/time (defaults to now with confirmation)
      * - Validates end > start
      * - Rejects if the end time would overlap another workout that starts on the same day:
-     *   otherStart in [current.start, proposedEnd)
+     * otherStart in [current.start, proposedEnd)
      */
     public void endWorkout(String initialArgs) {
         if (currentWorkout == null) {
@@ -891,14 +901,14 @@ public class WorkoutManager {
 
         // --- Overlap guard against later workouts on the SAME DAY ---
         for (Workout w : workouts) {
-            if (w == currentWorkout){
+            if (w == currentWorkout) {
                 continue;
             }
             LocalDateTime otherStart = w.getWorkoutStartDateTime();
-            if (otherStart == null){
+            if (otherStart == null) {
                 continue;
             }
-            if (!otherStart.toLocalDate().equals(startTime.toLocalDate())){
+            if (!otherStart.toLocalDate().equals(startTime.toLocalDate())) {
                 continue;
             }
 
@@ -941,6 +951,7 @@ public class WorkoutManager {
         final String valueTrimmed;
         final int endIndex;       // end position in original string (exclusive)
         final String valueRaw;    // substring between token and next prefix/end (untrimmed)
+
         Slice(String valueTrimmed, String valueRaw, int endIndex) {
             this.valueTrimmed = valueTrimmed;
             this.valueRaw = valueRaw;
@@ -963,7 +974,7 @@ public class WorkoutManager {
     // capturing the raw substring and where it ends in the original string.
     private static Slice extractSlice(String s, int tokenStart) {
         int valueStart = tokenStart + 2; // skip "x/"
-        if (valueStart > s.length()){
+        if (valueStart > s.length()) {
             return new Slice("", "", valueStart);
         }
 

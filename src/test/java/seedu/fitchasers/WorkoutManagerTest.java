@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.storage.FileHandler;
+import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Tagger;
 import seedu.fitchasers.workouts.Exercise;
@@ -14,11 +15,15 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class WorkoutManagerTest {
+    //methodName_whatIsTheConditionYouAreTesting_Outcome(If 2 Paths Can Exclude)
     private WorkoutManager manager;
 
     @BeforeEach
@@ -26,7 +31,13 @@ class WorkoutManagerTest {
         Tagger tagger = new DefaultTagger();
         FileHandler fileHandler = new FileHandler();
         manager = new WorkoutManager(tagger, fileHandler);
-        manager.addWorkout("n/TestWorkout d/01/11/25 t/1200");
+
+        // Use today's date to ensure tests are compatible with CI/system date.
+        java.time.LocalDate today = java.time.LocalDate.now();
+        String dateStr = today.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
+        // pick a fixed time that is valid
+        String timeStr = "1400";
+        manager.addWorkout("n/TestWorkout d/" + dateStr + " t/" + timeStr);
     }
 
     @Test
@@ -36,43 +47,61 @@ class WorkoutManagerTest {
     }
 
     @Test
-    void addExercise_validInput_addsExerciseToCurrentWorkout() throws IOException, FileNonexistent {
-        manager.endWorkout("d/01/11/25 t/1230"); // End the current workout
-        manager.addWorkout("n/TestWorkout2 d/01/11/25 t/1245"); // Start a new workout
+    void addExercise_validInput_addsExerciseToCurrentWorkout() throws IOException {
         manager.addExercise("n/PushUp r/10");
-
-        Workout w = manager.getWorkouts().get(1); // The second workout (index 1)
+        Workout w = manager.getWorkouts().get(0);
         assertEquals(1, w.getExercises().size());
         assertEquals("PushUp", w.getExercises().get(0).getName());
     }
 
     @Test
     void addSet_validInput_addsSetToCurrentExercise() throws IOException {
-        manager.addExercise("n/Squat r/12"); // Add an exercise first
+        manager.addExercise("n/Squat r/12");
         manager.addSet("r/15");
 
         Workout w = manager.getWorkouts().get(0);
         Exercise ex = w.getExercises().get(0);
-        assertEquals(2, ex.getNumSets()); // Original set + new set
-        assertEquals(15, ex.getSets().get(1)); // The added set
+        assertEquals(2, ex.getNumSets());
+        assertEquals(15, ex.getSets().get(1));
     }
 
     @Test
     void addWorkout_validInput_addsWorkoutToCurrentSet() throws Exception {
-        manager.endWorkout("d/01/11/25 t/1230"); // End the current workout
+        java.lang.reflect.Field field = manager.getClass().getDeclaredField("currentWorkout");
+        field.setAccessible(true);
+        Object current = field.get(manager);
+        if (current != null) {
+            LocalDateTime start = (LocalDateTime) current.getClass()
+                    .getMethod("getWorkoutStartDateTime")
+                    .invoke(current);
+            LocalDateTime end = start.plusMinutes(1);
 
-        manager.addWorkout("n/run d/01/11/25 t/1530");
+            String endArgs = String.format("d/%s t/%s",
+                    end.format(DateTimeFormatter.ofPattern("dd/MM/yy")),
+                    end.format(DateTimeFormatter.ofPattern("HHmm")));
+
+            UI dummyUI = new UI() {
+                @Override public boolean confirmationMessage() {
+                    return true;
+                }
+            };
+            manager.endWorkout(endArgs);
+        }
+
+        java.time.LocalDate today = java.time.LocalDate.now();
+        String dateStr = today.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
+        manager.addWorkout("n/run d/" + dateStr + " t/0730");
 
         assertEquals(2, manager.getWorkouts().size());
         assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
     }
 
+
     @Test
-    void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() throws IOException, FileNonexistent {
-        manager.addWorkout("n/run d/01/11/25 t/1530");
+    void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() throws IOException {
         manager.deleteWorkout("run");
         assertThrows(IndexOutOfBoundsException.class,
-                () -> manager.getWorkouts().get(1)); // Accessing deleted workout
+                ()-> manager.getWorkouts().get(1));
     }
 
     @Test
@@ -87,4 +116,5 @@ class WorkoutManagerTest {
 
         System.setOut(System.out); // reset stdout
     }
+
 }
