@@ -78,6 +78,7 @@ Rules:
 
 
 * `DATE`: Must follow DD/MM/YY format. 
+  - Defaults to today's date if not provided.
   - Day must be `01` to `31`.
   - Month must be `01` to `12`.
   - Year must be two digits (e.g., `25` for 2025).
