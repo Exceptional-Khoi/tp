@@ -53,6 +53,8 @@ This command allows you to update your display name in FitChasers. The name is s
 
 Format: `/rename n/NAME`
 
+Alternative: `rn`
+
 * `NAME`:
   - Must contain only letters (A–Z, a–z), numbers (0–9), spaces, underscores (_), or dashes (-). 
   - Must be 1–30 characters long. 
@@ -72,7 +74,9 @@ Rules:
 
 * `WEIGHT`: A numeric value (integer or decimal) in kilograms
   - Must be between 20.0 and 500.0 (for realistic human body weight range).
-  - Only one decimal point allowed.
+  - All weights are rounded up to 1 decimal place. 
+  - Due to floating-point precision in Java, extremely close values such as 19.999999999999999 or 500.000000000000001 
+  will be rounded into the valid range and accepted. This behaviour is expected and does not affect normal usage.
   - Must not contain symbols or units (e.g., kg is not accepted).
   - Must input weight.
 
@@ -141,8 +145,10 @@ Format: `/create_workout n/WORKOUT_NAME d/DATE t/TIME`
 
 **Notes:** 
 - You can create multiple workouts on the same day with different times. 
-However, you cannot create 2 workouts overlap time.
+However, you cannot create 2 workouts that have overlapping time. e.g. if you have a workout from 1400 to 1500, 
+you cannot create another workout starting at 1430 but you can create one starting at 1500.
 - You can only create workouts with a start time from the current time (according to your computer system).
+- FitChasers only operates for workout logs dated between the month of activation in 2025 and December 2099.
 
 Example:
 

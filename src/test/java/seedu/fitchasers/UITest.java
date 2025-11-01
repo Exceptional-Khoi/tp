@@ -5,6 +5,8 @@ import seedu.fitchasers.ui.UI;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import seedu.fitchasers.user.Person;
+import seedu.fitchasers.user.WeightManager;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -139,16 +141,21 @@ class UIConsoleTest {
 
     @Test
     void enterWeight_validatesUntilPositiveNumber() {
-        // Input provided to stdin:
+        // Simulated user input sequence:
         final String input = "abc\n-3\n60.5\n";
         setInput(input);
+
+        Person person = new Person("TestUser");
+        WeightManager weightManager = new WeightManager(person);
         UI ui = new UI();
 
-        double w = ui.enterWeight();
+        // Call updated enterWeight method
+        double w = ui.enterWeight(weightManager);
 
         assertEquals(60.5, w, 1e-9,
                 "Should accept final valid number from input sequence: " +
                         input.replace("\n", "\\n"));
+
         String out = outPlain();
         assertTrue(out.contains("Please enter your initial weight (in kg)."),
                 "Should prompt for weight. Input sequence: " + input.replace("\n", "\\n"));
