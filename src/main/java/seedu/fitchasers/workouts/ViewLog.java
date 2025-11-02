@@ -121,7 +121,7 @@ public class ViewLog {
         ).thenComparing(
                 Workout::getWorkoutStartDateTime,
                 Comparator.nullsLast(Comparator.naturalOrder())
-        ));  // ← NO .reversed()
+        ));
 
         this.lastFilteredListofWorkout = sorted;  // Store the sorted list
         return sorted;

@@ -346,7 +346,7 @@ public class FileHandler {
 
     /** Ask the user to input a valid End date-time and return it. */
     private void corruptedFileErrorHandling() {
-        ui.showMessage("⚠️ Invalid End date/time found in file. Skipping workout");
+        ui.showMessage("Invalid End date/time found in file. Skipping workout");
     }
 
     /**

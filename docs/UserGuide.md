@@ -112,16 +112,16 @@ Alternative: `vw`
 ### Setting a goal weight: `/set_goal`
 Lets you specify a target weight to monitor your progress.
 
-Format: `/set_goal g/GOAL_WEIGHT`
+Format: `/set_goal w/TARGET_WEIGHT`
 
-Rules: Same as `WEIGHT` parameter rules above.
+- `TARGET_WEIGHT` is your goal weight. Rules: Same as `WEIGHT` parameter rules above.
 
 **Note:** When you set a goal, FitChaser automatically uses your latest recorded weight (the most recent `/add_weight` entry) as your starting weight.
 This ensures that your progress is calculated accurately based on your most up-to-date data.
 
 Example:
 
-* `/set_goal g/70.0`
+* `/set_goal w/70.0`
 
 Alternative: `sg`
 
@@ -396,8 +396,7 @@ and exercise names. You can customize keywords using /add_modality_tag and /add_
 | **Open Workout**     | `/open INDEX`<br>e.g., `/open 1`                                                                |
 | **Override Tag**     | `/override_workout_tag id/ID newTag/TAG`<br>e.g., `/override_workout_tag id/1 newTag/strength`  |
 | **Rename**           | `/rename n/NAME`<br>e.g., `/rename n/John Doe`                                                  |
-| **Set Goal**         | `/set_goal g/GOAL_WEIGHT`<br>e.g., `/set_goal g/70`                                             |
+| **Set Goal**         | `/set_goal w/TARGET_WEIGHT`<br>e.g., `/set_goal w/70`                                           |
 | **View Goal**        | `/view_goal` or `vg`                                                                            |
 | **View Log**         | `/view_log`<br>e.g., `/view_log`                                                                |
 | **View Weight**      | `/view_weight` or `vw`                                                                          |
-
