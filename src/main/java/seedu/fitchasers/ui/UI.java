@@ -257,13 +257,30 @@ public class UI {
                                                    e.g. /end_workout d/30/10/25 t/1500
         
         ~~~ WORKOUT LOG MANAGEMENT ~~~
-        /view_log (vl)                            - View your workout history
-        /open (o) INDEX                           - Open detailed view of a workout
+        /view_log (vl) [Optional Tags]             - View first page of your workout history
+                                                   e.g. /view_log (vl)
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                           
+        [OPTIONAL TAGS FOR /view_log]:
+        vl pg/[Number]                             - Select page number of workout
+                                                   e.g vl pg/2
+        
+        vl detailed/                               - Show page in detail [No argument needed]                  
+                                                   e.g. vl detailed/
+                                                   
+        vl m/[month from 1-12]                     -  Select specific month in current year 
+                                                   e.g vl m/10 [Current Year Oct]
+                                                   
+        ym/                                        - Select specific month in specific year
+                                                     e.g. vl ym/10/26 [Selecting workouts in oct 2026]
+        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                           
+                                 
+        /open (o) INDEX                           - Open detailed view of the current list of workout
                                                    e.g. /open 1
-        /del_workout WORKOUT_NAME or /del_workout d/DATE
+        /del_workout id/[Workout Index] m/(1-12)
+        /dw WORKOUT_INDEX -ym [Year in full] [month (1-12)]
                                                    - Delete a workout by name or date
-                                                   e.g. /del_workout Chest Day
-                                                   e.g. /del_workout d/30/10/25
+                                                   e.g. /del_workout id/1 m/10
+                                                   e.g. /del_workout id/2 ym/10/26
         
         ~~~ TAGGING SYSTEM ~~~
         /add_modality_tag (amot) m/MODALITY k/KEYWORD
