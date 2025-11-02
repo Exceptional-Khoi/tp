@@ -321,17 +321,19 @@ Examples:
 
 Alternative: `o`
 
-### Deleting Workouts: `/del_workout`
-Deletes the specified workout(s) from your workout history by name or by date.
+### Deleting Workouts: `/delete_workout`
+Deletes the specified workout from your workout history by its display ID.
 
-Format: `/del_workout WORKOUT_NAME` or `/del_workout d/DATE`
+Format: `/delete_workout id/INDEX`
 
-* `WORKOUT_NAME` is the name of your workout. Rules: Same as `NAME` parameter rules above.
-* `DATE` is in `DD/MM/YY` format. Rules: Same as `DATE` parameter rules above.
+* `INDEX` is the positive ID number of the workout you want to delete, as shown in `/view_log`.
 
 Examples:
-* `/del_workout Chest Day`
-* `/del_workout d/30/10/25`
+* `/delete_workout id/8`
+* `/delete_workout id/2`
+
+
+* Alternative: `dw`
 
 ### Exiting the program: `/exit`
 Exits FitChasers and saves all your data.
