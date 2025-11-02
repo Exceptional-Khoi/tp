@@ -259,7 +259,7 @@ public class UI {
         ~~~ WORKOUT LOG MANAGEMENT ~~~
         /view_log (vl) [Optional Tags]             - View first page of your workout history
                                                    e.g. /view_log (vl)
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                           
+                                                   
         [OPTIONAL TAGS FOR /view_log]:
         vl pg/[Number]                             - Select page number of workout
                                                    e.g vl pg/2
@@ -271,8 +271,7 @@ public class UI {
                                                    e.g vl m/10 [Current Year Oct]
                                                    
         ym/                                        - Select specific month in specific year
-                                                     e.g. vl ym/10/26 [Selecting workouts in oct 2026]
-        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~                                           
+                                                   e.g. vl ym/10/26 [Oct 2026]                                 
                                  
         /open (o) INDEX                           - Open detailed view of the current list of workout
                                                    e.g. /open 1

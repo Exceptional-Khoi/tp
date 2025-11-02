@@ -2,8 +2,8 @@ package seedu.fitchasers.workouts;
 
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
-import seedu.fitchasers.parser.deleteWorkout.DeleteParser;
-import seedu.fitchasers.parser.deleteWorkout.DeleteWorkoutArguments;
+import seedu.fitchasers.parser.deleteworkout.DeleteParser;
+import seedu.fitchasers.parser.deleteworkout.DeleteWorkoutArguments;
 import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.ui.UI;
 
@@ -35,7 +35,8 @@ public class DeleteWorkout {
 
         // IMPORTANT: the ID must match how your /view_log displayed the list.
         // If /view_log sorts by endDateTime desc, sort here the same way before indexing.
-        ArrayList<Workout> monthWorkouts = new ArrayList<>(fileHandler.loadMonthList(parsedArgumentsForDelete.yearMonth()));
+        ArrayList<Workout> monthWorkouts =
+                new ArrayList<>(fileHandler.loadMonthList(parsedArgumentsForDelete.yearMonth()));
 
         if (monthWorkouts.isEmpty()) {
             ui.showMessage("No workouts found for " + parsedArgumentsForDelete.yearMonth() + ".");
@@ -56,7 +57,8 @@ public class DeleteWorkout {
         if (displayIndex < 1 || displayIndex > monthWorkouts.size()) {
             ui.showMessage("Invalid workout ID: " + displayIndex);
             ui.showMessage("Please use a valid ID between 1 and " + monthWorkouts.size());
-            ui.showMessage("Tip: /view_log m/" + parsedArgumentsForDelete.yearMonth().getMonthValue() + " to see the list.");
+            ui.showMessage("Tip: /view_log m/" + parsedArgumentsForDelete.yearMonth().getMonthValue()
+                    + " to see the list.");
             return;
         }
 

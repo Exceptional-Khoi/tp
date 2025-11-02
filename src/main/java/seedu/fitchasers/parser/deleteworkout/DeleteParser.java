@@ -1,4 +1,4 @@
-package seedu.fitchasers.parser.deleteWorkout;
+package seedu.fitchasers.parser.deleteworkout;
 
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.parser.CommandParser;
@@ -51,7 +51,9 @@ public class DeleteParser implements CommandParser<DeleteWorkoutArguments> {
             }
 
             if (argument.startsWith("ym/")) {
-                if (seenM) throw usage("Cannot combine ym/<MM>/<YY> with m/<MM>.");
+                if (seenM) {
+                    throw usage("Cannot combine ym/<MM>/<YY> with m/<MM>.");
+                }
                 seenYM = true;
                 String token = argument.substring(3).trim(); // expects "MM/YY"
                 try {

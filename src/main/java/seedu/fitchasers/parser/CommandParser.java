@@ -4,7 +4,6 @@ import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.storage.FileHandler;
 
 import java.io.IOException;
-import java.time.Year;
 import java.time.YearMonth;
 import java.util.regex.Pattern;
 

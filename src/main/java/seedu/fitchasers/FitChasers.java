@@ -1,11 +1,8 @@
 package seedu.fitchasers;
 
 import seedu.fitchasers.exceptions.FileNonexistent;
-import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.ui.UI;
-import seedu.fitchasers.workouts.DeleteWorkout;
 import seedu.fitchasers.workouts.ViewLog;
-import seedu.fitchasers.exceptions.InvalidCommandException;
 import seedu.fitchasers.gym.EquipmentDisplay;
 import seedu.fitchasers.gym.Gym;
 import seedu.fitchasers.gym.StaticGymData;
@@ -185,20 +182,20 @@ public class FitChasers {
                     }
                     break;
 
-                    case "/open":
-                    case "o":
-                        viewLog.openByIndex(Integer.parseInt(argumentStr));
-                        break;
-                    //@@author Kart04
-                    case "/delete_workout":
-                    case "dw":
-                        workoutManager.deleteParser(argumentStr);
-                        break;
-                    //@@author
-                    case "/exit":
-                    case "e":
-                        exitMethod();
-                        break;
+                case "/open":
+                case "o":
+                    viewLog.openByIndex(Integer.parseInt(argumentStr));
+                    break;
+                //@@author Kart04
+                case "/delete_workout":
+                case "dw":
+                    workoutManager.deleteParser(argumentStr);
+                    break;
+                //@@author
+                case "/exit":
+                case "e":
+                    exitMethod();
+                    break;
 
                 default:
                     ui.showError("That's not a thing, bestie. Try /help or h for the real moves!");
