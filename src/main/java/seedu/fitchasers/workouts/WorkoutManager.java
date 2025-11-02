@@ -528,7 +528,7 @@ public class WorkoutManager {
 
     public void deleteWorkoutByIndex(int index) throws IOException {
         if (index < 0 || index >= workouts.size()) {
-            ui.showMessage("Invalid workout index: " + index + "Please try again.:(");
+            ui.showMessage("Invalid workout ID :(  Use /view_log to double check workout ID");
             return;
         }
         Workout w = workouts.get(index);
