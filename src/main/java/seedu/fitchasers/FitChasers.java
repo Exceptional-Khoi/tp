@@ -48,7 +48,7 @@ public class FitChasers {
     private static WorkoutManager workoutManager;
     private static boolean isRunning = true;
     private static String command;
-    private static String argumentStr;
+    private static String argumentStr = "";
     private static String input;
     private static WeightManager weightManager;
     private static GoalWeightTracker goalTracker;
@@ -58,8 +58,9 @@ public class FitChasers {
         initVariables();
         ui.showGreeting();
         try {
-            viewLog.render(argumentStr);
-        } catch (IndexOutOfBoundsException | InvalidArgumentInput e) {
+            //viewLog.render(argumentStr);
+            System.out.println();
+        } catch (IndexOutOfBoundsException e) {
             ui.showError(e.getMessage());
         }
         workoutManager.initWorkouts();
@@ -203,7 +204,7 @@ public class FitChasers {
                     break;
                 }
             } catch (Exception e) {
-                ui.showError("Something went wrong in main: " + e.getMessage());
+                ui.showError(e.getMessage());
             }
         }
     }
@@ -224,14 +225,13 @@ public class FitChasers {
         if (argumentStr.isEmpty()) {
             throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
                     "Please enter a valid command.");
-        } else if (argumentStr.contains("-m")) {
-            //workoutManager.interactiveDeleteWorkout(argumentStr);
-            ViewLog.Parsed p = viewLog.parseArgs(argumentStr);
-            workoutManager.setWorkouts(fileHandler.loadMonthList(p.ym()),p.ym());
-            workoutManager.deleteWorkoutByIndex(p.extractedArg());
-        } else {
-            workoutManager.deleteWorkout(argumentStr);
+        } if(!argumentStr.contains(" m/")){
+            throw new InvalidCommandException("Workout deletion command requires a specific month use m/[1-12] to" +
+                    "specify the month");
         }
+        ViewLog.Parsed p = viewLog.parseArgs(argumentStr);
+        workoutManager.setWorkouts(fileHandler.loadMonthList(p.ym()),p.ym());
+        workoutManager.deleteWorkoutByIndex(p.extractedArg());
     }
 
     private static void owtMethod() throws FileNonexistent, IOException {
