@@ -58,12 +58,12 @@ class Exercise {
   +getName(): String
 }
 
-class Modality <<enum>> {
+class Modality <<enumeration>> {
   CARDIO
   STRENGTH
 }
 
-class MuscleGroup <<enum>> {
+class MuscleGroup <<enumeration>> {
   LEGS
   CHEST
   BACK
