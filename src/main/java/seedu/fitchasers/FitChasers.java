@@ -4,7 +4,6 @@ import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.workouts.ViewLog;
-import seedu.fitchasers.exceptions.InvalidCommandException;
 import seedu.fitchasers.gym.EquipmentDisplay;
 import seedu.fitchasers.gym.Gym;
 import seedu.fitchasers.gym.StaticGymData;
