@@ -112,23 +112,30 @@ class WorkoutManagerTest {
         assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
     }
 
-
     @Test
     void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() throws IOException, FileNonexistent {
         // To make this test meaningful, we first add a workout to delete.
         manager.addWorkout("/create_workout n/run d/01/01/25 t/1200");
-        manager.deleteWorkout("run");
+
+        // Delete the second workout using index-based deletion (id/2)
+        manager.handleDeleteWorkout("id/2");
+
+        // Accessing index 1 should throw IndexOutOfBoundsException since we only have 1 workout left
         assertThrows(IndexOutOfBoundsException.class,
                 ()-> manager.getWorkouts().get(1));
     }
 
     @Test
-    void removeWorkout_nonExistingWorkout_printsWorkoutNotFound() throws IOException {
+    void removeWorkout_nonExistingWorkout_printsWorkoutNotFound() throws IOException, FileNonexistent {
         // This test is tricky because the mock UI suppresses output.
         // A better approach would be to check the state of the application.
         // For now, let's ensure the list size doesn't change.
         int initialSize = manager.getWorkouts().size();
-        manager.deleteWorkout("swim");
+
+        // Try to delete a workout with invalid index (id/99 - doesn't exist)
+        manager.handleDeleteWorkout("id/99");
+
+        // List size should remain the same
         assertEquals(initialSize, manager.getWorkouts().size());
     }
 }

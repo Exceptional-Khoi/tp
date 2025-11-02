@@ -188,7 +188,7 @@ public class FitChasers {
                     viewLog.openByIndex(Integer.parseInt(argumentStr));
                     break;
                 //@@author Kart04
-                case "/del_workout":
+                case "/delete_workout":
                 case "dw":
                     delMethod();
                     break;
@@ -219,19 +219,8 @@ public class FitChasers {
         isRunning = false;
     }
 
-    private static void delMethod() throws InvalidCommandException, IOException, InvalidArgumentInput, FileNonexistent {
-        // Format: /del_workout WORKOUT_NAME
-        if (argumentStr.isEmpty()) {
-            throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
-                    "Please enter a valid command.");
-        } else if (argumentStr.contains("-m")) {
-            //workoutManager.interactiveDeleteWorkout(argumentStr);
-            ViewLog.Parsed p = viewLog.parseArgs(argumentStr);
-            workoutManager.setWorkouts(fileHandler.loadMonthList(p.ym()),p.ym());
-            workoutManager.deleteWorkoutByIndex(p.extractedArg());
-        } else {
-            workoutManager.deleteWorkout(argumentStr);
-        }
+    private static void delMethod() throws IOException, FileNonexistent {
+        workoutManager.handleDeleteWorkout(argumentStr);
     }
 
     private static void owtMethod() throws FileNonexistent, IOException {
