@@ -140,13 +140,9 @@ The Sequence Diagram below shows how the components interact with each other for
 ### Target user profile
 
 FitChasers is designed for individuals who want to track and improve their fitness progress effectively.
-Our target users include:
-
-1. University (NUS) students and working adults who want a lightweight fitness tracker without complex setup.
-2. Users who prefer a command-line interface for fast and distraction-free input.
-3. Fitness enthusiasts who want to log, view, and analyze workouts and body data (e.g., weight, reps, sets).
-4. People who value privacy and prefer storing their data locally instead of using cloud-based apps.
-5. Beginners who want simple, guided commands to build consistent fitness habits.
+Our target users are NUS Computer Science students (aged 19-25) who are fitness beginners to intermediate level, prefer
+command-line interfaces for quick workout logging without complex setup, and value local data privacy over cloud-based 
+solutions.
 
 ### Value proposition
 
