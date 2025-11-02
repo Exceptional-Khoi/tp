@@ -184,20 +184,20 @@ public class FitChasers {
                     }
                     break;
 
-                case "/open":
-                case "o":
-                    viewLog.openByIndex(Integer.parseInt(argumentStr));
-                    break;
-                //@@author Kart04
-                case "/delete_workout":
-                case "dw":
-                    delMethod();
-                    break;
-                //@@author
-                case "/exit":
-                case "e":
-                    exitMethod();
-                    break;
+                    case "/open":
+                    case "o":
+                        viewLog.openByIndex(Integer.parseInt(argumentStr));
+                        break;
+                    //@@author Kart04
+                    case "/delete_workout":
+                    case "dw":
+                        workoutManager.deleteParser(argumentStr);
+                        break;
+                    //@@author
+                    case "/exit":
+                    case "e":
+                        exitMethod();
+                        break;
 
                 default:
                     ui.showError("That's not a thing, bestie. Try /help or h for the real moves!");
