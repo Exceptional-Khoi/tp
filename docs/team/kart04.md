@@ -9,7 +9,7 @@ workout sessions through an intuitive command-line interface. It is written in J
 Given below are my contributions to the project:
 
 **Code Contributed:**  
-[Code Contribution](https://nus-cs2113-ay2526s1.github.io/tp-dashboard/?search=kart04&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2025-09-19T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=&tabOpen=true&tabType=authorship&tabAuthor=Kart04&tabRepo=AY2526S1-CS2113-W14-3%2Ftp%5Bmaster%5D&authorshipIsMergeGroup=false&authorshipFileTypes=docs~functional-code~test-code&authorshipIsBinaryFileTypeChecked=false&authorshipIsIgnoredFilesChecked=false)
+[RepoSense link](https://nus-cs2113-ay2526s1.github.io/tp-dashboard/?search=kart04&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2025-09-19T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=&tabOpen=true&tabType=authorship&tabAuthor=Kart04&tabRepo=AY2526S1-CS2113-W14-3%2Ftp%5Bmaster%5D&authorshipIsMergeGroup=false&authorshipFileTypes=docs~functional-code~test-code&authorshipIsBinaryFileTypeChecked=false&authorshipIsIgnoredFilesChecked=false)
 
 
 ### New Feature: Intelligent Workout Tagging System with Manual & Auto Tags
@@ -89,3 +89,11 @@ commands/output and Java stream-based implementation plan.
 * WorkoutManager class diagram (reflecting aggregation of workouts, integration with tagger and gym systems)
 * Tagging sequence diagram (showing control/data flow during tag generation and override)
 * Various supporting diagrams for design alternatives and anticipated enhancements.
+
+## Contributions to team-based tasks
+* Documenting the target user profile
+* Maintaining the issue tracker
+
+## Review/mentoring contributions
+* PRs reviewed (with non-trivial review comments):#256, #164, #133, #100, #98, #87, #60, #57
+* 
