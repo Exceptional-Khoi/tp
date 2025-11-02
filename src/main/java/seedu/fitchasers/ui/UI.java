@@ -260,10 +260,8 @@ public class UI {
         /view_log (vl)                            - View your workout history
         /open (o) INDEX                           - Open detailed view of a workout
                                                    e.g. /open 1
-        /del_workout WORKOUT_NAME or /del_workout d/DATE
-                                                   - Delete a workout by name or date
-                                                   e.g. /del_workout Chest Day
-                                                   e.g. /del_workout d/30/10/25
+        /delete_workout (dw) id/INDEX             - Delete a workout index
+                                                   e.g. /delete_workout id/8
         
         ~~~ TAGGING SYSTEM ~~~
         /add_modality_tag (amot) m/MODALITY k/KEYWORD

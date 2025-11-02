@@ -504,43 +504,115 @@ public class WorkoutManager {
     }
 
     /**
-     * Deletes a workout by name.
+     * Handles the complete workout deletion flow by display ID.
+     * Parses the command, validates input, shows details, confirms, and deletes.
      *
-     * @param name the name of the workout to delete
+     * @param command the raw command string from user (e.g., "id/8")
+     * @throws IOException if saving fails
+     * @throws FileNonexistent if the month file doesn't exist
      */
-    public void deleteWorkout(String name) throws IOException {
-        for (Workout w : workouts) {
-            if (w.getWorkoutName().equals(name)) {
-                ui.showMessage("Deleting " + w.getWorkoutName() + " | " + w.getWorkoutDateString() +
-                        "? T.T Are you sure, bestie? (Type Y to confirm)");
-                if (ui.confirmationMessage()) {
-                    workouts.remove(w);
-                    fileHandler.saveMonthList(currentLoadedMonth, workouts);
-                    ui.showMessage("Workout deleted successfully!");
-                } else {
-                    ui.showMessage("Okay, I didn't delete it.");
-                }
-                return;
-            }
-        }
-        ui.showMessage("Workout not found: " + name);
-    }
-
-    public void deleteWorkoutByIndex(int index) throws IOException {
-        if (index < 0 || index >= workouts.size()) {
-            ui.showMessage("Invalid workout index: " + index + "Please try again.:(");
+    public void handleDeleteWorkout(String command) throws IOException, FileNonexistent {
+        // Validate command is not empty
+        if (command == null || command.trim().isEmpty()) {
+            ui.showMessage("Workout deletion requires an ID.");
+            ui.showMessage("Usage: /delete_workout id/INDEX");
+            ui.showMessage("Example: /delete_workout id/8");
+            ui.showMessage("Use /view_log to see workout IDs.");
             return;
         }
-        Workout w = workouts.get(index);
-        ui.showMessage("Deleting " + w.getWorkoutName() + " | " + w.getWorkoutName() + "|");
-        ui.showMessage("You sure you want to delete this?(y/n)");
-        if (ui.confirmationMessage()) {
-            ui.showMessage("Deleted workout: " + w.getWorkoutName());
-            workouts.remove(index);
-            fileHandler.saveMonthList(currentLoadedMonth, workouts);
-        } else {
-            ui.showMessage("Okay, deletion aborted.");
+
+        String trimmed = command.trim();
+
+        // Check if the command starts with "id/"
+        if (!trimmed.startsWith("id/")) {
+            ui.showMessage("Invalid format. Use: /delete_workout id/INDEX");
+            ui.showMessage("Example: /delete_workout id/8");
+            ui.showMessage("Use /view_log to see workout IDs.");
+            return;
         }
+
+        // Extract the index
+        String indexStr = trimmed.substring(3).trim(); // Remove "id/"
+
+        if (indexStr.isEmpty()) {
+            ui.showMessage("Missing workout ID. Use: /delete_workout id/INDEX");
+            ui.showMessage("Example: /delete_workout id/8");
+            return;
+        }
+
+        // Parse the index
+        int workoutId;
+        try {
+            workoutId = Integer.parseInt(indexStr);
+        } catch (NumberFormatException e) {
+            ui.showMessage("Invalid workout ID. Please enter a valid number.");
+            ui.showMessage("Example: /delete_workout id/8");
+            return;
+        }
+
+        // Validate positive integer
+        if (workoutId < 1) {
+            ui.showMessage("Workout ID must be a positive integer.");
+            ui.showMessage("Example: /delete_workout id/8");
+            return;
+        }
+
+        // Perform the deletion
+        deleteWorkoutByDisplayId(workoutId, currentLoadedMonth);
+    }
+
+    /**
+     * Deletes a workout by its display index from ViewLog.
+     * The index corresponds to the ID shown in /view_log output.
+     * Prompts user for confirmation before deletion.
+     *
+     * @param displayIndex the 1-based index from view_log
+     * @param month the YearMonth of the workout list
+     * @throws IOException if saving fails
+     * @throws FileNonexistent if the month file doesn't exist
+     */
+    private void deleteWorkoutByDisplayId(int displayIndex, YearMonth month) throws IOException, FileNonexistent {
+        // Load the correct month's workouts
+        ArrayList<Workout> monthWorkouts = fileHandler.loadMonthList(month);
+
+        // Validate index
+        if (displayIndex < 1 || displayIndex > monthWorkouts.size()) {
+            ui.showMessage("Invalid workout ID: " + displayIndex);
+            ui.showMessage("Please use a valid ID between 1 and " + monthWorkouts.size());
+            ui.showMessage("Use /view_log to see all workout IDs.");
+            return;
+        }
+
+        // Get the workout (convert 1-based to 0-based)
+        Workout workoutToDelete = monthWorkouts.get(displayIndex - 1);
+
+        // Show workout details
+        ui.showMessage("You are about to delete this workout:");
+        ui.displayDetailsOfWorkout(workoutToDelete);
+        ui.showMessage("Are you sure you want to delete this workout? (Press 'y' to confirm, 'n' to cancel)");
+
+        // Confirm deletion
+        if (!ui.confirmationMessage()) {
+            ui.showMessage("Deletion cancelled. Workout preserved.");
+            return;
+        }
+
+        // Store workout name before deletion
+        String deletedWorkoutName = workoutToDelete.getWorkoutName();
+
+        // Remove the workout
+        monthWorkouts.remove(displayIndex - 1);
+
+        // Save updated list
+        fileHandler.saveMonthList(month, monthWorkouts);
+
+        // Update current workouts if we're viewing the same month
+        if (currentLoadedMonth.equals(month)) {
+            this.workouts = monthWorkouts;
+        }
+
+        ui.showMessage("✓ Deleted workout: " + deletedWorkoutName);
+        ui.showMessage("Updated workout list saved successfully.");
     }
 
     /**

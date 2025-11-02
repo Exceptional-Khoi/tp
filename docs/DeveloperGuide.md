@@ -163,8 +163,7 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 | v1.0    | new user           | see a welcome message and list of commands                        | know how to start using the app                           |
 | v1.0    | user               | create a new workout with a date and time                         | plan and record my daily workouts                         |
 | v1.0    | user               | add exercises to a workout                                        | track what I am doing during my session                   |
-| v1.0    | user               | add sets and reps for each exercise                               | monitor my training volume and progress                   |
-| v1.0    | user               | delete an exercise or set                                         | fix mistakes if I entered wrong data                      |
+| v1.0    | user               | add sets and reps for each exercise                               | monitor my training volume and progress                   ||
 | v1.0    | user               | end my workout and record its duration                            | know how long I trained for each session                  |
 | v1.0    | user               | view a log of past workouts                                       | review my training history easily                         |
 | v1.1    | frequent user      | record my weight by date                                          | monitor my weight progress over time                      |
@@ -624,24 +623,21 @@ ew d/23/10/25 t/0830            → success (ends active workout)
 ### Success Cases
 
 ```
-/del_workout Push          → success (delete by name)
-
-/del_workout d/23/10/25    → success (delete by date; interactive path)
+/delete_workout id/2          → success (delete workout at index 2)
 ```
 
 ### Error Cases
 
 ```
-/del_workout                   → error (missing target)
-/del_workout d/99/99/99        → error (invalid date)
-/del_workout NotAWorkout       → error (not found)
+/delete_workout             → error (missing target)
+/delete_workout id/0        → error (invalid index; must be > 0)
+/delete_workout id/-2       → error (invalid index; must be positive)
 ```
 
 **Usage:**
 
-* `/del_workout <WORKOUT_NAME>`
-* `/del_workout d/<dd/MM/yy>` (interactive delete)
-  (aliases: `d`)
+* `/delete_workout id/<INDEX>`
+  (aliases: `dw`)
 
 ---
 
