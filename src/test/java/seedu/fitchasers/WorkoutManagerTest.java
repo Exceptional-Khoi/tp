@@ -118,7 +118,7 @@ class WorkoutManagerTest {
         manager.addWorkout("/create_workout n/run d/01/01/25 t/1200");
 
         // Delete the second workout using index-based deletion (id/2)
-        manager.handleDeleteWorkout("id/2");
+        manager.deleteParser("id/2");
 
         // Accessing index 1 should throw IndexOutOfBoundsException since we only have 1 workout left
         assertThrows(IndexOutOfBoundsException.class,
@@ -133,7 +133,7 @@ class WorkoutManagerTest {
         int initialSize = manager.getWorkouts().size();
 
         // Try to delete a workout with invalid index (id/99 - doesn't exist)
-        manager.handleDeleteWorkout("id/99");
+        manager.deleteParser("id/99");
 
         // List size should remain the same
         assertEquals(initialSize, manager.getWorkouts().size());

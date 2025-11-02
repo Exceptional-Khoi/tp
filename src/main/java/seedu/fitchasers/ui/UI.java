@@ -276,9 +276,9 @@ public class UI {
                                  
         /open (o) INDEX                           - Open detailed view of the current list of workout
                                                    e.g. /open 1
-        /delete_workout id/[Workout Index] m/(1-12)
-        /dw WORKOUT_INDEX -ym [Year in full] [month (1-12)]
-                                                   - Delete a workout by index seen in viewlog
+        
+        /delete_workout (dw) id/<INDEX> m/<MM>    - Delete a workout by index shown in viewlog
+        /delete_workout (dw) id/<INDEX> ym/<MM>/<YY>
                                                    e.g. /del_workout id/1 m/10
                                                    e.g. /del_workout id/2 ym/10/26
         

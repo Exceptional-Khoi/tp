@@ -302,7 +302,7 @@ public class ViewLog {
                 continue;
             }
 
-            if (t.startsWith("-") || t.contains("/")) {
+            if (t.contains("/")) {
                 throw new InvalidArgumentInput("Unknown or malformed flag: " + t);
             } else {
                 throw new InvalidArgumentInput("Unexpected token: " + t);

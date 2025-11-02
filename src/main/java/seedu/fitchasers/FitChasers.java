@@ -3,6 +3,7 @@ package seedu.fitchasers;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.ui.UI;
+import seedu.fitchasers.workouts.DeleteWorkout;
 import seedu.fitchasers.workouts.ViewLog;
 import seedu.fitchasers.exceptions.InvalidCommandException;
 import seedu.fitchasers.gym.EquipmentDisplay;
@@ -218,10 +219,6 @@ public class FitChasers {
             ui.showError("Failed to save workouts before exit.");
         }
         isRunning = false;
-    }
-
-    private static void delMethod() throws IOException, FileNonexistent {
-        workoutManager.handleDeleteWorkout(argumentStr);
     }
 
     private static void owtMethod() throws FileNonexistent, IOException {
@@ -572,6 +569,7 @@ public class FitChasers {
             person = new Person(userName);
             try {
                 fileHandler.saveUserName(person);
+                fileHandler.saveCreationMonth(YearMonth.now());
                 ui.showMessage("Your name has been saved.");
             } catch (IOException e) {
                 ui.showError("Failed to save username: " + e.getMessage());
