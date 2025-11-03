@@ -1,5 +1,5 @@
 @startuml
-title FitChasers – UI Class Diagram
+title FitChasers UI - Class Diagram
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -16,7 +16,7 @@ hide circle
 ' ===== Types used by UI =====
 class Scanner
 
-package "seedu.fitchasers.workouts" as pkg_workouts #DDDDFF {
+package "seedu.fitchasers.workouts" {
   class Exercise {
     - name: String
     - sets: ArrayList<Integer>
@@ -37,7 +37,7 @@ package "seedu.fitchasers.workouts" as pkg_workouts #DDDDFF {
   }
 }
 
-package "seedu.fitchasers.user" as pkg_user #DDFFDD {
+package "seedu.fitchasers.user" {
   class WeightManager {
     - currentUser: Person
     --
@@ -62,9 +62,9 @@ class UI {
 
 ' ===== Relationships =====
 UI *-- Scanner
-UI ..> Workout : uses
-UI ..> Exercise : uses
-UI ..> WeightManager : uses
+UI ..> Workout
+UI ..> Exercise
+UI ..> WeightManager
 
-WeightManager ..> UI : uses
+WeightManager ..> UI
 @enduml
