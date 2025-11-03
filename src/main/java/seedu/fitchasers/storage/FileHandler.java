@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//@@Kart04
+//@@author Kart04
 /**
  * Handles the permanent storage of workout and exercise data.
  * Saves to and loads from: data/save.txt
@@ -38,13 +38,7 @@ import java.util.Set;
  * Each workout starts with "WORKOUT" and ends with "END_WORKOUT".
  * Exercises are listed between, with all set repetitions joined by commas.
  * <p>
- * Example:
- * WORKOUT | Chest Day | 45
- * EXERCISE | Push-Ups | 15,15,12
- * EXERCISE | Bench Press | 12,10,8
- * END_WORKOUT
  */
-
 public class FileHandler {
 
     public static final Path DATA_DIRECTORY = Paths.get("data");

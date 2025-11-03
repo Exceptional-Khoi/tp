@@ -3,7 +3,7 @@ import seedu.fitchasers.workouts.Workout;
 
 import java.util.Set;
 
-//@@Kart04
+//@@author Kart04
 public interface Tagger {
     Set<String> suggest(Workout w);
 }

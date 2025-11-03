@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-//@@bennyy117
+//@@author bennyy117
 /**
  * Handles the recording and viewing of weight data for a person.
  */
