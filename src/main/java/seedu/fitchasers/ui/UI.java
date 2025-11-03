@@ -312,9 +312,9 @@ public class UI {
      *         {@code false} if declined (N/No),
      *         {@code null} if cancelled
      */
-    public Boolean confirmationMessage() {
+    public boolean confirmationMessage() {
         while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N or /cancel) > ");
+            String ans = readInsideRightBubble("Confirm (Y/N or /help) > ");
             if (ans == null) {
                 return false;
             }
@@ -326,11 +326,12 @@ public class UI {
             if (lower.equals("n") || lower.equals("no")) {
                 return false;
             }
-            if (lower.equals("/cancel")) {
-                showMessage("Action cancelled.");
-                return null;
+            if (lower.equals("/help")) {
+                showHelp();
+                continue;
             }
-            showError("Please answer Y or N (yes/no), or type /cancel to abort.");
+            showError("Please answer Y or N (yes/no), or type /help for command list for formats." +
+                    " \n Tip: Type just keep typing No to exit :)");
         }
     }
 
