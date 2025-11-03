@@ -35,15 +35,6 @@ Justification:
 Helps NUS students find the most convenient gym location for their planned workouts, reducing friction 
 in their fitness routine and promoting consistent training.
 
-### New Feature: Robust Workout Deletion with User Confirmation
- * Allows users to delete workouts by name or date using `/delete [WORKOUT_NAME]` or `/delete d/[DATE]`
- * Shows indexed list of workouts matching criteria before deletion
- * Requires user confirmation before permanently removing data
- * Supports batch deletion of multiple workouts
-
-Justification:
-Provides users with deletion with clear feedback and confirmation steps, preventing accidental data loss.
-
 ### New_feature: Enhanced Workout Session Management
 * Improved `/create_workout` and `/end_workout` command to handle partial date/time input with smart defaulting.
 * Uses current date and time when user omits these parameters
@@ -74,6 +65,24 @@ Added sequence diagrams for:
 
 * Tag override workflow via /override_workout_tag, from command parsing to tag set manipulation.
 
+### Contributions to Core Modules
+#### Workout.java
+* Contributor of the Workout class, which models individual workout sessions, encapsulates all properties, implements 
+  tag logic and supports serialisation for persistence.
+* Implemented methods for workout lifecycle (creation, ending, editing, deletion).
+* Integrated tag management with auto and manual tags, as well as duration and date validation logic.
+
+#### WorkoutManager.java 
+* Contributor to the WorkoutManager class, the controller responsible for managing lists of workouts, handling file 
+  storage/retrieval and coordinating logic for create/update/delete/search commands.
+* Designed workout loading/saving using FileHandler.
+* Integrated tagging engine and ensured support for both batch and single workout operations.
+* Authored/maintained key methods for filtering, sorting, and indexing workout logs.
+
+#### Contributed to the DeleteWorkout feature
+* Helped implement the class and workflow that removes workouts from the user's log, handling user confirmation, 
+  storage updates, and UI coordination.
+
 ### Design Considerations and Alternatives:
 Described the decision process for storing tags in separate collections (autoTags, manualTags) vs. alternative 
 single-set approaches with meta-flags. Outlined the trade-offs for each method, and justified the selected approach 
@@ -93,7 +102,9 @@ commands/output and Java stream-based implementation plan.
 ## Contributions to team-based tasks
 * Documenting the target user profile
 * Maintaining the issue tracker
+* Added Junit testing for ViewLogTest, WorkoutManagerTest, WorkoutTest, WeightManagerTest and EquipmentDisplayTest
 
 ## Review/mentoring contributions
-* PRs reviewed (with non-trivial review comments):#256, #164, #133, #100, #98, #87, #60, #57
-* 
+* Pull requests reviewed (with non-trivial review comments):#256, #164, #133, #100, #98, #87, #60, #57. #272
+* Pull request created: #7, #32, #42, $58, #82, #106, #108, #112, #127, #142, #151, #165, #180, #195, #204, #257, #270, 
+  #270, #275
