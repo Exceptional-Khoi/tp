@@ -20,16 +20,24 @@ import java.time.format.DateTimeFormatter;
  */
 public class GoalWeightTracker {
 
-    /** Formatter for displaying dates in dd/MM/yy format. */
+    /**
+     * Formatter for displaying dates in dd/MM/yy format.
+     */
     private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yy");
 
-    /** UI instance used to show messages to the user. */
+    /**
+     * UI instance used to show messages to the user.
+     */
     private final UI ui = new UI();
 
-    /** The user's goal weight in kilograms. */
+    /**
+     * The user's goal weight in kilograms.
+     */
     private Double goalWeight = null;
 
-    /** The date when the goal weight was set. */
+    /**
+     * The date when the goal weight was set.
+     */
     private LocalDate setDate = null;
 
     /**

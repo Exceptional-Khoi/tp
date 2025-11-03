@@ -54,7 +54,7 @@ public class UI {
      * Prompts the user to enter one or more indices for deletion.
      *
      * @return the trimmed input string containing indices,
-     *         or {@code null} if no input is provided
+     *     or {@code null} if no input is provided
      */
     public String enterSelection() {
         String s = readInsideRightBubble("Enter the index(es) to be deleted > ");
@@ -105,7 +105,7 @@ public class UI {
      * @return the user's initial weight as a double, or -1 if input fails
      */
     public double enterWeight(WeightManager weightManager) {
-        double weight = -1;
+        double weight;
         while (true) {
             showMessage("Please enter your initial weight (in kg).");
             String ans = readInsideRightBubble("Enter your weight > ");
@@ -169,9 +169,9 @@ public class UI {
                 " █      ▄▄█▄▄    ▀▄▄   ▀▄▄▄▀ █   █  ▀▄▄▀█  ▀▄▄▄▀  ▀█▄▄▀   █     ▀▄▄▄▀\n" + RESET);
 
         showMessage("""
-          Your virtual gym buddy's clocked in and ready to make you strong!
-          Type /help or h to explore all available commands!
-          Let's crush your fitness goals together!""");
+                Your virtual gym buddy's clocked in and ready to make you strong!
+                Type /help or h to explore all available commands!
+                Let's crush your fitness goals together!""");
     }
 
     /**
@@ -220,6 +220,7 @@ public class UI {
                 ====================================================================
                 """);
     }
+
     /**
      * Displays the exit message upon program termination.
      */
@@ -232,77 +233,77 @@ public class UI {
      */
     public void showHelp() {
         showMessage("""
-        /help (h)                                 - View all available commands
-        
-        ~~~ USER PROFILE ~~~
-        /rename (rn) n/NAME                       - Set or change your display name
-                                                   e.g. /rename n/Nitin
-        
-        ~~~ WEIGHT TRACKING ~~~
-        /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
-                                                   e.g. /add_weight w/75 d/30/10/25
-        /view_weight (vw)                         - View your recorded weights
-        /set_goal (sg) g/GOAL_WEIGHT              - Set a goal weight to track progress
-                                                   e.g. /set_goal g/70.0
-        /view_goal (vg)                           - View your current goal and progress
-        
-        ~~~ WORKOUT CREATION & LOGGING ~~~
-        /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
-                                                   e.g. /create_workout n/Chest Day d/30/10/25 t/1430
-        /add_exercise (ae) n/NAME r/REPS          - Add an exercise to current workout
-                                                   e.g. /add_exercise n/Squat r/12
-        /add_set (as) r/REPS                      - Add another set to the latest exercise
-                                                   e.g. /add_set r/10
-        /end_workout (ew) d/DATE t/TIME           - End and save current workout
-                                                   e.g. /end_workout d/30/10/25 t/1500
-                                                   e.g. /end_workout t/1500 (Will prompt current date)
-        
-        ~~~ WORKOUT LOG MANAGEMENT ~~~
-        /view_log (vl) [Optional Tags]             - View first page of your workout history
-                                                   e.g. /view_log (vl)
-                                                   
-        [OPTIONAL TAGS FOR /view_log]:
-        vl pg/[Number]                             - Select page number of workout
-                                                   e.g vl pg/2
-        
-        vl detailed/                               - Show page in detail [No argument needed]                  
-                                                   e.g. vl detailed/
-                                                   
-        vl m/[month from 1-12]                     -  Select specific month in current year 
-                                                   e.g vl m/10 [Current Year Oct]
-                                                   
-        ym/                                        - Select specific month in specific year
-                                                   e.g. vl ym/10/26 [Oct 2026]                                 
-                                 
-        /open (o) INDEX                           - Open detailed view of the current list of workout
-                                                   e.g. /open 1
-        
-        /delete_workout (dw) id/<INDEX> m/<MM>    - Delete a workout by index shown in viewlog
-        /delete_workout (dw) id/<INDEX> ym/<MM>/<YY>
-                                                   e.g. /del_workout id/1 m/10
-                                                   e.g. /del_workout id/2 ym/10/26
-        
-        ~~~ TAGGING SYSTEM ~~~
-        /add_modality_tag (amot) m/MODALITY k/KEYWORD
-                                                   - Add a keyword for a workout modality
-                                                   e.g. /add_modality_tag m/CARDIO k/running
-        /add_muscle_tag (amt) m/MUSCLE_GROUP k/KEYWORD
-                                                   - Add a keyword for a muscle group
-                                                   e.g. /add_muscle_tag m/LEGS k/lunges
-        /override_workout_tag (owt) id/INDEX newTag/TAG_NAME
-                                                   - Manually override a workout’s tag
-                                                   e.g. /override_workout_tag id/1 newTag/strength
-        
-        ~~~ GYM FINDER ~~~
-        /gym_where (gw) n/EXERCISE                - Suggest NUS gyms with equipment for the exercise
-                                                   e.g. /gym_where n/squat
-        /gym_page (gp) p/PAGE_OR_NAME             - View available NUS gym pages or by gym name
-                                                   e.g. /gym_page p/1
-                                                   e.g. /gym_page p/SRC Gym
-        
-        ~~~ SYSTEM ~~~
-        /exit (e)                                 - Save all progress and exit the app
-            """);
+                /help (h)                                 - View all available commands
+               \s
+                ~~~ USER PROFILE ~~~
+                /rename (rn) n/NAME                       - Set or change your display name
+                                                           e.g. /rename n/Nitin
+               \s
+                ~~~ WEIGHT TRACKING ~~~
+                /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
+                                                           e.g. /add_weight w/75 d/30/10/25
+                /view_weight (vw)                         - View your recorded weights
+                /set_goal (sg) w/GOAL_WEIGHT              - Set a goal weight to track progress
+                                                           e.g. /set_goal w/70.0
+                /view_goal (vg)                           - View your current goal and progress
+               \s
+                ~~~ WORKOUT CREATION & LOGGING ~~~
+                /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
+                                                           e.g. /create_workout n/Chest Day d/30/10/25 t/1430
+                /add_exercise (ae) n/NAME r/REPS          - Add an exercise to current workout
+                                                           e.g. /add_exercise n/Squat r/12
+                /add_set (as) r/REPS                      - Add another set to the latest exercise
+                                                           e.g. /add_set r/10
+                /end_workout (ew) d/DATE t/TIME           - End and save current workout
+                                                           e.g. /end_workout d/30/10/25 t/1500
+                                                           e.g. /end_workout t/1500 (Will prompt current date)
+               \s
+                ~~~ WORKOUT LOG MANAGEMENT ~~~
+                /view_log (vl) [Optional Tags]             - View first page of your workout history
+                                                           e.g. /view_log (vl)
+               \s
+                [OPTIONAL TAGS FOR /view_log]:
+                vl pg/[Number]                             - Select page number of workout
+                                                           e.g vl pg/2
+               \s
+                vl detailed/                               - Show page in detail [No argument needed]                 \s
+                                                           e.g. vl detailed/
+               \s
+                vl m/[month from 1-12]                     -  Select specific month in current year\s
+                                                           e.g vl m/10 [Current Year Oct]
+               \s
+                ym/                                        - Select specific month in specific year
+                                                           e.g. vl ym/10/26 [Oct 2026]                                \s
+               \s
+                /open (o) INDEX                           - Open detailed view of the current list of workout
+                                                           e.g. /open 1
+               \s
+                /delete_workout (dw) id/<INDEX> m/<MM>    - Delete a workout by index shown in viewlog
+                /delete_workout (dw) id/<INDEX> ym/<MM>/<YY>
+                                                           e.g. /del_workout id/1 m/10
+                                                           e.g. /del_workout id/2 ym/10/26
+               \s
+                ~~~ TAGGING SYSTEM ~~~
+                /add_modality_tag (amot) m/MODALITY k/KEYWORD
+                                                           - Add a keyword for a workout modality
+                                                           e.g. /add_modality_tag m/CARDIO k/running
+                /add_muscle_tag (amt) m/MUSCLE_GROUP k/KEYWORD
+                                                           - Add a keyword for a muscle group
+                                                           e.g. /add_muscle_tag m/LEGS k/lunges
+                /override_workout_tag (owt) id/INDEX newTag/TAG_NAME
+                                                           - Manually override a workout’s tag
+                                                           e.g. /override_workout_tag id/1 newTag/strength
+               \s
+                ~~~ GYM FINDER ~~~
+                /gym_where (gw) n/EXERCISE                - Suggest NUS gyms with equipment for the exercise
+                                                           e.g. /gym_where n/squat
+                /gym_page (gp) p/PAGE_OR_NAME             - View available NUS gym pages or by gym name
+                                                           e.g. /gym_page p/1
+                                                           e.g. /gym_page p/SRC Gym
+               \s
+                ~~~ SYSTEM ~~~
+                /exit (e)                                 - Save all progress and exit the app
+               \s""");
     }
 
     /**
@@ -313,53 +314,57 @@ public class UI {
      *         {@code false} if declined (N/No),
      *         {@code null} if cancelled
      */
-
-    public Boolean confirmationMessageWithCancel(){
-        while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N, /help or /cancel) > ");
-            if (ans == null) {
-                return false;
-            }
-            String lower = ans.trim().toLowerCase();
-
-            if (lower.equals("y") || lower.equals("yes")) {
-                return true;
-            }
-            if (lower.equals("n") || lower.equals("no")) {
-                return false;
-            }
-            if (lower.equals("/help")) {
-                showHelp();
-                continue;
-            }
-            if(lower.equals("/cancel")) {
-                return null;
-            }
-            showError("Please answer Y or N (yes/no).Type /help for command list or /cancel to cancel." +
-                    " \n Tip: Type just keep typing No to exit :)");
-        }
+    public Boolean confirmationMessageWithCancel() {
+        return confirmLoop(true);
     }
 
+    /**
+     * Prompts for a yes/no confirmation from the user (no cancel option).
+     *
+     * @return {@code true} if confirmed (Y/Yes),
+     *         {@code false} if declined (N/No)
+     */
     public boolean confirmationMessage() {
+        Boolean result = confirmLoop(false);
+        return Boolean.TRUE.equals(result);
+    }
+
+    private Boolean confirmLoop(boolean allowCancel) {
+        String prompt = allowCancel
+                ? "Confirm (Y/N, /help or /cancel) > "
+                : "Confirm (Y/N or /help) > ";
+
+        String errorMsg = allowCancel
+                ? "Please answer Y or N (yes/no). Type /help for command list or /cancel to cancel."
+                : "Please answer Y or N (yes/no), or type /help for command list for formats.";
+
+        errorMsg += "\n Tip: Type just keep typing N (no) to exit :)";
+
         while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N or /help) > ");
+            String ans = readInsideRightBubble(prompt);
             if (ans == null) {
                 return false;
             }
             String lower = ans.trim().toLowerCase();
 
-            if (lower.equals("y") || lower.equals("yes")) {
+            switch (lower) {
+            case "y", "yes" -> {
                 return true;
             }
-            if (lower.equals("n") || lower.equals("no")) {
+            case "n", "no" -> {
                 return false;
             }
-            if (lower.equals("/help")) {
+            case "/help" -> {
                 showHelp();
                 continue;
             }
-            showError("Please answer Y or N (yes/no), or type /help for command list for formats." +
-                    " \n Tip: Type just keep typing No to exit :)");
+            default -> {}
+            }
+
+            if (allowCancel && lower.equals("/cancel")) {
+                return null;
+            }
+            showError(errorMsg);
         }
     }
 
@@ -498,6 +503,16 @@ public class UI {
         return sb.toString();
     }
 
+    /**
+     * Displays an input bubble aligned to the right side of the console for user input.
+     * <p>
+     * This method prints a stylized text bubble labeled "(You)" to represent user prompts,
+     * waits for user input, and then returns the trimmed response. If no input is available,
+     * it gracefully handles the end of input stream.
+     *
+     * @param prompt The message or question to display inside the right-side bubble.
+     * @return The trimmed user input string, or {@code null} if no input was provided.
+     */
     public String readInsideRightBubble(String prompt) {
         int innerWidth = Math.max(1, (int) (CONSOLE_WIDTH * 3.0 / 5) - FRAME_OVERHEAD);
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);

@@ -6,11 +6,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+//@@author nitin19011
 /**
  * Test stub for FileHandler used in unit tests.
  */
-
-//@@author nitin19011
 public class FileHandlerTest extends FileHandler {
 
     @Override

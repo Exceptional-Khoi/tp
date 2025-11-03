@@ -26,8 +26,8 @@ public class WeightManager {
     /**
      * Adds a new weight entry.
      * Command examples:
-     *   /add_weight w/65
-     *   /add_weight w/65 d/25/10/25
+     * /add_weight w/65
+     * /add_weight w/65 d/25/10/25
      *
      * @param command full command string containing weight and optionally a date
      */
@@ -164,7 +164,6 @@ public class WeightManager {
             ui.showMessage("Weight must be between 20 kg and 500 kg.");
             return false;
         }
-
         return true;
     }
 }

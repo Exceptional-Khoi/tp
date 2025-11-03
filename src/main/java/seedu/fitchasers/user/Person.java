@@ -10,9 +10,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-//@@bennyy117
+//@@author bennyy117
 /**
  * Represents a person using the FitChasers app.
  * Stores the person's name and their weight history, maintaining chronological order.
@@ -156,11 +155,11 @@ public class Person {
 
         List<Double> weights = weightHistory.stream()
                 .map(WeightRecord::getWeight)
-                .collect(Collectors.toList());
+                .toList();
 
         List<String> dates = weightHistory.stream()
                 .map(r -> r.getDate().format(DateTimeFormatter.ofPattern("dd/MM")))
-                .collect(Collectors.toList());
+                .toList();
 
         int height = 10;
         int spacing = 12;
@@ -306,7 +305,7 @@ public class Person {
      * If multiple records exist for the same date, only the first is kept,
      * the rest are removed. The updated record is re-inserted to maintain order.
      *
-     * @param date the date to update
+     * @param date      the date to update
      * @param newWeight the new weight value
      */
     public void updateWeightRecord(LocalDate date, double newWeight) {

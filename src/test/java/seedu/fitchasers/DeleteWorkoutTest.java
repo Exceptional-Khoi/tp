@@ -23,12 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+//@@author ZhongBaode
 /**
  * JUnit 5 tests for DeleteWorkout without Mockito.
  * Uses simple in-memory fakes for UI, FileHandler, and WorkoutManager.
  */
-
-//@@author ZhongBaode
 class DeleteWorkoutTest {
 
     /** Fake UI that records messages and returns a configurable confirmation. */

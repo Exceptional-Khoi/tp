@@ -16,6 +16,13 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 //@@author ZhongBaode
+/**
+ * Handles the display and navigation of the user's workout logs.
+ * <p>
+ * This class is responsible for loading, filtering, sorting, and paginating
+ * workout data for display. It also maintains the most recently rendered list
+ * to support features like reopening or viewing specific workouts by index.
+ */
 public class ViewLog {
     public static final int MINIMUM_PAGE_SIZE = 1;
     public static final int ARRAY_INDEX_OFFSET = 1;
@@ -41,9 +48,9 @@ public class ViewLog {
     /**
      * Constructs a ViewLog instance with required dependencies.
      *
-     * @param ui the UI instance for displaying output
+     * @param ui             the UI instance for displaying output
      * @param workoutManager the WorkoutManager for accessing workout data
-     * @param fileHandler the FileHandler for loading workouts from disk
+     * @param fileHandler    the FileHandler for loading workouts from disk
      */
     public ViewLog(UI ui, WorkoutManager workoutManager, FileHandler fileHandler) {
         ViewLog.ui = ui;
@@ -62,7 +69,7 @@ public class ViewLog {
      *   <li>/view_log -ym &lt;year&gt; &lt;month 1..12&gt; [extractedArg]</li>
      *   <li>Optional: -d (detailed view)</li>
      * </ul>
-     *
+     * <p>
      * Examples:
      * <pre>
      *   /view_log -m 10          // Oct (current year), extractedArg 1
@@ -118,6 +125,7 @@ public class ViewLog {
         buf.append("Tip: /view_log pg/2 (next pg of Current Month), /view_log m/10 (view October), /open <ID>.");
         ui.showMessage(buf.toString());
     }
+
     /**
      * Loads workouts for a specific month and sorts them by date (newest first).
      * <p>
@@ -127,7 +135,7 @@ public class ViewLog {
      *
      * @param p the YearMonth to load workouts for
      * @return a new ArrayList of workouts for the month, sorted newest first
-     * @throws IOException if an error occurs reading from disk
+     * @throws IOException     if an error occurs reading from disk
      * @throws FileNonexistent if no workout file exists for the specified month
      * @see FileHandler#loadMonthList(YearMonth)
      */
@@ -207,6 +215,15 @@ public class ViewLog {
 
     /* ------------------------------ Helpers/Util ----------------------------- */
 
+    /**
+     * Computes the total number of pages required to display a given number of items.
+     * <p>
+     * Ensures that both size and page size are non-negative before performing the calculation.
+     *
+     * @param size The total number of items.
+     * @param pageSize The number of items per page.
+     * @return The total number of pages needed to display all items.
+     */
     public static int computeTotalPages(int size, int pageSize) {
         return (int) Math.ceil(Math.max(0, size) / (double) Math.max(1, pageSize));
     }
@@ -222,7 +239,6 @@ public class ViewLog {
             ui.showMessage("Hey that page exceeds largest page! I will default to the last page okay!");
             return totalPages;
         }
-
         return page;
     }
 
@@ -271,11 +287,36 @@ public class ViewLog {
         return String.format("%s %d%s of %s, %d:%02d %s", dow, d, suffix, mon, hr12, min, ampm);
     }
 
+    /**
+     * Represents the parsed result of a command or user input.
+     * <p>
+     * This record encapsulates a {@code YearMonth}, an extracted integer argument,
+     * and a boolean flag indicating whether detailed output was requested.
+     *
+     * @param ym The {@code YearMonth} extracted from the input.
+     * @param extractedArg The numeric argument parsed from the input.
+     * @param detailed {@code true} if detailed output is requested; {@code false} otherwise.
+     */
     public record Parsed(YearMonth ym, int extractedArg, boolean detailed) {
     }
 
+    //@@author nitin19011
     /**
-     * Parses flags/args into a structured form with validation/guards.
+     * Parses raw user input to extract date, page, and detail parameters.
+     * <p>
+     * Supports arguments in the following formats:
+     * <ul>
+     *   <li>{@code m/<MM>} — Specifies the month of the current year.</li>
+     *   <li>{@code ym/<MM>/<YY>} — Specifies a particular year and month.</li>
+     *   <li>{@code pg/<N>} — Specifies the page number for paginated display.</li>
+     *   <li>{@code detailed/} — Requests detailed output mode.</li>
+     * </ul>
+     * The method validates argument consistency (e.g., {@code m/} cannot be combined with {@code ym/})
+     * and ensures numeric values are positive.
+     *
+     * @param raw The raw user input string containing command arguments.
+     * @return A {@code Parsed} record containing the parsed {@code YearMonth}, page number, and detail flag.
+     * @throws InvalidArgumentInput If the arguments are invalid, conflicting, or improperly formatted.
      */
     public Parsed parseArgs(String raw) throws InvalidArgumentInput {
         YearMonth now = YearMonth.now();
@@ -355,7 +396,6 @@ public class ViewLog {
         return s != null && INT.matcher(s).matches();
     }
 
-
     private static int readPositiveInt(String s, String err) throws InvalidArgumentInput {
         try {
             int v = Integer.parseInt(s);
@@ -380,15 +420,6 @@ public class ViewLog {
         }
     }
 
-
-    /**
-     * Strictly parses ym token in the form "MM/YY" (e.g., "10/25" -> 2025-10).
-     * - MM: 1..12
-     * - YY: 00..99  (converted to four-digit year)
-     *
-     * Conversion rule (simple): 2000 + YY  → "25" => 2025, "03" => 2003.
-     * Change the conversion if you prefer a different century policy.
-     */
     private YearMonth parseYearMonthToken(String token) throws InvalidArgumentInput {
         String[] parts = token.split("/");
         if (parts.length != 2) {

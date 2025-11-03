@@ -23,7 +23,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 //@@author ZhongBaode
-
 /**
  * Manages workout sessions for the FitChasers application.
  * <p>
@@ -62,6 +61,17 @@ public class WorkoutManager {
     private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
             .withResolverStyle(ResolverStyle.SMART);
 
+    /**
+     * Constructs a {@code WorkoutManager} with the specified tagger and file handler.
+     * <p>
+     * Initializes the workout data structure by loading all stored workouts from files,
+     * sets the current loaded month to the present month, and retrieves the application's
+     * creation date from the file handler.
+     *
+     * @param tagger The {@code Tagger} used to generate automatic workout tags.
+     * @param fileHandler The {@code FileHandler} responsible for reading and writing workout data.
+     * @throws IOException If an error occurs while loading existing workout data from files.
+     */
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) throws IOException {
         this.tagger = tagger;
         this.fileHandler = fileHandler;
@@ -83,18 +93,36 @@ public class WorkoutManager {
         }
     }
 
+    /**
+     * Initializes workouts by checking for any sessions that were not properly ended.
+     * <p>
+     * If a workout is found without an end time, the user is prompted to enter one.
+     * The method updates each incomplete workout interactively until all are finalized.
+     */
     public void setWorkouts(ArrayList<Workout> workouts) {
         this.workouts = workouts;
     }
 
+    /**
+     * Sets the current list of workouts and updates the loaded month context.
+     *
+     * @param workouts The list of workouts to assign.
+     * @param monthOfArrayList The {@code YearMonth} representing the workouts' month.
+     */
     public void setWorkouts(ArrayList<Workout> workouts, YearMonth monthOfArrayList) {
         this.workouts = workouts;
         currentLoadedMonth = monthOfArrayList;
     }
 
+    /**
+     * Returns the creation date of the workout data.
+     *
+     * @return The {@code YearMonth} representing when the data was first created.
+     */
     public YearMonth getCreationDate() {
         return creationDate;
     }
+
     /**
      * Adds a new workout session from the user's command input.
      * <p>
@@ -164,8 +192,8 @@ public class WorkoutManager {
             ui.showMessage("Tags generated for workout: " + (suggestedTags == null || suggestedTags.isEmpty()
                     ? "none"
                     : String.join(", ", suggestedTags)) + "\n"
-                            + "Added workout: " + workoutName);
-            fileHandler.saveMonthList(currentLoadedMonth,workouts);
+                    + "Added workout: " + workoutName);
+            fileHandler.saveMonthList(currentLoadedMonth, workouts);
 
         } catch (Exception e) {
             ui.showMessage("Something went wrong creating the workout. Please try again.");
@@ -296,7 +324,7 @@ public class WorkoutManager {
         this.workoutDateTime = LocalDateTime.of(parsedDate, parsedTime);
 
         // Future/past confirmations + month file bootstrap (reuse your existing logic)
-        checkPastFutureDate(parsedDate,parsedTime);
+        checkPastFutureDate(parsedDate, parsedTime);
 
         // Duplicate date/time check (unchanged from your version)
         for (Workout w : workouts) {
@@ -384,6 +412,18 @@ public class WorkoutManager {
         workoutDateTime = LocalDateTime.of(date, time);
     }
 
+    /**
+     * Extracts the workout name from a raw command string based on the positions of date and time flags.
+     * <p>
+     * The method determines where the name segment ends by checking for {@code d/} or {@code t/} markers.
+     * If no markers are present, the remainder of the command after {@code n/} is treated as the name.
+     *
+     * @param command The full command string entered by the user.
+     * @param dIndex The index of the {@code d/} flag in the command, or -1 if absent.
+     * @param tIndex The index of the {@code t/} flag in the command, or -1 if absent.
+     * @return The extracted workout name.
+     * @throws InvalidArgumentInput If the extracted name is empty or invalid.
+     */
     public String extractWorkoutNameFromRaw(String command, int dIndex, int tIndex) throws InvalidArgumentInput {
         String workoutName;
         int nextMarker = -1;
@@ -408,6 +448,17 @@ public class WorkoutManager {
         return workoutName;
     }
 
+    /**
+     * Extracts and parses a time value from the raw command string.
+     * <p>
+     * The method searches for the {@code t/} flag and attempts to parse the following token
+     * as a time in {@code HHmm} format. If parsing fails, an error message is displayed.
+     *
+     * @param command The full command string entered by the user.
+     * @param tIndex The index of the {@code t/} flag in the command, or -1 if absent.
+     * @return The parsed {@code LocalTime}, or {@code null} if no valid time was provided.
+     * @throws InvalidArgumentInput If the time format is invalid.
+     */
     public LocalTime extractTimeFromRaw(String command, int tIndex) throws InvalidArgumentInput {
         String timeStr = "";
         LocalTime time = null;
@@ -429,6 +480,17 @@ public class WorkoutManager {
         return time;
     }
 
+    /**
+     * Extracts and parses a date value from the raw command string.
+     * <p>
+     * The method searches for the {@code d/} flag and attempts to parse the following token
+     * as a date in {@code dd/MM/yy} format. If parsing fails, an error message is displayed.
+     *
+     * @param command The full command string entered by the user.
+     * @param dIndex The index of the {@code d/} flag in the command, or -1 if absent.
+     * @return The parsed {@code LocalDate}, or {@code null} if no valid date was provided.
+     * @throws InvalidArgumentInput If the date format is invalid.
+     */
     public LocalDate extractDateFromRaw(String command, int dIndex) throws InvalidArgumentInput {
         String dateStr = "";
         LocalDate date = null;
@@ -499,6 +561,11 @@ public class WorkoutManager {
         }
     }
 
+    /**
+     * Returns the total number of workouts currently stored.
+     *
+     * @return The number of workouts in the list.
+     */
     public int getWorkoutSize() {
         return workouts.size();
     }
@@ -511,7 +578,6 @@ public class WorkoutManager {
     public ArrayList<Workout> getWorkouts() {
         return workouts;
     }
-
 
     /**
      * Adds an exercise to the current workout.
@@ -703,6 +769,16 @@ public class WorkoutManager {
         workout.setAutoTags(new LinkedHashSet<>());
     }
 
+    /**
+     * Checks if the given workout has a conflicting modality tag.
+     * <p>
+     * A conflict occurs when the workout already contains a different modality tag
+     * that does not match the specified one.
+     *
+     * @param w The {@code Workout} to check.
+     * @param mod The modality to compare against.
+     * @return {@code true} if a conflicting modality exists; {@code false} otherwise.
+     */
     public boolean hasConflictingModality(Workout w, String mod) {
         Set<String> tags = w.getAllTags();
         for (String tag : tags) {
@@ -713,6 +789,13 @@ public class WorkoutManager {
         return false;
     }
 
+    /**
+     * Returns the set of tags that are overridden due to conflicts
+     * between manual and automatically generated tags.
+     *
+     * @param w The {@code Workout} to check for tag conflicts.
+     * @return A {@code Set<String>} of conflicting tags, or an empty set if none exist.
+     */
     public Set<String> checkForOverriddenTags(Workout w) {
         return w.getConflictingTags();
     }
@@ -726,6 +809,15 @@ public class WorkoutManager {
         }
     }
 
+    /**
+     * Returns the modality tag that conflicts with the given workout, if any.
+     * <p>
+     * This method checks the workout's automatically generated tags and identifies
+     * whether it belongs to the {@code cardio} or {@code strength} category.
+     *
+     * @param w The {@code Workout} to check.
+     * @return The conflicting modality tag ({@code "cardio"} or {@code "strength"}), or {@code null} if none exist.
+     */
     public String getConflictingModality(Workout w) {
         Set<String> autoTags = w.getAutoTags();
         if (autoTags.contains("cardio")) {
@@ -921,10 +1013,24 @@ public class WorkoutManager {
         currentWorkout = null;
     }
 
+    /**
+     * Returns the currently loaded month of workout data.
+     *
+     * @return The {@code YearMonth} representing the active workout month.
+     */
     public YearMonth getCurrentLoadedMonth() {
         return currentLoadedMonth;
     }
 
+    /**
+     * Executes the delete workout command by invoking the {@code DeleteWorkout} handler.
+     * <p>
+     * This method parses the user's input, deletes the specified workout if valid,
+     * and handles any exceptions that occur during the process by displaying
+     * appropriate error messages.
+     *
+     * @param argumentStr The raw user input string containing delete command arguments.
+     */
     public void deleteParser(String argumentStr) {
         try {
             new DeleteWorkout(ui, fileHandler, this).execute(argumentStr);
@@ -979,7 +1085,6 @@ public class WorkoutManager {
         String raw = (next == -1) ? s.substring(valueStart) : s.substring(valueStart, next);
         return new Slice(raw.trim(), raw, (next == -1 ? s.length() : next));
     }
-
 
     private static boolean isValidName(String name) {
         if (name == null) {
@@ -1053,5 +1158,4 @@ public class WorkoutManager {
         }
         return null;
     }
-
 }
