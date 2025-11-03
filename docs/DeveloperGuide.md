@@ -320,6 +320,18 @@ Mainstream OS: Windows, Linux, Unix, macOS
 | **Workout**                  | A session of physical exercise consisting of various exercises and sets.                                               |
 
 # Instructions for manual testing
+1.  Initial launch 
+    1. Download the jar file and copy into an empty folder. 
+    2. Double-click the jar file Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
+2. Saving window preferences
+   1. Resize the window to an optimum size. Move the window to a different location. Close the window.
+   2. Re-launch the app by double-clicking the jar file.<br>
+      Expected: The most recent window size and location is retained.
+3. Graceful shutdown with data save.
+   1.  Perform some actions (add, edit, or delete a workout). Close the app via the menu or window close button.
+   2. Re-launch the app.<br>
+      Expected: All changes are retained and displayed.
+
 ## Help
 
 ### Success Cases
