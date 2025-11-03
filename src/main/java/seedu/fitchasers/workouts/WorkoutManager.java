@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,9 +49,7 @@ public class WorkoutManager {
     private LocalDateTime workoutDateTime;
     private String workoutName;
     private YearMonth currentLoadedMonth;
-    private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
     private final FileHandler fileHandler;
-    private int nameIndex;
     private int afterNameIndex = 2;
     private LocalDate date = null;
     private LocalTime time = null;
@@ -75,7 +72,6 @@ public class WorkoutManager {
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) throws IOException {
         this.tagger = tagger;
         this.fileHandler = fileHandler;
-        this.workoutsByMonth = fileHandler.getArrayByMonth();
         this.currentLoadedMonth = YearMonth.now();
         this.creationDate = fileHandler.getCreationMonth();
     }
@@ -84,9 +80,12 @@ public class WorkoutManager {
         for (Workout workout : this.workouts) {
             while (workout.getWorkoutEndDateTime() == null) {
                 ui.showError("Looks like you forgot to end the previous workout, please enter it now!");
-                ui.showMessage("[IMPORTANT] You cannot continue using the app unless you enter it ;) "+
-                        "\n Tip: Enter '/end_workout' it will ask you if you want to use today's date" +
-                        "\n Else: Enter '/end_workout d/<DD/MM/YY> t/<HHMM>' e.g. ew d/03/11/25 t/1200" );
+                ui.showMessage("""
+                        [IMPORTANT] You cannot continue using the app unless you enter it ;) \
+                        
+                         Tip: Enter '/end_workout' it will ask you if you want to use today's date\
+                        
+                         Else: Enter '/end_workout d/<DD/MM/YY> t/<HHMM>' e.g. ew d/03/11/25 t/1200""");
                 currentWorkout = workout;
                 endWorkout(ui.readCommand());
             }
@@ -112,15 +111,6 @@ public class WorkoutManager {
     public void setWorkouts(ArrayList<Workout> workouts, YearMonth monthOfArrayList) {
         this.workouts = workouts;
         currentLoadedMonth = monthOfArrayList;
-    }
-
-    /**
-     * Returns the creation date of the workout data.
-     *
-     * @return The {@code YearMonth} representing when the data was first created.
-     */
-    public YearMonth getCreationDate() {
-        return creationDate;
     }
 
     /**
@@ -367,14 +357,12 @@ public class WorkoutManager {
             throw new InvalidArgumentInput("");
         }
 
-        assert currentWorkout == null : "No active workout expected before creating a new one";
-
         if (command == null || !command.contains("n/")) {
             ui.showMessage("Invalid format. Use: /create_workout n/WorkoutName d/DD/MM/YY t/HHmm");
             throw new InvalidArgumentInput("");
         }
 
-        nameIndex = command.indexOf("n/");
+        int nameIndex = command.indexOf("n/");
         afterNameIndex += nameIndex;
 
         // Find first marker after n/
@@ -827,6 +815,7 @@ public class WorkoutManager {
         return null;
     }
 
+    //@@author nitin19011
     /**
      * Ends the current workout session by recording the end time and calculating duration.
      * Usage: /end_workout d/DD/MM/YY t/HHmm
@@ -834,7 +823,7 @@ public class WorkoutManager {
      * - Prompts for missing date/time (defaults to now with confirmation)
      * - Validates end > start
      * - Rejects if the end time would overlap another workout that starts on the same day:
-     * otherStart in [current.start, proposedEnd)
+     * otherStart in [current.start, proposedEnd]
      */
     public void endWorkout(String initialArgs) {
         if (currentWorkout == null) {
@@ -930,7 +919,7 @@ public class WorkoutManager {
             }
         }
 
-        // prompt ONLY for missing pieces (same UX as your create flow)
+        // prompt ONLY for missing pieces
         if (date == null) {
             String todayStr = LocalDate.now().format(DATE_FMT);
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
@@ -1099,7 +1088,7 @@ public class WorkoutManager {
         return m.find() ? name.charAt(m.start()) : null;
     }
 
-    // Safe parse reps: only digits, length<=4, range 1..MAX_REPS
+    // Safe parse reps: only digits, length<=4, range 1-MAX_REPS
     private static Integer parseRepsSafe(String repsStr) {
         String t = repsStr.trim();
         if (!REPS_TOKEN.matcher(t).matches()) {

@@ -1,5 +1,6 @@
 package seedu.fitchasers.storage;
 
+import seedu.fitchasers.exceptions.CorruptedDataException;
 import seedu.fitchasers.exceptions.CorruptedFileError;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.ui.UI;
@@ -70,15 +71,6 @@ public class FileHandler {
                         }
                     });
         }
-    }
-
-    /**
-     * Returns the mapping of all workouts grouped by month.
-     *
-     * @return A map where each key is a {@code YearMonth} and the value is a list of workouts for that month.
-     */
-    public Map<YearMonth, ArrayList<Workout>> getArrayByMonth() {
-        return arrayByMonth;
     }
 
     private void ensureDataDir() throws IOException {
@@ -359,7 +351,7 @@ public class FileHandler {
      * @param person the {@link Person} whose weight history will be loaded
      * @throws IOException if an I/O error occurs while reading the file
      */
-    public void loadWeightList(Person person) throws IOException {
+    public void loadWeightList(Person person) throws IOException, CorruptedDataException {
         ensureDataDir();
         Path filePath = DATA_DIRECTORY.resolve("weight.txt");
         if (Files.notExists(filePath)) {
@@ -367,12 +359,49 @@ public class FileHandler {
         }
 
         List<WeightRecord> list = new ArrayList<>();
+        Set<LocalDate> seenDates = new HashSet<>();
+        int lineNumber = 0;
+
         try (BufferedReader reader = Files.newBufferedReader(filePath)) {
             String line;
             while ((line = reader.readLine()) != null) {
+                lineNumber++;
+                if (line.trim().isEmpty()) {
+                    continue; // Skip empty lines
+                }
+
                 String[] parts = line.split(",");
-                LocalDate date = LocalDate.parse(parts[0]);
-                double weight = Double.parseDouble(parts[1]);
+                if (parts.length != 2) {
+                    throw new CorruptedDataException("Error in weight.txt at line " + lineNumber
+                            + ": Each line must be 'date,weight'.");
+                }
+
+                LocalDate date;
+                try {
+                    date = LocalDate.parse(parts[0].trim());
+                } catch (DateTimeParseException e) {
+                    throw new CorruptedDataException("Error in weight.txt at line " + lineNumber
+                            + ": Invalid date format. Use YYYY-MM-DD.");
+                }
+
+                if (!seenDates.add(date)) {
+                    throw new CorruptedDataException("Error in weight.txt: Duplicate date '"
+                            + date + "' found. Only one weight entry per day is allowed.");
+                }
+
+                double weight;
+                try {
+                    weight = Double.parseDouble(parts[1].trim());
+                } catch (NumberFormatException e) {
+                    throw new CorruptedDataException("Error in weight.txt at line " + lineNumber
+                            + ": Invalid weight format. Must be a number.");
+                }
+
+                if (weight < 20 || weight > 500) {
+                    throw new CorruptedDataException("Error in weight.txt at line " + lineNumber
+                            + ": Weight " + weight + " is outside the valid range (20-500 kg).");
+                }
+
                 list.add(new WeightRecord(weight, date));
             }
         }

@@ -1,5 +1,6 @@
 package seedu.fitchasers;
 
+import seedu.fitchasers.exceptions.CorruptedDataException;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.workouts.ViewLog;
@@ -17,6 +18,8 @@ import seedu.fitchasers.workouts.WorkoutManager;
 import seedu.fitchasers.storage.FileHandler;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,11 +48,10 @@ public class FitChasers {
     private static final List<Gym> gyms = StaticGymData.getNusGyms();
     private static WorkoutManager workoutManager;
     private static boolean isRunning = true;
-    private static String command;
     private static String argumentStr = "";
-    private static String input;
     private static WeightManager weightManager;
     private static GoalWeightTracker goalTracker;
+    private static boolean isWeightFileCorrupted = false;
 
     /**
      * The main entry point for the FitChasers application.
@@ -61,9 +63,8 @@ public class FitChasers {
      *
      * @param args The command-line arguments (not used in this application).
      * @throws IOException If an I/O error occurs during file operations.
-     * @throws FileNonexistent If a required data file is missing or cannot be accessed.
      */
-    public static void main(String[] args) throws IOException, FileNonexistent {
+    public static void main(String[] args) throws IOException {
         ui.printLeftHeader();
         initVariables();
         ui.showGreeting();
@@ -75,17 +76,33 @@ public class FitChasers {
         }
         workoutManager.initWorkouts();
         while (isRunning) {
-            input = ui.readCommand();
+            String input = ui.readCommand();
+
             if (input == null) {
                 break;
             }
+
             if (input.trim().isEmpty()) {
                 ui.showMessage("Please enter a command, or type /help or h for options.");
                 continue;
             }
 
+            if (isWeightFileCorrupted) {
+                String[] parts = input.trim().split("\\s+", 2);
+                String cmd = parts[0].toLowerCase();
+
+                boolean isCommandAllowed = cmd.equals("/clear_weights")
+                        || cmd.equals("/exit") || cmd.equals("e");
+
+                if (!isCommandAllowed) {
+                    ui.showError("Action disabled due to corrupted weight file.");
+                    ui.showMessage("Please use '/clear_weights' or '/exit' and manually resolve the weight.txt file.");
+                    continue;
+                }
+            }
+
             String[] parts = input.trim().split("\\s+", 2);
-            command = parts[0].toLowerCase();
+            String command = parts[0].toLowerCase();
             argumentStr = (parts.length > 1) ? parts[1].trim() : "";
 
             try {
@@ -119,6 +136,10 @@ public class FitChasers {
                 case "/view_weight":
                 case "vw":
                     viewWeightMethod(weightManager);
+                    break;
+
+                case "/clear_weights":
+                    handleClearWeights();
                     break;
 
                 case "/set_goal":
@@ -211,6 +232,25 @@ public class FitChasers {
             } catch (Exception e) {
                 ui.showError(e.getMessage());
             }
+        }
+    }
+
+    private static void handleClearWeights() {
+        ui.showMessage("WARNING: This will delete all your weight records permanently.");
+        ui.showMessage("Are you sure you want to proceed? (y/n)");
+
+        if (ui.confirmationMessage()) {
+            try {
+                person.setWeightHistory(new ArrayList<>());
+                Path weightFile = FileHandler.DATA_DIRECTORY.resolve("weight.txt");
+                Files.deleteIfExists(weightFile);
+                isWeightFileCorrupted = false;
+                ui.showMessage("All weight data has been cleared. You can now use all commands.");
+            } catch (IOException e) {
+                ui.showError("Failed to clear weight data: " + e.getMessage());
+            }
+        } else {
+            ui.showMessage("Operation cancelled. Your weight data is safe.");
         }
     }
 
@@ -396,6 +436,7 @@ public class FitChasers {
         String[] params = argumentStr.split("\\s+");
         String mus = null;
         String keyword = null;
+
         for (String param : params) {
             if (param.startsWith("m/")) {
                 mus = param.substring(2).toUpperCase();
@@ -555,7 +596,7 @@ public class FitChasers {
         }
     }
 
-    private static void initVariables() throws IOException, FileNonexistent {
+    private static void initVariables() throws IOException {
         try {
             savedName = fileHandler.loadUserName();
         } catch (IOException e) {
@@ -610,8 +651,12 @@ public class FitChasers {
 
         try {
             fileHandler.loadWeightList(person);
-            workoutManager.getCurrentLoadedMonth();
             workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
+        } catch (CorruptedDataException e) {
+            isWeightFileCorrupted = true;
+            ui.showError("CRITICAL ERROR: Your weight.txt file is corrupted or has been tampered with.");
+            ui.showError(e.getMessage());
+            ui.showMessage("Please fix the file manually or type '/clear_weights' to delete all weight data and start fresh.");
         } catch (IOException e) {
             ui.showError(e.getMessage());
         } catch (FileNonexistent e) {

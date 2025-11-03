@@ -105,7 +105,7 @@ public class UI {
      * @return the user's initial weight as a double, or -1 if input fails
      */
     public double enterWeight(WeightManager weightManager) {
-        double weight = -1;
+        double weight;
         while (true) {
             showMessage("Please enter your initial weight (in kg).");
             String ans = readInsideRightBubble("Enter your weight > ");
