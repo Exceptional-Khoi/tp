@@ -19,6 +19,8 @@ import seedu.fitchasers.user.WeightRecord;
 /**
  * Unit tests for the {@link Person} class.
  */
+
+//@@author ZhongBaode
 class PersonTest {
 
     private Person person;

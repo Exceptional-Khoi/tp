@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-//@@Exceptional-Khoi
+//@@author Exceptional-Khoi
 /**
  * Handles all user interactions for the FitChasers application.
  * Provides an enhanced text-based interface with chat-bubble visuals
@@ -161,24 +161,30 @@ public class UI {
                                                    e.g. /end_workout d/30/10/25 t/1500
         
         ~~~ WORKOUT LOG MANAGEMENT ~~~
-        vl                                        - View your workout history (this month, page 1)
-        vl pg/PAGE                                - Go to a specific page
-        vl m/MONTH                                - View a specific month in the current year (e.g., vl m/11)
-        vl ym/MONTH/YEAR                          - View a specific month/year (YEAR = YY or YYYY, e.g., vl ym/11/2025 or vl ym/11/25)
+        /view_log (vl) [Optional Tags]             - View first page of your workout history
+                                                   e.g. /view_log (vl)
+                                                   
+        [OPTIONAL TAGS FOR /view_log]:
+        vl pg/[Number]                             - Select page number of workout
+                                                   e.g vl pg/2
         
-        /open (o) id/INDEX                        - Open detailed view of a workout
+        vl detailed/                               - Show page in detail [No argument needed]                  
+                                                   e.g. vl detailed/
+                                                   
+        vl m/[month from 1-12]                     -  Select specific month in current year 
+                                                   e.g vl m/10 [Current Year Oct]
+                                                   
+        ym/                                        - Select specific month in specific year
+                                                   e.g. vl ym/10/26 [Oct 2026]                                 
+                                 
+        /open (o) INDEX                           - Open detailed view of the current list of workout
                                                    e.g. /open 1
-
-        /delete_workout (dw) id/INDEX             - Delete a workout (current month)
-                                                   e.g. /delete_workout id/8
-
-        /delete_workout (dw) m/MM id/INDEX        - Delete from a specific month of current year
-                                                   e.g. /delete_workout m/11 id/3
-
-        /delete_workout (dw) ym/MM/YY id/INDEX    - Delete from a specific year+month (MM then YY)
-                                                   e.g. /delete_workout ym/11/25 id/1
         
-    
+        /delete_workout (dw) id/<INDEX> m/<MM>    - Delete a workout by index shown in viewlog
+        /delete_workout (dw) id/<INDEX> ym/<MM>/<YY>
+                                                   e.g. /del_workout id/1 m/10
+                                                   e.g. /del_workout id/2 ym/10/26
+        
         ~~~ TAGGING SYSTEM ~~~
         /add_modality_tag (amot) m/MODALITY k/KEYWORD
                                                    - Add a keyword for a workout modality

@@ -6,6 +6,7 @@ import seedu.fitchasers.workouts.Exercise;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+//@@author nitin19011
 class ExerciseTest {
 
     @Test

@@ -23,6 +23,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+//@@author ZhongBaode
 import static seedu.fitchasers.FitChasers.parser;
 
 //@@ZhongBaode
@@ -47,7 +48,7 @@ public class WorkoutManager {
             DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
     private static final DateTimeFormatter TIME_FMT =
             DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
-
+    protected YearMonth creationDate;
 
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
@@ -63,17 +64,21 @@ public class WorkoutManager {
     private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
             .withResolverStyle(ResolverStyle.SMART);
 
-    public WorkoutManager(Tagger tagger, FileHandler fileHandler) {
+    public WorkoutManager(Tagger tagger, FileHandler fileHandler) throws IOException {
         this.tagger = tagger;
         this.fileHandler = fileHandler;
         this.workoutsByMonth = fileHandler.getArrayByMonth();
         this.currentLoadedMonth = YearMonth.now();
+        this.creationDate = fileHandler.getCreationMonth();
     }
 
     public void initWorkouts() {
         for (Workout workout : this.workouts) {
             while (workout.getWorkoutEndDateTime() == null) {
-                ui.showMessage("Looks like you forgot to end the previous workout, please enter it now!");
+                ui.showError("Looks like you forgot to end the previous workout, please enter it now!");
+                ui.showMessage("[IMPORTANT] You cannot continue using the app unless you enter it ;) "+
+                        "\n Tip: Enter '/end_workout' it will ask you if you want to use today's date" +
+                        "\n Else: Enter '/end_workout d/<DD/MM/YY> t/<HHMM>' e.g. ew d/03/11/25 t/1200" );
                 currentWorkout = workout;
                 endWorkout(parser.readCommand());
             }
@@ -89,6 +94,9 @@ public class WorkoutManager {
         currentLoadedMonth = monthOfArrayList;
     }
 
+    public YearMonth getCreationDate() {
+        return creationDate;
+    }
     /**
      * Adds a new workout session from the user's command input.
      * <p>
@@ -157,14 +165,16 @@ public class WorkoutManager {
         YearMonth monthOfWorkout = YearMonth.from(workoutDateTime);
         if (!currentLoadedMonth.equals(monthOfWorkout)) {
             // Check if workout month is before the month app was first started
-            if (monthOfWorkout.isBefore(currentLoadedMonth)) {
+            if (monthOfWorkout.isBefore(creationDate)) {
                 ui.showMessage("FitChasers was first booted on "
-                        + currentLoadedMonth.getMonth().name().substring(0,1).toUpperCase()
-                        + currentLoadedMonth.getMonth().name().substring(1).toLowerCase()
-                        + " of " + currentLoadedMonth.getYear() + ".");
+                        + creationDate.getMonth().name().toLowerCase().substring(0, 1).toUpperCase()
+                        + creationDate.getMonth().name().toLowerCase().substring(1)
+                        + " of " + creationDate.getYear() + ".");
                 ui.showMessage("Please start your fitness logging from then!");
-                return;
+                return; // stop creating workout
             }
+
+            // Only load if valid
             setWorkouts(fileHandler.loadMonthList(monthOfWorkout), monthOfWorkout);
         }
 
@@ -207,11 +217,12 @@ public class WorkoutManager {
         // Create, tag, persist
         try {
             Workout newWorkout = new Workout(workoutName, workoutDateTime);
+
+            // merge auto-tags if you have a tagger
             Set<String> suggestedTags = tagger.suggest(newWorkout);
             newWorkout.setAutoTags(suggestedTags);
             workouts.add(newWorkout);
             currentWorkout = newWorkout;
-
             ui.showMessage("New workout sesh incoming!");
             ui.showMessage("Tags generated for workout: " + ((suggestedTags == null || suggestedTags.isEmpty())
                     ? "none" : String.join(", ", suggestedTags)) + "\n" + "Added workout: " + workoutName);
@@ -560,154 +571,6 @@ public class WorkoutManager {
         return workouts;
     }
 
-    /**
-     * Handles the complete workout deletion flow by display ID.
-     * Parses the command, validates input, shows details, confirms, and deletes.
-     *
-     * @param raw the raw command string from user (e.g., "id/8")
-     * @throws IOException if saving fails
-     * @throws FileNonexistent if the month file doesn't exist
-     */
-    public void handleDeleteWorkout(String raw) throws IOException, FileNonexistent {
-        Parser.DelArgs d;
-        try {
-            d = parser.parseDel(raw);
-        } catch (InvalidArgumentInput e) {
-            ui.showMessage(e.getMessage());
-            return;
-        }
-
-        if (d.byMonth) {
-            // Form: -m <MONTH> <INDEX>
-            YearMonth ym = d.ym;
-            int displayIndex = d.index1Based;
-
-            ArrayList<Workout> monthWorkouts = fileHandler.loadMonthList(ym);
-            if (displayIndex < 1 || displayIndex > monthWorkouts.size()) {
-                ui.showMessage("Invalid workout ID: " + displayIndex);
-                ui.showMessage("Please use a valid ID between 1 and " + monthWorkouts.size());
-                ui.showMessage("Use /view_log -m " + ym.getMonthValue() + " to see IDs.");
-                return;
-            }
-
-            Workout w = monthWorkouts.get(displayIndex - 1);
-            ui.showMessage("You are about to delete this workout:");
-            ui.displayDetailsOfWorkout(w);
-            ui.showMessage("Are you sure you want to delete this workout? (Press 'Y' to confirm, 'N' to cancel)");
-
-            Boolean ok = parser.confirmationMessage();
-            if (ok == null) return;                      // only "Action cancelled." line
-            if (!ok) { ui.showMessage("Deletion cancelled. Workout preserved."); return; }
-
-            monthWorkouts.remove(displayIndex - 1);
-            fileHandler.saveMonthList(ym, monthWorkouts);
-
-            if (currentLoadedMonth.equals(ym)) {
-                this.workouts = monthWorkouts;
-            }
-
-            ui.showMessage("Deleted workout: " + w.getWorkoutName());
-            ui.showMessage("Updated workout list saved successfully.");
-            return;
-        }
-
-        // Form: <WORKOUT_NAME>  (exact name match)
-        String target = d.targetName;
-        ArrayList<Workout> monthWorkouts = fileHandler.loadMonthList(currentLoadedMonth);
-
-        // Find exact name in the currently loaded month list (same behavior as your old delete-by-name)
-        int idx = -1;
-        for (int i = 0; i < monthWorkouts.size(); i++) {
-            if (monthWorkouts.get(i).getWorkoutName().equals(target)) {
-                idx = i; break;
-            }
-        }
-
-        if (idx == -1) {
-            ui.showMessage("No workout named \"" + target + "\" found in "
-                    + currentLoadedMonth.getMonth().toString().substring(0,1).toUpperCase()
-                    + currentLoadedMonth.getMonth().toString().substring(1).toLowerCase()
-                    + " " + currentLoadedMonth.getYear() + ".");
-            ui.showMessage("Tip: /view_log to see the list with IDs, then delete by ID via:");
-            ui.showMessage("  /del_workout id/<ID>");
-            ui.showMessage("  /del_workout id/<ID> -m <MONTH>");
-            ui.showMessage("  /del_workout -m <MONTH> <ID>");
-            ui.showMessage("  /del_workout -ym <YEAR> <MONTH> <ID>");
-            return;
-        }
-
-        Workout w = monthWorkouts.get(idx);
-        ui.showMessage("You are about to delete this workout:");
-        ui.displayDetailsOfWorkout(w);
-        ui.showMessage("Are you sure you want to delete this workout? (Press 'Y' to confirm, 'N' to cancel)");
-
-        if (!parser.confirmationMessage()) {
-            ui.showMessage("Deletion cancelled. Workout preserved.");
-            return;
-        }
-
-        monthWorkouts.remove(idx);
-        fileHandler.saveMonthList(currentLoadedMonth, monthWorkouts);
-        this.workouts = monthWorkouts;
-
-        ui.showMessage("✓ Deleted workout: " + w.getWorkoutName());
-        ui.showMessage("Updated workout list saved successfully.");
-    }
-
-
-    /**
-     * Deletes a workout by its display index from ViewLog.
-     * The index corresponds to the ID shown in /view_log output.
-     * Prompts user for confirmation before deletion.
-     *
-     * @param displayIndex the 1-based index from view_log
-     * @param month the YearMonth of the workout list
-     * @throws IOException if saving fails
-     * @throws FileNonexistent if the month file doesn't exist
-     */
-    private void deleteWorkoutByDisplayId(int displayIndex, YearMonth month) throws IOException, FileNonexistent {
-        // Load the correct month's workouts
-        ArrayList<Workout> monthWorkouts = fileHandler.loadMonthList(month);
-
-        // Validate index
-        if (displayIndex < 1 || displayIndex > monthWorkouts.size()) {
-            ui.showMessage("Invalid workout ID: " + displayIndex);
-            ui.showMessage("Please use a valid ID between 1 and " + monthWorkouts.size());
-            ui.showMessage("Use /view_log to see all workout IDs.");
-            return;
-        }
-
-        // Get the workout (convert 1-based to 0-based)
-        Workout workoutToDelete = monthWorkouts.get(displayIndex - 1);
-
-        // Show workout details
-        ui.showMessage("You are about to delete this workout:");
-        ui.displayDetailsOfWorkout(workoutToDelete);
-        ui.showMessage("Are you sure you want to delete this workout? (Press 'Y' to confirm, 'N' to cancel)");
-
-        // Confirm deletion
-        if (!parser.confirmationMessage()) {
-            ui.showMessage("Deletion cancelled. Workout preserved.");
-            return;
-        }
-
-        // Store workout name before deletion
-        String deletedWorkoutName = workoutToDelete.getWorkoutName();
-
-        // Remove the workout
-        monthWorkouts.remove(displayIndex - 1);
-
-        // Save updated list
-        fileHandler.saveMonthList(month, monthWorkouts);
-
-        // Update current workouts if we're viewing the same month
-        if (currentLoadedMonth.equals(month)) {
-            this.workouts = monthWorkouts;
-        }
-
-        ui.showMessage("✓ Deleted workout: " + deletedWorkoutName);
-        ui.showMessage("Updated workout list saved successfully.");
-    }
 
     /**
      * Adds an exercise to the current workout.
@@ -831,35 +694,17 @@ public class WorkoutManager {
             return;
         }
 
-        Parser.EndWorkoutArgs a;
-        try {
-            a = parser.parseEndWorkout(initialArgs);
-        } catch (InvalidArgumentInput e) {
-            ui.showMessage(e.getMessage());
+        final String args = (initialArgs == null) ? "" : initialArgs.trim();
+
+        int dIdx = args.indexOf("d/");
+        int tIdx = args.indexOf("t/");
+        // enforce order only if both provided
+        if (dIdx != -1 && tIdx != -1 && tIdx < dIdx) {
+            ui.showMessage("Order must be d/ then t/. Example: /end_workout d/29/10/25 t/1800");
             return;
         }
 
-        LocalDate date = a.date;
-        LocalTime time = a.time;
-
-        // Prompt for missing pieces (same UX you had)
-        if (date == null) {
-            String todayStr = LocalDate.now().format(DATE_FMT);
-            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
-            Boolean ok = parser.confirmationMessage();
-            if (ok == null) return;
-            if (!ok) { ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm"); return; }
-            date = LocalDate.now();
-        }
-        if (time == null) {
-            String nowStr = LocalTime.now().format(TIME_FMT);
-            ui.showMessage("Looks like you missed the time. Use current time (" + nowStr + ")? (Y/N)");
-            Boolean ok = parser.confirmationMessage();
-            if (ok == null) return;
-            if (!ok) { ui.showMessage("Please enter: /end_workout d/DD/MM/YY t/HHmm"); return; }
-            time = LocalTime.now();
-        }
-
+        // compute & validate chronology
         LocalDateTime proposedEnd = LocalDateTime.of(date, time).truncatedTo(ChronoUnit.MINUTES);
         LocalDateTime startTime = currentWorkout.getWorkoutStartDateTime().truncatedTo(ChronoUnit.MINUTES);
 
@@ -886,6 +731,7 @@ public class WorkoutManager {
             }
         }
 
+        // persist
         currentWorkout.setWorkoutEndDateTime(proposedEnd);
         int duration = currentWorkout.calculateDuration();
         currentWorkout.setDuration(duration);
@@ -903,6 +749,20 @@ public class WorkoutManager {
                 currentWorkout.getWorkoutName(), duration));
 
         currentWorkout = null;
+    }
+
+    public YearMonth getCurrentLoadedMonth() {
+        return currentLoadedMonth;
+    }
+
+    public void deleteParser(String argumentStr) {
+        try {
+            new DeleteWorkout(ui, fileHandler, this).execute(argumentStr);
+        } catch (InvalidArgumentInput | FileNonexistent e) {
+            ui.showError(e.getMessage());
+        } catch (IOException e) {
+            ui.showError("Failed to save changes: " + e.getMessage());
+        }
     }
 
     private static final class Slice {

@@ -5,8 +5,23 @@ import seedu.fitchasers.workouts.Workout;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
-
-//@@Kart04
+/**
+ * Default implementation of the Tagger interface for automatic workout classification.
+ * <p>
+ * This class automatically suggests modality tags (e.g., cardio, strength) and muscle group
+ * tags (e.g., chest, legs) based on keyword matching in workout names. It uses predefined
+ * keyword mappings organized by modality and muscle group enums.
+ * </p>
+ * <p>
+ * Keywords are matched case-insensitively against the workout name. Multiple tags can be
+ * suggested for a single workout if multiple keywords match.
+ * </p>
+ *
+ * @see Tagger
+ * @see Modality
+ * @see MuscleGroup
+ */
+//@@author Kart04
 public class DefaultTagger implements Tagger {
     private final EnumMap<Modality, Set<String>> modalityKeywords = new EnumMap<>(Modality.class);
     private final EnumMap<MuscleGroup, Set<String>> muscleKeywords = new EnumMap<>(MuscleGroup.class);
@@ -36,6 +51,18 @@ public class DefaultTagger implements Tagger {
         muscleKeywords.put(MuscleGroup.CORE, new LinkedHashSet<>(Set.of("abs", "core", "plank")));
     }
 
+    /**
+     * Suggests workout tags based on keywords found in the workout name.
+     * <p>
+     * Analyzes the workout name (case-insensitive) against predefined modality and
+     * muscle group keywords. Returns a set of matching tags in standardized lowercase
+     * format. Muscle group tags have underscores replaced with hyphens.
+     *
+     * @param w the Workout to analyze for tag suggestions
+     * @return a Set of suggested tag strings in lowercase; empty if no keywords match
+     * @see Modality
+     * @see MuscleGroup
+     */
     @Override
     public Set<String> suggest(Workout w) {
         String workoutName = w.getWorkoutName();

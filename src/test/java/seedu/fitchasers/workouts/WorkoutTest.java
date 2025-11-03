@@ -1,16 +1,14 @@
-package seedu.fitchasers;
+package seedu.fitchasers.workouts;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import seedu.fitchasers.workouts.Exercise;
-import seedu.fitchasers.workouts.Workout;
 
 import java.time.LocalDateTime;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-
+//@@author nitin19011
 class WorkoutTest {
     private Workout workout;
 

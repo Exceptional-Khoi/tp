@@ -50,7 +50,7 @@ public class FitChasers {
     private static WorkoutManager workoutManager;
     private static boolean isRunning = true;
     private static String command;
-    private static String argumentStr;
+    private static String argumentStr = "";
     private static String input;
     private static WeightManager weightManager;
     private static GoalWeightTracker goalTracker;
@@ -194,7 +194,7 @@ public class FitChasers {
                 //@@author Kart04
                 case "/delete_workout":
                 case "dw":
-                    delMethod();
+                    workoutManager.deleteParser(argumentStr);
                     break;
                 //@@author
                 case "/exit":
@@ -207,7 +207,7 @@ public class FitChasers {
                     break;
                 }
             } catch (Exception e) {
-                ui.showError("Something went wrong in main: " + e.getMessage());
+                ui.showError(e.getMessage());
             }
         }
     }
@@ -221,10 +221,6 @@ public class FitChasers {
             ui.showError("Failed to save workouts before exit.");
         }
         isRunning = false;
-    }
-
-    private static void delMethod() throws IOException, FileNonexistent {
-        workoutManager.handleDeleteWorkout(argumentStr);
     }
 
     private static void owtMethod() throws FileNonexistent, IOException {
@@ -505,6 +501,7 @@ public class FitChasers {
             person = new Person(userName);
             try {
                 fileHandler.saveUserName(person);
+                fileHandler.saveCreationMonth(YearMonth.now());
                 ui.showMessage("Your name has been saved.");
             } catch (IOException e) {
                 ui.showError("Failed to save username: " + e.getMessage());

@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//@@Kart04
+//@@author Kart04
 /**
  * Handles the permanent storage of workout and exercise data.
  * Saves to and loads from: data/save.txt
@@ -37,13 +38,7 @@ import java.util.Set;
  * Each workout starts with "WORKOUT" and ends with "END_WORKOUT".
  * Exercises are listed between, with all set repetitions joined by commas.
  * <p>
- * Example:
- * WORKOUT | Chest Day | 45
- * EXERCISE | Push-Ups | 15,15,12
- * EXERCISE | Bench Press | 12,10,8
- * END_WORKOUT
  */
-
 public class FileHandler {
 
     public static final Path DATA_DIRECTORY = Paths.get("data");
@@ -440,6 +435,26 @@ public class FileHandler {
         Files.writeString(filePath, person.getName());
     }
 
+    public void saveCreationMonth(YearMonth yearMonth) throws IOException {
+        ensureDataDir();
+        Path filePath = DATA_DIRECTORY.resolve("creationDate.txt");
+        Files.writeString(filePath, yearMonth.toString());
+    }
+
+    public YearMonth getCreationMonth() throws IOException {
+        ensureDataDir();
+        Path filePath = DATA_DIRECTORY.resolve("creationDate.txt");
+        if (Files.notExists(filePath)) {
+            return null;
+        }
+        try{
+            return YearMonth.parse(Files.readString(filePath).trim());
+        } catch (DateTimeParseException e) {
+            ui.showError("Creation Date File Got Corrupted!! Using Today's Date as Creation Date. \n" +
+                    "This means you may not be able to add workout before today!");
+            return YearMonth.now();
+        }
+    }
     /**
      * Loads the saved username from text file.
      * Returns null if file doesn't exist.

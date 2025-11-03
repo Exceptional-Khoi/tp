@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-//@@ZhongBaode
+//@@author ZhongBaode
 public class ViewLog {
     public static final int MINIMUM_PAGE_SIZE = 1;
     //public static final int ARRAY_INDEX_OFFSET = 1;
@@ -41,6 +41,13 @@ public class ViewLog {
         }
     }
 
+    /**
+     * Constructs a ViewLog instance with required dependencies.
+     *
+     * @param ui the UI instance for displaying output
+     * @param workoutManager the WorkoutManager for accessing workout data
+     * @param fileHandler the FileHandler for loading workouts from disk
+     */
     public ViewLog(UI ui, WorkoutManager workoutManager, FileHandler fileHandler, Parser parser) {
         ViewLog.ui = ui;
         this.workoutManager = workoutManager;
@@ -55,7 +62,7 @@ public class ViewLog {
      * <p>
      * Supported forms:
      * <ul>
-     *   <li>/view_log -m &lt;month 1..12&gt; [extractedArg]</li>
+     *   <li>/view_log m/ &lt;month 1..12&gt; [extractedArg]</li>
      *   <li>/view_log -ym &lt;year&gt; &lt;month 1..12&gt; [extractedArg]</li>
      *   <li>Optional: -d (detailed view)</li>
      * </ul>
@@ -87,13 +94,13 @@ public class ViewLog {
         }
 
         int totalPages = computeTotalPages(displayList.size(), pageSize);
-        int current = parsed.page;
-        if (current < 1) current = 1;
-        if (current > totalPages) {
-            ui.showError("Only " + totalPages + " page" + (totalPages == 1 ? "" : "s")
-                    + " for " + parsed.ym + ". Try: vl pg/1");
-            return; // stop rendering
-        }
+        int current = ensureValidPage(parsed.page);
+//        if (current < 1) current = 1;
+//        if (current > totalPages) {
+//            ui.showError("Only " + totalPages + " page" + (totalPages == 1 ? "" : "s")
+//                    + " for " + parsed.ym + ". Try: vl pg/1");
+//            return; // stop rendering
+//        }
 
         int start = (current - 1) * pageSize;
         int end   = Math.min(start + pageSize, displayList.size());
@@ -109,7 +116,8 @@ public class ViewLog {
         }
 
         if (!parsed.detailed) {
-            buf.append(String.format("%-4s %-20s %-22s %-10s%n", "ID", "Date", "Name", "Duration"));
+            buf.append(String.format("%-4s %-20s %-20s %-22s %-10s%n",
+                    "ID","Start Date", "End Date", "Name", "Duration"));
         }
 
         for (int i = start; i < end; i++) {
@@ -125,21 +133,35 @@ public class ViewLog {
         buf.append("Tip: vl pg/2 (next page), vl m/10, vl ym/10/24, /open id/<ID>.");
         ui.showMessage(buf.toString());
     }
-
-    public ArrayList<Workout> loadAndSortList(YearMonth p) throws IOException, FileNonexistent {
+    /**
+     * Loads workouts for a specific month and sorts them by date (newest first).
+     * <p>
+     * Fetches workouts from the file handler and sorts them by end time, then start time,
+     * with null values placed last. The sorted list is cached internally for quick access
+     * via subsequent operations.
+     *
+     * @param targetMonth the YearMonth to load workouts for
+     * @return a new ArrayList of workouts for the month, sorted newest first
+     * @throws IOException if an error occurs reading from disk
+     * @throws FileNonexistent if no workout file exists for the specified month
+     * @see FileHandler#loadMonthList(YearMonth)
+     */
+    public ArrayList<Workout> loadAndSortList(YearMonth targetMonth) throws IOException, FileNonexistent {
         // Fetch month list (lazy-load), then sort by end time (ascending, nulls last)
-        ArrayList<Workout> monthList = fileHandler.loadMonthList(p);
+        ArrayList<Workout> monthList = fileHandler.loadMonthList(targetMonth);
         ArrayList<Workout> sorted = new ArrayList<>(monthList);
-        sorted.sort(Comparator.comparing(
-                Workout::getWorkoutEndDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ).thenComparing(
-                Workout::getWorkoutStartDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ));
+        sorted.sort(
+                Comparator.comparing(
+                        Workout::getWorkoutStartDateTime,
+                        Comparator.nullsLast(Comparator.reverseOrder())   // start: desc, nulls last
+                ).thenComparing(
+                        Workout::getWorkoutEndDateTime,
+                        Comparator.nullsLast(Comparator.reverseOrder())   // end: desc, nulls last
+                )
+        ); // ← NO .reversed()
 
         this.lastFilteredListofWorkout = sorted;  // Store the sorted list
-        this.lastRenderMonth = p;                  // Keep cache + month in sync
+        this.lastRenderMonth = targetMonth;                  // Keep cache + month in sync
         return sorted;
     }
 
@@ -161,11 +183,12 @@ public class ViewLog {
     }
 
     private String renderCompactRow(int id, Workout w) {
-        String date = formatDayMon(w.getWorkoutEndDateTime());
+        String startDate = formatDayMon(w.getWorkoutStartDateTime());
+        String endDate = formatDayMon(w.getWorkoutEndDateTime());
         String name = truncate(safe(w.getWorkoutName()), 22);
         String dur  = formatDuration(w.getDuration());
-        return String.format("%-4d %-20s %-22s %-10s%n",
-                id, safe(date), safe(name), safe(dur));
+        return String.format("%-4d %-20s %-20s %-22s %-10s%n",
+                id, safe(startDate), safe(endDate), safe(name), safe(dur));
     }
 
 
@@ -180,6 +203,20 @@ public class ViewLog {
         String tags = workout.getAllTags().toString();
         sb.append("Tags     : ").append((tags.isBlank() ? "-" : tags)).append('\n');
         return sb.toString();
+    }
+
+    // keep old openByIndex but route it through the new parser-aware context
+    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput, FileNonexistent, IOException {
+        if (lastFilteredListofWorkout.isEmpty()) {
+            // fallback: reload current month if render hasn't run yet
+            YearMonth current = YearMonth.now();
+            loadAndSortList(current);
+            lastRenderMonth = current;
+        }
+        if (oneBasedIndex <= 0 || oneBasedIndex > lastFilteredListofWorkout.size()) {
+            throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
+        }
+        ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(oneBasedIndex - 1));
     }
 
     /* ------------------------------ Commands API ----------------------------- */
@@ -199,13 +236,20 @@ public class ViewLog {
         return (int) Math.ceil(Math.max(0, size) / (double) Math.max(1, pageSize));
     }
 
-//    private int ensureValidPage(int page) {
-//        int totalPages = computeTotalPages(this.workoutManager.getWorkoutSize(), pageSize);
-//        if (page < MINIMUM_PAGE_SIZE) {
-//            return MINIMUM_PAGE_SIZE;
-//        }
-//        return Math.min(page, totalPages);
-//    }
+    private int ensureValidPage(int page) {
+        int totalPages = computeTotalPages(this.workoutManager.getWorkoutSize(), pageSize);
+        if (page < MINIMUM_PAGE_SIZE) {
+            ui.showMessage("Hey that page is too small! I will default to the first page okay!");
+            return MINIMUM_PAGE_SIZE;
+        }
+
+        if (page > totalPages) {
+            ui.showMessage("Hey that page exceeds largest page! I will default to the last page okay!");
+            return totalPages;
+        }
+
+        return page;
+    }
 
     private static String safe(String s) {
         return s == null ? "" : s;
@@ -252,6 +296,74 @@ public class ViewLog {
         return String.format("%s %d%s of %s, %d:%02d %s", dow, d, suffix, mon, hr12, min, ampm);
     }
 
+    public record Parsed(YearMonth ym, int extractedArg, boolean detailed) {
+    }
+
+//    /**
+//     * Parses flags/args into a structured form with validation/guards.
+//     */
+//    public Parsed parseArgs(String raw) throws InvalidArgumentInput {
+//        YearMonth now = YearMonth.now();
+//        YearMonth target = now;
+//        int page = 1;
+//        boolean detailed = false;
+//
+//        if (raw == null || raw.isBlank()) {
+//            return new Parsed(target, page, false);
+//        }
+//
+//        String[] arguments = raw.trim().split("\\s+");
+//        boolean seenM = false;
+//        boolean seenYM = false;
+//        boolean seenPg = false;
+//
+//        for (int i = 0; i < arguments.length; i++) {
+//            String t = arguments[i];
+//
+//            if ("detailed/".equals(t)) {
+//                detailed = true;
+//                continue;
+//            }
+//
+//            if (t.startsWith("m/")) {
+//                if (seenYM) {
+//                    throw new InvalidArgumentInput("Cannot combine m/<MM> with ym/<A>/<B>.");
+//                }
+//                seenM = true;
+//                int month = readPositiveInt(t.substring(2), "Month after m/ must be an integer.");
+//                validateMonth(month);
+//                target = YearMonth.of(now.getYear(), month);
+//
+//                // optional trailing page
+//                if (i + 1 < arguments.length && isInt(arguments[i + 1])) {
+//                    page = readPositiveInt(arguments[++i], "Page must be a positive integer.");
+//                }
+//                continue;
+//            }
+//
+//            if (t.startsWith("ym/")) {
+//                if (seenM) {
+//                    throw new InvalidArgumentInput("Cannot combine ym/<A>/<B> with m/<MM>.");
+//                }
+//                seenYM = true;
+//                target = parseYearMonthToken(t.substring(3));
+//                // optional trailing page
+//                if (i + 1 < arguments.length && isInt(arguments[i + 1])) {
+//                    page = readPositiveInt(arguments[++i], "Page must be a positive integer.");
+//                }
+//                continue;
+//            }
+//
+//            if (t.startsWith("pg/")) {
+//                if (seenPg) {
+//                    throw new InvalidArgumentInput("Page specified more than once. Use a single pg/<N>.");
+//                }
+//                seenPg = true;
+//                int p = readPositiveInt(t.substring(3), "Page after pg/ must be above 1!" +
+//                        " Also remember no space after pg/ :) e.g pg/2 ");
+//                page = p;
+//                continue;
+//            }
 //    public record Parsed(YearMonth ym, int extractedArg, boolean detailed) {
 //    }
 //
@@ -362,18 +474,80 @@ public class ViewLog {
 //        }
 //    }
 
-    // keep old openByIndex but route it through the new parser-aware context
-    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput, FileNonexistent, IOException {
-        if (lastFilteredListofWorkout.isEmpty()) {
-                // fallback: reload current month if render hasn't run yet
-                        YearMonth current = YearMonth.now();
-                loadAndSortList(current);
-                lastRenderMonth = current;
-            }
-        if (oneBasedIndex <= 0 || oneBasedIndex > lastFilteredListofWorkout.size()) {
-                throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
-            }
-        ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(oneBasedIndex - 1));
-    }
+//            if (t.contains("/")) {
+//                throw new InvalidArgumentInput("Unknown flag: " + t + ". Use /help to see how to use view log :)");
+//            } else {
+//                throw new InvalidArgumentInput("Unexpected Argument: " + t +
+//                        " . Use /help to see how to use view log :)");
+//            }
+//        }
+//
+//        return new Parsed(target, page, detailed);
+//    }
+
+//    private static boolean isInt(String s) {
+//        return s != null && INT.matcher(s).matches();
+//    }
+//
+//
+//    private static int readPositiveInt(String s, String err) throws InvalidArgumentInput {
+//        try {
+//            int v = Integer.parseInt(s);
+//            if (v <= 0) {
+//                throw new NumberFormatException();
+//            }
+//            return v;
+//        } catch (NumberFormatException nfe) {
+//            throw new InvalidArgumentInput(err);
+//        }
+//    }
+//
+//    private static void validateMonth(int month) throws InvalidArgumentInput {
+//        if (month < 1 || month > 12) {
+//            throw new InvalidArgumentInput("Month must be between 1 and 12.");
+//        }
+//    }
+//
+//    private static void validateYear(int year) throws InvalidArgumentInput {
+//        if (year < 2025 || year > 2099) {
+//            throw new InvalidArgumentInput("Month must be between 1 and 12.");
+//        }
+//    }
+//
+//
+//    /**
+//     * Strictly parses ym token in the form "MM/YY" (e.g., "10/25" -> 2025-10).
+//     * - MM: 1..12
+//     * - YY: 00..99  (converted to four-digit year)
+//     *
+//     * Conversion rule (simple): 2000 + YY  → "25" => 2025, "03" => 2003.
+//     * Change the conversion if you prefer a different century policy.
+//     */
+//    private YearMonth parseYearMonthToken(String token) throws InvalidArgumentInput {
+//        String[] parts = token.split("/");
+//        if (parts.length != 2) {
+//            throw new InvalidArgumentInput("Use ym/<MM>/<YY>, e.g., ym/10/25.");
+//        }
+//        String mmStr = parts[0].trim();
+//        String yyStr = parts[1].trim();
+//
+//        if (!isInt(mmStr) || !isInt(yyStr)) {
+//            throw new InvalidArgumentInput("Use digits only: ym/<MM>/<YY>, e.g., ym/10/25.");
+//        }
+//
+//        int mm = Integer.parseInt(mmStr);
+//        int yy = Integer.parseInt(yyStr);
+//
+//
+//        if (yy < 0 || yy > 99) {
+//            throw new InvalidArgumentInput("Year must be 00..99 (two digits).");
+//        }
+//
+//        int yyyy = 2000 + yy; // Simple rule: map 00..99 → 2000..2099
+//        validateYear(yyyy);    // your existing guard (e.g., 1970..2100)
+//        validateMonth(mm);
+//        return YearMonth.of(yyyy, mm);
+//    }
+
 }
 
