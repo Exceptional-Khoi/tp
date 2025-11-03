@@ -1,6 +1,5 @@
 package seedu.fitchasers.workouts;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.AfterEach;
 import seedu.fitchasers.exceptions.FileNonexistent;
@@ -13,11 +12,14 @@ import seedu.fitchasers.ui.UI;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.ArrayList;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 
 /**
  * JUnit test suite for the ViewLog class.
@@ -32,12 +34,11 @@ public class ViewLogTest {
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
 
-    @BeforeEach
-    public void setUp() {
+    public void setUp() throws IOException {
         mockUI = new UI();
-        mockFileHandler = new FileHandler();  // FIX: Make it a class field, not local
+        mockFileHandler = new FileHandler();  // Now a class-level field
         Tagger mockTagger = new DefaultTagger();
-        mockWorkoutManager = new WorkoutManager(mockTagger, mockFileHandler);
+        mockWorkoutManager = new WorkoutManager(mockTagger, mockFileHandler); // throws IOException
         viewLog = new ViewLog(mockUI, mockWorkoutManager, mockFileHandler);
 
         System.setOut(new PrintStream(outputStream, true));

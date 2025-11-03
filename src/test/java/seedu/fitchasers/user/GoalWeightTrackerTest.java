@@ -8,9 +8,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
  * JUnit test suite for the GoalWeightTracker class.
@@ -22,7 +23,6 @@ public class GoalWeightTrackerTest {
     private GoalWeightTracker tracker;
     private final ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     private final PrintStream originalOut = System.out;
-    private static final DateTimeFormatter DF = DateTimeFormatter.ofPattern("dd/MM/yy");
 
     @BeforeEach
     public void setUp() {
@@ -149,7 +149,8 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testHandleViewGoal_currentWeightAboveGoal_showsAboveMessage() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleViewGoal_currentWeightAboveGoal_showsAboveMessage() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60");
         outputStream.reset();
 
@@ -160,7 +161,8 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testHandleViewGoal_currentWeightBelowGoal_showsBelowMessage() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleViewGoal_currentWeightBelowGoal_showsBelowMessage() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60");
         outputStream.reset();
 
@@ -171,7 +173,8 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testHandleViewGoal_currentWeightEqualGoal_showsCongrats() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleViewGoal_currentWeightEqualGoal_showsCongrats() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60");
         outputStream.reset();
 
@@ -182,7 +185,8 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testHandleViewGoal_displayFormat_showsAllRequiredInfo() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleViewGoal_displayFormat_showsAllRequiredInfo() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60");
         outputStream.reset();
 
@@ -194,7 +198,8 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testHandleViewGoal_decimalDifference_calculatesCorrectly() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleViewGoal_decimalDifference_calculatesCorrectly() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60.5");
         outputStream.reset();
 
@@ -205,18 +210,21 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testHandleViewGoal_noWeightRecords_showsGoalOnly() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleViewGoal_noWeightRecords_showsGoalOnly() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60");
         outputStream.reset();
 
         tracker.handleViewGoal(null);
 
         String output = outputStream.toString();
-        assertTrue(output.contains("No weight records") || output.contains("no weight records") || output.contains("goal"));
+        assertTrue(output.contains("No weight records") || output.contains("no weight records")
+                || output.contains("goal"));
     }
 
     @Test
-    public void testHandleViewGoal_negativeCurrentWeight_showsNoRecordsMessage() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleViewGoal_negativeCurrentWeight_showsNoRecordsMessage() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60");
         outputStream.reset();
 
@@ -259,7 +267,8 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testHandleViewGoal_verySmallDifference_calculatesCorrectly() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleViewGoal_verySmallDifference_calculatesCorrectly() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60.0");
         outputStream.reset();
 
@@ -278,7 +287,8 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testHandleSetGoal_scientificNotation_parsesCorrectly() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleSetGoal_scientificNotation_parsesCorrectly() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/1e2");
 
         // Java's Double.parseDouble supports scientific notation
@@ -286,7 +296,8 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testHandleViewGoal_zeroCurrentWeight_showsComparison() throws NoSuchFieldException, IllegalAccessException {
+    public void testHandleViewGoal_zeroCurrentWeight_showsComparison() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60");
         outputStream.reset();
 
@@ -298,7 +309,8 @@ public class GoalWeightTrackerTest {
     }
 
     @Test
-    public void testGoalTrackerState_afterMultipleOperations_remainsConsistent() throws NoSuchFieldException, IllegalAccessException {
+    public void testGoalTrackerState_afterMultipleOperations_remainsConsistent() throws NoSuchFieldException,
+            IllegalAccessException {
         tracker.handleSetGoal("w/60");
         Double firstGoal = getGoalWeight();
         LocalDate firstDate = getSetDate();
