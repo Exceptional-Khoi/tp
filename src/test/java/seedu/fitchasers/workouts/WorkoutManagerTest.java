@@ -32,7 +32,7 @@ class WorkoutManagerTest {
         // Create a mock UI that always confirms prompts
         mockUi = new UI() {
             @Override
-            public Boolean confirmationMessage() {
+            public boolean confirmationMessage() {
                 return true; // Always return true for "are you sure?" prompts
             }
             @Override

@@ -180,12 +180,14 @@ public class ViewLog {
 
 
     private String renderDetailedRow(int id, Workout workout) {
-        String dateLong = formatLong(workout.getWorkoutEndDateTime());
+        String startDateLong = formatLong(workout.getWorkoutStartDateTime());
+        String endDateLong = formatLong(workout.getWorkoutEndDateTime());
         String dur = formatDuration(workout.getDuration());
         StringBuilder sb = new StringBuilder();
         sb.append("—".repeat(60)).append('\n');
         sb.append(String.format("#%d  %s%n", id, safe(workout.getWorkoutName())));
-        sb.append("Date     : ").append(dateLong).append('\n');
+        sb.append("Start Date     : ").append(startDateLong).append('\n');
+        sb.append("End Date     : ").append(endDateLong).append('\n');
         sb.append("Duration : ").append(dur).append('\n');
         String tags = workout.getAllTags().toString();
         sb.append("Tags     : ").append((tags.isBlank() ? "-" : tags)).append('\n');
@@ -202,9 +204,9 @@ public class ViewLog {
      * @throws InvalidArgumentInput if the index is out of bounds or invalid
      * @see #lastFilteredListofWorkout
      */
-    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput {
+    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput, FileNonexistent, IOException {
+        loadAndSortList(YearMonth.now());
         int i = oneBasedIndex - ARRAY_INDEX_OFFSET;  // Convert to 0-based
-
         if (i < 0 || i >= workoutManager.getWorkoutSize()) {
             throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
         }

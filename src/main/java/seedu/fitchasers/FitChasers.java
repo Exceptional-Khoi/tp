@@ -610,6 +610,7 @@ public class FitChasers {
 
         try {
             fileHandler.loadWeightList(person);
+            workoutManager.getCurrentLoadedMonth();
             workoutManager.setWorkouts(fileHandler.loadMonthList(currentMonth), currentMonth);
         } catch (IOException e) {
             ui.showError(e.getMessage());

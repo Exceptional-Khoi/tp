@@ -482,7 +482,10 @@ public class FileHandler {
         ensureDataDir();
         Path filePath = DATA_DIRECTORY.resolve("creationDate.txt");
         if (Files.notExists(filePath)) {
-            return null;
+            ui.showError("Creation File Not Found!! Using Today's Date as Creation Date. \n" +
+                    "This means you may not be able to add workout before today!");
+            saveCreationMonth(YearMonth.now());
+            return YearMonth.now();
         }
         try {
             return YearMonth.parse(Files.readString(filePath).trim());
