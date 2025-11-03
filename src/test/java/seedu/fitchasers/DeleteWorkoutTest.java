@@ -45,7 +45,7 @@ class DeleteWorkoutTest {
         }
 
         @Override
-        public boolean confirmationMessage() {
+        public Boolean confirmationMessage() {
             return nextConfirm;
         }
     }
