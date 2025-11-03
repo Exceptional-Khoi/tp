@@ -109,13 +109,4 @@ public class DeleteWorkout {
 
         ui.showMessage("✓ Deleted workout: " + deletedName);
     }
-
-    /**
-     * Updates the currently loaded month context.
-     *
-     * @param ym The {@code YearMonth} to set as the current loaded month.
-     */
-    public void setCurrentLoadedMonth(YearMonth ym) {
-        this.currentLoadedMonth = ym;
-    }
 }
