@@ -1,4 +1,4 @@
-package seedu.fitchasers;
+package seedu.fitchasers.workouts;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,9 +7,6 @@ import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Tagger;
-import seedu.fitchasers.workouts.Exercise;
-import seedu.fitchasers.workouts.Workout;
-import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.IOException;
 
@@ -34,7 +31,7 @@ class WorkoutManagerTest {
         // Create a mock UI that always confirms prompts
         mockUi = new UI() {
             @Override
-            public boolean confirmationMessage() {
+            public Boolean confirmationMessage() {
                 return true; // Always return true for "are you sure?" prompts
             }
             @Override

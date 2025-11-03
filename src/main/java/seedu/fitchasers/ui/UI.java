@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-//@@Exceptional-Khoi
+//@@author Exceptional-Khoi
 /**
  * Handles all user interactions for the FitChasers application.
  * Provides an enhanced text-based interface with chat-bubble visuals
@@ -306,24 +306,31 @@ public class UI {
 
     /**
      * Prompts for a yes/no confirmation from the user.
+     * Users can also type "/cancel" to abort the operation.
      *
      * @return {@code true} if confirmed (Y/Yes),
-     *         {@code false} otherwise
+     *         {@code false} if declined (N/No),
+     *         {@code null} if cancelled
      */
-    public boolean confirmationMessage() {
+    public Boolean confirmationMessage() {
         while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N) > ");
+            String ans = readInsideRightBubble("Confirm (Y/N or /cancel) > ");
             if (ans == null) {
                 return false;
             }
             String lower = ans.trim().toLowerCase();
+
             if (lower.equals("y") || lower.equals("yes")) {
                 return true;
             }
             if (lower.equals("n") || lower.equals("no")) {
                 return false;
             }
-            showError("Please answer Y or N (yes/no).");
+            if (lower.equals("/cancel")) {
+                showMessage("Action cancelled.");
+                return null;
+            }
+            showError("Please answer Y or N (yes/no), or type /cancel to abort.");
         }
     }
 
@@ -452,7 +459,7 @@ public class UI {
         return sb.toString();
     }
 
-    private String readInsideRightBubble(String prompt) {
+    public String readInsideRightBubble(String prompt) {
         int innerWidth = Math.max(1, (int) (CONSOLE_WIDTH * 3.0 / 5) - FRAME_OVERHEAD);
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
 

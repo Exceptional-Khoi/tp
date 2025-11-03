@@ -8,7 +8,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 
-//@@bennyy117
+//@@author bennyy117
 /**
  * Handles the recording and viewing of weight data for a person.
  */
@@ -49,7 +49,7 @@ public class WeightManager {
         try {
             weightValue = Double.parseDouble(weightString.trim());
             if (!isValidWeight(weightValue)) {
-                return; // error message handled in helper
+                return;
             }
         } catch (NumberFormatException e) {
             ui.showMessage("Invalid weight. Please enter a number (e.g., 65 or 65.5).");
@@ -58,12 +58,30 @@ public class WeightManager {
 
         if (dateString.isEmpty()) {
             String todayStr = LocalDate.now().format(DATE_FORMAT);
-            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
-            if (ui.confirmationMessage()) {
+            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? " +
+                    "(Y/N, or type /cancel to abort)");
+
+            Boolean confirmed = ui.confirmationMessage();
+            if (confirmed == null) {
+                return;
+            } else if (confirmed) {
                 dateString = todayStr;
             } else {
-                ui.showMessage("Please provide a date in format dd/MM/yy.");
-                return;
+                while (true) {
+                    ui.showMessage("Please provide a date in format dd/MM/yy or type /cancel to abort.");
+                    String inputDate = ui.readInsideRightBubble("Enter date > ");
+                    if (inputDate == null || inputDate.equalsIgnoreCase("/cancel")) {
+                        ui.showMessage("Weight entry canceled.");
+                        return;
+                    }
+                    try {
+                        LocalDate.parse(inputDate.trim(), DATE_FORMAT);
+                        dateString = inputDate.trim();
+                        break;
+                    } catch (DateTimeParseException e) {
+                        ui.showError("Invalid date format. Use dd/MM/yy (e.g., 28/10/25) or type /cancel to abort.");
+                    }
+                }
             }
         }
 
@@ -75,14 +93,12 @@ public class WeightManager {
             return;
         }
 
-        // Check if date is in the future
         if (entryDate.isAfter(LocalDate.now())) {
             ui.showMessage("The date you entered (" + entryDate.format(DATE_FORMAT)
                     + ") is in the future. Please use a valid date.");
             return;
         }
 
-        // If record for the same date already exists, update and remove duplicates
         if (currentUser.hasWeightRecordOn(entryDate)) {
             ui.showMessage("A weight entry already exists for " + entryDate.format(DATE_FORMAT)
                     + ". The record will be updated.");
@@ -93,7 +109,7 @@ public class WeightManager {
         }
 
         ui.showMessage("Logging your weight... don't lie to me!\n"
-                        + "Recorded weight " + weightValue + " kg for " + entryDate.format(DATE_FORMAT) + ".");
+                + "Recorded weight " + weightValue + " kg for " + entryDate.format(DATE_FORMAT) + ".");
 
         try {
             FileHandler fileHandler = new FileHandler();

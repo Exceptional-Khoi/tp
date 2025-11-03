@@ -270,7 +270,7 @@ public class FitChasers {
 
             Set<String> autoTagsThatWillBeOverridden = tagger.suggest(workout);
             if (!autoTagsThatWillBeOverridden.isEmpty()) {
-                ui.showMessage("⚠️ WARNING: This will override auto generated tags: " + String.join(", ",
+                ui.showMessage("WARNING: This will override auto generated tags: " + String.join(", ",
                         autoTagsThatWillBeOverridden));
                 ui.showMessage("Continue with override? (y/n)");
 

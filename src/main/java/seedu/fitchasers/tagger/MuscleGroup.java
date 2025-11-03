@@ -1,6 +1,6 @@
 package seedu.fitchasers.tagger;
 
-//@@Kart04
+//@@author Kart04
 public enum MuscleGroup {
     LEGS,
     POSTERIOR_CHAIN,

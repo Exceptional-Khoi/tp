@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//@@ZhongBaode
+//@@author ZhongBaode
 
 /**
  * Manages workout sessions for the FitChasers application.
@@ -224,7 +224,7 @@ public class WorkoutManager {
             Character bad = findFirstIllegalNameChar(name);
             if (bad != null) {
                 String shown = (bad == '\\') ? "\\\\" : String.valueOf(bad);
-                ui.showMessage("“" + shown + "” is not allowed in the workout name.");
+                ui.showMessage("'" + shown + "' is not allowed in the workout name.");
             } else {
                 ui.showMessage("Name too long or invalid.");
             }
@@ -558,7 +558,7 @@ public class WorkoutManager {
             Character bad = findFirstIllegalNameChar(name);
             if (bad != null) {
                 String shown = (bad == '\\') ? "\\\\" : String.valueOf(bad);
-                ui.showMessage("“" + shown + "” is not allowed in the exercise name.");
+                ui.showMessage("'" + shown + "' is not allowed in the exercise name.");
             } else {
                 ui.showMessage("Name too long or invalid.");
             }
