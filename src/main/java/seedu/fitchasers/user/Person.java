@@ -6,24 +6,21 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.Collections;
+import java.util.stream.Collectors;
 
-//@@bennyy117
 /**
  * Represents a person using the FitChasers app.
- * Stores the person's name and their weight history.
+ * Stores the person's name and their weight history, maintaining chronological order.
  */
-
 public class Person {
 
     private final UI ui = new UI();
     private String name;
-
-    private final ArrayList<WeightRecord> weightHistory;
-
+    private final ArrayList<WeightRecord> weightHistory = new ArrayList<>();
 
     /**
      * Constructs a new Person with the given name.
@@ -34,9 +31,7 @@ public class Person {
      */
     public Person(String name) {
         setName(name);
-        this.weightHistory = new ArrayList<>();
     }
-
 
     /**
      * Returns the name of the person.
@@ -47,12 +42,11 @@ public class Person {
         return name;
     }
 
-
     /**
      * Updates the name of the person.
      *
      * @param name The new name
-     * @throws IllegalArgumentException if newName is null or empty
+     * @throws IllegalArgumentException if name is null or empty
      */
     public void setName(String name) {
         if (name == null || name.trim().isEmpty()) {
@@ -61,18 +55,31 @@ public class Person {
         this.name = name.trim();
     }
 
-
     /**
-     * Adds a weight record to the person's weight history.
+     * Adds a weight record to the person's weight history, maintaining chronological order.
      *
      * @param record The WeightRecord to add
      * @throws NullPointerException if record is null
      */
     public void addWeightRecord(WeightRecord record) {
         Objects.requireNonNull(record, "WeightRecord cannot be null.");
-        weightHistory.add(record);
+        insertSorted(record);
     }
 
+    /**
+     * Inserts a WeightRecord into the sorted weightHistory list.
+     * Maintains chronological order (earliest to latest).
+     *
+     * @param record The record to insert
+     */
+    private void insertSorted(WeightRecord record) {
+        int index = 0;
+        while (index < weightHistory.size() &&
+                weightHistory.get(index).getDate().isBefore(record.getDate())) {
+            index++;
+        }
+        weightHistory.add(index, record);
+    }
 
     /**
      * Returns an unmodifiable copy of the weight history.
@@ -83,9 +90,8 @@ public class Person {
         return List.copyOf(weightHistory);
     }
 
-
     /**
-     * Displays the weight history in the console.
+     * Displays the weight history in chronological order.
      * Prints a message if there are no records.
      */
     public void displayWeightHistory() {
@@ -96,30 +102,24 @@ public class Person {
 
         StringBuilder sb = new StringBuilder();
         sb.append("Here's your weight, you've been killing it lately!\n");
-
         for (int i = 0; i < weightHistory.size(); i++) {
             sb.append("  ").append(weightHistory.get(i));
-            if (i != weightHistory.size() - 1) {
+            if (i < weightHistory.size() - 1) {
                 sb.append("\n");
             }
         }
-
         ui.showMessage(sb.toString());
     }
 
-
     /**
      * Returns the most recent weight recorded for the person.
+     * Since the list is sorted, the last element is the latest.
      *
      * @return The latest weight, or -1 if no records exist
      */
     public double getLatestWeight() {
-        if (weightHistory.isEmpty()) {
-            return -1;
-        }
-        return weightHistory.get(weightHistory.size() - 1).getWeight();
+        return weightHistory.isEmpty() ? -1 : weightHistory.get(weightHistory.size() - 1).getWeight();
     }
-
 
     /**
      * Returns the number of weight records.
@@ -129,7 +129,6 @@ public class Person {
     public int getWeightHistorySize() {
         return weightHistory.size();
     }
-
 
     /**
      * Removes the most recent weight record.
@@ -144,26 +143,23 @@ public class Person {
         return true;
     }
 
-
+    /**
+     * Displays a line graph of weight progression with dates.
+     * Uses the sorted weightHistory directly.
+     */
     public void displayWeightGraphWithDates() {
-
-        // Sort records by date ascending
-        List<WeightRecord> sortedRecords = new ArrayList<>(weightHistory);
-        sortedRecords.sort(Comparator.comparing(WeightRecord::getDate));
-
-        List<Double> weights = new ArrayList<>();
-        List<String> dates = new ArrayList<>();
-        DateTimeFormatter df = DateTimeFormatter.ofPattern("dd/MM");
-
-        for (WeightRecord r : sortedRecords) {
-            weights.add(r.getWeight());
-            dates.add(r.getDate().format(df));
-        }
-
-        if (weights.isEmpty()) {
+        if (weightHistory.isEmpty()) {
             ui.showMessage("No weight records to display.");
             return;
         }
+
+        List<Double> weights = weightHistory.stream()
+                .map(WeightRecord::getWeight)
+                .collect(Collectors.toList());
+
+        List<String> dates = weightHistory.stream()
+                .map(r -> r.getDate().format(DateTimeFormatter.ofPattern("dd/MM")))
+                .collect(Collectors.toList());
 
         int height = 10;
         int spacing = 12;
@@ -220,7 +216,6 @@ public class Person {
             }
         }
 
-
         boolean[][] isWeightPoint = new boolean[height][width];
         for (int i = 0; i < displayWeights.size(); i++) {
             int x = i * spacing;
@@ -231,7 +226,6 @@ public class Person {
             }
         }
 
-
         final String reset = "\u001B[0m";
         final String orange = "\u001B[1m\u001B[38;5;208m";
 
@@ -240,13 +234,11 @@ public class Person {
         if (displayWeights.size() == 1) {
             double w = displayWeights.get(0);
             System.out.printf("%6.1f | %s\u25CF%s\n", w, orange, reset);
-
             System.out.print("        ");
             for (int j = 0; j < displayDates.get(0).length(); j++) {
                 System.out.print('_');
             }
             System.out.println();
-
             System.out.print("        ");
             System.out.println(displayDates.get(0));
             return;
@@ -266,13 +258,11 @@ public class Person {
             System.out.println();
         }
 
-
         System.out.print("        ");
         for (int j = 0; j < width + 4; j++) {
             System.out.print('_');
         }
         System.out.println();
-
 
         System.out.print("        ");
         for (int i = 0; i < displayDates.size(); i++) {
@@ -288,9 +278,16 @@ public class Person {
         System.out.println("\n");
     }
 
+    /**
+     * Replaces the current weight history with a new list, sorted chronologically.
+     *
+     * @param history The new list of weight records
+     */
     public void setWeightHistory(List<WeightRecord> history) {
         this.weightHistory.clear();
-        this.weightHistory.addAll(history);
+        List<WeightRecord> sorted = new ArrayList<>(history);
+        sorted.sort(Comparator.comparing(WeightRecord::getDate));
+        this.weightHistory.addAll(sorted);
     }
 
     /**
@@ -300,18 +297,13 @@ public class Person {
      * @return true if a record exists for that date, false otherwise
      */
     public boolean hasWeightRecordOn(LocalDate date) {
-        for (WeightRecord record : weightHistory) {
-            if (record.getDate().equals(date)) {
-                return true;
-            }
-        }
-        return false;
+        return weightHistory.stream().anyMatch(r -> r.getDate().equals(date));
     }
 
     /**
      * Updates the weight record for the given date if it exists.
      * If multiple records exist for the same date, only the first is kept,
-     * the rest are removed. If no record exists, nothing happens.
+     * the rest are removed. The updated record is re-inserted to maintain order.
      *
      * @param date the date to update
      * @param newWeight the new weight value
@@ -331,7 +323,10 @@ public class Person {
             }
         }
 
-        // Remove duplicate records for the same date
-        weightHistory.removeAll(duplicates);
+        if (mainRecord != null) {
+            weightHistory.removeAll(duplicates);
+            weightHistory.remove(mainRecord);
+            insertSorted(mainRecord);
+        }
     }
 }

@@ -21,7 +21,6 @@ import seedu.fitchasers.storage.FileHandler;
 
 import java.io.IOException;
 import java.time.YearMonth;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -44,7 +43,7 @@ public class FitChasers {
     private static final UI ui = new UI();
     private static final FileHandler fileHandler = new FileHandler();
     private static final YearMonth currentMonth = YearMonth.now();
-    private static final Parser parser = new Parser();
+    public static final Parser parser = new Parser();
     private static ViewLog viewLog;
     private static final DefaultTagger tagger = new DefaultTagger();
     private static final List<Gym> gyms = StaticGymData.getNusGyms();
@@ -180,12 +179,20 @@ public class FitChasers {
                     }
                     break;
 
-                case "/open":
-                case "o":
-                    viewLog.openByIndex(Integer.parseInt(argumentStr));
-                    break;
+                    case "/open":
+                    case "o": {
+                        try {
+                            Parser.OpenArgs oa = parser.parseOpen(argumentStr);
+                            viewLog.openByIndex(oa.displayId);
+                        } catch (InvalidArgumentInput e) {
+                            ui.showError(e.getMessage());
+                        } catch (Exception e) {
+                            ui.showError("Something went wrong in main: " + e.getMessage());
+                        }
+                        break;
+                    }
                 //@@author Kart04
-                case "/del_workout":
+                case "/delete_workout":
                 case "dw":
                     delMethod();
                     break;
@@ -216,220 +223,102 @@ public class FitChasers {
         isRunning = false;
     }
 
-//    private static void delMethod() throws InvalidCommandException, IOException, InvalidArgumentInput, FileNonexistent {
-//        // Format: /del_workout WORKOUT_NAME
-//        if (argumentStr.isEmpty()) {
-//            throw new InvalidCommandException("Workout deletion command requires a workout name or date. " +
-//                    "Please enter a valid command.");
-//        } else if (argumentStr.contains("-m")) {
-//            // Use the Parser's DTO instead of the removed ViewLog.Parsed
-//            Parser.ViewLogArgs p = parser.parseViewLog(argumentStr);
-//            workoutManager.setWorkouts(fileHandler.loadMonthList(p.ym), p.ym);
-//            // In the new DTO, the old "extractedArg" is the "page" field
-//            workoutManager.deleteWorkoutByIndex(p.page);
-//        } else {
-//            workoutManager.deleteWorkout(argumentStr);
-//        }
-//    }
+    private static void delMethod() throws IOException, FileNonexistent {
+        workoutManager.handleDeleteWorkout(argumentStr);
+    }
 
-    private static void delMethod() throws InvalidCommandException, IOException, InvalidArgumentInput, FileNonexistent {
-        if (argumentStr == null) throw new InvalidCommandException(
-                "Usage:\n  /del_workout <WORKOUT_NAME>\n  /del_workout -m <MONTH> <INDEX>"
-        );
+    private static void owtMethod() throws FileNonexistent, IOException {
+        // Parse parameters
+        String[] params = argumentStr.split("\\s+");
+        Integer workoutId = null;
+        String newTag = null;
 
-        Parser.DelArgs a = parser.parseDel(argumentStr);
+        for (String param : params) {
+            if (param.startsWith("id/")) {
+                try {
+                    workoutId = Integer.parseInt(param.substring(3));
+                } catch (NumberFormatException e) {
+                    ui.showMessage("Invalid workout ID.");
+                    return;
+                }
+            } else if (param.startsWith("newTag/")) {
+                newTag = param.substring(7);
+            }
+        }
 
-        if (a.byMonth) {
-            // Load the specified month and delete by 1-based index
-            workoutManager.setWorkouts(fileHandler.loadMonthList(a.ym), a.ym);
-            if (!workoutManager.deleteWorkoutByIndex(a.index1Based - 1)) {
-                ui.showMessage("No workout found at index " + a.index1Based + " in " + a.ym + ".");
+        if (workoutId != null && newTag != null) {
+            // Validate empty tag
+            if (newTag.trim().isEmpty()) {
+                ui.showMessage("Tag cannot be empty.");
                 return;
             }
-            fileHandler.saveMonthList(a.ym, workoutManager.getWorkouts());
-            ui.showMessage("Deleted workout #" + a.index1Based + " in " + a.ym + ".");
-            return;
-        }
 
-        // Exact-name delete in the currently loaded month (old behavior)
-        final String name = a.targetName.trim();
-        if (workoutManager.deleteWorkout(name)) {
-            // Persist to whatever month is currently loaded in memory (your old code saved to currentMonth)
-            fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-            ui.showMessage("Deleted workout \"" + name + "\".");
+            // Validate workout ID
+            if (workoutId <= 0 || workoutId > workoutManager.getWorkouts().size()) {
+                ui.showMessage("Invalid workout ID. Use valid ID between 1 and " +
+                        workoutManager.getWorkouts().size());
+                return;
+            }
+
+            Workout workout = viewLog.getWorkoutByDisplayId(workoutId, currentMonth);
+            if (workout == null) {
+                ui.showMessage("Invalid workout ID.");
+                return;
+            }
+
+            Set<String> oldTags = workout.getAllTags();
+
+            ui.showMessage("Current tags: " + String.join(", ", oldTags));
+            ui.showMessage("Change to: " + newTag + "?");
+            ui.showMessage("Are you sure? (Y/N)");
+
+            if (!parser.confirmationMessage()) {
+                ui.showMessage("Tag change cancelled.");
+                return;
+            }
+
+            Set<String> autoTagsThatWillBeOverridden = tagger.suggest(workout);
+            if (!autoTagsThatWillBeOverridden.isEmpty()) {
+                ui.showMessage("WARNING: This will override auto generated tags: " + String.join(", ",
+                        autoTagsThatWillBeOverridden));
+                ui.showMessage("Continue with override? (Y/N)");
+
+                if (!parser.confirmationMessage()) {
+                    ui.showMessage("Override cancelled.");
+                    return;
+                }
+            }
+
+            workoutManager.overrideWorkoutTags(workout, newTag);
+
+
+
+            try {
+                fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
+
+                ArrayList<Workout> reloadedWorkouts = fileHandler.getWorkoutsForMonth(currentMonth);
+                workoutManager.setWorkouts(reloadedWorkouts);
+
+                ui.showMessage("Workout tags updated successfully.");
+                ui.showMessage("New tags: " + newTag);
+
+                Set<String> conflicts = workoutManager.checkForOverriddenTags(reloadedWorkouts.get(workoutId - 1));
+
+                if (!conflicts.isEmpty()) {
+                    ui.showMessage("WARNING: These manual tags override auto-tags: " + conflicts);
+                }
+
+            } catch (IOException e) {
+                ui.showMessage("Error saving workout data: " + e.getMessage());
+            } catch (FileNonexistent e) {
+                throw new RuntimeException(e);
+            }
+
         } else {
-            ui.showMessage("No workout named \"" + name + "\" in the current month.");
+            ui.showMessage("Usage: /override_workout_tag id/WORKOUT_ID newTag/NEW_TAG");
         }
     }
 
-
-//    private static void owtMethod() throws FileNonexistent, IOException {
-//        // Parse parameters
-//        String[] params = argumentStr.split("\\s+");
-//        Integer workoutId = null;
-//        String newTag = null;
-//
-//        for (String param : params) {
-//            if (param.startsWith("id/")) {
-//                try {
-//                    workoutId = Integer.parseInt(param.substring(3));
-//                } catch (NumberFormatException e) {
-//                    ui.showMessage("Invalid workout ID.");
-//                    return;
-//                }
-//            } else if (param.startsWith("newTag/")) {
-//                newTag = param.substring(7);
-//            }
-//        }
-//
-//        if (workoutId != null && newTag != null) {
-//            // Validate empty tag
-//            if (newTag.trim().isEmpty()) {
-//                ui.showMessage("Tag cannot be empty.");
-//                return;
-//            }
-//
-//            // Validate workout ID
-//            if (workoutId <= 0 || workoutId > workoutManager.getWorkouts().size()) {
-//                ui.showMessage("Invalid workout ID. Use valid ID between 1 and " +
-//                        workoutManager.getWorkouts().size());
-//                return;
-//            }
-//
-//            Workout workout = viewLog.getWorkoutByDisplayId(workoutId, currentMonth);
-//            if (workout == null) {
-//                ui.showMessage("Invalid workout ID.");
-//                return;
-//            }
-//
-//            Set<String> oldTags = workout.getAllTags();
-//
-//            ui.showMessage("Current tags: " + String.join(", ", oldTags));
-//            ui.showMessage("Change to: " + newTag + "?");
-//            ui.showMessage("Are you sure? (y/n)");
-//
-//            if (!parser.confirmationMessage()) {
-//                ui.showMessage("Tag change cancelled.");
-//                return;
-//            }
-//
-//            Set<String> autoTagsThatWillBeOverridden = tagger.suggest(workout);
-//            if (!autoTagsThatWillBeOverridden.isEmpty()) {
-//                ui.showMessage("WARNING: This will override auto generated tags: " + String.join(", ",
-//                        autoTagsThatWillBeOverridden));
-//                ui.showMessage("Continue with override? (y/n)");
-//
-//                if (!parser.confirmationMessage()) {
-//                    ui.showMessage("Override cancelled.");
-//                    return;
-//                }
-//            }
-//
-//            workoutManager.overrideWorkoutTags(workout, newTag);
-//
-//
-//
-//            try {
-//                fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-//
-//                ArrayList<Workout> reloadedWorkouts = fileHandler.getWorkoutsForMonth(currentMonth);
-//                workoutManager.setWorkouts(reloadedWorkouts);
-//
-//                ui.showMessage("Workout tags updated successfully.");
-//                ui.showMessage("  New tags: " + newTag);
-//
-//                Set<String> conflicts = workoutManager.checkForOverriddenTags(reloadedWorkouts.get(workoutId - 1));
-//
-//                if (!conflicts.isEmpty()) {
-//                    ui.showMessage("WARNING: These manual tags override auto-tags: " + conflicts);
-//                }
-//
-//            } catch (IOException e) {
-//                ui.showMessage("Error saving workout data: " + e.getMessage());
-//            } catch (FileNonexistent e) {
-//                throw new RuntimeException(e);
-//            }
-//
-//        } else {
-//            ui.showMessage("Usage: /override_workout_tag id/WORKOUT_ID newTag/NEW_TAG");
-//        }
-//    }
-
-    private static void owtMethod() throws FileNonexistent, IOException, InvalidArgumentInput {
-        if (argumentStr == null) { ui.showMessage("Usage: /override_workout_tag id/ID newTag/TAG [-m M| -ym Y M]"); return; }
-        Parser.OverrideTagArgs a = parser.parseOverrideWorkoutTag(argumentStr);
-
-        // Resolve month context and workout
-        workoutManager.setWorkouts(fileHandler.loadMonthList(a.ym), a.ym);
-        if (a.displayId <= 0 || a.displayId > workoutManager.getWorkouts().size()) {
-            ui.showMessage("Invalid workout ID. Use 1.." + workoutManager.getWorkouts().size());
-            return;
-        }
-        Workout w = viewLog.getWorkoutByDisplayId(a.displayId, a.ym);
-        if (w == null) { ui.showMessage("Invalid workout ID."); return; }
-
-        if (!a.confirmChange) {
-            ui.showMessage("Tag change cancelled.");
-            return;
-        }
-
-        // If your logic needs to check auto-tag conflicts before overriding:
-        Set<String> autoToBeOverridden = tagger.suggest(w);
-        if (!autoToBeOverridden.isEmpty() && !a.confirmOverrideAuto) {
-            ui.showMessage("Override cancelled (auto-tags present).");
-            return;
-        }
-
-        workoutManager.overrideWorkoutTags(w, a.newTag);
-        fileHandler.saveMonthList(a.ym, workoutManager.getWorkouts());
-
-        ui.showMessage("Workout tags updated. New tags: " + a.newTag);
-
-        // Optionally warn if conflicts remain
-        Set<String> conflicts = workoutManager.checkForOverriddenTags(w);
-        if (!conflicts.isEmpty()) {
-            ui.showMessage("WARNING: These manual tags override auto-tags: " + conflicts);
-        }
-    }
-
-
-//    private static void gpMethod() {
-//        try {
-//            String trimmedArg = argumentStr.trim();
-//            Gym selectedGym = null;
-//
-//            if (trimmedArg.startsWith("p/") && trimmedArg.length() > 2) {
-//                String input = trimmedArg.substring(2).trim();
-//                if (input.isEmpty()) {  // ADD THIS
-//                    ui.showMessage("Please provide a gym number or name.");
-//                    listAvailableGyms();
-//                    return;
-//                }
-//
-//                try {
-//                    int pageNum = Integer.parseInt(input);
-//                    if (pageNum >= 1 && pageNum <= gyms.size()) {
-//                        selectedGym = gyms.get(pageNum - 1);
-//                    }
-//                } catch (NumberFormatException e) {
-//                    selectedGym = findGymByName(input);
-//                }
-//
-//                if (selectedGym != null) {
-//                    EquipmentDisplay.showEquipmentForSingleGym(selectedGym);
-//                } else {
-//                    ui.showMessage("Invalid gym. Use number (1-" + gyms.size() + ") or gym name (e.g., SRC Gym)");
-//                    listAvailableGyms();
-//                }
-//            } else {
-//                ui.showMessage("Usage: /gym_page p/page_number_or_gym_name");
-//                ui.showMessage("Example: /gym_page p/1 OR /gym_page p/SRC Gym");
-//                listAvailableGyms();
-//            }
-//        } catch (Exception e) {
-//            ui.showMessage("Error: " + e.getMessage());
-//        }
-//    }
 
     private static void gpMethod() {
         try {
@@ -468,31 +357,13 @@ public class FitChasers {
     }
 
     private static void listAvailableGyms() {
-        ui.showMessage("Available gyms:");
+        StringBuilder sb = new StringBuilder();
+        sb.append("Available gyms:\n");
         for (int i = 0; i < gyms.size(); i++) {
-            ui.showMessage("  " + (i + 1) + ". " + gyms.get(i).getName());
+            sb.append("  " + (i + 1) + ". " + gyms.get(i).getName() + "\n");
         }
+        ui.showMessage(sb.toString().trim());
     }
-
-//    private static void gwMethod() {
-//        String trimmedArg = argumentStr.trim();
-//        try {
-//            if (trimmedArg.startsWith("n/") && trimmedArg.length() > 2) {
-//                Set<String> gymsToSuggest = EquipmentDisplay.suggestGymsForExercise(gyms, argumentStr);
-//                if (!gymsToSuggest.isEmpty()) {
-//                    ui.showMessage("You can do this workout at: " + String.join(", ",
-//                            gymsToSuggest));
-//                } else {
-//                    ui.showMessage("Sorry, no gyms found for that exercise.");
-//                }
-//            } else {
-//                ui.showMessage("Usage: /gym_where n/exercise_name");
-//            }
-//        } catch (Exception e) {
-//            ui.showMessage("An error occurred while searching for gyms. Please check your input " +
-//                    "and try again.");
-//        }
-//    }
 
     private static void gwMethod() {
         try {
@@ -509,52 +380,6 @@ public class FitChasers {
             ui.showMessage("An error occurred while searching for gyms.");
         }
     }
-
-//    private static void amtMethod() {
-//        String[] params = argumentStr.split("\\s+");
-//        String mus = null;
-//        String keyword = null;
-//        for (String param : params) {
-//            if (param.startsWith("m/")) {
-//                mus = param.substring(2).toUpperCase();
-//            }
-//            if (param.startsWith("k/")) {
-//                keyword = param.substring(2).toLowerCase();
-//            }
-//        }
-//        if (mus != null && mus.trim().isEmpty()) {
-//            ui.showMessage("Muscle cannot be empty. Use: LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE");
-//            return;
-//        }
-//
-//        if (keyword != null && keyword.trim().isEmpty()) {
-//            ui.showMessage("Keyword cannot be empty. Example: /add_muscle_tag m/CARDIO k/running");
-//            return;
-//        }
-//        if (mus != null && keyword != null) {
-//            try {
-//                MuscleGroup muscleGroup = MuscleGroup.valueOf(mus);
-//                tagger.addMuscleKeyword(muscleGroup, keyword);
-//
-//                for (Workout w : workoutManager.getWorkouts()) {
-//                    Set<String> updatedTags = tagger.suggest(w);
-//                    w.setAutoTags(updatedTags);
-//                    ui.showMessage("Retagged workout " + w.getWorkoutName() + ": " + updatedTags);
-//                }
-//                try {
-//                    fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-//                    ui.showMessage("Added keyword " + keyword + " to muscle group " + mus);
-//                } catch (IOException e) {
-//                    ui.showMessage("Error saving changes: " + e.getMessage());
-//                }
-//            } catch (IllegalArgumentException e) {
-//                ui.showMessage("Invalid muscle group. Valid options: LEGS, POSTERIOR_CHAIN, CHEST, BACK, " +
-//                        "SHOULDERS, ARMS, CORE");
-//            }
-//        } else {
-//            ui.showMessage("Usage: /add_muscle_tag m/LEGS/ CHEST/... k/keyword");
-//        }
-//    }
 
     private static void amtMethod() {
         try {
@@ -578,78 +403,6 @@ public class FitChasers {
         }
     }
 
-//    private static void amotMethod() {
-//        String[] params = argumentStr.split("\\s+");
-//        String mod = null;
-//        String keyword = null;
-//
-//        for (String param : params) {
-//            if (param.startsWith("m/")) {
-//                mod = param.substring(2).toUpperCase();
-//            }
-//            if (param.startsWith("k/")) {
-//                keyword = param.substring(2).toLowerCase();
-//            }
-//        }
-//
-//        if (mod != null && mod.trim().isEmpty()) {
-//            ui.showMessage("Modality cannot be empty. Use: CARDIO or STRENGTH");
-//            return;
-//        }
-//
-//        if (keyword != null && keyword.trim().isEmpty()) {
-//            ui.showMessage("Keyword cannot be empty. Example: /add_modality_tag m/CARDIO k/running");
-//            return;
-//        }
-//
-//        if (mod != null && keyword != null) {
-//            try {
-//                Modality modality = Modality.valueOf(mod);
-//                tagger.addModalityKeyword(modality, keyword);
-//
-//                // Check ONLY workouts that contain this keyword
-//                StringBuilder conflicts = new StringBuilder();
-//                List<Workout> affectedWorkouts = new ArrayList<>();
-//
-//                for (Workout w : workoutManager.getWorkouts()) {
-//                    String workoutText = w.getWorkoutName().toLowerCase();
-//                    if (workoutText.contains(keyword.toLowerCase())) {
-//                        affectedWorkouts.add(w);
-//                        if (workoutManager.hasConflictingModality(w, mod)) {
-//                            String existing = workoutManager.getConflictingModality(w);
-//                            conflicts.append("\n - ").append(w.getWorkoutName())
-//                                    .append(" is already tagged to ").append(existing);
-//                        }
-//                    }
-//                }
-//
-//                if (!conflicts.isEmpty()) {
-//                    ui.showMessage("CANNOT ADD KEYWORD: Conflicting modality tags detected:");
-//                    ui.showMessage(conflicts.toString());
-//                    ui.showMessage("\nTo change these tags, first remove the old keyword or manually edit the tag.");
-//                    return;
-//                }
-//
-//                for (Workout w : affectedWorkouts) {
-//                    Set<String> updatedTags = tagger.suggest(w);
-//                    w.setAutoTags(updatedTags);
-//                    ui.showMessage("Retagged: " + w.getWorkoutName() + " → " + updatedTags);
-//                }
-//
-//                try {
-//                    fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
-//                    ui.showMessage("Added keyword '" + keyword + "' to modality " + mod);
-//                } catch (IOException e) {
-//                    ui.showMessage("Error saving changes: " + e.getMessage());
-//                }
-//            } catch (IllegalArgumentException e) {
-//                ui.showMessage("Invalid modality. Valid options: CARDIO, STRENGTH");
-//            }
-//
-//        } else {
-//            ui.showMessage("Usage: /add_modality_tag m/(CARDIO/STRENGTH) k/keyword");
-//        }
-//    }
 
     private static void amotMethod() {
         try {

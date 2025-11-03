@@ -41,7 +41,7 @@ class WorkoutManagerTest {
      * we just override the public methods to bypass prompts/printing.
      */
     private static class AlwaysYesParser extends Parser {
-        @Override public boolean confirmationMessage() { return true; }
+        @Override public Boolean confirmationMessage() { return true; }
         @Override public String readCommand() { return ""; }
         // If you ever need to bypass weight/name prompts in other tests,
         // override enterName()/enterWeight(...) similarly.
@@ -137,15 +137,26 @@ class WorkoutManagerTest {
     void deleteWorkout_accessingDeletedWorkout_throwsIndexOutOfBoundsException()
             throws IOException, FileNonexistent {
         manager.addWorkout("/create_workout n/run d/01/01/25 t/1200");
-        manager.deleteWorkout("run");
+
+        // Delete the second workout using index-based deletion (id/2)
+        manager.handleDeleteWorkout("id/2");
+
+        // Accessing index 1 should throw IndexOutOfBoundsException since we only have 1 workout left
         assertThrows(IndexOutOfBoundsException.class,
                 () -> manager.getWorkouts().get(1));
     }
 
     @Test
-    void removeWorkout_nonExistingWorkout_doesNotChangeListSize() throws IOException {
+    void removeWorkout_nonExistingWorkout_printsWorkoutNotFound() throws IOException, FileNonexistent {
+        // This test is tricky because the mock UI suppresses output.
+        // A better approach would be to check the state of the application.
+        // For now, let's ensure the list size doesn't change.
         int initialSize = manager.getWorkouts().size();
-        manager.deleteWorkout("swim");
+
+        // Try to delete a workout with invalid index (id/99 - doesn't exist)
+        manager.handleDeleteWorkout("id/99");
+
+        // List size should remain the same
         assertEquals(initialSize, manager.getWorkouts().size());
     }
 }

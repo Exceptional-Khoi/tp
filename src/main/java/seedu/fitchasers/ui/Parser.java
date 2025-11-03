@@ -141,24 +141,32 @@ public class Parser {
      *
      * @return {@code true} if confirmed (Y/Yes), {@code false} if No or input terminates
      */
-    public boolean confirmationMessage() {
+    public Boolean confirmationMessage() {
         while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N) > ");
+            String ans = readInsideRightBubble("Confirm (Y/N or /cancel) > ");
             if (ans == null) {
                 return false;
             }
+
             String lower = ans.trim().toLowerCase();
+
             if (lower.equals("y") || lower.equals("yes")) {
                 return true;
             }
             if (lower.equals("n") || lower.equals("no")) {
                 return false;
             }
-            ui.showError("Please answer Y or N (yes/no).");
+            if (lower.equals("/cancel")) {
+                ui.showMessage("Action cancelled.");
+                return null;
+            }
+
+            ui.showError("Please answer Y or N (yes/no), or type /cancel to abort.");
         }
     }
 
-    private String readInsideRightBubble(String prompt) {
+
+    public String readInsideRightBubble(String prompt) {
         int innerWidth = Math.max(1, (int) (CONSOLE_WIDTH * 3.0 / 5) - FRAME_OVERHEAD);
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
 
@@ -264,8 +272,14 @@ public class Parser {
         return new ParseOutcome(CommandType.ADD_WEIGHT, parseAddWeight(argsOnly(s)));
         }  else if (s.startsWith("/set_goal")) {
         return new ParseOutcome(CommandType.SET_GOAL, parseSetGoal(argsOnly(s)));
-        } else if (s.startsWith("/view_log")) {
+        } else if (s.equals("vl") || s.startsWith("vl ")) {
             return new ParseOutcome(CommandType.VIEW_LOG, parseViewLog(argsOnly(s)));
+        } else if (s.startsWith("/view_log")) {
+            throw err("'/view_log' is deprecated. Use one of:\n" +
+                    "  vl\n" +
+                    "  vl pg/<page>\n" +
+                    "  vl m/<month>\n" +
+                    "  vl ym/<month>/<year>");
         } else if (s.startsWith("/open")) {
             return new ParseOutcome(CommandType.OPEN, parseOpen(argsOnly(s)));
         }
@@ -757,107 +771,92 @@ public class Parser {
         java.time.YearMonth now = java.time.YearMonth.now();
         java.time.YearMonth target = now;
         int page = 1;
-        boolean detailed = false;
+        boolean detailed = false; // not used in the new scheme
 
+        // "vl"
         if (raw == null || raw.isBlank()) {
-            return new ViewLogArgs(target, page, false);
+            return new ViewLogArgs(target, page, detailed);
         }
 
-        String[] tok = raw.trim().split("\\s+");
-        boolean seenMonthFlag = false;     // -m
-        boolean seenYearMonthFlag = false; // -ym
+        String s = raw.trim();
 
-        for (int i = 0; i < tok.length; i++) {
-            String t = tok[i];
+        // Accept single-token only
+        if (s.contains(" ")) {
+            throw err("Invalid format. Accepted:\n" +
+                    "  vl\n" +
+                    "  vl pg/<page>\n" +
+                    "  vl m/<month>\n" +
+                    "  vl ym/<month>/<year>");
+        }
 
-            switch (t) {
-                case "-d":
-                case "--detailed":
-                    detailed = true;
-                    break;
+        // "vl pg/<page>"
+        if (s.startsWith("pg/")) {
+            String v = s.substring(3).trim();
+            if (!isInt(v)) throw err("Invalid page. Use: vl pg/<page>");
+            page = readPositiveInt(v, "Page must be a positive integer.");
+            return new ViewLogArgs(target, page, detailed);
+        }
 
-                case "-m": {
-                    if (seenYearMonthFlag) throw err("Cannot combine -m with -ym.");
-                    seenMonthFlag = true;
-                    int month = readIntArg(tok, ++i, "Missing month after -m");
-                    validateMonth(month);
-                    target = java.time.YearMonth.of(now.getYear(), month);
-                    if (i + 1 < tok.length && isInt(tok[i + 1])) {
-                        page = readPositiveInt(tok[++i], "Page must be a positive integer.");
-                    }
-                    break;
-                }
+        // "vl m/<month>"
+        if (s.startsWith("m/")) {
+            String v = s.substring(2).trim();
+            if (!isInt(v)) throw err("Invalid month. Use: vl m/<month>");
+            int m = Integer.parseInt(v);
+            validateMonth(m);
+            target = java.time.YearMonth.of(now.getYear(), m);
+            return new ViewLogArgs(target, page, detailed);
+        }
 
-                case "-ym": {
-                    if (seenMonthFlag) throw err("Cannot combine -ym with -m.");
-                    seenYearMonthFlag = true;
-                    int year = readIntArg(tok, ++i, "Missing year after -ym");
-                    validateYear(year);
-                    int m = readIntArg(tok, ++i, "Missing month after year");
-                    validateMonth(m);
-                    target = java.time.YearMonth.of(year, m);
-                    if (i + 1 < tok.length && isInt(tok[i + 1])) {
-                        page = readPositiveInt(tok[++i], "Page must be a positive integer.");
-                    }
-                    break;
-                }
-
-                default:
-                    if (isInt(t)) {
-                        page = readPositiveInt(t, "Page must be a positive integer.");
-                    } else if (t.startsWith("-")) {
-                        throw err("Unknown flag: " + t);
-                    } else {
-                        throw err("Unexpected token: " + t);
-                    }
+        // "vl ym/<month>/<year>"
+        if (s.startsWith("ym/")) {
+            String body = s.substring(3).trim(); // "<MONTH>/<YEAR>"
+            String[] parts = body.split("/");
+            if (parts.length != 2 || !isInt(parts[0]) || !isInt(parts[1])) {
+                throw err("Invalid ym. Use: vl ym/<month>/<year>  (e.g., vl ym/11/2025 or vl ym/11/25)");
             }
+            int m = Integer.parseInt(parts[0]);
+            int y = parseYearFlexible(parts[1]); // accepts 2- or 4-digit year
+            validateMonth(m);
+            validateYear(y);
+            target = java.time.YearMonth.of(y, m);
+            return new ViewLogArgs(target, page, detailed);
         }
 
-        return new ViewLogArgs(target, page, detailed);
+        throw err("Invalid format. Accepted:\n" +
+                "  vl\n" +
+                "  vl pg/<page>\n" +
+                "  vl m/<month>\n" +
+                "  vl ym/<month>/<year>");
     }
 
-    // === 1E) Implement parseOpen(...) ===
-    private OpenArgs parseOpen(String raw) throws InvalidArgumentInput {
-        // Forms:
-        //   /open 3             -> open display ID 3 from CURRENT month
-        //   /open 3 -m 10       -> open ID 3 from Oct this year
-        //   /open 3 -ym 2025 10 -> open ID 3 from Oct 2025
-        if (blank(raw)) throw err("Usage: /open <ID> [-m M] | [-ym YYYY M]");
-
-        String[] tok = raw.trim().split("\\s+");
-        if (!isInt(tok[0])) throw err("First argument must be the ID number shown in /view_log.");
-        int id = readPositiveInt(tok[0], "ID must be a positive integer.");
-
-        java.time.YearMonth now = java.time.YearMonth.now();
-        java.time.YearMonth target = now;
-
-        boolean seenM = false, seenYM = false;
-        for (int i = 1; i < tok.length; i++) {
-            String t = tok[i];
-            switch (t) {
-                case "-m": {
-                    if (seenYM) throw err("Cannot combine -m with -ym.");
-                    seenM = true;
-                    int m = readIntArg(tok, ++i, "Missing month after -m");
-                    validateMonth(m);
-                    target = java.time.YearMonth.of(now.getYear(), m);
-                    break;
-                }
-                case "-ym": {
-                    if (seenM) throw err("Cannot combine -ym with -m.");
-                    seenYM = true;
-                    int y = readIntArg(tok, ++i, "Missing year after -ym");
-                    validateYear(y);
-                    int m = readIntArg(tok, ++i, "Missing month after year");
-                    validateMonth(m);
-                    target = java.time.YearMonth.of(y, m);
-                    break;
-                }
-                default:
-                    throw err("Unexpected token in /open: " + t);
-            }
+    private static int parseYearFlexible(String yText) throws InvalidArgumentInput {
+        try {
+            int y = Integer.parseInt(yText);
+            if (yText.length() == 2) y += 2000; // "25" -> 2025
+            return y;
+        } catch (NumberFormatException ex) {
+            throw err("Invalid year. Use a number like 2025 (or 25 for 2025).");
         }
-        return new OpenArgs(id, target);
+    }
+
+
+    // === 1E) Implement parseOpen(...) ===
+    public OpenArgs parseOpen(String raw) throws InvalidArgumentInput {
+        if (raw == null || raw.isBlank()) {
+            throw err("Usage: /open id/<INDEX>");
+        }
+        String[] tok = raw.trim().split("\\s+");
+        if (tok.length != 1 || !tok[0].startsWith("id/")) {
+            throw err("Usage: /open id/<INDEX>");
+        }
+
+        String num = tok[0].substring(3).trim();
+        if (!isInt(num)) {
+            throw err("Workout ID must be a positive integer.");
+        }
+
+        int id = readPositiveInt(num, "Workout ID must be a positive integer.");
+        return new OpenArgs(id, java.time.YearMonth.now());
     }
 
     public static int readIntArg(String[] tok, int idx, String err) throws InvalidArgumentInput {
@@ -909,31 +908,65 @@ public class Parser {
         if (blank(raw)) {
             throw err(
                     "Usage:\n" +
-                            "  /del_workout <WORKOUT_NAME>\n" +
-                            "  /del_workout -m <MONTH> <INDEX>"
+                            "  /del_workout id/<ID>\n" +
+                            "  /del_workout m/<MONTH> id/<ID>\n" +
+                            "  /del_workout ym/<MONTH>/<YEAR> id/<ID>"
             );
         }
+
         String[] tok = raw.trim().split("\\s+");
         java.time.YearMonth now = java.time.YearMonth.now();
 
-        // Month form: /del_workout -m <MONTH> <INDEX>
-        if (tok[0].equals("-m") || tok[0].equals("--month")) {
-            int m = readIntArg(tok, 1, "Missing month after -m");
-            validateMonth(m);
-            if (tok.length < 3 || !isInt(tok[2])) throw err("Missing index after month. Example: -m 11 2");
-            int idx = readPositiveInt(tok[2], "Index must be a positive integer.");
-            // Optionally reject extra tokens:
-            if (tok.length > 3) throw err("Unexpected extra input. Usage: /del_workout -m <MONTH> <INDEX>");
-            return new DelArgs(true, java.time.YearMonth.of(now.getYear(), m), idx, null);
+        // ---- Case 1: /del_workout id/<ID>
+        if (tok.length == 1 && tok[0].startsWith("id/")) {
+            String v = tok[0].substring(3);
+            if (!isInt(v)) throw err("Invalid ID. Usage: /del_workout id/<ID>");
+            int id = readPositiveInt(v, "ID must be a positive integer.");
+            return new DelArgs(true, now, id, null);
         }
 
-        // Otherwise: treat as exact name (literal string, including things like d/01/11/25)
-        String name = String.join(" ", tok).trim();
-        if (name.isEmpty()) {
-            throw err("Missing workout name. Usage: /del_workout <WORKOUT_NAME>");
+        // ---- Case 2: /del_workout m/<MONTH> id/<ID>
+        if (tok.length == 2 && tok[0].startsWith("m/") && tok[1].startsWith("id/")) {
+            String mStr = tok[0].substring(2).trim();
+            String idStr = tok[1].substring(3).trim();
+            if (!isInt(mStr)) throw err("Invalid month. Usage: /del_workout m/<MONTH> id/<ID>");
+            int m = Integer.parseInt(mStr);
+            validateMonth(m);
+            if (!isInt(idStr)) throw err("Invalid ID. Usage: /del_workout m/<MONTH> id/<ID>");
+            int id = readPositiveInt(idStr, "ID must be a positive integer.");
+            return new DelArgs(true, java.time.YearMonth.of(now.getYear(), m), id, null);
         }
-        return new DelArgs(false, null, null, name);
+
+        // ---- Case 3: /del_workout ym/<MONTH>/<YEAR> id/<ID>
+        if (tok.length == 2 && tok[0].startsWith("ym/") && tok[1].startsWith("id/")) {
+            String ymBody = tok[0].substring(3).trim(); // "<MONTH>/<YEAR>"
+            String[] parts = ymBody.split("/");
+            if (parts.length != 2 || !isInt(parts[0]) || !isInt(parts[1])) {
+                throw err("Invalid ym. Usage: /del_workout ym/<MONTH>/<YEAR> id/<ID>");
+            }
+            int m = Integer.parseInt(parts[0]);
+            int y = Integer.parseInt(parts[1]);
+            if (y <= 100) {
+                y += 2000; // interpret '25' as 2025
+            }
+
+            String idStr = tok[1].substring(3).trim();
+            if (!isInt(idStr)) throw err("Invalid ID. Usage: /del_workout ym/<MONTH>/<YEAR> id/<ID>");
+            int id = readPositiveInt(idStr, "ID must be a positive integer.");
+
+            return new DelArgs(true, java.time.YearMonth.of(y, m), id, null);
+        }
+
+        // Anything else is NOT accepted
+        throw err(
+                "Invalid format.\nAccepted:\n" +
+                        "  /del_workout id/<ID>\n" +
+                        "  /del_workout m/<MONTH> id/<ID>\n" +
+                        "  /del_workout ym/<MONTH>/<YEAR> id/<ID>"
+        );
     }
+
+
 
     // ==================== OWT (override workout tag) ====================
     public static final class OverrideTagArgs {

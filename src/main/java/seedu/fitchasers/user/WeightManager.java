@@ -38,135 +38,99 @@ public class WeightManager {
     }
 
     public void addWeight(String argumentStr) {
+        // 0) Fast guard for empty input
+        if (argumentStr == null || argumentStr.trim().isEmpty()) {
+            ui.showMessage("Please enter valid arguments: /add_weight w/WEIGHT [d/DD/MM/YY]");
+            return;
+        }
+
+        Double weightValue = null;
+        LocalDate entryDate = null;
+
         try {
-            // 1) If the user typed nothing
-            if (argumentStr == null || argumentStr.trim().isEmpty()) {
-                ui.showMessage("Please enter valid arguments: /add_weight w/WEIGHT [d/DD/MM/YY]");
-                return;
-            }
-
-            // 2) Delegate all parsing & optional confirmation to Parser
+            // 1) Delegate primary parsing to Parser (preferred path)
             Parser.AddWeightArgs args = parser.parseAddWeight(argumentStr.trim());
-
-            double weightValue = args.weight;
-            LocalDate entryDate = args.date;
-
-            // 3) Validate business rules
-            if (!isValidWeight(weightValue)) {
-                ui.showError("Weight must be between 20 and 500 kg.");
-                return;
-            }
-
-            if (entryDate.isAfter(LocalDate.now())) {
-                ui.showError("The date you entered (" + entryDate.format(DATE_FORMAT)
-                        + ") is in the future. Please use a valid date.");
-                return;
-            }
-
-            // 4) Create or update record
-            if (currentUser.hasWeightRecordOn(entryDate)) {
-                currentUser.updateWeightRecord(entryDate, weightValue);
-                ui.showMessage("A weight entry already exists for "
-                        + entryDate.format(DATE_FORMAT) + ". The record has been updated.");
-            } else {
-                currentUser.addWeightRecord(new WeightRecord(weightValue, entryDate));
-                ui.showMessage("Logging your weight... don't lie to me!\n"
-                        + "Recorded weight " + weightValue + " kg for " + entryDate.format(DATE_FORMAT) + ".");
-            }
-
-            // 5) Save to file
-            try {
-                new FileHandler().saveWeightList(currentUser);
-            } catch (IOException ioe) {
-                ui.showError("Failed to save weight data: " + ioe.getMessage());
-            }
+            weightValue = args.weight;
+            entryDate  = args.date;   // may be null if user omitted d/...
 
         } catch (InvalidArgumentInput ex) {
+            // Parser-level validation error (bad tokens, invalid ranges, etc.)
             ui.showError(ex.getMessage());
+            return;
+        } catch (NumberFormatException ex) {
+            // Make sure we keep the friendlier message from the old version 2
+            ui.showMessage("Invalid weight. Please enter a number (e.g., 65 or 65.5).");
+            return;
         } catch (Exception ex) {
             ui.showError("Unexpected error: " + ex.getMessage());
+            return;
+        }
+
+        // 2) If date was omitted, offer to use today; otherwise prompt repeatedly (old v2 behavior)
+        if (entryDate == null) {
+            String todayStr = LocalDate.now().format(DATE_FORMAT);
+            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? " +
+                    "(Y/N, or type /cancel to abort)");
+
+            Boolean confirmed = parser.confirmationMessage();  // null => user aborted during confirm flow
+            if (confirmed == null) {
+                return; // user aborted confirm
+            } else if (confirmed) {
+                entryDate = LocalDate.now();
+            } else {
+                // Re-prompt until a valid date or /cancel
+                while (true) {
+                    ui.showMessage("Please provide a date in format dd/MM/yy or type /cancel to abort.");
+                    String inputDate = parser.readInsideRightBubble("Enter date > ");
+                    if (inputDate == null || inputDate.equalsIgnoreCase("/cancel")) {
+                        ui.showMessage("Weight entry canceled.");
+                        return;
+                    }
+                    try {
+                        entryDate = LocalDate.parse(inputDate.trim(), DATE_FORMAT);
+                        break; // valid date captured
+                    } catch (DateTimeParseException e) {
+                        ui.showError("Invalid date format. Use dd/MM/yy (e.g., 28/10/25) or type /cancel to abort.");
+                    }
+                }
+            }
+        }
+
+        // 3) Business rules (preserve clear messages from v1 & v2)
+        if (!isValidWeight(weightValue)) {
+            ui.showError("Weight must be between 20 and 500 kg.");
+            return;
+        }
+
+        if (entryDate.isAfter(LocalDate.now())) {
+            ui.showError("The date you entered (" + entryDate.format(DATE_FORMAT)
+                    + ") is in the future. Please use a valid date.");
+            return;
+        }
+
+        // 4) Create or update record (keep both message styles)
+        if (currentUser.hasWeightRecordOn(entryDate)) {
+            // v2 had a “will be updated” message, v1 had a past-tense “has been updated”.
+            // Keep the clearer two-step: notify + then perform + success info.
+            ui.showMessage("A weight entry already exists for " + entryDate.format(DATE_FORMAT)
+                    + ". The record will be updated.");
+            currentUser.updateWeightRecord(entryDate, weightValue);
+            ui.showMessage("A weight entry already exists for "
+                    + entryDate.format(DATE_FORMAT) + ". The record has been updated.");
+        } else {
+            currentUser.addWeightRecord(new WeightRecord(weightValue, entryDate));
+            ui.showMessage("Logging your weight... don't lie to me!\n"
+                    + "Recorded weight " + weightValue + " kg for " + entryDate.format(DATE_FORMAT) + ".");
+        }
+
+        // 5) Persist to file (v1 & v2 behavior)
+        try {
+            new FileHandler().saveWeightList(currentUser);
+        } catch (IOException ioe) {
+            ui.showError("Failed to save weight data: " + ioe.getMessage());
         }
     }
-    
-//    /**
-//     * Adds a new weight entry.
-//     * Command examples:
-//     *   /add_weight w/65
-//     *   /add_weight w/65 d/25/10/25
-//     *
-//     * @param command full command string containing weight and optionally a date
-//     */
-//    public void addWeight(String command) {
-//        if (command == null || command.trim().isEmpty()) {
-//            ui.showMessage("Please enter a valid command: /add_weight w/WEIGHT [d/DATE]");
-//            return;
-//        }
-//
-//        String weightString = extractBetween(command);
-//        String dateString = extractAfter(command);
-//
-//        if (weightString.isEmpty()) {
-//            ui.showMessage("Missing weight value. Example: /add_weight w/65 d/10/10/25");
-//            return;
-//        }
-//
-//        double weightValue;
-//        try {
-//            weightValue = Double.parseDouble(weightString.trim());
-//            if (!isValidWeight(weightValue)) {
-//                return; // error message handled in helper
-//            }
-//        } catch (NumberFormatException e) {
-//            ui.showMessage("Invalid weight. Please enter a number (e.g., 65 or 65.5).");
-//            return;
-//        }
-//
-//        if (dateString.isEmpty()) {
-//            String todayStr = LocalDate.now().format(DATE_FORMAT);
-//            ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? (Y/N)");
-//            if (parser.confirmationMessage()) {
-//                dateString = todayStr;
-//            } else {
-//                ui.showMessage("Please provide a date in format dd/MM/yy.");
-//                return;
-//            }
-//        }
-//
-//        LocalDate entryDate;
-//        try {
-//            entryDate = LocalDate.parse(dateString.trim(), DATE_FORMAT);
-//        } catch (DateTimeParseException e) {
-//            ui.showMessage("Invalid date format. Use dd/MM/yy (e.g., 28/10/25).");
-//            return;
-//        }
-//
-//        // Check if date is in the future
-//        if (entryDate.isAfter(LocalDate.now())) {
-//            ui.showMessage("The date you entered (" + entryDate.format(DATE_FORMAT)
-//                    + ") is in the future. Please use a valid date.");
-//            return;
-//        }
-//
-//        // If record for the same date already exists, update and remove duplicates
-//        if (currentUser.hasWeightRecordOn(entryDate)) {
-//            ui.showMessage("A weight entry already exists for " + entryDate.format(DATE_FORMAT)
-//                    + ". The record will be updated.");
-//            currentUser.updateWeightRecord(entryDate, weightValue);
-//        } else {
-//            WeightRecord weightRecord = new WeightRecord(weightValue, entryDate);
-//            currentUser.addWeightRecord(weightRecord);
-//        }
-//
-//        ui.showMessage("Logging your weight... don't lie to me!\n"
-//                        + "Recorded weight " + weightValue + " kg for " + entryDate.format(DATE_FORMAT) + ".");
-//
-//        try {
-//            FileHandler fileHandler = new FileHandler();
-//            fileHandler.saveWeightList(currentUser);
-//        } catch (IOException e) {
-//            ui.showMessage("Failed to save weight data: " + e.getMessage());
-//        }
-//    }
+
 
     /**
      * Displays all weight records for the current user.
@@ -218,6 +182,16 @@ public class WeightManager {
 //    }
 
     public boolean isValidWeight(double weight) {
-        return weight > 0 && weight >= 20 && weight <= 500;
+        if (weight <= 0) {
+            ui.showMessage("Weight must be a positive number.");
+            return false;
+        }
+
+        if (weight < 20 || weight > 500) {
+            ui.showMessage("Weight must be between 20 kg and 500 kg.");
+            return false;
+        }
+
+        return true;
     }
 }

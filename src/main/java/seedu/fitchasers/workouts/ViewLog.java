@@ -87,11 +87,16 @@ public class ViewLog {
         }
 
         int totalPages = computeTotalPages(displayList.size(), pageSize);
-        //int current = ensureValidPage(p.extractedArg);
-        int current = clampPage(parsed.page, totalPages);
+        int current = parsed.page;
+        if (current < 1) current = 1;
+        if (current > totalPages) {
+            ui.showError("Only " + totalPages + " page" + (totalPages == 1 ? "" : "s")
+                    + " for " + parsed.ym + ". Try: vl pg/1");
+            return; // stop rendering
+        }
 
         int start = (current - 1) * pageSize;
-        int end = Math.min(start + pageSize, displayList.size());
+        int end   = Math.min(start + pageSize, displayList.size());
 
         StringBuilder buf = new StringBuilder();
         buf.append(String.format("Workouts for %s (%d total) — Page %d/%d%n",
@@ -117,7 +122,7 @@ public class ViewLog {
         }
 
         //buf.append("Tip: /view_log -m 10 2 (next extractedArg Oct), /view_log --search run, /open <ID>.");
-        buf.append("Tip: /view_log -m 10 2 (next page for Oct), /view_log --search run, /open <ID>.");
+        buf.append("Tip: vl pg/2 (next page), vl m/10, vl ym/10/24, /open id/<ID>.");
         ui.showMessage(buf.toString());
     }
 
@@ -131,7 +136,7 @@ public class ViewLog {
         ).thenComparing(
                 Workout::getWorkoutStartDateTime,
                 Comparator.nullsLast(Comparator.naturalOrder())
-        ));  // ← NO .reversed()
+        ));
 
         this.lastFilteredListofWorkout = sorted;  // Store the sorted list
         this.lastRenderMonth = p;                  // Keep cache + month in sync
@@ -369,13 +374,6 @@ public class ViewLog {
                 throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
             }
         ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(oneBasedIndex - 1));
-    }
-
-    // internal helper for page clamping
-    private int clampPage(int requested, int totalPages) {
-        if (totalPages <= 0) return 1;
-        if (requested < MINIMUM_PAGE_SIZE) return MINIMUM_PAGE_SIZE;
-        return Math.min(requested, totalPages);
     }
 }
 

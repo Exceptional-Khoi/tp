@@ -146,7 +146,7 @@ public class UI {
         /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
                                                    e.g. /add_weight w/75 d/30/10/25
         /view_weight (vw)                         - View your recorded weights
-        /set_goal (sg) g/GOAL_WEIGHT              - Set a goal weight to track progress
+        /set_goal (sg) w/GOAL_WEIGHT              - Set a goal weight to track progress
                                                    e.g. /set_goal g/70.0
         /view_goal (vg)                           - View your current goal and progress
         
@@ -161,14 +161,24 @@ public class UI {
                                                    e.g. /end_workout d/30/10/25 t/1500
         
         ~~~ WORKOUT LOG MANAGEMENT ~~~
-        /view_log (vl)                            - View your workout history
-        /open (o) INDEX                           - Open detailed view of a workout
-                                                   e.g. /open 1
-        /del_workout WORKOUT_NAME or /del_workout d/DATE
-                                                   - Delete a workout by name or date
-                                                   e.g. /del_workout Chest Day
-                                                   e.g. /del_workout d/30/10/25
+        vl                                        - View your workout history (this month, page 1)
+        vl pg/PAGE                                - Go to a specific page
+        vl m/MONTH                                - View a specific month in the current year (e.g., vl m/11)
+        vl ym/MONTH/YEAR                          - View a specific month/year (YEAR = YY or YYYY, e.g., vl ym/11/2025 or vl ym/11/25)
         
+        /open (o) id/INDEX                        - Open detailed view of a workout
+                                                   e.g. /open 1
+
+        /delete_workout (dw) id/INDEX             - Delete a workout (current month)
+                                                   e.g. /delete_workout id/8
+
+        /delete_workout (dw) m/MM id/INDEX        - Delete from a specific month of current year
+                                                   e.g. /delete_workout m/11 id/3
+
+        /delete_workout (dw) ym/MM/YY id/INDEX    - Delete from a specific year+month (MM then YY)
+                                                   e.g. /delete_workout ym/11/25 id/1
+        
+    
         ~~~ TAGGING SYSTEM ~~~
         /add_modality_tag (amot) m/MODALITY k/KEYWORD
                                                    - Add a keyword for a workout modality

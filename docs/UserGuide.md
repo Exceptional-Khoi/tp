@@ -112,16 +112,16 @@ Alternative: `vw`
 ### Setting a goal weight: `/set_goal`
 Lets you specify a target weight to monitor your progress.
 
-Format: `/set_goal g/GOAL_WEIGHT`
+Format: `/set_goal w/TARGET_WEIGHT`
 
-Rules: Same as `WEIGHT` parameter rules above.
+- `TARGET_WEIGHT` is your goal weight. Rules: Same as `WEIGHT` parameter rules above.
 
 **Note:** When you set a goal, FitChaser automatically uses your latest recorded weight (the most recent `/add_weight` entry) as your starting weight.
 This ensures that your progress is calculated accurately based on your most up-to-date data.
 
 Example:
 
-* `/set_goal g/70.0`
+* `/set_goal w/70.0`
 
 Alternative: `sg`
 
@@ -321,17 +321,19 @@ Examples:
 
 Alternative: `o`
 
-### Deleting Workouts: `/del_workout`
-Deletes the specified workout(s) from your workout history by name or by date.
+### Deleting Workouts: `/delete_workout`
+Deletes the specified workout from your workout history by its display ID.
 
-Format: `/del_workout WORKOUT_NAME` or `/del_workout d/DATE`
+Format: `/delete_workout id/INDEX`
 
-* `WORKOUT_NAME` is the name of your workout. Rules: Same as `NAME` parameter rules above.
-* `DATE` is in `DD/MM/YY` format. Rules: Same as `DATE` parameter rules above.
+* `INDEX` is the positive ID number of the workout you want to delete, as shown in `/view_log`.
 
 Examples:
-* `/del_workout Chest Day`
-* `/del_workout d/30/10/25`
+* `/delete_workout id/8`
+* `/delete_workout id/2`
+
+
+* Alternative: `dw`
 
 ### Exiting the program: `/exit`
 Exits FitChasers and saves all your data.
@@ -394,8 +396,7 @@ and exercise names. You can customize keywords using /add_modality_tag and /add_
 | **Open Workout**     | `/open INDEX`<br>e.g., `/open 1`                                                                |
 | **Override Tag**     | `/override_workout_tag id/ID newTag/TAG`<br>e.g., `/override_workout_tag id/1 newTag/strength`  |
 | **Rename**           | `/rename n/NAME`<br>e.g., `/rename n/John Doe`                                                  |
-| **Set Goal**         | `/set_goal g/GOAL_WEIGHT`<br>e.g., `/set_goal g/70`                                             |
+| **Set Goal**         | `/set_goal w/TARGET_WEIGHT`<br>e.g., `/set_goal w/70`                                           |
 | **View Goal**        | `/view_goal` or `vg`                                                                            |
 | **View Log**         | `/view_log`<br>e.g., `/view_log`                                                                |
 | **View Weight**      | `/view_weight` or `vw`                                                                          |
-
