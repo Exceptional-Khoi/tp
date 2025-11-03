@@ -411,7 +411,7 @@ public class UI {
             sb.append("\nExercises:\n");
             int i = 1;
             for (Exercise e : exercises) {
-                sb.append(String.format("  %d. %s%n ", i++, e.toString()));
+                sb.append(String.format("  %d. %s%n", i++, e.toString()));
 
                 // Detailed per-set reps:
                 ArrayList<Integer> sets = e.getSets();

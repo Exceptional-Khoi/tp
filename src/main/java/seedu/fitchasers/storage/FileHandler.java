@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -336,11 +337,38 @@ public class FileHandler {
         w.setAutoTags(autoTags);
         w.setManualTags(manualTags);
         // Add sets
+        // 1) Sort by name (case-insensitive), keeping null/blank names last.
+        setLines.sort(Comparator.comparing((SetLine s) -> s.name() == null ? "" : s.name().toLowerCase()));
+
+        // 2) Collapse rows with same name into one Exercise, adding sets.
+        Exercise current = null;
+        String lastName = null;
+
         for (SetLine s : setLines) {
-            final String n = s.name == null ? "" : s.name;
-            final Integer r = s.reps == null ? 0 : s.reps;
-            w.addExercise(new Exercise(n, r));
+            final String exerciseName = (s.name() == null) ? "" : s.name().trim();
+            final int reps = (s.reps() == null) ? 0 : s.reps();
+
+            // skip rows with no exerciseName at all (optional; remove if you want empty-exerciseName exercises)
+            if (exerciseName.isEmpty()){
+                continue;
+            }
+
+            if (lastName != null && lastName.equalsIgnoreCase(exerciseName) && current != null) {
+                current.addSet(reps);
+            } else {
+                // new exercise exerciseName → flush previous, start new
+                if (current != null) {
+                    w.addExercise(current);
+                }
+                current = new Exercise(exerciseName, reps);
+                lastName = exerciseName;
+            }
         }
+        // 3) Flush the last one
+        if (current != null) {
+            w.addExercise(current);
+        }
+
         return w;
     }
 
