@@ -15,77 +15,56 @@ hide circle
 
 ' ===== Types used by UI =====
 class Scanner
+
 package "seedu.fitchasers.workouts" as pkg_workouts #DDDDFF {
   class Exercise {
     - name: String
     - sets: ArrayList<Integer>
     --
     + addSet(reps: int): void
-    + getName(): String
-    + getNumSets(): int
     + getSets(): ArrayList<Integer>
-    + toDetailedString(): String
     + toString(): String
   }
 
   class Workout {
-    - ui: UI {static}
-    - exercises: ArrayList<Exercise>
     - workoutName: String
     - duration: int
-    - workoutStartDateTime: LocalDateTime
-    - workoutEndDateTime: LocalDateTime
-    - currentExercise: Exercise
-    - manualTags: Set<String>
-    - autoTags: Set<String>
+    - exercises: ArrayList<Exercise>
     --
-    + getManualTags(): Set<String>
-    + getAutoTags(): Set<String>
-    + setManualTags(tags: Set<String>): void
-    + setAutoTags(tags: Set<String>): void
-    + getAllTags(): Set<String>
-    + getConflictingTags(): Set<String>
-    + getWorkoutName(): String
-    + setWorkoutName(workoutName: String): void
-    + getDuration(): int
-    + setDuration(duration: int): void
     + addExercise(exercise: Exercise): void
     + getExercises(): ArrayList<Exercise>
-    + getCurrentExercise(): Exercise
-    + getWorkoutStartDateTime(): LocalDateTime
-    + setWorkoutStartDateTime(dt: LocalDateTime): void
-    + getWorkoutEndDateTime(): LocalDateTime
-    + setWorkoutEndDateTime(dt: LocalDateTime): void
     + getWorkoutDateString(): String
-    + calculateDuration(): int
-    + toString(): String
-    --
-    - formatWorkoutDate(dateTime: LocalDateTime): String {static}
   }
 }
 
-' ===== UI class  =====
+package "seedu.fitchasers.user" as pkg_user #DDFFDD {
+  class WeightManager {
+    - currentUser: Person
+    --
+    + addWeight(command: String): void
+    + viewWeights(): void
+    + isValidWeight(weight: double): boolean
+  }
+}
+
+' ===== UI class (trimmed to essentials) =====
 class UI {
   - scanner: Scanner
   --
-  + printLeftHeader(): void
   + readCommand(): String
-  + enterSelection(): String
-  + enterName(): String
-  + enterWeight(): double
   + showMessage(message: String): void
   + showError(error: String): void
-  + showGreeting(): void
-  + showQuickStartTutorial(): void
-  + showExitMessage(): void
   + showHelp(): void
-  + confirmationMessage(): boolean
   + displayDetailsOfWorkout(workout: Workout): void
-  + getDaySuffix(day: int): String
+  + readInsideRightBubble(prompt: String): String
+  + confirmationMessageWithCancel(): Boolean
 }
 
 ' ===== Relationships =====
 UI *-- Scanner
 UI ..> Workout : uses
 UI ..> Exercise : uses
+UI ..> WeightManager : uses
+
+WeightManager ..> UI : uses
 @enduml
