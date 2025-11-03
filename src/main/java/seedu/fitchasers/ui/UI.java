@@ -357,7 +357,9 @@ public class UI {
                 showHelp();
                 continue;
             }
+            default -> {}
             }
+
             if (allowCancel && lower.equals("/cancel")) {
                 return null;
             }
