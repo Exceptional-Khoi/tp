@@ -207,7 +207,8 @@ public class WorkoutManager {
 
         if (currentWorkout != null) {
             ui.showMessage("You currently have an active workout: '" + currentWorkout.getWorkoutName() + "'.");
-            ui.showMessage("Please end the active workout first with: /end_workout d/DD/MM/YY t/HHmm");
+            ui.showMessage("Please end the active workout first with: /end_workout d/DD/MM/YY t/HHmm" +
+                    "\n Alternatively you may just enter 'ew' or 'ew t/HHmm' (Will prompt current date)");
             throw new InvalidArgumentInput("");
         }
 
@@ -356,7 +357,8 @@ public class WorkoutManager {
         if (currentWorkout != null) {
             ui.showMessage("You currently have an active workout: '"
                     + currentWorkout.getWorkoutName() + "'.");
-            ui.showMessage("Please end the active workout first with: /end_workout d/DD/MM/YY t/HHmm");
+            ui.showMessage("Please end the active workout first with: /end_workout d/DD/MM/YY t/HHmm" +
+                    "\n Alternatively you may just enter 'ew' or 'ew t/HHmm' (Will prompt current date)");
             throw new InvalidArgumentInput("");
         }
 
@@ -834,7 +836,8 @@ public class WorkoutManager {
             return;
         }
 
-        final String usage = "Please enter: /end_workout d/DD/MM/YY t/HHmm";
+        final String usage = "Please enter: /end_workout d/DD/MM/YY t/HHmm" +
+                "\n Alternatively you may just enter 'ew' or 'ew t/HHmm' (Will prompt current date)";
         final String args = (initialArgs == null) ? "" : initialArgs.trim();
 
         // allow 0 or 1 of each; reject duplicates
