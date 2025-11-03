@@ -656,7 +656,8 @@ public class FitChasers {
             isWeightFileCorrupted = true;
             ui.showError("CRITICAL ERROR: Your weight.txt file is corrupted or has been tampered with.");
             ui.showError(e.getMessage());
-            ui.showMessage("Please fix the file manually or type '/clear_weights' to delete all weight data and start fresh.");
+            ui.showMessage("Please fix the file manually or type '/clear_weights' to delete all weight " +
+                    "data and start fresh.");
         } catch (IOException e) {
             ui.showError(e.getMessage());
         } catch (FileNonexistent e) {
