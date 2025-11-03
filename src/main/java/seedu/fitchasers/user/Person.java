@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-//@@bennyy117
+//@@author bennyy117
 /**
  * Represents a person using the FitChasers app.
  * Stores the person's name and their weight history, maintaining chronological order.
@@ -306,7 +306,7 @@ public class Person {
      * If multiple records exist for the same date, only the first is kept,
      * the rest are removed. The updated record is re-inserted to maintain order.
      *
-     * @param date the date to update
+     * @param date      the date to update
      * @param newWeight the new weight value
      */
     public void updateWeightRecord(LocalDate date, double newWeight) {

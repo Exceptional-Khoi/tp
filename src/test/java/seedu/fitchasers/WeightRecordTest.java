@@ -9,12 +9,11 @@ import java.time.format.DateTimeFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+//@@author Exceptional-Khoi
 /**
  * Unit tests for the {@link WeightRecord} class.
  * These tests verify that weight and date values are stored and formatted correctly.
  */
-
-//@@author Exceptional-Khoi
 public class WeightRecordTest {
 
     /**

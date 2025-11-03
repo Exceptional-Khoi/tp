@@ -5,6 +5,8 @@ import seedu.fitchasers.workouts.Workout;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
+
+//@@author Kart04
 /**
  * Default implementation of the Tagger interface for automatic workout classification.
  * <p>
@@ -21,7 +23,6 @@ import java.util.Set;
  * @see Modality
  * @see MuscleGroup
  */
-//@@author Kart04
 public class DefaultTagger implements Tagger {
     private final EnumMap<Modality, Set<String>> modalityKeywords = new EnumMap<>(Modality.class);
     private final EnumMap<MuscleGroup, Set<String>> muscleKeywords = new EnumMap<>(MuscleGroup.class);
@@ -95,9 +96,28 @@ public class DefaultTagger implements Tagger {
         return tags;
     }
 
+    /**
+     * Adds a keyword associated with a given workout modality.
+     * <p>
+     * If the modality does not already exist in the map, a new entry is created.
+     * The keyword is stored in lowercase to ensure case-insensitive matching.
+     *
+     * @param modality The {@code Modality} to which the keyword belongs.
+     * @param keyword The keyword describing the modality.
+     */
     public void addModalityKeyword(Modality modality, String keyword) {
         modalityKeywords.computeIfAbsent(modality, k -> new LinkedHashSet<>()).add(keyword.toLowerCase());
     }
+
+    /**
+     * Adds a keyword associated with a given muscle group.
+     * <p>
+     * If the muscle group does not already exist in the map, a new entry is created.
+     * The keyword is converted to lowercase to maintain case-insensitive matching.
+     *
+     * @param muscle The {@code MuscleGroup} to which the keyword belongs.
+     * @param keyword The keyword describing the muscle group.
+     */
     public void addMuscleKeyword(MuscleGroup muscle, String keyword) {
         muscleKeywords.computeIfAbsent(muscle, k -> new LinkedHashSet<>()).add(keyword.toLowerCase());
     }

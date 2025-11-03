@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-
+//@@author nitin19011
 /**
  * Main entry point for the FitChasers application.
  * <p>
@@ -51,6 +51,18 @@ public class FitChasers {
     private static WeightManager weightManager;
     private static GoalWeightTracker goalTracker;
 
+    /**
+     * The main entry point for the FitChasers application.
+     * <p>
+     * Initializes core components, displays the greeting interface, and continuously
+     * listens for user input commands until termination. Commands are parsed and executed
+     * according to their respective handlers (e.g., workouts, weight tracking, goals, gyms).
+     * Invalid or malformed commands trigger user-friendly error messages.
+     *
+     * @param args The command-line arguments (not used in this application).
+     * @throws IOException If an I/O error occurs during file operations.
+     * @throws FileNonexistent If a required data file is missing or cannot be accessed.
+     */
     public static void main(String[] args) throws IOException, FileNonexistent {
         ui.printLeftHeader();
         initVariables();
@@ -130,37 +142,32 @@ public class FitChasers {
                     // Format: /add_exercise n/NAME r/REPS
                     workoutManager.addExercise(argumentStr);
                     break;
-                //@@author Kart04
+
                 case "/add_modality_tag":
-                case "amot": {
+                case "amot":
                     amotMethod();
                     break;
-                }
 
                 case "/add_muscle_tag":
-                case "amt": {
+                case "amt":
                     amtMethod();
                     break;
-                }
 
                 case "/gym_where":
-                case "gw": {
+                case "gw":
                     gwMethod();
                     break;
-                }
 
                 case "/gym_page":
-                case "gp": {
+                case "gp":
                     gpMethod();
                     break;
-                }
 
                 case "/override_workout_tag":
-                case "owt": {
+                case "owt":
                     owtMethod();
                     break;
-                }
-                //@@author
+
                 case "/add_set":
                 case "as":
                     // Format: /add_set r/REPS
@@ -186,12 +193,12 @@ public class FitChasers {
                 case "o":
                     viewLog.openByIndex(Integer.parseInt(argumentStr));
                     break;
-                //@@author Kart04
+
                 case "/delete_workout":
                 case "dw":
                     workoutManager.deleteParser(argumentStr);
                     break;
-                //@@author
+
                 case "/exit":
                 case "e":
                     exitMethod();
@@ -218,6 +225,7 @@ public class FitChasers {
         isRunning = false;
     }
 
+    //@@author bennyy117
     private static void owtMethod() throws FileNonexistent, IOException {
         // Parse parameters
         String[] params = argumentStr.split("\\s+");
@@ -282,8 +290,6 @@ public class FitChasers {
 
             workoutManager.overrideWorkoutTags(workout, newTag);
 
-
-
             try {
                 fileHandler.saveMonthList(currentMonth, workoutManager.getWorkouts());
 
@@ -310,7 +316,7 @@ public class FitChasers {
         }
     }
 
-
+    //@@author Exceptional-Khoi
     private static void gpMethod() {
         try {
             String trimmedArg = argumentStr.trim();
@@ -432,7 +438,7 @@ public class FitChasers {
         }
     }
 
-
+    //@@author Kart04
     private static void amotMethod() {
         String[] params = argumentStr.split("\\s+");
         String mod = null;

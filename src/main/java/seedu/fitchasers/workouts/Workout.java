@@ -10,9 +10,14 @@ import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Set;
 
-//@@author ZhongBaode
+//@@author Exceptional-Khoi
 /**
- * Represents a workout session containing a name, duration, start/end times, and a list of exercises.
+ * Represents a workout session consisting of one or more exercises.
+ * <p>
+ * Each workout has a name, start and end times, duration, and associated tags.
+ * Tags can be added manually by the user or generated automatically based on
+ * workout content. The class also provides methods for managing exercises and
+ * computing workout duration.
  */
 public class Workout {
     private static final UI ui = new UI();
@@ -25,16 +30,36 @@ public class Workout {
     private Set<String> manualTags = new LinkedHashSet<>(); // tags the user edits manually
     private Set<String> autoTags = new LinkedHashSet<>();
 
+    /**
+     * Constructs a {@code Workout} with the specified name and duration.
+     *
+     * @param workoutName The name of the workout.
+     * @param duration The duration of the workout in minutes.
+     */
     public Workout(String workoutName, int duration) {
         this.workoutName = workoutName;
         this.duration = duration;
     }
 
+    /**
+     * Constructs a {@code Workout} with the specified name and start time.
+     *
+     * @param workoutName The name of the workout.
+     * @param workoutStartDateTime The start time of the workout.
+     */
     public Workout(String workoutName, LocalDateTime workoutStartDateTime) {
         this.workoutName = workoutName;
         this.workoutStartDateTime = workoutStartDateTime;
     }
 
+    /**
+     * Constructs a {@code Workout} with the specified name, start time, and end time.
+     * Automatically calculates the duration based on the time difference.
+     *
+     * @param workoutName The name of the workout.
+     * @param workoutStartDateTime The start time of the workout.
+     * @param workoutEndDateTime The end time of the workout.
+     */
     public Workout(String workoutName, LocalDateTime workoutStartDateTime, LocalDateTime workoutEndDateTime) {
         this.workoutName = workoutName;
         this.workoutStartDateTime = workoutStartDateTime;
@@ -51,6 +76,7 @@ public class Workout {
     public Set<String> getManualTags() {
         return new LinkedHashSet<>(manualTags);
     }
+
     /**
      * Returns the set of auto tags.
      * Auto tags are those generated automatically based on workout content or keywords.
@@ -60,6 +86,7 @@ public class Workout {
     public Set<String> getAutoTags() {
         return autoTags;
     }
+
     /**
      * Sets the manual tags to a defensive copy of the given set.
      * This replaces any existing manual tags with the provided set.
@@ -69,6 +96,7 @@ public class Workout {
     public void setManualTags(Set<String> tags) {
         this.manualTags = new LinkedHashSet<>(tags);
     }
+
     /**
      * Sets the auto tags to a defensive copy of the given set.
      * This replaces any existing auto tags with the provided set.
@@ -82,17 +110,15 @@ public class Workout {
     /**
      * Returns a set containing the union of manual tags
      * and automatically generated (auto) tags for the workout.
-     *
+     * <p>
      * Manual tags represent user-edited tags, while auto tags
      * are suggested based on workout content or keywords.
      *
      * @return a new {@code Set<String>} containing all manual and auto tags
      */
     public Set<String> getAllTags() {
-        //return new LinkedHashSet<>(manualTags);
         Set<String> out = new LinkedHashSet<>(manualTags);
 
-        // Only add autoTags that DON'T conflict with manualTags
         for (String autoTag : autoTags) {
             if (!manualTags.contains(autoTag)) {
                 out.add(autoTag);
@@ -101,6 +127,11 @@ public class Workout {
         return out;
     }
 
+    /**
+     * Returns the set of tags that appear in both manual and auto tag lists.
+     *
+     * @return A {@code Set<String>} containing conflicting tags.
+     */
     public Set<String> getConflictingTags() {
         Set<String> conflicts = new LinkedHashSet<>();
         for (String manualTag : manualTags) {
@@ -111,18 +142,39 @@ public class Workout {
         return conflicts;
     }
 
+    /**
+     * Returns the workout name.
+     *
+     * @return The workout name.
+     */
     public String getWorkoutName() {
         return workoutName;
     }
 
+    /**
+     * Sets the workout name.
+     *
+     * @param workoutName The new name for the workout.
+     */
     public void setWorkoutName(String workoutName) {
         this.workoutName = workoutName;
     }
 
+    //@@author bennyy117
+    /**
+     * Returns the workout duration in minutes.
+     *
+     * @return The duration of the workout.
+     */
     public int getDuration() {
         return duration;
     }
 
+    /**
+     * Sets the workout duration in minutes.
+     *
+     * @param duration The duration to set.
+     */
     public void setDuration(int duration) {
         this.duration = duration;
     }
@@ -155,19 +207,42 @@ public class Workout {
         return currentExercise;
     }
 
+    /**
+     * Returns the start date and time of this workout.
+     *
+     * @return The workout start time.
+     */
     public LocalDateTime getWorkoutStartDateTime() {
         return workoutStartDateTime;
     }
 
+    /**
+     * Sets the start date and time of this workout.
+     *
+     * @param workoutStartDateTime The start time to set.
+     */
     public void setWorkoutStartDateTime(LocalDateTime workoutStartDateTime) {
         this.workoutStartDateTime = workoutStartDateTime;
     }
+
+    /**
+     * Returns the end date and time of this workout.
+     *
+     * @return The workout end time.
+     */
     public LocalDateTime getWorkoutEndDateTime() {
         return workoutEndDateTime;
     }
-    public String getWorkoutDateString(){
+
+    /**
+     * Returns the formatted workout date string, e.g. "Monday 30th of June".
+     *
+     * @return The formatted date string.
+     */
+    public String getWorkoutDateString() {
         return formatWorkoutDate(workoutStartDateTime);
     }
+
     /**
      * Returns a formatted date string such as "Monday 30th of June"
      *
@@ -189,12 +264,21 @@ public class Workout {
         return String.format("%s %d%s of %s", dayOfWeek, dayOfMonth, suffix, month);
     }
 
-
-
+    /**
+     * Sets the end date and time of this workout.
+     *
+     * @param workoutEndDateTime The end time to set.
+     */
     public void setWorkoutEndDateTime(LocalDateTime workoutEndDateTime) {
         this.workoutEndDateTime = workoutEndDateTime;
     }
 
+    /**
+     * Calculates and returns the workout duration in minutes
+     * based on the start and end times.
+     *
+     * @return The duration in minutes, or 0 if the times are incomplete.
+     */
     public int calculateDuration() {
         if (workoutStartDateTime != null && workoutEndDateTime != null) {
             return (int) Duration.between(workoutStartDateTime, workoutEndDateTime).toMinutes();
@@ -202,6 +286,11 @@ public class Workout {
         return 0;
     }
 
+    /**
+     * Returns a summary string describing the workout.
+     *
+     * @return A string representation of the workout.
+     */
     @Override
     public String toString() {
         return "Workout Name: " + workoutName + ", Duration: " + duration + " has been created and saved.";
