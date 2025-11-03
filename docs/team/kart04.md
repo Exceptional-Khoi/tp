@@ -1,8 +1,8 @@
 # Karthik - Project Portfolio Page
 
 ## Overview
-FitChasers is a desktop fitness tracking application that empowers users to log, organize, and analyze their 
-workout sessions through an intuitive command-line interface. It is written in Java and incorporates approximately 
+FitChasers is a desktop fitness tracking application that empowers users to log, organize, and analyze their
+workout sessions through an intuitive command-line interface. It is written in Java and incorporates approximately
 4 kLoC of well-structured code.
 
 ## Summary of Contributions
@@ -13,26 +13,22 @@ Given below are my contributions to the project:
 
 
 ### New Feature: Intelligent Workout Tagging System with Manual & Auto Tags
-  * Automatically generates tags for workouts using an enum-based keyword matching engine (`DefaultTagger`) 
-    that categorizes by modality (cardio, strength) and muscle groups 
-    (legs, chest, back, shoulders, arms, core, posterior-chain).
-  * Allows users to manually override tags using `/override_workout_tag id/[ID] newTag/[TAG]`
-  * Maintains separation between auto-tags and manual tags to prevent user-defined tags 
-    from being overwritten by automatic suggestions.
-  * Implements dynamic keyword addition through `/add_modality_tag` and `/add_muscle_tag` commands
+* Automatically generates workout tags using an enum-based keyword matching engine for modalities and muscle groups.
+* Allows users to manually override tags using `/override_workout_tag id/[ID] newTag/[TAG]`
+* Maintains separation between auto-tags and manual tags
+* Implements dynamic keyword addition through `/add_modality_tag` and `/add_muscle_tag` commands
 
 Justification:
-This feature significantly improves user experience by organizing workouts intelligently without requiring manual 
-categorization for every session. Users can quickly filter, search, and analyze workout history by type and 
-muscle group, making progress tracking and workout planning more intuitive.
+This feature greatly enhances user experience by intelligently organizing workouts, enabling quick filtering, searching
+and analysis by type and muscle group for better progress tracking and planning.
 
 ### New Feature: Gym Localization & Equipment Recommendation System
-  * Suggests NUS gyms (UTown, SRC, USC) that have equipment matching user exercises using `/gym_where n/[EXERCISE]`
-  * Displays equipment tables for specific gyms using `/gym_page p/[PAGE_NUMBER]`
-  * Maps exercise names to body part tags, then matches against available gym equipment
+* Suggests NUS gyms (UTown, SRC, USC) that have equipment matching user exercises using `/gym_where n/[EXERCISE]`
+* Displays equipment tables for specific gyms using `/gym_page p/[PAGE_NUMBER]`
+* Maps exercise names to body part tags, then matches against available gym equipment
 
 Justification:
-Helps NUS students find the most convenient gym location for their planned workouts, reducing friction 
+Helps NUS students find the most convenient gym location for their planned workouts, reducing friction
 in their fitness routine and promoting consistent training.
 
 ### New_feature: Enhanced Workout Session Management
@@ -43,55 +39,42 @@ in their fitness routine and promoting consistent training.
 Justification:
 Reduces user errors by allowing flexible input while maintaining data integrity through validation.
 
-## Documentation 
+## Documentation
 ### User Guide Contributions
-
-Primarily responsible for drafting and maintaining the core sections of the FitChasers User Guide, including feature 
-explanations, command formats, FAQs and example scenarios. I also coordinated with my teammates to review, update
-and finalize the documentation, ensuring clarity and completeness. Their suggestions and edits helped strengthen 
-the guide, and the published version is the result of our joint efforts.
+Primarily drafted and maintained core FitChasers User Guide sections, coordinating with teammates to review and finalize
+clear, comprehensive documentation.
 
 ## Developer Guide Contribution
 ### WorkoutManager Component Documentation:
-Added and documented the architecture, responsibilities, and API of the WorkoutManager component, 
-including UML class diagram and explanation of its role as the controller for all workout-related features 
-(workout creation, exercise management, tagging, data persistence, deletion, and display).
+Added and documented the WorkoutManager architecture, responsibilities, and API, including UML class diagram and its
+role as the controller for workout features like creation, management, tagging, persistence, deletion, and display.
 
 ### Tagging System Implementation Details:
-Documented in detail the underlying mechanics of the auto-tagging and manual tag override process. Included clear 
-“Manual Tag Method” and “Overriding Workout Tags” subsections, with step-by-step breakdowns and code references. 
-Added sequence diagrams for:
+* Documented auto-tagging and manual override processes with step-by-step breakdowns including sequence diagrams to illustrate workflow.
 * Tag generation and updating when workouts are created or edited.
-
 * Tag override workflow via /override_workout_tag, from command parsing to tag set manipulation.
 
 ### Contributions to Core Modules
 #### Workout.java
-* Contributor of the Workout class, which models individual workout sessions, encapsulates all properties, implements 
-  tag logic and supports serialisation for persistence.
+* Contributor to the Workout class that models workout sessions, manages tags, and supports data persistence.
 * Implemented methods for workout lifecycle (creation, ending, editing, deletion).
 * Integrated tag management with auto and manual tags, as well as duration and date validation logic.
 
-#### WorkoutManager.java 
-* Contributor to the WorkoutManager class, the controller responsible for managing lists of workouts, handling file 
-  storage/retrieval and coordinating logic for create/update/delete/search commands.
+#### WorkoutManager.java
+* Contributor to the WorkoutManager class, which manages workouts, file I/O, and core command logic.
 * Designed workout loading/saving using FileHandler.
 * Integrated tagging engine and ensured support for both batch and single workout operations.
-* Authored/maintained key methods for filtering, sorting, and indexing workout logs.
 
 #### Contributed to the DeleteWorkout feature
-* Helped implement the class and workflow that removes workouts from the user's log, handling user confirmation, 
+* Helped implement the class and workflow that removes workouts from the user's log, handling user confirmation,
   storage updates, and UI coordination.
 
 ### Design Considerations and Alternatives:
-Described the decision process for storing tags in separate collections (autoTags, manualTags) vs. alternative 
-single-set approaches with meta-flags. Outlined the trade-offs for each method, and justified the selected approach 
-(clarity, extensibility, and debugging advantages for our CLI-based context).
-Provided rationale for using substring-matching instead of full NLP, and compared their pros/cons 
-(see “Keyword Matching Strategy”).
+Chose separate collections for auto/manual tags (over a meta-flag set) for greater clarity and extensibility. Used
+substring matching (not full NLP) for its simplicity and efficiency in our CLI context.
 
 ### Future Enhancements Section:
-Wrote “Future Enhancements” discussing planned extensions for tag-based log filtering and statistics, with example 
+Wrote “Future Enhancements” discussing planned extensions for tag-based log filtering and statistics, with example
 commands/output and Java stream-based implementation plan.
 
 ### Diagrams:
@@ -106,5 +89,5 @@ commands/output and Java stream-based implementation plan.
 
 ## Review/mentoring contributions
 * Pull requests reviewed (with non-trivial review comments):#256, #164, #133, #100, #98, #87, #60, #57. #272
-* Pull request created: #7, #32, #42, $58, #82, #106, #108, #112, #127, #142, #151, #165, #180, #195, #204, #257, #270, 
+* Pull request created: #7, #32, #42, $58, #82, #106, #108, #112, #127, #142, #151, #165, #180, #195, #204, #257, #270,
   #270, #275
