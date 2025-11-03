@@ -83,7 +83,7 @@
 /create_workout n/run d/27/11/25 t/0615
 /add_exercise n/warmup jog r/1
 /add_exercise n/5k pace r/1
-/end_workout d/27/10/25 t/0710
+/end_workout d/27/11/25 t/0710
 
 /create_workout n/full body d/27/11/25 t/1900
 /add_exercise n/push-up r/20
@@ -100,7 +100,7 @@
 /add_exercise n/sit-up r/30
 /add_exercise n/leg raise r/20
 /add_exercise n/plank r/3
-/end_workout d/28/10/25 t/2050
+/end_workout d/28/11/25 t/2050
 
 /create_workout n/boxing d/29/11/25 t/1800
 /add_exercise n/shadowboxing r/5
