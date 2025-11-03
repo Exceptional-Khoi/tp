@@ -31,7 +31,7 @@ public class DeleteWorkout {
      */
     public void execute(String args) throws InvalidArgumentInput, IOException, FileNonexistent {
         //format and package the Arguments nicely into DeleteWorkoutArguments
-        DeleteWorkoutArguments parsedArgumentsForDelete = new DeleteParser().parse(args);
+        DeleteWorkoutArguments parsedArgumentsForDelete = new DeleteParser().parse(args, workoutManager.getCurrentLoadedMonth());
 
         // IMPORTANT: the ID must match how your /view_log displayed the list.
         // If /view_log sorts by endDateTime desc, sort here the same way before indexing.

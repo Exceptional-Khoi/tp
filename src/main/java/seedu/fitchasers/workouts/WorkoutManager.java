@@ -8,6 +8,7 @@ import seedu.fitchasers.tagger.Tagger;
 import seedu.fitchasers.ui.UI;
 
 import java.io.IOException;
+import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.ResolverStyle;
 import java.util.LinkedHashSet;
@@ -42,7 +43,7 @@ public class WorkoutManager {
             DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
     private static final DateTimeFormatter TIME_FMT =
             DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
-    protected YearMonth creationDate = null;
+    protected YearMonth creationDate;
 
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
@@ -89,6 +90,9 @@ public class WorkoutManager {
         currentLoadedMonth = monthOfArrayList;
     }
 
+    public YearMonth getCreationDate() {
+        return creationDate;
+    }
     /**
      * Adds a new workout session from the user's command input.
      * <p>

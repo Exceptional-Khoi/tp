@@ -11,7 +11,7 @@ import java.time.YearMonth;
 public class DeleteParser implements CommandParser<DeleteWorkoutArguments> {
 
     @Override
-    public DeleteWorkoutArguments parse(String raw) throws InvalidArgumentInput {
+    public DeleteWorkoutArguments parse(String raw, YearMonth creationDate) throws InvalidArgumentInput {
         UI ui = new UI();
         if (raw == null || raw.isBlank()) {
             throw usage("Workout deletion requires arguments try /delete workout id/<workout_id>.");
@@ -57,7 +57,7 @@ public class DeleteParser implements CommandParser<DeleteWorkoutArguments> {
                 seenYM = true;
                 String token = argument.substring(3).trim(); // expects "MM/YY"
                 try {
-                    ym = CommandParser.parseYearMonthTokenStrict(token); // see below
+                    ym = CommandParser.parseYearMonthTokenStrict(token, creationDate); // see below
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

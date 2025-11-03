@@ -1,7 +1,6 @@
 package seedu.fitchasers.parser;
 
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
-import seedu.fitchasers.storage.FileHandler;
 
 import java.io.IOException;
 import java.time.YearMonth;
@@ -10,7 +9,7 @@ import java.util.regex.Pattern;
 public interface CommandParser<T> {
     Pattern INT = Pattern.compile("^\\d+$");
 
-    T parse(String raw) throws InvalidArgumentInput;
+    T parse(String raw, YearMonth creationDate) throws InvalidArgumentInput;
     static void validateMonth(int m) throws InvalidArgumentInput {
         if (m < 1 || m > 12){
             throw new InvalidArgumentInput("Month must be between 1 and 12.");
@@ -30,9 +29,8 @@ public interface CommandParser<T> {
     /**
      * Strictly "MM/YY" → YearMonth(2000+YY, MM). Adjust if you prefer another rule.
      */
-    static YearMonth parseYearMonthTokenStrict(String token) throws InvalidArgumentInput, IOException {
+    static YearMonth parseYearMonthTokenStrict(String token, YearMonth creationDate) throws InvalidArgumentInput, IOException {
         String[] parts = token.split("/");
-        FileHandler fh = new FileHandler();
         if (parts.length != 2) {
             throw new InvalidArgumentInput("Use ym/<MM>/<YY>, e.g., ym/10/26");
         }
@@ -52,7 +50,7 @@ public interface CommandParser<T> {
 
         YearMonth yyyy = YearMonth.of(yy+2000, mm); // Example policy: 00..99 -> 2000..2099
         try {
-            if (fh.getCreationMonth().isBefore(yyyy) || yyyy.isAfter(YearMonth.of(2100, 12))) {
+            if (creationDate.isBefore(yyyy) || yyyy.isAfter(YearMonth.of(2100, 12))) {
                 throw new InvalidArgumentInput("Year out of supported range.");
             }
         }catch (Exception e){
