@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,6 +50,7 @@ public class WorkoutManager {
     private LocalDateTime workoutDateTime;
     private String workoutName;
     private YearMonth currentLoadedMonth;
+    private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
     private final FileHandler fileHandler;
     private int afterNameIndex = 2;
     private LocalDate date = null;
@@ -72,6 +74,7 @@ public class WorkoutManager {
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) throws IOException {
         this.tagger = tagger;
         this.fileHandler = fileHandler;
+        this.workoutsByMonth = fileHandler.getArrayByMonth();
         this.currentLoadedMonth = YearMonth.now();
         this.creationDate = fileHandler.getCreationMonth();
     }

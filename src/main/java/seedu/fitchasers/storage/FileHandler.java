@@ -73,6 +73,15 @@ public class FileHandler {
         }
     }
 
+    /**
+     * Returns the mapping of all workouts grouped by month.
+     *
+     * @return A map where each key is a {@code YearMonth} and the value is a list of workouts for that month.
+     */
+    public Map<YearMonth, ArrayList<Workout>> getArrayByMonth() {
+        return arrayByMonth;
+    }
+
     private void ensureDataDir() throws IOException {
         Files.createDirectories(DATA_DIRECTORY);
         Files.createDirectories(workoutDir);
