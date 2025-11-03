@@ -17,6 +17,7 @@ import java.time.format.DateTimeFormatter;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
+//@@author Kart04
 class WorkoutManagerTest {
     //methodName_whatIsTheConditionYouAreTesting_Outcome(If 2 Paths Can Exclude)
     private WorkoutManager manager;

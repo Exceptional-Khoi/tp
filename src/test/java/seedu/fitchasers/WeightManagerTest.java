@@ -18,6 +18,7 @@ import seedu.fitchasers.user.WeightRecord;
  * Tests for WeightManager.
  * This version uses a mock UI and disables file saving for test stability.
  */
+//@@author Kart04
 class WeightManagerTest {
 
     private Person testUser;
