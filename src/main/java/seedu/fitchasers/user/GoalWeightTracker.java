@@ -1,6 +1,8 @@
 package seedu.fitchasers.user;
 
+import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.storage.FileHandler;
+import seedu.fitchasers.ui.Parser;
 import seedu.fitchasers.ui.UI;
 
 import java.io.IOException;
@@ -39,45 +41,71 @@ public class GoalWeightTracker {
         loadGoal();
     }
 
-    /**
-     * Handles user input for setting a new goal weight.
-     * <p>
-     * Example command: {@code /set_goal w/60}
-     * </p>
-     * <ul>
-     *     <li>Validates that the input starts with {@code w/}.</li>
-     *     <li>Ensures the weight is a positive number.</li>
-     *     <li>Saves the goal and displays confirmation.</li>
-     * </ul>
-     *
-     * @param input the user's raw input string (e.g., {@code "w/60"})
-     */
-    public void handleSetGoal(String input) {
-        if (input == null || !input.startsWith("w/")) {
-            ui.showMessage("Usage: /set_goal w/TARGET_WEIGHT (e.g., /set_goal w/60)");
-            return;
-        }
+//    /**
+//     * Handles user input for setting a new goal weight.
+//     * <p>
+//     * Example command: {@code /set_goal w/60}
+//     * </p>
+//     * <ul>
+//     *     <li>Validates that the input starts with {@code w/}.</li>
+//     *     <li>Ensures the weight is a positive number.</li>
+//     *     <li>Saves the goal and displays confirmation.</li>
+//     * </ul>
+//     *
+//     * @param input the user's raw input string (e.g., {@code "w/60"})
+//     */
+//    public void handleSetGoal(String input) {
+//        if (input == null || !input.startsWith("w/")) {
+//            ui.showMessage("Usage: /set_goal w/TARGET_WEIGHT (e.g., /set_goal w/60)");
+//            return;
+//        }
+//
+//        String weightStr = input.substring(2).trim();
+//        double target;
+//        try {
+//            target = Double.parseDouble(weightStr);
+//            if (target <= 0) {
+//                ui.showMessage("Goal weight must be a positive number.");
+//                return;
+//            }
+//        } catch (NumberFormatException e) {
+//            ui.showMessage("Invalid weight. Please enter a number (e.g., 60 or 60.5).");
+//            return;
+//        }
+//
+//        this.goalWeight = target;
+//        this.setDate = LocalDate.now();
+//        ui.showMessage(String.format(
+//                "Your new goal weight of %.1f kg has been set on %s.",
+//                goalWeight, setDate.format(DF)));
+//
+//        saveGoal();
+//    }
 
-        String weightStr = input.substring(2).trim();
-        double target;
+    public void handleSetGoal(String argumentStr) {
+        Parser parser = new Parser();
         try {
-            target = Double.parseDouble(weightStr);
-            if (target <= 0) {
+            Parser.SetGoalArgs args = parser.parseSetGoal(argumentStr);
+            double targetWeight = args.targetWeight;
+            LocalDate setOn = (args.date != null) ? args.date : LocalDate.now();
+
+            if (targetWeight <= 0) {
                 ui.showMessage("Goal weight must be a positive number.");
                 return;
             }
-        } catch (NumberFormatException e) {
-            ui.showMessage("Invalid weight. Please enter a number (e.g., 60 or 60.5).");
-            return;
+
+            this.goalWeight = targetWeight;
+            this.setDate = setOn;
+
+            ui.showMessage(String.format(
+                    "Your new goal weight of %.1f kg has been set on %s.",
+                    goalWeight, setDate.format(DF)));
+
+            saveGoal();
+
+        } catch (InvalidArgumentInput e) {
+            ui.showMessage(e.getMessage());
         }
-
-        this.goalWeight = target;
-        this.setDate = LocalDate.now();
-        ui.showMessage(String.format(
-                "Your new goal weight of %.1f kg has been set on %s.",
-                goalWeight, setDate.format(DF)));
-
-        saveGoal();
     }
 
     /**

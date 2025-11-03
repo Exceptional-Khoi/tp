@@ -2,11 +2,9 @@ package seedu.fitchasers.ui;
 
 import seedu.fitchasers.workouts.Exercise;
 import seedu.fitchasers.workouts.Workout;
-import seedu.fitchasers.user.WeightManager;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 import java.util.Set;
 
 //@@Exceptional-Khoi
@@ -22,108 +20,14 @@ public class UI {
     private static final String BOT_HEADER = "{^o^} FitChasers";
     private static final String BOLD_WHITE = "\u001B[1;97m";
     private static final String BOLD_RESET = "\u001B[0m";
-    private static final String BOLD_BRIGHT_PURPLE = "\u001B[1;38;5;183m";
     private static final int PADDING = 2;
     private static final int FRAME_OVERHEAD = 6;
-    private final Scanner scanner;
-
-    /**
-     * Constructs a {@code UI} instance and initializes the input scanner.
-     */
-    public UI() {
-        this.scanner = new Scanner(System.in);
-    }
 
     /**
      * Prints the header of the left chat bubble.
      */
     public void printLeftHeader() {
         System.out.println(LIGHT_YELLOW + BOT_HEADER + RESET);
-    }
-
-    /**
-     * Reads a general command input from the user.
-     *
-     * @return the command entered by the user
-     */
-    public String readCommand() {
-        return readInsideRightBubble("Enter command > ");
-    }
-
-    /**
-     * Prompts the user to enter one or more indices for deletion.
-     *
-     * @return the trimmed input string containing indices,
-     *         or {@code null} if no input is provided
-     */
-    public String enterSelection() {
-        String s = readInsideRightBubble("Enter the index(es) to be deleted > ");
-        if (s == null || s.isEmpty()) {
-            showError("No input detected.");
-            return null;
-        }
-        return s.trim();
-    }
-
-    /**
-     * Prompts the user to enter their name.
-     * Ensures that the name is not empty.
-     *
-     * @return the trimmed username, or {@code null} if input is terminated
-     */
-    public String enterName() {
-        while (true) {
-            String name = readInsideRightBubble("Enter your name > ");
-            if (name == null) {
-                return null;
-            }
-            name = name.trim();
-
-            if (name.isEmpty()) {
-                showError("Name cannot be empty. Please try again!");
-                continue;
-            }
-
-            if (name.length() > 30) {
-                showError("Name is too long. Maximum is 30 characters.");
-                continue;
-            }
-
-            if (!name.matches("^[a-zA-Z0-9 _-]+$")) {
-                showError("Name can only contain letters, numbers, spaces, underscores (_), or dashes (-).");
-                continue;
-            }
-
-            return name;
-        }
-    }
-
-    /**
-     * Prompts the user to enter their initial weight in kilograms.
-     * Validates numeric input greater than zero.
-     *
-     * @return the user's initial weight as a double, or -1 if input fails
-     */
-    public double enterWeight(WeightManager weightManager) {
-        double weight = -1;
-        while (true) {
-            showMessage("Please enter your initial weight (in kg).");
-            String ans = readInsideRightBubble("Enter your weight > ");
-            if (ans == null) {
-                showError("No input detected. Exiting weight entry.");
-                return -1;
-            }
-
-            String input = ans.trim();
-            try {
-                weight = Double.parseDouble(input);
-                if (weightManager.isValidWeight(weight)) {
-                    return weight;
-                }
-            } catch (NumberFormatException e) {
-                showError("Invalid number. Please enter a valid weight (e.g., 60.5).");
-            }
-        }
     }
 
     /**
@@ -212,7 +116,7 @@ public class UI {
                      /view_log
                    Press Enter to see the workout you just created!
                 
-                --------------------------------------------------------------------
+                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
                 Tips:
                 • You can also use short aliases: /create_workout (cw), /add_exercise (ae),
                   /end_workout (ew), /view_log (vl)
@@ -284,31 +188,7 @@ public class UI {
                                                    e.g. /gym_page p/SRC Gym
         
         ~~~ SYSTEM ~~~
-        /exit (e)                                 - Save all progress and exit the app
-            """);
-    }
-
-    /**
-     * Prompts for a yes/no confirmation from the user.
-     *
-     * @return {@code true} if confirmed (Y/Yes),
-     *         {@code false} otherwise
-     */
-    public boolean confirmationMessage() {
-        while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N) > ");
-            if (ans == null) {
-                return false;
-            }
-            String lower = ans.trim().toLowerCase();
-            if (lower.equals("y") || lower.equals("yes")) {
-                return true;
-            }
-            if (lower.equals("n") || lower.equals("no")) {
-                return false;
-            }
-            showError("Please answer Y or N (yes/no).");
-        }
+        /exit (e)                                 - Save all progress and exit the app""");
     }
 
     /**
@@ -434,29 +314,5 @@ public class UI {
         }
         sb.append(bottom);
         return sb.toString();
-    }
-
-    private String readInsideRightBubble(String prompt) {
-        int innerWidth = Math.max(1, (int) (CONSOLE_WIDTH * 3.0 / 5) - FRAME_OVERHEAD);
-        int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
-
-        String top = BOLD_BRIGHT_PURPLE + "+" + "-".repeat(innerWidth) + "+" + RESET;
-        String bottom = BOLD_BRIGHT_PURPLE + "+" + "-".repeat(innerWidth) + "+" + RESET;
-        String leftPrefix = " ".repeat(pad) + BOLD_BRIGHT_PURPLE +
-                "|" + RESET + BOLD_BRIGHT_PURPLE + " ".repeat(PADDING) + RESET;
-        System.out.println(" ".repeat(pad) + LIGHT_YELLOW + "(You)" + RESET);
-        System.out.println(" ".repeat(pad) + top);
-        System.out.print(leftPrefix + BOLD_BRIGHT_PURPLE + prompt + BOLD_RESET);
-        System.out.flush();
-        if (!scanner.hasNextLine()) {
-            System.out.println();
-            System.out.println(" ".repeat(pad) + bottom);
-            return null;
-        }
-        String input = scanner.nextLine();
-        String trimmed = input.trim();
-        System.out.println(" ".repeat(pad) + bottom);
-        printLeftHeader();
-        return trimmed;
     }
 }

@@ -3,6 +3,7 @@ package seedu.fitchasers.workouts;
 import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
+import seedu.fitchasers.ui.Parser;
 import seedu.fitchasers.ui.UI;
 
 import java.io.IOException;
@@ -18,15 +19,17 @@ import java.util.regex.Pattern;
 //@@ZhongBaode
 public class ViewLog {
     public static final int MINIMUM_PAGE_SIZE = 1;
-    public static final int ARRAY_INDEX_OFFSET = 1;
-    private static final Pattern INT = Pattern.compile("^-?\\d+$");
+    //public static final int ARRAY_INDEX_OFFSET = 1;
+    //private static final Pattern INT = Pattern.compile("^-?\\d+$");
     private static UI ui = new UI();                         // your existing UI class
     private final WorkoutManager workoutManager;
     private final int pageSize = 10;
     private final FileHandler fileHandler;
+    private final Parser parser;
 
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
     private List<Workout> lastFilteredListofWorkout = List.of();
+    private YearMonth lastRenderMonth = null;
 
     private static class DisplayWorkout {
         Workout workout;
@@ -38,10 +41,11 @@ public class ViewLog {
         }
     }
 
-    public ViewLog(UI ui, WorkoutManager workoutManager, FileHandler fileHandler) {
+    public ViewLog(UI ui, WorkoutManager workoutManager, FileHandler fileHandler, Parser parser) {
         ViewLog.ui = ui;
         this.workoutManager = workoutManager;
         this.fileHandler = fileHandler;
+        this.parser = parser;
     }
 
     /* ----------------------------- Core renderers ----------------------------- */
@@ -69,9 +73,13 @@ public class ViewLog {
      * @throws InvalidArgumentInput if flags or numbers are invalid
      */
     public void render(String args) throws InvalidArgumentInput, FileNonexistent, IOException {
-        Parsed p = parseArgs(args);
+//        Parsed p = parseArgs(args);
+//
+//        ArrayList<Workout> sorted = loadAndSortList(p.ym);
 
-        ArrayList<Workout> sorted = loadAndSortList(p.ym);
+        Parser.ViewLogArgs parsed = parser.parseViewLog(args);
+        this.lastRenderMonth = parsed.ym;
+        ArrayList<Workout> sorted = loadAndSortList(parsed.ym);
 
         ArrayList<DisplayWorkout> displayList = new ArrayList<>();
         for (int i = 0; i < sorted.size(); i++) {
@@ -79,14 +87,15 @@ public class ViewLog {
         }
 
         int totalPages = computeTotalPages(displayList.size(), pageSize);
-        int current = ensureValidPage(p.extractedArg);
+        //int current = ensureValidPage(p.extractedArg);
+        int current = clampPage(parsed.page, totalPages);
 
         int start = (current - 1) * pageSize;
         int end = Math.min(start + pageSize, displayList.size());
 
         StringBuilder buf = new StringBuilder();
         buf.append(String.format("Workouts for %s (%d total) — Page %d/%d%n",
-                p.ym, displayList.size(), current, Math.max(1, totalPages)));
+                parsed.ym, displayList.size(), current, Math.max(1, totalPages)));
 
         if (displayList.isEmpty()) {
             buf.append("No workouts this month.");
@@ -94,25 +103,26 @@ public class ViewLog {
             return;
         }
 
-        if (!p.detailed) {
+        if (!parsed.detailed) {
             buf.append(String.format("%-4s %-20s %-22s %-10s%n", "ID", "Date", "Name", "Duration"));
         }
 
         for (int i = start; i < end; i++) {
             DisplayWorkout dw = displayList.get(i);
-            if (p.detailed) {
+            if (parsed.detailed) {
                 buf.append(renderDetailedRow(dw.originalIndex, dw.workout));
             } else {
                 buf.append(renderCompactRow(dw.originalIndex, dw.workout));
             }
         }
 
-        buf.append("Tip: /view_log -m 10 2 (next extractedArg Oct), /view_log --search run, /open <ID>.");
+        //buf.append("Tip: /view_log -m 10 2 (next extractedArg Oct), /view_log --search run, /open <ID>.");
+        buf.append("Tip: /view_log -m 10 2 (next page for Oct), /view_log --search run, /open <ID>.");
         ui.showMessage(buf.toString());
     }
 
     public ArrayList<Workout> loadAndSortList(YearMonth p) throws IOException, FileNonexistent {
-        // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
+        // Fetch month list (lazy-load), then sort by end time (ascending, nulls last)
         ArrayList<Workout> monthList = fileHandler.loadMonthList(p);
         ArrayList<Workout> sorted = new ArrayList<>(monthList);
         sorted.sort(Comparator.comparing(
@@ -124,13 +134,19 @@ public class ViewLog {
         ));  // ← NO .reversed()
 
         this.lastFilteredListofWorkout = sorted;  // Store the sorted list
+        this.lastRenderMonth = p;                  // Keep cache + month in sync
         return sorted;
     }
 
     public Workout getWorkoutByDisplayId(int displayId, YearMonth month) throws FileNonexistent, IOException {
         // Fetch and sort on demand if needed
-        if (lastFilteredListofWorkout.isEmpty()) {
-            loadAndSortList(month);
+//        if (lastFilteredListofWorkout.isEmpty()) {
+//            loadAndSortList(month);
+//        }
+
+        // Ensure cache corresponds to the requested month
+            if (lastFilteredListofWorkout.isEmpty() || lastRenderMonth == null || !lastRenderMonth.equals(month)) {
+         loadAndSortList(month); // also updates lastRenderMonth
         }
 
         if (displayId <= 0 || displayId > lastFilteredListofWorkout.size()) {
@@ -163,14 +179,14 @@ public class ViewLog {
 
     /* ------------------------------ Commands API ----------------------------- */
 
-    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput {
-        int i = oneBasedIndex - ARRAY_INDEX_OFFSET;  // Convert to 0-based
-
-        if (i < 0 || i >= workoutManager.getWorkoutSize()) {
-            throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
-        }
-        ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(i));
-    }
+//    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput {
+//        int i = oneBasedIndex - ARRAY_INDEX_OFFSET;  // Convert to 0-based
+//
+//        if (i < 0 || i >= workoutManager.getWorkoutSize()) {
+//            throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
+//        }
+//        ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(i));
+//    }
 
     /* ------------------------------ Helpers/Util ----------------------------- */
 
@@ -178,13 +194,13 @@ public class ViewLog {
         return (int) Math.ceil(Math.max(0, size) / (double) Math.max(1, pageSize));
     }
 
-    private int ensureValidPage(int page) {
-        int totalPages = computeTotalPages(this.workoutManager.getWorkoutSize(), pageSize);
-        if (page < MINIMUM_PAGE_SIZE) {
-            return MINIMUM_PAGE_SIZE;
-        }
-        return Math.min(page, totalPages);
-    }
+//    private int ensureValidPage(int page) {
+//        int totalPages = computeTotalPages(this.workoutManager.getWorkoutSize(), pageSize);
+//        if (page < MINIMUM_PAGE_SIZE) {
+//            return MINIMUM_PAGE_SIZE;
+//        }
+//        return Math.min(page, totalPages);
+//    }
 
     private static String safe(String s) {
         return s == null ? "" : s;
@@ -231,115 +247,135 @@ public class ViewLog {
         return String.format("%s %d%s of %s, %d:%02d %s", dow, d, suffix, mon, hr12, min, ampm);
     }
 
-    public record Parsed(YearMonth ym, int extractedArg, boolean detailed) {
-    }
+//    public record Parsed(YearMonth ym, int extractedArg, boolean detailed) {
+//    }
+//
+//    /**
+//     * Parses flags/args into a structured form with validation/guards.
+//     */
+//    public Parsed parseArgs(String raw) throws InvalidArgumentInput {
+//        YearMonth now = YearMonth.now();
+//        YearMonth target = now;
+//        int page = 1;
+//        boolean detailed = false;
+//
+//        if (raw == null || raw.isBlank()) {
+//            return new Parsed(target, page, false);
+//        }
+//
+//        String[] tok = raw.trim().split("\\s+");
+//        boolean seenMonthFlag = false;  // -m
+//        boolean seenYearMonthFlag = false; // -ym
+//
+//        for (int i = 0; i < tok.length; i++) {
+//            String t = tok[i];
+//
+//            switch (t) {
+//            case "-d":
+//            case "--detailed":
+//                detailed = true;
+//                break;
+//
+//            case "-m":
+//                if (seenYearMonthFlag) {
+//                    throw new InvalidArgumentInput("Cannot combine -m with -ym.");
+//                }
+//                seenMonthFlag = true;
+//                int month = readIntArg(tok, ++i, "Missing month after -m");
+//                validateMonth(month);
+//                // default to current year when -m is used
+//                target = YearMonth.of(now.getYear(), month);
+//                // optional extractedArg next
+//                if (i + 1 < tok.length && isInt(tok[i + 1])) {
+//                    page = readPositiveInt(tok[++i], "Page must be a positive integer.");
+//                }
+//                break;
+//
+//            case "-ym":
+//                if (seenMonthFlag) {
+//                    throw new InvalidArgumentInput("Cannot combine -ym with -m.");
+//                }
+//                seenYearMonthFlag = true;
+//                int year = readIntArg(tok, ++i, "Missing year after -ym");
+//                validateYear(year);
+//                int m = readIntArg(tok, ++i, "Missing month after year");
+//                validateMonth(m);
+//                target = YearMonth.of(year, m);
+//                // optional extractedArg next
+//                if (i + 1 < tok.length && isInt(tok[i + 1])) {
+//                    page = readPositiveInt(tok[++i], "Page must be a positive integer.");
+//                }
+//                break;
+//
+//            default:
+//                // allow trailing extractedArg as bare number (e.g., "/view_log 2")
+//                if (isInt(t)) {
+//                    page = readPositiveInt(t, "Page must be a positive integer.");
+//                } else if (t.startsWith("-")) {
+//                    throw new InvalidArgumentInput("Unknown flag: " + t);
+//                } else {
+//                    throw new InvalidArgumentInput("Unexpected token: " + t);
+//                }
+//            }
+//        }
+//
+//        return new Parsed(target, page, detailed);
+//    }
+//
+//    public static boolean isInt(String s) {
+//        return s != null && INT.matcher(s).matches();
+//    }
+//
+//    public static int readIntArg(String[] tok, int idx, String err) throws InvalidArgumentInput {
+//        if (idx >= tok.length || !isInt(tok[idx])) {
+//            throw new InvalidArgumentInput(err);
+//        }
+//        return Integer.parseInt(tok[idx]);
+//    }
+//
+//    public static int readPositiveInt(String s, String err) throws InvalidArgumentInput {
+//        try {
+//            int v = Integer.parseInt(s);
+//            if (v <= 0) {
+//                throw new NumberFormatException();
+//            }
+//            return v;
+//        } catch (NumberFormatException nfe) {
+//            throw new InvalidArgumentInput(err);
+//        }
+//    }
+//
+//    public static void validateMonth(int month) throws InvalidArgumentInput {
+//        if (month < 1 || month > 12) {
+//            throw new InvalidArgumentInput("Month must be between 1 and 12.");
+//        }
+//    }
+//
+//    public static void validateYear(int year) throws InvalidArgumentInput {
+//        if (year < 1970 || year > 2100) {
+//            throw new InvalidArgumentInput("Year must be between 1970 and 2100.");
+//        }
+//    }
 
-    /**
-     * Parses flags/args into a structured form with validation/guards.
-     */
-    public Parsed parseArgs(String raw) throws InvalidArgumentInput {
-        YearMonth now = YearMonth.now();
-        YearMonth target = now;
-        int page = 1;
-        boolean detailed = false;
-
-        if (raw == null || raw.isBlank()) {
-            return new Parsed(target, page, false);
-        }
-
-        String[] tok = raw.trim().split("\\s+");
-        boolean seenMonthFlag = false;  // -m
-        boolean seenYearMonthFlag = false; // -ym
-
-        for (int i = 0; i < tok.length; i++) {
-            String t = tok[i];
-
-            switch (t) {
-            case "-d":
-            case "--detailed":
-                detailed = true;
-                break;
-
-            case "-m":
-                if (seenYearMonthFlag) {
-                    throw new InvalidArgumentInput("Cannot combine -m with -ym.");
-                }
-                seenMonthFlag = true;
-                int month = readIntArg(tok, ++i, "Missing month after -m");
-                validateMonth(month);
-                // default to current year when -m is used
-                target = YearMonth.of(now.getYear(), month);
-                // optional extractedArg next
-                if (i + 1 < tok.length && isInt(tok[i + 1])) {
-                    page = readPositiveInt(tok[++i], "Page must be a positive integer.");
-                }
-                break;
-
-            case "-ym":
-                if (seenMonthFlag) {
-                    throw new InvalidArgumentInput("Cannot combine -ym with -m.");
-                }
-                seenYearMonthFlag = true;
-                int year = readIntArg(tok, ++i, "Missing year after -ym");
-                validateYear(year);
-                int m = readIntArg(tok, ++i, "Missing month after year");
-                validateMonth(m);
-                target = YearMonth.of(year, m);
-                // optional extractedArg next
-                if (i + 1 < tok.length && isInt(tok[i + 1])) {
-                    page = readPositiveInt(tok[++i], "Page must be a positive integer.");
-                }
-                break;
-
-            default:
-                // allow trailing extractedArg as bare number (e.g., "/view_log 2")
-                if (isInt(t)) {
-                    page = readPositiveInt(t, "Page must be a positive integer.");
-                } else if (t.startsWith("-")) {
-                    throw new InvalidArgumentInput("Unknown flag: " + t);
-                } else {
-                    throw new InvalidArgumentInput("Unexpected token: " + t);
-                }
+    // keep old openByIndex but route it through the new parser-aware context
+    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput, FileNonexistent, IOException {
+        if (lastFilteredListofWorkout.isEmpty()) {
+                // fallback: reload current month if render hasn't run yet
+                        YearMonth current = YearMonth.now();
+                loadAndSortList(current);
+                lastRenderMonth = current;
             }
-        }
-
-        return new Parsed(target, page, detailed);
-    }
-
-    private static boolean isInt(String s) {
-        return s != null && INT.matcher(s).matches();
-    }
-
-    private static int readIntArg(String[] tok, int idx, String err) throws InvalidArgumentInput {
-        if (idx >= tok.length || !isInt(tok[idx])) {
-            throw new InvalidArgumentInput(err);
-        }
-        return Integer.parseInt(tok[idx]);
-    }
-
-    private static int readPositiveInt(String s, String err) throws InvalidArgumentInput {
-        try {
-            int v = Integer.parseInt(s);
-            if (v <= 0) {
-                throw new NumberFormatException();
+        if (oneBasedIndex <= 0 || oneBasedIndex > lastFilteredListofWorkout.size()) {
+                throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
             }
-            return v;
-        } catch (NumberFormatException nfe) {
-            throw new InvalidArgumentInput(err);
-        }
+        ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(oneBasedIndex - 1));
     }
 
-    private static void validateMonth(int month) throws InvalidArgumentInput {
-        if (month < 1 || month > 12) {
-            throw new InvalidArgumentInput("Month must be between 1 and 12.");
-        }
+    // internal helper for page clamping
+    private int clampPage(int requested, int totalPages) {
+        if (totalPages <= 0) return 1;
+        if (requested < MINIMUM_PAGE_SIZE) return MINIMUM_PAGE_SIZE;
+        return Math.min(requested, totalPages);
     }
-
-    private static void validateYear(int year) throws InvalidArgumentInput {
-        if (year < 1970 || year > 2100) {
-            throw new InvalidArgumentInput("Year must be between 1970 and 2100.");
-        }
-    }
-
 }
 

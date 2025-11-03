@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.storage.FileHandler;
+import seedu.fitchasers.ui.Parser;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.tagger.DefaultTagger;
 import seedu.fitchasers.tagger.Tagger;
@@ -12,53 +13,73 @@ import seedu.fitchasers.workouts.Workout;
 import seedu.fitchasers.workouts.WorkoutManager;
 
 import java.io.IOException;
-
 import java.lang.reflect.Field;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Unit tests for {@link WorkoutManager}.
+ * Compatible with the refactored Parser that has a no-arg constructor
+ * and static UI/Scanner.
+ */
 class WorkoutManagerTest {
-    //methodName_whatIsTheConditionYouAreTesting_Outcome(If 2 Paths Can Exclude)
+
     private WorkoutManager manager;
-    private UI mockUi;
+
+    /** UI stub that suppresses console output from WorkoutManager itself. */
+    private static class SilentUI extends UI {
+        @Override public void printLeftHeader() { /* no output */ }
+        @Override public void showMessage(String message) { /* no output */ }
+        @Override public void showError(String error) { /* no output */ }
+    }
+
+    /**
+     * Parser stub that always confirms and never reads real input.
+     * Since Parser now has a no-arg constructor and internal static UI,
+     * we just override the public methods to bypass prompts/printing.
+     */
+    private static class AlwaysYesParser extends Parser {
+        @Override public boolean confirmationMessage() { return true; }
+        @Override public String readCommand() { return ""; }
+        // If you ever need to bypass weight/name prompts in other tests,
+        // override enterName()/enterWeight(...) similarly.
+    }
 
     @BeforeEach
-    void setup() throws FileNonexistent, IOException, NoSuchFieldException, IllegalAccessException {
+    void setup() throws Exception {
         Tagger tagger = new DefaultTagger();
         FileHandler fileHandler = new FileHandler();
         manager = new WorkoutManager(tagger, fileHandler);
 
-        // Create a mock UI that always confirms prompts
-        mockUi = new UI() {
-            @Override
-            public boolean confirmationMessage() {
-                return true; // Always return true for "are you sure?" prompts
-            }
-            @Override
-            public void showMessage(String message) {
-                // Suppress console output during tests to keep logs clean
-            }
-            @Override
-            public String readCommand() {
-                return ""; // Return empty for any read command prompts
-            }
-        };
+        // 1) Inject a silent UI so manager.showMessage()/showError() don't print
+        UI silentUi = new SilentUI();
+        setField(manager, "ui", silentUi);
 
-        // Use reflection to inject the mock UI into the WorkoutManager instance
-        Field uiField = manager.getClass().getDeclaredField("ui");
-        uiField.setAccessible(true);
-        uiField.set(manager, mockUi);
+        // 2) Inject a Parser stub that always returns confirmation = true
+        //    (only if WorkoutManager has a 'parser' field)
+        try {
+            Parser parser = new AlwaysYesParser();
+            setField(manager, "parser", parser);
+        } catch (NoSuchFieldException ignore) {
+            // Safe to ignore if WorkoutManager does not yet have a 'parser' field.
+            // In that case, confirmation may still be handled through UI or another path.
+        }
 
-
-        // Use today's date to ensure tests are compatible with CI/system date.
-        java.time.LocalDate today = java.time.LocalDate.now();
+        // 3) Create an initial valid workout using today's date (CI-friendly)
+        var today = java.time.LocalDate.now();
         String dateStr = today.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
-        // pick a fixed time that is valid
         String timeStr = "1400";
         manager.addWorkout("/create_workout n/TestWorkout d/" + dateStr + " t/" + timeStr);
+    }
+
+    /** Reflection helper to set private fields on the SUT. */
+    private static void setField(Object target, String fieldName, Object value)
+            throws NoSuchFieldException, IllegalAccessException {
+        Field f = target.getClass().getDeclaredField(fieldName);
+        f.setAccessible(true);
+        f.set(target, value);
     }
 
     @Test
@@ -87,8 +108,8 @@ class WorkoutManagerTest {
     }
 
     @Test
-    void addWorkout_validInput_addsWorkoutToCurrentSet() throws Exception {
-        java.lang.reflect.Field field = manager.getClass().getDeclaredField("currentWorkout");
+    void addWorkout_validInput_createsAdditionalWorkoutAfterEndingPrevious() throws Exception {
+        Field field = manager.getClass().getDeclaredField("currentWorkout");
         field.setAccessible(true);
         Object current = field.get(manager);
         if (current != null) {
@@ -104,7 +125,7 @@ class WorkoutManagerTest {
             manager.endWorkout(endArgs);
         }
 
-        java.time.LocalDate today = java.time.LocalDate.now();
+        var today = java.time.LocalDate.now();
         String dateStr = today.format(java.time.format.DateTimeFormatter.ofPattern("dd/MM/yy"));
         manager.addWorkout("/create_workout n/run d/" + dateStr + " t/2030");
 
@@ -112,21 +133,17 @@ class WorkoutManagerTest {
         assertEquals("run", manager.getWorkouts().get(1).getWorkoutName());
     }
 
-
     @Test
-    void deleteWorkout_acessingDeletedWorkout_indexOutOfBoundsException() throws IOException, FileNonexistent {
-        // To make this test meaningful, we first add a workout to delete.
+    void deleteWorkout_accessingDeletedWorkout_throwsIndexOutOfBoundsException()
+            throws IOException, FileNonexistent {
         manager.addWorkout("/create_workout n/run d/01/01/25 t/1200");
         manager.deleteWorkout("run");
         assertThrows(IndexOutOfBoundsException.class,
-                ()-> manager.getWorkouts().get(1));
+                () -> manager.getWorkouts().get(1));
     }
 
     @Test
-    void removeWorkout_nonExistingWorkout_printsWorkoutNotFound() throws IOException {
-        // This test is tricky because the mock UI suppresses output.
-        // A better approach would be to check the state of the application.
-        // For now, let's ensure the list size doesn't change.
+    void removeWorkout_nonExistingWorkout_doesNotChangeListSize() throws IOException {
         int initialSize = manager.getWorkouts().size();
         manager.deleteWorkout("swim");
         assertEquals(initialSize, manager.getWorkouts().size());
