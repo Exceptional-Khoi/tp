@@ -95,7 +95,7 @@ public class ViewLog {
         }
 
         if (!p.detailed) {
-            buf.append(String.format("%-4s %-20s %-22s %-10s%n", "ID", "Date", "Name", "Duration"));
+            buf.append(String.format("%-4s %-20s %-20s %-22s %-10s%n", "ID","Start Date", "End Date", "Name", "Duration"));
         }
 
         for (int i = start; i < end; i++) {
@@ -107,7 +107,7 @@ public class ViewLog {
             }
         }
 
-        buf.append("Tip: /view_log pg/2 (next page of Oct), /view_log m, /open <ID>.");
+        buf.append("Tip: /view_log pg/2 (next pg of Current Month), /view_log m/10 (view October), /open <ID>.");
         ui.showMessage(buf.toString());
     }
 
@@ -115,13 +115,15 @@ public class ViewLog {
         // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
         ArrayList<Workout> monthList = fileHandler.loadMonthList(p);
         ArrayList<Workout> sorted = new ArrayList<>(monthList);
-        sorted.sort(Comparator.comparing(
-                Workout::getWorkoutEndDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ).thenComparing(
-                Workout::getWorkoutStartDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ));  // ← NO .reversed()
+        sorted.sort(
+                Comparator.comparing(
+                        Workout::getWorkoutStartDateTime,
+                        Comparator.nullsLast(Comparator.reverseOrder())   // start: desc, nulls last
+                ).thenComparing(
+                        Workout::getWorkoutEndDateTime,
+                        Comparator.nullsLast(Comparator.reverseOrder())   // end: desc, nulls last
+                )
+        ); // ← NO .reversed()
 
         this.lastFilteredListofWorkout = sorted;  // Store the sorted list
         return sorted;
@@ -140,11 +142,12 @@ public class ViewLog {
     }
 
     private String renderCompactRow(int id, Workout w) {
-        String date = formatDayMon(w.getWorkoutEndDateTime());
+        String startDate = formatDayMon(w.getWorkoutStartDateTime());
+        String endDate = formatDayMon(w.getWorkoutEndDateTime());
         String name = truncate(safe(w.getWorkoutName()), 22);
         String dur  = formatDuration(w.getDuration());
-        return String.format("%-4d %-20s %-22s %-10s%n",
-                id, safe(date), safe(name), safe(dur));
+        return String.format("%-4d %-20s %-20s %-22s %-10s%n",
+                id, safe(startDate), safe(endDate), safe(name), safe(dur));
     }
 
 
@@ -163,7 +166,8 @@ public class ViewLog {
 
     /* ------------------------------ Commands API ----------------------------- */
 
-    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput {
+    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput, FileNonexistent, IOException {
+        loadAndSortList(YearMonth.now());
         int i = oneBasedIndex - ARRAY_INDEX_OFFSET;  // Convert to 0-based
 
         if (i < 0 || i >= workoutManager.getWorkoutSize()) {
@@ -181,9 +185,16 @@ public class ViewLog {
     private int ensureValidPage(int page) {
         int totalPages = computeTotalPages(this.workoutManager.getWorkoutSize(), pageSize);
         if (page < MINIMUM_PAGE_SIZE) {
+            ui.showMessage("Hey that page is too small! I will default to the first page okay!");
             return MINIMUM_PAGE_SIZE;
         }
-        return Math.min(page, totalPages);
+
+        if (page > totalPages) {
+            ui.showMessage("Hey that page exceeds largest page! I will default to the last page okay!");
+            return totalPages;
+        }
+
+        return page;
     }
 
     private static String safe(String s) {
@@ -294,18 +305,17 @@ public class ViewLog {
                     throw new InvalidArgumentInput("Page specified more than once. Use a single pg/<N>.");
                 }
                 seenPg = true;
-                int p = readPositiveInt(t.substring(3), "Page after pg/ must be an integer.");
-                if (p <= 0) {
-                    throw new InvalidArgumentInput("Page must be a positive integer.");
-                }
+                int p = readPositiveInt(t.substring(3), "Page after pg/ must be above 1!" +
+                        " Also remember no space after pg/ :) e.g pg/2 ");
                 page = p;
                 continue;
             }
 
             if (t.contains("/")) {
-                throw new InvalidArgumentInput("Unknown or malformed flag: " + t);
+                throw new InvalidArgumentInput("Unknown flag: " + t + ". Use /help to see how to use view log :)");
             } else {
-                throw new InvalidArgumentInput("Unexpected token: " + t);
+                throw new InvalidArgumentInput("Unexpected Argument: " + t +
+                        " . Use /help to see how to use view log :)");
             }
         }
 
