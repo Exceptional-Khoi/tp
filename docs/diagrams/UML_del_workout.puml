@@ -24,14 +24,14 @@ control WM as "WorkoutManager"
 database FH as "FileHandler"
 
 == User enters command ==
-User -> UI : enter "/del_workout -m 10 5"\n(or: "/del_workout Push Day")
+User -> UI : enter "/del_workout m/10 "\n(or: "/del_workout Push Day")
 UI -> FitChasers : readCommand()
 activate FitChasers
 
 FitChasers -> FitChasers : delMethod(args)
 activate WM #white
 
-alt Month + Index form: "-m <MM> <index>"
+alt Month + Index form: "m/<MM> id/<index>"
   FitChasers -> VL : parseArgs(args)
   VL --> FitChasers : {ym, extractedArg=index}
 

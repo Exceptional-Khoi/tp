@@ -18,6 +18,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -440,6 +441,26 @@ public class FileHandler {
         Files.writeString(filePath, person.getName());
     }
 
+    public void saveCreationMonth(YearMonth yearMonth) throws IOException {
+        ensureDataDir();
+        Path filePath = DATA_DIRECTORY.resolve("creationDate.txt");
+        Files.writeString(filePath, yearMonth.toString());
+    }
+
+    public YearMonth getCreationMonth() throws IOException {
+        ensureDataDir();
+        Path filePath = DATA_DIRECTORY.resolve("creationDate.txt");
+        if (Files.notExists(filePath)) {
+            return null;
+        }
+        try{
+            return YearMonth.parse(Files.readString(filePath).trim());
+        } catch (DateTimeParseException e) {
+            ui.showError("Creation Date File Got Corrupted!! Using Today's Date as Creation Date. \n" +
+                    "This means you may not be able to add workout before today!");
+            return YearMonth.now();
+        }
+    }
     /**
      * Loads the saved username from text file.
      * Returns null if file doesn't exist.

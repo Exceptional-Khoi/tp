@@ -51,7 +51,7 @@ public class ViewLog {
      * <p>
      * Supported forms:
      * <ul>
-     *   <li>/view_log -m &lt;month 1..12&gt; [extractedArg]</li>
+     *   <li>/view_log m/ &lt;month 1..12&gt; [extractedArg]</li>
      *   <li>/view_log -ym &lt;year&gt; &lt;month 1..12&gt; [extractedArg]</li>
      *   <li>Optional: -d (detailed view)</li>
      * </ul>
@@ -107,7 +107,7 @@ public class ViewLog {
             }
         }
 
-        buf.append("Tip: /view_log -m 10 2 (next extractedArg Oct), /view_log --search run, /open <ID>.");
+        buf.append("Tip: /view_log pg/2 (next page of Oct), /view_log m, /open <ID>.");
         ui.showMessage(buf.toString());
     }
 
@@ -247,59 +247,65 @@ public class ViewLog {
             return new Parsed(target, page, false);
         }
 
-        String[] tok = raw.trim().split("\\s+");
-        boolean seenMonthFlag = false;  // -m
-        boolean seenYearMonthFlag = false; // -ym
+        String[] arguments = raw.trim().split("\\s+");
+        boolean seenM = false;
+        boolean seenYM = false;
+        boolean seenPg = false;
 
-        for (int i = 0; i < tok.length; i++) {
-            String t = tok[i];
+        for (int i = 0; i < arguments.length; i++) {
+            String t = arguments[i];
 
-            switch (t) {
-            case "-d":
-            case "--detailed":
+            if ("detailed/".equals(t)) {
                 detailed = true;
-                break;
+                continue;
+            }
 
-            case "-m":
-                if (seenYearMonthFlag) {
-                    throw new InvalidArgumentInput("Cannot combine -m with -ym.");
+            if (t.startsWith("m/")) {
+                if (seenYM) {
+                    throw new InvalidArgumentInput("Cannot combine m/<MM> with ym/<A>/<B>.");
                 }
-                seenMonthFlag = true;
-                int month = readIntArg(tok, ++i, "Missing month after -m");
+                seenM = true;
+                int month = readPositiveInt(t.substring(2), "Month after m/ must be an integer.");
                 validateMonth(month);
-                // default to current year when -m is used
                 target = YearMonth.of(now.getYear(), month);
-                // optional extractedArg next
-                if (i + 1 < tok.length && isInt(tok[i + 1])) {
-                    page = readPositiveInt(tok[++i], "Page must be a positive integer.");
-                }
-                break;
 
-            case "-ym":
-                if (seenMonthFlag) {
-                    throw new InvalidArgumentInput("Cannot combine -ym with -m.");
+                // optional trailing page
+                if (i + 1 < arguments.length && isInt(arguments[i + 1])) {
+                    page = readPositiveInt(arguments[++i], "Page must be a positive integer.");
                 }
-                seenYearMonthFlag = true;
-                int year = readIntArg(tok, ++i, "Missing year after -ym");
-                validateYear(year);
-                int m = readIntArg(tok, ++i, "Missing month after year");
-                validateMonth(m);
-                target = YearMonth.of(year, m);
-                // optional extractedArg next
-                if (i + 1 < tok.length && isInt(tok[i + 1])) {
-                    page = readPositiveInt(tok[++i], "Page must be a positive integer.");
-                }
-                break;
+                continue;
+            }
 
-            default:
-                // allow trailing extractedArg as bare number (e.g., "/view_log 2")
-                if (isInt(t)) {
-                    page = readPositiveInt(t, "Page must be a positive integer.");
-                } else if (t.startsWith("-")) {
-                    throw new InvalidArgumentInput("Unknown flag: " + t);
-                } else {
-                    throw new InvalidArgumentInput("Unexpected token: " + t);
+            if (t.startsWith("ym/")) {
+                if (seenM) {
+                    throw new InvalidArgumentInput("Cannot combine ym/<A>/<B> with m/<MM>.");
                 }
+                seenYM = true;
+                target = parseYearMonthToken(t.substring(3));
+                // optional trailing page
+                if (i + 1 < arguments.length && isInt(arguments[i + 1])) {
+                    page = readPositiveInt(arguments[++i], "Page must be a positive integer.");
+                }
+                continue;
+            }
+
+            if (t.startsWith("pg/")) {
+                if (seenPg) {
+                    throw new InvalidArgumentInput("Page specified more than once. Use a single pg/<N>.");
+                }
+                seenPg = true;
+                int p = readPositiveInt(t.substring(3), "Page after pg/ must be an integer.");
+                if (p <= 0) {
+                    throw new InvalidArgumentInput("Page must be a positive integer.");
+                }
+                page = p;
+                continue;
+            }
+
+            if (t.contains("/")) {
+                throw new InvalidArgumentInput("Unknown or malformed flag: " + t);
+            } else {
+                throw new InvalidArgumentInput("Unexpected token: " + t);
             }
         }
 
@@ -310,12 +316,6 @@ public class ViewLog {
         return s != null && INT.matcher(s).matches();
     }
 
-    private static int readIntArg(String[] tok, int idx, String err) throws InvalidArgumentInput {
-        if (idx >= tok.length || !isInt(tok[idx])) {
-            throw new InvalidArgumentInput(err);
-        }
-        return Integer.parseInt(tok[idx]);
-    }
 
     private static int readPositiveInt(String s, String err) throws InvalidArgumentInput {
         try {
@@ -336,9 +336,44 @@ public class ViewLog {
     }
 
     private static void validateYear(int year) throws InvalidArgumentInput {
-        if (year < 1970 || year > 2100) {
-            throw new InvalidArgumentInput("Year must be between 1970 and 2100.");
+        if (year < 2025 || year > 2099) {
+            throw new InvalidArgumentInput("Month must be between 1 and 12.");
         }
+    }
+
+
+    /**
+     * Strictly parses ym token in the form "MM/YY" (e.g., "10/25" -> 2025-10).
+     * - MM: 1..12
+     * - YY: 00..99  (converted to four-digit year)
+     *
+     * Conversion rule (simple): 2000 + YY  → "25" => 2025, "03" => 2003.
+     * Change the conversion if you prefer a different century policy.
+     */
+    private YearMonth parseYearMonthToken(String token) throws InvalidArgumentInput {
+        String[] parts = token.split("/");
+        if (parts.length != 2) {
+            throw new InvalidArgumentInput("Use ym/<MM>/<YY>, e.g., ym/10/25.");
+        }
+        String mmStr = parts[0].trim();
+        String yyStr = parts[1].trim();
+
+        if (!isInt(mmStr) || !isInt(yyStr)) {
+            throw new InvalidArgumentInput("Use digits only: ym/<MM>/<YY>, e.g., ym/10/25.");
+        }
+
+        int mm = Integer.parseInt(mmStr);
+        int yy = Integer.parseInt(yyStr);
+
+
+        if (yy < 0 || yy > 99) {
+            throw new InvalidArgumentInput("Year must be 00..99 (two digits).");
+        }
+
+        int yyyy = 2000 + yy; // Simple rule: map 00..99 → 2000..2099
+        validateYear(yyyy);    // your existing guard (e.g., 1970..2100)
+        validateMonth(mm);
+        return YearMonth.of(yyyy, mm);
     }
 
 }
