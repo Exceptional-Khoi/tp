@@ -58,6 +58,8 @@ public class EquipmentDisplay {
      */
     public static String showEquipmentForSingleGym(Gym gym) {
 
+        assert gym != null : "Gym object passed to showEquipmentForSingleGym cannot be null";
+
         System.out.println("\n" + gym.getName());
         System.out.println("+" + "-".repeat(gym.getName().length()) + "+");
 
@@ -95,6 +97,11 @@ public class EquipmentDisplay {
      * @return A set of gym names that have matching machines; empty set if none found.
      */
     public static Set<String> suggestGymsForExercise(List<Gym> gyms, String argumentStr) {
+
+        assert gyms != null : "Gyms list passed to suggestGymsForExercise cannot be null";
+
+        assert argumentStr != null : "Argument string passed to suggestGymsForExercise cannot be null";
+
         String exerciseName = "";
 
         // Extract exercise name from n/ parameter
