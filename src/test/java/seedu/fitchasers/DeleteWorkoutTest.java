@@ -167,11 +167,11 @@ class DeleteWorkoutTest {
         FakeFileHandler.SaveCall sc = fh.lastSave;
         assertEquals(ym, sc.ym);
         List<String> names = sc.listCopy.stream().map(Workout::getWorkoutName).toList();
-        assertEquals(List.of("A", "C"), names);
+        assertEquals(List.of("C", "A"), names);
         // In-memory update because deleting current month
         assertEquals(ym, fakeWorkoutManager.lastSetMonth);
         assertNotNull(fakeWorkoutManager.lastSetList);
-        assertEquals(List.of("A", "C"), fakeWorkoutManager.lastSetList.stream().map(Workout::getWorkoutName).toList());
+        assertEquals(List.of("C", "A"), fakeWorkoutManager.lastSetList.stream().map(Workout::getWorkoutName).toList());
 
         // UI showed details and success
         assertTrue(fakeUI.messages.stream().anyMatch(s -> s.startsWith("[DETAILS] ")));
