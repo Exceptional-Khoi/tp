@@ -312,6 +312,33 @@ public class UI {
      *         {@code false} if declined (N/No),
      *         {@code null} if cancelled
      */
+
+    public Boolean confirmationMessageWithCancel(){
+        while (true) {
+            String ans = readInsideRightBubble("Confirm (Y/N, /help or /cancel) > ");
+            if (ans == null) {
+                return false;
+            }
+            String lower = ans.trim().toLowerCase();
+
+            if (lower.equals("y") || lower.equals("yes")) {
+                return true;
+            }
+            if (lower.equals("n") || lower.equals("no")) {
+                return false;
+            }
+            if (lower.equals("/help")) {
+                showHelp();
+                continue;
+            }
+            if(lower.equals("/cancel")) {
+                return null;
+            }
+            showError("Please answer Y or N (yes/no).Type /help for command list or /cancel to cancel." +
+                    " \n Tip: Type just keep typing No to exit :)");
+        }
+    }
+
     public boolean confirmationMessage() {
         while (true) {
             String ans = readInsideRightBubble("Confirm (Y/N or /help) > ");
@@ -378,7 +405,17 @@ public class UI {
             sb.append("\nExercises:\n");
             int i = 1;
             for (Exercise e : exercises) {
-                sb.append(String.format("  %d. %s%n", i++, e.toString()));
+                sb.append(String.format("  %d. %s%n ", i++, e.toString()));
+
+                // Detailed per-set reps:
+                ArrayList<Integer> sets = e.getSets();
+                if (sets != null && !sets.isEmpty()) {
+                    for (int s = 0; s < sets.size(); s++) {
+                        sb.append(String.format("       - Set %d: %d reps%n", s + 1, sets.get(s)));
+                    }
+                } else {
+                    sb.append("       - No sets recorded\n");
+                }
             }
         }
         showMessage(sb.toString().trim());

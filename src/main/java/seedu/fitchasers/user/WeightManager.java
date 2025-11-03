@@ -61,7 +61,7 @@ public class WeightManager {
             ui.showMessage("Looks like you missed the date. Use current date (" + todayStr + ")? " +
                     "(Y/N, or type /cancel to abort)");
 
-            Boolean confirmed = ui.confirmationMessage();
+            Boolean confirmed = ui.confirmationMessageWithCancel();
             if (confirmed == null) {
                 return;
             } else if (confirmed) {
