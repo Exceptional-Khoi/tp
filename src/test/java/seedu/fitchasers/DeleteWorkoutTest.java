@@ -12,9 +12,16 @@ import seedu.fitchasers.workouts.WorkoutManager;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * JUnit 5 tests for DeleteWorkout without Mockito.
@@ -24,11 +31,13 @@ class DeleteWorkoutTest {
 
     /** Fake UI that records messages and returns a configurable confirmation. */
     static class FakeUI extends UI {
-        final List<String> messages = new ArrayList<>();
         public boolean nextConfirm = true; // default: confirm
+        final ArrayList<String> messages = new ArrayList<>();
 
         @Override
-        public void showMessage(String s) { messages.add(s); }
+        public void showMessage(String s) {
+            messages.add(s);
+        }
 
         @Override
         public void displayDetailsOfWorkout(Workout w) {
@@ -36,7 +45,7 @@ class DeleteWorkoutTest {
         }
 
         @Override
-        public Boolean confirmationMessage() {
+        public boolean confirmationMessage() {
             return nextConfirm;
         }
     }
@@ -80,9 +89,9 @@ class DeleteWorkoutTest {
 
     /** Fake WorkoutManager that exposes/records only what DeleteWorkout uses. */
     static class FakeWorkoutManager extends WorkoutManager {
-        private YearMonth current = YearMonth.now();
         YearMonth lastSetMonth = null;
-        List<Workout> lastSetList = null;
+        ArrayList<Workout> lastSetList = null;
+        private YearMonth current = YearMonth.now();
 
         FakeWorkoutManager(FakeFileHandler fhh) throws IOException {
             super(null,fhh);
@@ -133,7 +142,7 @@ class DeleteWorkoutTest {
     /* ---------------- Tests ---------------- */
 
     @Test
-    void execute_confirmedDeletion_savesAndUpdates_whenCurrentMonth() throws Exception {
+    void execute_confirmedDeletion_whenCurrentMonth() throws Exception {
         YearMonth ym = YearMonth.now();
         fakeWorkoutManager.setCurrentLoadedMonth(ym);
         // Order in file doesn’t matter; DeleteWorkout sorts by end then start (ascending in your code)
@@ -153,13 +162,12 @@ class DeleteWorkoutTest {
         assertEquals(ym, sc.ym);
         List<String> names = sc.listCopy.stream().map(Workout::getWorkoutName).toList();
         assertEquals(List.of("A", "C"), names);
-
-//        // In-memory update because deleting current month
+        // In-memory update because deleting current month
         assertEquals(ym, fakeWorkoutManager.lastSetMonth);
         assertNotNull(fakeWorkoutManager.lastSetList);
         assertEquals(List.of("A", "C"), fakeWorkoutManager.lastSetList.stream().map(Workout::getWorkoutName).toList());
-//
-//        // UI showed details and success
+
+        // UI showed details and success
         assertTrue(fakeUI.messages.stream().anyMatch(s -> s.startsWith("[DETAILS] ")));
         assertTrue(fakeUI.messages.stream().anyMatch(s -> s.contains("Deleted workout")));
     }
@@ -180,7 +188,7 @@ class DeleteWorkoutTest {
     }
 
     @Test
-    void execute_invalidIndex_showsError_noSave() throws Exception {
+    void execute_invalidIndex_noSave() throws Exception {
         YearMonth ym = YearMonth.of(2025, 10);
         fh.store.put(ym, new ArrayList<>(List.of(
                 makeWorkout("OnlyOne", 2025,10,1,10,0,11,0)
@@ -199,7 +207,7 @@ class DeleteWorkoutTest {
     }
 
     @Test
-    void execute_emptyMonth_showsMessage_noSave() throws Exception {
+    void execute_emptyMonth_noSave() throws Exception {
         YearMonth ym = YearMonth.of(2025, 10);
         // No data added -> empty
         sut.execute("id/1 m/10");
