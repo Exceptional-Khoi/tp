@@ -16,11 +16,10 @@ import org.junit.jupiter.api.Test;
 import seedu.fitchasers.user.Person;
 import seedu.fitchasers.user.WeightRecord;
 
+//@@author ZhongBaode
 /**
  * Unit tests for the {@link Person} class.
  */
-
-//@@author ZhongBaode
 class PersonTest {
 
     private Person person;

@@ -13,13 +13,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+//@@author Exceptional-Khoi
 /**
  * JUnit test suite for the GoalWeightTracker class.
  * Tests goal setting, viewing, saving, and loading functionality.
  * Uses reflection to access private fields for testing.
  */
-
-//@@author Exceptional-Khoi
 public class GoalWeightTrackerTest {
 
     private GoalWeightTracker tracker;
