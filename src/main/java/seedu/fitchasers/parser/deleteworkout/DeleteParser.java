@@ -7,9 +7,21 @@ import seedu.fitchasers.ui.UI;
 import java.io.IOException;
 import java.time.YearMonth;
 
-
+//@@author Exceptional-Khoi
+/**
+ * Parses and validates user input for the /delete_workout command.
+ * Handles flags like id/, m/, and ym/ to identify which workout to delete.
+ */
 public class DeleteParser implements CommandParser<DeleteWorkoutArguments> {
 
+    /**
+     * Parses the raw user input and returns a {@code DeleteWorkoutArguments} object.
+     *
+     * @param raw The raw user input string.
+     * @param creationDate The creation date context for parsing year-month values.
+     * @return A {@code DeleteWorkoutArguments} object containing parsed arguments.
+     * @throws InvalidArgumentInput If the input format is invalid or missing required flags.
+     */
     @Override
     public DeleteWorkoutArguments parse(String raw, YearMonth creationDate) throws InvalidArgumentInput {
         UI ui = new UI();
@@ -26,7 +38,7 @@ public class DeleteParser implements CommandParser<DeleteWorkoutArguments> {
 
         for (String argument : rawArguments) {
             if (argument.startsWith("id/")) {
-                if (id != null){
+                if (id != null) {
                     throw usage("ID was specified more than once.");
                 }
                 String idStr = argument.substring(3).trim();
@@ -38,7 +50,7 @@ public class DeleteParser implements CommandParser<DeleteWorkoutArguments> {
             }
 
             if (argument.startsWith("m/")) {
-                if (seenYM){
+                if (seenYM) {
                     throw usage("Cannot combine m/<MM> with ym/<MM>/<YY>.");
                 }
                 seenM = true;
@@ -66,17 +78,17 @@ public class DeleteParser implements CommandParser<DeleteWorkoutArguments> {
 
             // No other flags are allowed here.
             if (argument.contains("/")) {
-                throw usage("Your flag '" + argument +"' is wrong! Do follow the examples below :)");
+                throw usage("Your flag '" + argument + "' is wrong! Do follow the examples below :)");
             } else {
-                throw usage("The '"+ argument + "' doesn't mean anything :/ \n" +
+                throw usage("The '" + argument + "' doesn't mean anything :/ \n" +
                         " Ensure you follow the examples below :)");
             }
         }
 
-        if (id == null){
+        if (id == null) {
             throw usage("Missing ID. Example: id/3");
         }
-        if (ym == null){
+        if (ym == null) {
             ui.showError("Since you didn't input any month or year, I will assume you mean the current month ya! \n " +
                     "If that's not what you want check help to see correct date format input :) ");
             ym = YearMonth.now();
@@ -89,13 +101,13 @@ public class DeleteParser implements CommandParser<DeleteWorkoutArguments> {
 
     private InvalidArgumentInput usage(String msg) {
         String help = """
-            Usage:
-              /delete_workout id/<INDEX> m/<MM>
-              /delete_workout id/<INDEX> ym/<MM>/<YY>
-            Examples:
-              /delete_workout id/1 m/10
-              /delete_workout id/2 ym/10/26
-            """;
+                Usage:
+                  /delete_workout id/<INDEX> m/<MM>
+                  /delete_workout id/<INDEX> ym/<MM>/<YY>
+                Examples:
+                  /delete_workout id/1 m/10
+                  /delete_workout id/2 ym/10/26
+                """;
         return new InvalidArgumentInput(msg + "\n" + help);
     }
 }

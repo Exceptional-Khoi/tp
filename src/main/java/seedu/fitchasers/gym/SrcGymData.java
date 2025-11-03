@@ -1,7 +1,14 @@
 package seedu.fitchasers.gym;
+
 import java.util.List;
 
-//@@nitin19011
+//@@author nitin19011
+/**
+ * Provides predefined data for the SRC Gym, including its machines and targeted body parts.
+ * <p>
+ * This class serves as a static data source used to initialize a {@code Gym} object
+ * representing the SRC Gym with a fixed set of workout machines and their corresponding tags.
+ */
 public class SrcGymData {
     public static Gym getGym() {
         Gym srcGym = new Gym("SRC Gym");

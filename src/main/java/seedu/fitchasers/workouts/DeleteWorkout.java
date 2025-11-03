@@ -12,12 +12,26 @@ import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+//@@author Exceptional-Khoi
+/**
+ * Handles the deletion of workouts from the user's workout log.
+ * <p>
+ * This class coordinates between the {@code UI}, {@code FileHandler}, and {@code WorkoutManager}
+ * to parse deletion commands, confirm user actions, update files, and synchronize in-memory data.
+ */
 public class DeleteWorkout {
     private final UI ui;
     private final FileHandler fileHandler;
     private final WorkoutManager workoutManager;
     private YearMonth currentLoadedMonth; // set this from your app when month context changes
 
+    /**
+     * Constructs a {@code DeleteWorkout} instance with the specified dependencies.
+     *
+     * @param ui The user interface for displaying messages and confirmations.
+     * @param fileHandler The file handler responsible for loading and saving workout data.
+     * @param workoutManager The workout manager that maintains in-memory workout lists.
+     */
     public DeleteWorkout(UI ui, FileHandler fileHandler, WorkoutManager workoutManager) {
         this.ui = ui;
         this.fileHandler = fileHandler;
@@ -26,16 +40,22 @@ public class DeleteWorkout {
     }
 
     /**
-     * Entry point for /delete_workout ... args.
-     * Parses, loads the month list, shows details, confirms, deletes, saves.
+     * Executes the {@code /delete_workout} command.
+     * <p>
+     * Parses the user's input, loads workouts for the specified month,
+     * displays details of the selected workout, requests confirmation,
+     * performs deletion, saves the updated list, and refreshes in-memory data.
+     *
+     * @param args The raw command arguments provided by the user.
+     * @throws InvalidArgumentInput If the arguments are invalid or incorrectly formatted.
+     * @throws IOException If an I/O error occurs while accessing workout files.
+     * @throws FileNonexistent If the workout file for the specified month does not exist.
      */
     public void execute(String args) throws InvalidArgumentInput, IOException, FileNonexistent {
         //format and package the Arguments nicely into DeleteWorkoutArguments
         DeleteWorkoutArguments parsedArgumentsForDelete =
                 new DeleteParser().parse(args, workoutManager.getCurrentLoadedMonth());
 
-        // IMPORTANT: the ID must match how your /view_log displayed the list.
-        // If /view_log sorts by endDateTime desc, sort here the same way before indexing.
         ArrayList<Workout> monthWorkouts =
                 new ArrayList<>(fileHandler.loadMonthList(parsedArgumentsForDelete.yearMonth()));
 
@@ -52,7 +72,7 @@ public class DeleteWorkout {
         ).thenComparing(
                 Workout::getWorkoutStartDateTime,
                 Comparator.nullsLast(Comparator.naturalOrder())
-        ));  // ← NO .reversed()
+        ));
 
         int displayIndex = parsedArgumentsForDelete.indexToDelete();
         if (displayIndex < 1 || displayIndex > monthWorkouts.size()) {
@@ -88,6 +108,11 @@ public class DeleteWorkout {
         ui.showMessage("✓ Deleted workout: " + deletedName);
     }
 
+    /**
+     * Updates the currently loaded month context.
+     *
+     * @param ym The {@code YearMonth} to set as the current loaded month.
+     */
     public void setCurrentLoadedMonth(YearMonth ym) {
         this.currentLoadedMonth = ym;
     }

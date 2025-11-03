@@ -2,7 +2,7 @@ package seedu.fitchasers.workouts;
 
 import java.util.ArrayList;
 
-//@@author ZhongBaode
+//@@author nitin19011
 /**
  * Represents an exercise with a name and multiple sets, each having a number of reps.
  */

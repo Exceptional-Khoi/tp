@@ -6,7 +6,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-//@@nitin19011
+//@@author nitin19011
+/**
+ * Handles the display and suggestion logic for gym equipment and related exercises.
+ * <p>
+ * This class provides utility methods to:
+ * <ul>
+ *   <li>Display all available machines in a gym, along with the exercises each machine supports.</li>
+ *   <li>Suggest gyms that contain machines matching specific exercise-related tags provided by the user.</li>
+ * </ul>
+ * It maintains an internal mapping between machine names and the exercises they enable,
+ * facilitating quick lookups and formatted display outputs.
+ */
 public class EquipmentDisplay {
 
     private static final Map<String, String> MACHINE_TO_EXERCISES = new HashMap<>();
@@ -79,7 +90,7 @@ public class EquipmentDisplay {
     /**
      * Suggests gyms that have machines matching all tags corresponding to the given exercise.
      *
-     * @param gyms       The list of Gym objects to check.
+     * @param gyms        The list of Gym objects to check.
      * @param argumentStr The user input string containing the exercise to search for (e.g. "n/bench").
      * @return A set of gym names that have matching machines; empty set if none found.
      */

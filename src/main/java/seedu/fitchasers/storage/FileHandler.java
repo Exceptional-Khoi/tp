@@ -52,7 +52,7 @@ public class FileHandler {
      *
      * @throws IOException if directory or file creation fails
      */
-    public void initIndex() throws IOException, FileNonexistent {
+    public void initIndex() throws IOException {
         ensureDataDir();
         onDiskMonths.clear();
         try (var stream = Files.list(workoutDir)) {
@@ -72,20 +72,19 @@ public class FileHandler {
         }
     }
 
+    /**
+     * Returns the mapping of all workouts grouped by month.
+     *
+     * @return A map where each key is a {@code YearMonth} and the value is a list of workouts for that month.
+     */
     public Map<YearMonth, ArrayList<Workout>> getArrayByMonth() {
         return arrayByMonth;
     }
 
-    /**
-     * Ensures that the save file and its parent directory exist.
-     *
-     * @throws IOException if directory or file creation fails
-     */
     private void ensureDataDir() throws IOException {
         Files.createDirectories(DATA_DIRECTORY);
         Files.createDirectories(workoutDir);
     }
-
 
     // ----------------- Workout -----------------
     /**
@@ -111,11 +110,19 @@ public class FileHandler {
         ui.showMessage("Saved " + list.size() + " workouts for " + month);
     }
 
+    /**
+     * Checks whether the workout data file for the specified month exists.
+     *
+     * @param month The {@code YearMonth} representing the target month.
+     * @return {@code true} if the file exists, {@code false} otherwise.
+     * @throws IOException If an I/O error occurs while accessing the directory.
+     */
     public boolean checkFileExists(YearMonth month) throws IOException {
         ensureDataDir();
         Path txt = workoutDir.resolve(String.format("workouts_%s.txt", month));
         return Files.exists(txt);
     }
+
     /**
      * Loads the given month's workouts from the human-readable text file.
      * If .txt is absent but legacy .dat exists, migrate once: load .dat, save as .txt, return data.
@@ -135,7 +142,7 @@ public class FileHandler {
      *
      * @param month the YearMonth to load workouts for
      * @return a fresh ArrayList of workouts for that month
-     * @throws IOException if reading fails
+     * @throws IOException     if reading fails
      * @throws FileNonexistent if no file exists for that month
      */
     public ArrayList<Workout> getWorkoutsForMonth(YearMonth month) throws IOException, FileNonexistent {
@@ -153,8 +160,8 @@ public class FileHandler {
         final LocalDateTime start = workout.getWorkoutStartDateTime();
         final Set<String> tags = workout.getAllTags();
         String endTime;
-        final List<Exercise> exercises  = workout.getExercises();
-        if( workout.getWorkoutEndDateTime() == null){
+        final List<Exercise> exercises = workout.getExercises();
+        if (workout.getWorkoutEndDateTime() == null) {
             endTime = "Unended";
         } else {
             endTime = workout.getWorkoutEndDateTime().toString();
@@ -170,7 +177,7 @@ public class FileHandler {
         bw.write("DurationMin: " + duration);
         bw.newLine();
         bw.write("Tags: ");
-        for(String tag : tags){
+        for (String tag : tags) {
             bw.write(tag);
             bw.write(',');
         }
@@ -244,10 +251,10 @@ public class FileHandler {
             if (line.startsWith("Start:")) {
                 String v = line.substring(6).trim();
                 try {
-                    if (!v.isEmpty()){
+                    if (!v.isEmpty()) {
                         start = LocalDateTime.parse(v);
                     }
-                }catch(Throwable e){
+                } catch (Throwable e) {
                     throw new CorruptedFileError();
                 }
                 continue;
@@ -255,12 +262,12 @@ public class FileHandler {
 
             if (line.startsWith("End:")) {
                 String v = line.substring(4).trim();
-                try{
-                    if (!v.isEmpty()){
+                try {
+                    if (!v.isEmpty()) {
                         end = LocalDateTime.parse(v);
                     }
-                }catch(Throwable e){
-                    if(v.equalsIgnoreCase("unended")){
+                } catch (Throwable e) {
+                    if (v.equalsIgnoreCase("unended")) {
                         end = null;
                     } else {
                         throw new CorruptedFileError();
@@ -339,7 +346,9 @@ public class FileHandler {
     }
 
 
-    /** Ask the user to input a valid End date-time and return it. */
+    /**
+     * Ask the user to input a valid End date-time and return it.
+     */
     private void corruptedFileErrorHandling() {
         ui.showMessage("Invalid End date/time found in file. Skipping workout");
     }
@@ -371,6 +380,7 @@ public class FileHandler {
     }
 
     // ----------------- Goal -----------------
+
     /**
      * Saves the user's goal weight and the date it was set to a text file named {@code goal.txt}.
      *
@@ -404,6 +414,7 @@ public class FileHandler {
             }
         }
     }
+
     /**
      * Loads the saved goal weight and the date it was set from the text file {@code goal.txt}.
      *
@@ -426,6 +437,7 @@ public class FileHandler {
     }
 
     // ----------------- Username -----------------
+
     /**
      * Saves the person's name to a text file for future sessions.
      */
@@ -447,7 +459,7 @@ public class FileHandler {
         if (Files.notExists(filePath)) {
             return null;
         }
-        try{
+        try {
             return YearMonth.parse(Files.readString(filePath).trim());
         } catch (DateTimeParseException e) {
             ui.showError("Creation Date File Got Corrupted!! Using Today's Date as Creation Date. \n" +
@@ -455,6 +467,7 @@ public class FileHandler {
             return YearMonth.now();
         }
     }
+
     /**
      * Loads the saved username from text file.
      * Returns null if file doesn't exist.

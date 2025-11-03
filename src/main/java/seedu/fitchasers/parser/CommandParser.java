@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.time.YearMonth;
 import java.util.regex.Pattern;
 
+//@@author Exceptional-Khoi
 public interface CommandParser<T> {
     Pattern INT = Pattern.compile("^\\d+$");
 
     T parse(String raw, YearMonth creationDate) throws InvalidArgumentInput;
+
     static void validateMonth(int m) throws InvalidArgumentInput {
-        if (m < 1 || m > 12){
+        if (m < 1 || m > 12) {
             throw new InvalidArgumentInput("Month must be between 1 and 12.");
         }
     }
@@ -21,7 +23,7 @@ public interface CommandParser<T> {
     }
 
     static void guard(boolean cond, String msg) throws InvalidArgumentInput {
-        if (!cond){
+        if (!cond) {
             throw new InvalidArgumentInput(msg);
         }
     }
@@ -42,19 +44,19 @@ public interface CommandParser<T> {
         }
         int mm = Integer.parseInt(mmStr);
         int yy = Integer.parseInt(yyStr);
-        if (mm < 1 || mm > 12){
+        if (mm < 1 || mm > 12) {
             throw new InvalidArgumentInput("Month must be 1..12.");
         }
-        if (yy < 0 || yy > 99){
+        if (yy < 0 || yy > 99) {
             throw new InvalidArgumentInput("Year must be two digits 00..99.");
         }
 
-        YearMonth yyyy = YearMonth.of(yy+2000, mm); // Example policy: 00..99 -> 2000..2099
+        YearMonth yyyy = YearMonth.of(yy + 2000, mm); // Example policy: 00..99 -> 2000..2099
         try {
             if (creationDate.isBefore(yyyy) || yyyy.isAfter(YearMonth.of(2100, 12))) {
                 throw new InvalidArgumentInput("Year out of supported range.");
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new IOException("Oh no seems like your Creation Month File is corrupted, Please check it");
         }
         return yyyy;
