@@ -54,8 +54,6 @@ class DeleteWorkoutTest {
     static class FakeFileHandler extends FileHandler {
         final Map<YearMonth, ArrayList<Workout>> store = new HashMap<>();
 
-        @Override
-
         static class SaveCall {
             final YearMonth ym;
             final ArrayList<Workout> listCopy;
