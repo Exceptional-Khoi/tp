@@ -10,7 +10,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 //@@author bennyy117
 /**
@@ -156,11 +155,11 @@ public class Person {
 
         List<Double> weights = weightHistory.stream()
                 .map(WeightRecord::getWeight)
-                .collect(Collectors.toList());
+                .toList();
 
         List<String> dates = weightHistory.stream()
                 .map(r -> r.getDate().format(DateTimeFormatter.ofPattern("dd/MM")))
-                .collect(Collectors.toList());
+                .toList();
 
         int height = 10;
         int spacing = 12;
