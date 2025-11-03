@@ -56,7 +56,7 @@ public class WorkoutManager {
     private int afterNameIndex = 2;
     private LocalDate date = null;
     private LocalTime time = null;
-    private YearMonth creationDate = null;
+    protected YearMonth creationDate = null;
     private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
             .withResolverStyle(ResolverStyle.SMART);
     private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")

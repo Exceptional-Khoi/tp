@@ -54,6 +54,8 @@ class DeleteWorkoutTest {
     static class FakeFileHandler extends FileHandler {
         final Map<YearMonth, ArrayList<Workout>> store = new HashMap<>();
 
+        @Override
+
         static class SaveCall {
             final YearMonth ym;
             final ArrayList<Workout> listCopy;
@@ -93,6 +95,7 @@ class DeleteWorkoutTest {
         ArrayList<Workout> lastSetList = null;
         private YearMonth current = YearMonth.now();
 
+
         FakeWorkoutManager(FakeFileHandler fhh) throws IOException {
             super(null,fhh);
         }
@@ -111,6 +114,10 @@ class DeleteWorkoutTest {
             lastSetMonth = ym;
             lastSetList = new ArrayList<>(monthWorkouts);
         }
+
+        void setCreationDate(YearMonth set){
+            super.creationDate = set;
+        }
     }
 
     /* ---------------- Test fixtures ---------------- */
@@ -126,6 +133,7 @@ class DeleteWorkoutTest {
         fh = new FakeFileHandler();
         fakeWorkoutManager = new FakeWorkoutManager(fh);
         sut = new DeleteWorkout(fakeUI, fh, fakeWorkoutManager);
+        fakeWorkoutManager.setCreationDate(YearMonth.now());
     }
 
     private static Workout makeWorkout(String name,
