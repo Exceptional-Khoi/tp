@@ -243,8 +243,8 @@ public class UI {
                 /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
                                                            e.g. /add_weight w/75 d/30/10/25
                 /view_weight (vw)                         - View your recorded weights
-                /set_goal (sg) g/GOAL_WEIGHT              - Set a goal weight to track progress
-                                                           e.g. /set_goal g/70.0
+                /set_goal (sg) w/GOAL_WEIGHT              - Set a goal weight to track progress
+                                                           e.g. /set_goal w/70.0
                 /view_goal (vg)                           - View your current goal and progress
                 
                 ~~~ WORKOUT CREATION & LOGGING ~~~
