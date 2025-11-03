@@ -194,9 +194,9 @@ public class ViewLog {
      * @throws InvalidArgumentInput if the index is out of bounds or invalid
      * @see #lastFilteredListofWorkout
      */
-    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput {
+    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput, FileNonexistent, IOException {
+        loadAndSortList(YearMonth.now());
         int i = oneBasedIndex - ARRAY_INDEX_OFFSET;  // Convert to 0-based
-
         if (i < 0 || i >= workoutManager.getWorkoutSize()) {
             throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
         }
