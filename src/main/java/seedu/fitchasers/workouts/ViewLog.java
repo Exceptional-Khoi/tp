@@ -102,7 +102,8 @@ public class ViewLog {
         }
 
         if (!p.detailed) {
-            buf.append(String.format("%-4s %-20s %-20s %-22s %-10s%n", "ID","Start Date", "End Date", "Name", "Duration"));
+            buf.append(String.format("%-4s %-20s %-20s %-22s %-10s%n",
+                    "ID","Start Date", "End Date", "Name", "Duration"));
         }
 
         for (int i = start; i < end; i++) {
