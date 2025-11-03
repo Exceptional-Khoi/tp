@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 
-//@@ZhongBaode
+//@@author ZhongBaode
 public class ViewLog {
     public static final int MINIMUM_PAGE_SIZE = 1;
     public static final int ARRAY_INDEX_OFFSET = 1;
@@ -38,6 +38,13 @@ public class ViewLog {
         }
     }
 
+    /**
+     * Constructs a ViewLog instance with required dependencies.
+     *
+     * @param ui the UI instance for displaying output
+     * @param workoutManager the WorkoutManager for accessing workout data
+     * @param fileHandler the FileHandler for loading workouts from disk
+     */
     public ViewLog(UI ui, WorkoutManager workoutManager, FileHandler fileHandler) {
         ViewLog.ui = ui;
         this.workoutManager = workoutManager;
@@ -110,7 +117,19 @@ public class ViewLog {
         buf.append("Tip: /view_log -m 10 2 (next extractedArg Oct), /view_log --search run, /open <ID>.");
         ui.showMessage(buf.toString());
     }
-
+    /**
+     * Loads workouts for a specific month and sorts them by date (newest first).
+     * <p>
+     * Fetches workouts from the file handler and sorts them by end time, then start time,
+     * with null values placed last. The sorted list is cached internally for quick access
+     * via subsequent operations.
+     *
+     * @param p the YearMonth to load workouts for
+     * @return a new ArrayList of workouts for the month, sorted newest first
+     * @throws IOException if an error occurs reading from disk
+     * @throws FileNonexistent if no workout file exists for the specified month
+     * @see FileHandler#loadMonthList(YearMonth)
+     */
     public ArrayList<Workout> loadAndSortList(YearMonth p) throws IOException, FileNonexistent {
         // Fetch month list (lazy-load), then sort newest first by end time (nulls last)
         ArrayList<Workout> monthList = fileHandler.loadMonthList(p);
@@ -161,8 +180,16 @@ public class ViewLog {
         return sb.toString();
     }
 
-    /* ------------------------------ Commands API ----------------------------- */
-
+    /**
+     * Opens and displays detailed information for a workout by its display index.
+     * <p>
+     * Retrieves the workout from the cached rendered list and delegates to the UI
+     * for display. The index must correspond to a previously rendered workout list.
+     *
+     * @param oneBasedIndex the 1-based display index of the workout to open
+     * @throws InvalidArgumentInput if the index is out of bounds or invalid
+     * @see #lastFilteredListofWorkout
+     */
     public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput {
         int i = oneBasedIndex - ARRAY_INDEX_OFFSET;  // Convert to 0-based
 

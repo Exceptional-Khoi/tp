@@ -22,7 +22,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-//@@ZhongBaode
+//@@author ZhongBaode
 
 /**
  * Manages workout sessions for the FitChasers application.

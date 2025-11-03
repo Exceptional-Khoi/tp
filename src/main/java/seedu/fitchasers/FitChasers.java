@@ -221,7 +221,7 @@ public class FitChasers {
     private static void delMethod() throws IOException, FileNonexistent {
         workoutManager.handleDeleteWorkout(argumentStr);
     }
-
+    //@@author Kart04
     private static void owtMethod() throws FileNonexistent, IOException {
         // Parse parameters
         String[] params = argumentStr.split("\\s+");
@@ -552,6 +552,7 @@ public class FitChasers {
             ui.showError("Failed to save username: " + e.getMessage());
         }
     }
+    //@@author
 
     private static void initVariables() throws IOException, FileNonexistent {
         try {

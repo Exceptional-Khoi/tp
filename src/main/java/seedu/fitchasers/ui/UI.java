@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
-//@@Exceptional-Khoi
+//@@author Exceptional-Khoi
 /**
  * Handles all user interactions for the FitChasers application.
  * Provides an enhanced text-based interface with chat-bubble visuals
