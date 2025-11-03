@@ -234,19 +234,19 @@ public class UI {
     public void showHelp() {
         showMessage("""
                 /help (h)                                 - View all available commands
-                
+               \s
                 ~~~ USER PROFILE ~~~
                 /rename (rn) n/NAME                       - Set or change your display name
                                                            e.g. /rename n/Nitin
-                
+               \s
                 ~~~ WEIGHT TRACKING ~~~
                 /add_weight (aw) w/WEIGHT d/DATE          - Record your weight
                                                            e.g. /add_weight w/75 d/30/10/25
                 /view_weight (vw)                         - View your recorded weights
-                /set_goal (sg) g/GOAL_WEIGHT              - Set a goal weight to track progress
-                                                           e.g. /set_goal g/70.0
+                /set_goal (sg) w/GOAL_WEIGHT              - Set a goal weight to track progress
+                                                           e.g. /set_goal w/70.0
                 /view_goal (vg)                           - View your current goal and progress
-                
+               \s
                 ~~~ WORKOUT CREATION & LOGGING ~~~
                 /create_workout (cw) n/NAME d/DATE t/TIME - Create a new workout
                                                            e.g. /create_workout n/Chest Day d/30/10/25 t/1430
@@ -256,32 +256,32 @@ public class UI {
                                                            e.g. /add_set r/10
                 /end_workout (ew) d/DATE t/TIME           - End and save current workout
                                                            e.g. /end_workout d/30/10/25 t/1500
-                
+               \s
                 ~~~ WORKOUT LOG MANAGEMENT ~~~
                 /view_log (vl) [Optional Tags]             - View first page of your workout history
                                                            e.g. /view_log (vl)
-                
+               \s
                 [OPTIONAL TAGS FOR /view_log]:
                 vl pg/[Number]                             - Select page number of workout
                                                            e.g vl pg/2
-                
-                vl detailed/                               - Show page in detail [No argument needed]                  
+               \s
+                vl detailed/                               - Show page in detail [No argument needed]                 \s
                                                            e.g. vl detailed/
-                
-                vl m/[month from 1-12]                     -  Select specific month in current year 
+               \s
+                vl m/[month from 1-12]                     -  Select specific month in current year\s
                                                            e.g vl m/10 [Current Year Oct]
-                
+               \s
                 ym/                                        - Select specific month in specific year
-                                                           e.g. vl ym/10/26 [Oct 2026]                                 
-                
+                                                           e.g. vl ym/10/26 [Oct 2026]                                \s
+               \s
                 /open (o) INDEX                           - Open detailed view of the current list of workout
                                                            e.g. /open 1
-                
+               \s
                 /delete_workout (dw) id/<INDEX> m/<MM>    - Delete a workout by index shown in viewlog
                 /delete_workout (dw) id/<INDEX> ym/<MM>/<YY>
                                                            e.g. /del_workout id/1 m/10
                                                            e.g. /del_workout id/2 ym/10/26
-                
+               \s
                 ~~~ TAGGING SYSTEM ~~~
                 /add_modality_tag (amot) m/MODALITY k/KEYWORD
                                                            - Add a keyword for a workout modality
@@ -292,17 +292,17 @@ public class UI {
                 /override_workout_tag (owt) id/INDEX newTag/TAG_NAME
                                                            - Manually override a workout’s tag
                                                            e.g. /override_workout_tag id/1 newTag/strength
-                
+               \s
                 ~~~ GYM FINDER ~~~
                 /gym_where (gw) n/EXERCISE                - Suggest NUS gyms with equipment for the exercise
                                                            e.g. /gym_where n/squat
                 /gym_page (gp) p/PAGE_OR_NAME             - View available NUS gym pages or by gym name
                                                            e.g. /gym_page p/1
                                                            e.g. /gym_page p/SRC Gym
-                
+               \s
                 ~~~ SYSTEM ~~~
                 /exit (e)                                 - Save all progress and exit the app
-                """);
+               \s""");
     }
 
     /**
@@ -310,56 +310,60 @@ public class UI {
      * Users can also type "/cancel" to abort the operation.
      *
      * @return {@code true} if confirmed (Y/Yes),
-     *     {@code false} if declined (N/No),
-     *     {@code null} if cancelled
+     *         {@code false} if declined (N/No),
+     *         {@code null} if cancelled
      */
-
-    public Boolean confirmationMessageWithCancel(){
-        while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N, /help or /cancel) > ");
-            if (ans == null) {
-                return false;
-            }
-            String lower = ans.trim().toLowerCase();
-
-            if (lower.equals("y") || lower.equals("yes")) {
-                return true;
-            }
-            if (lower.equals("n") || lower.equals("no")) {
-                return false;
-            }
-            if (lower.equals("/help")) {
-                showHelp();
-                continue;
-            }
-            if(lower.equals("/cancel")) {
-                return null;
-            }
-            showError("Please answer Y or N (yes/no).Type /help for command list or /cancel to cancel." +
-                    " \n Tip: Type just keep typing No to exit :)");
-        }
+    public Boolean confirmationMessageWithCancel() {
+        return confirmLoop(true);
     }
 
+    /**
+     * Prompts for a yes/no confirmation from the user (no cancel option).
+     *
+     * @return {@code true} if confirmed (Y/Yes),
+     *         {@code false} if declined (N/No)
+     */
     public boolean confirmationMessage() {
+        Boolean result = confirmLoop(false);
+        return Boolean.TRUE.equals(result);
+    }
+
+    private Boolean confirmLoop(boolean allowCancel) {
+        String prompt = allowCancel
+                ? "Confirm (Y/N, /help or /cancel) > "
+                : "Confirm (Y/N or /help) > ";
+
+        String errorMsg = allowCancel
+                ? "Please answer Y or N (yes/no). Type /help for command list or /cancel to cancel."
+                : "Please answer Y or N (yes/no), or type /help for command list for formats.";
+
+        errorMsg += "\n Tip: Type just keep typing N (no) to exit :)";
+
         while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N or /help) > ");
+            String ans = readInsideRightBubble(prompt);
             if (ans == null) {
                 return false;
             }
             String lower = ans.trim().toLowerCase();
 
-            if (lower.equals("y") || lower.equals("yes")) {
+            switch (lower) {
+            case "y", "yes" -> {
                 return true;
             }
-            if (lower.equals("n") || lower.equals("no")) {
+            case "n", "no" -> {
                 return false;
             }
-            if (lower.equals("/help")) {
+            case "/help" -> {
                 showHelp();
                 continue;
             }
-            showError("Please answer Y or N (yes/no), or type /help for command list for formats." +
-                    " \n Tip: Type just keep typing No to exit :)");
+            default -> {}
+            }
+
+            if (allowCancel && lower.equals("/cancel")) {
+                return null;
+            }
+            showError(errorMsg);
         }
     }
 
