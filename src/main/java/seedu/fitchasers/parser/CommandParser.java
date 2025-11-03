@@ -29,7 +29,8 @@ public interface CommandParser<T> {
     /**
      * Strictly "MM/YY" → YearMonth(2000+YY, MM). Adjust if you prefer another rule.
      */
-    static YearMonth parseYearMonthTokenStrict(String token, YearMonth creationDate) throws InvalidArgumentInput, IOException {
+    static YearMonth parseYearMonthTokenStrict(String token, YearMonth creationDate)
+            throws InvalidArgumentInput, IOException {
         String[] parts = token.split("/");
         if (parts.length != 2) {
             throw new InvalidArgumentInput("Use ym/<MM>/<YY>, e.g., ym/10/26");

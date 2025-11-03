@@ -8,7 +8,6 @@ import seedu.fitchasers.tagger.Tagger;
 import seedu.fitchasers.ui.UI;
 
 import java.io.IOException;
-import java.time.Year;
 import java.time.YearMonth;
 import java.time.format.ResolverStyle;
 import java.util.LinkedHashSet;
