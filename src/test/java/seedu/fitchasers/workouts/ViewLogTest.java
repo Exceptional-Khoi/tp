@@ -2,17 +2,18 @@ package seedu.fitchasers.workouts;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
 import seedu.fitchasers.storage.FileHandlerTest;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.ui.UI;
-
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.io.IOException;
 import java.time.YearMonth;
-import java.time.YearMonth;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+//@@author Kart04
 public class ViewLogTest {
 
     private ViewLog viewLog;
