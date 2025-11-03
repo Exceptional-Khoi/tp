@@ -3,7 +3,7 @@
 ## Introduction
 ### FitChasers User Guide
 FitChasers is a desktop app for managing your fitness journey, optimized for use via a Command Line Interface (CLI) 
-while still having the benefits of a Graphical User Interface (GUI). If you can type fast, ss can help you 
+while still having the benefits of a Graphical User Interface (GUI). If you can type fast, FitChasers can help you 
 track workouts, monitor weight progress, and achieve your fitness goals faster than traditional GUI apps.
 
 ### Interface Display (Console Width)
@@ -66,7 +66,7 @@ Examples:
 - `/rename n/FitChaser_User-1`
 
 ### Adding weight: `/add_weight`
-Logs your weight for a specific date. You can record one or multiple weights per day to monitor changes over time.
+Logs your weight for a specific date.
 
 Format: `/add_weight w/WEIGHT [d/DATE]`
 
@@ -88,7 +88,7 @@ Rules:
   - Year must be two digits (e.g., `25` for 2025).
   - Date must not be in the future relative to the system date.
 
-**Note:** You can log multiple weight entries for the same date but the application only saves the latest entry.
+**Note:** If a weight entry for the specified date already exists, it will be updated with the new weight. Only one weight record is stored per day.
 
 Example:
 
@@ -102,8 +102,7 @@ Displays your recorded weight entries in chronological order.
 
 Format: `/view_weight`
 
-**Notes:** 
-- You can log multiple weight entries for the same date but the application only saves the latest entry.
+**Notes:**
 - Extraneous parameters for commands that do not take in parameters will be ignored.<br>
     e.g. if the command specifies /view_weight 123, it will be interpreted as /view_weight.
 
@@ -138,16 +137,12 @@ Starts a new workout session.
 Format: `/create_workout n/WORKOUT_NAME d/DATE t/TIME`
 
 - `WORKOUT_NAME` is the name of your workout (e.g., "Chest Day", "Morning Run"). 
-  - Rules: Same as `NAME` parameter rules above.
-  - No duplicates on the same date.
+  - Rules: Must contain only letters, numbers, spaces, underscores (_), or hyphens (-). Max 32 characters.
 - `DATE` is in `DD/MM/YY` format. Rules: Same as `DATE` parameter rules above.
 - `TIME` is in `HHMM` format (24-hour, e.g., `1430` for 2:30 PM).
 
 **Notes:** 
-- You can create multiple workouts on the same day with different times. 
-However, you cannot create 2 workouts that have overlapping time. e.g. if you have a workout from 1400 to 1500, 
-you cannot create another workout starting at 1430 but you can create one starting at 1500.
-- You can only create workouts with a start time from the current time (according to your computer system).
+- No Overlapping Workouts: You cannot start a new workout if its start time / end time falls within an already completed workout session on the same day. For example, if you have a workout logged from 08:00 to 09:30, you cannot create a new workout that starts at 09:00 on the same day. You can, however, create one that starts at 09:30.
 - FitChasers only operates for workout logs dated between the month of activation in 2025 and December 2099.
 
 Example:
@@ -161,7 +156,6 @@ Adds an exercise to your current workout session.
 
 Format: `/add_exercise n/EXERCISE_NAME r/REPS`
 
-- `EXERCISE_NAME` is the exercise name. Rules: Same as `NAME` parameter rules above.
 - `REPS` is a number represents repetition for a set (e.g., `15`). It must be an integer less than 1000.
 
 Example:
@@ -190,6 +184,9 @@ Format: `/end_workout d/DATE t/TIME`
 
 - `DATE` is in `DD/MM/YY` format. Rules: Same as `DATE` parameter rules above.
 - `TIME` is in `HHMM` format.
+
+**Notes:**
+- End Time Must Be After Start Time: The application ensures the end time you provide is chronologically after the workout's start time.
 
 Example:
 
@@ -289,21 +286,29 @@ Examples:
 Alternative: `gp`
 
 ### Viewing workout log: `/view_log`
-Displays a list of your workouts, typically for the current month.
+  Displays a list of your workouts, typically for the current month.
 
 Format: `/view_log`
 
 Parameters:
-* -m Month [PAGE] - View workouts for a specific month in the current year
-  * `MONTH` must be `1-12` (e.g., 10 for October)
-  * Optional `PAGE` for pagination (default is page 1)
-* `-ym YEAR MONTH [PAGE]` - View workouts for a specific year and month
-  * `YEAR` must be a two-digit year (e.g.`25` for 2025)
-  * `MONTH` must be `1-12`
-* `[PAGE]` - Navigate to a specific page of the current month's workouts
-  * `PAGE` must be a positive integer
-* `-d` - Display workouts in detailed view with full exercise information
-Default Behavior: When called without parameters, shows the current month's workouts (page 1).
+* `pg/[Number]` - Select a specific page of your workout history
+    * e.g. `/view_log pg/2` → View page 2 of the current month's workouts
+
+* `detailed/` - Show your workouts in detailed view (no argument needed)
+    * e.g. `/view_log detailed/` → Displays full exercise and set details
+
+* `m/[month from 1–12]` - View workouts for a specific month in the current year
+    * `MONTH` must be `1–12` (e.g., 10 for October)
+    * e.g. `/view_log m/10` → October (current year)
+
+* `ym/[month]/[year]` - View workouts for a specific month and year
+    * `YEAR` must be two digits (e.g., 26 for 2026)
+    * `MONTH` must be `1–12`
+    * e.g. `/view_log ym/10/26` → October 2026
+
+Default Behavior:
+When called without parameters, shows the current month's workouts (page 1) in summary view.
+* e.g. `/view_log`
 
 Alternative: `vl`
 
@@ -324,13 +329,16 @@ Alternative: `o`
 ### Deleting Workouts: `/delete_workout`
 Deletes the specified workout from your workout history by its display ID.
 
-Format: `/delete_workout id/INDEX`
+Format: `/delete_workout id/<INDEX> [Optional Tags]`
 
-* `INDEX` is the positive ID number of the workout you want to delete, as shown in `/view_log`.
+Parameters:
+* `id/<INDEX> m/<MM>` - Delete a workout by index shown in the view log for a specific month
+    * e.g. `/delete_workout id/1 m/10` → Deletes workout #1 from October (current year)
+    * e.g. `dw id/1 m/10`
 
-Examples:
-* `/delete_workout id/8`
-* `/delete_workout id/2`
+* `id/<INDEX> ym/<MM>/<YY>` - Delete a workout by index for a specific month and year
+    * e.g. `/delete_workout id/2 ym/10/26` → Deletes workout #2 from October 2026
+    * e.g. `dw id/2 ym/10/26`
 
 
 * Alternative: `dw`
@@ -359,13 +367,9 @@ Data is organized by month and stored in the data/ folder in your FitChasers hom
 directory to the new computer's FitChasers installation. The next time you run FitChasers, it will load all your 
 saved data.
 
-**Q**: What happens if I enter an invalid date format?
-
-**A**: FitChasers will display an error message and ask you to re-enter the command with the correct `DD/MM/YY` format.
-
 **Q**: Can I have multiple workouts on the same day?
 
-**A**: Yes! FitChasers allows you to create and save multiple workouts on the same date. You can even specify 
+**A**: Yes! FitChasers allows you to create and save multiple workouts on the same date as long as you specify 
 different times for each workout.
 
 **Q**: How are tags automatically assigned?
@@ -379,24 +383,24 @@ and exercise names. You can customize keywords using /add_modality_tag and /add_
 
 ## Command Summary
 
-| Action               | Format, Examples                                                                                |
-|----------------------|-------------------------------------------------------------------------------------------------|
-| **Add Exercise**     | `/add_exercise n/NAME r/REPS`<br>e.g., `/add_exercise n/Push Ups r/15`                          |
-| **Add Modality Tag** | `/add_modality_tag m/MODALITY k/KEYWORD`<br>e.g., `/add_modality_tag m/CARDIO k/running`        |
-| **Add Muscle Tag**   | `/add_muscle_tag m/MUSCLE_GROUP k/KEYWORD`<br>e.g., `/add_muscle_tag m/LEGS k/squat`            |
-| **Add Set**          | `/add_set r/REPS`<br>e.g., `/add_set r/10`                                                      |
-| **Add Weight**       | `/add_weight w/WEIGHT d/DATE`<br>e.g., `/add_weight w/75 d/30/10/25`                            |
-| **Create Workout**   | `/create_workout n/NAME d/DATE t/TIME`<br>e.g., `/create_workout n/Chest Day d/30/10/25 t/1430` |
-| **Delete Workout**   | `/del_workout WORKOUT_NAME` or `/del_workout d/DATE`<br>e.g., `/del_workout Chest Day`          |
-| **End Workout**      | `/end_workout d/DATE t/TIME`<br>e.g., `/end_workout d/30/10/25 t/1500`                          |
-| **Exit**             | `/exit` or `e`                                                                                  |
-| **Gym Page**         | `/gym_page p/PAGE_OR_NAME`<br>e.g., `/gym_page p/1` or `/gym_page p/SRC Gym`                    |
-| **Gym Where**        | `/gym_where n/EXERCISE`<br>e.g., `/gym_where n/deadlift`                                        |
-| **Help**             | `/help` or `h`                                                                                  |
-| **Open Workout**     | `/open INDEX`<br>e.g., `/open 1`                                                                |
-| **Override Tag**     | `/override_workout_tag id/ID newTag/TAG`<br>e.g., `/override_workout_tag id/1 newTag/strength`  |
-| **Rename**           | `/rename n/NAME`<br>e.g., `/rename n/John Doe`                                                  |
-| **Set Goal**         | `/set_goal w/TARGET_WEIGHT`<br>e.g., `/set_goal w/70`                                           |
-| **View Goal**        | `/view_goal` or `vg`                                                                            |
-| **View Log**         | `/view_log`<br>e.g., `/view_log`                                                                |
-| **View Weight**      | `/view_weight` or `vw`                                                                          |
+| Action                    | Format, Examples                                                                                                               |
+|---------------------------|--------------------------------------------------------------------------------------------------------------------------------|
+| **Help**                  | `/help (h)`<br>View all available commands                                                                                     |
+| **Rename (User Profile)** | `/rename (rn) n/NAME`<br>e.g. `/rename n/Nitin`                                                                                |
+| **Add Weight**            | `/add_weight (aw) w/WEIGHT d/DATE`<br>e.g. `/add_weight w/75 d/30/10/25`                                                       |
+| **View Weight**           | `/view_weight (vw)`<br>View your recorded weights                                                                              |
+| **Set Goal**              | `/set_goal (sg) w/GOAL_WEIGHT`<br>e.g. `/set_goal w/70.0`                                                                      |
+| **View Goal**             | `/view_goal (vg)`<br>View your current goal and progress                                                                       |
+| **Create Workout**        | `/create_workout (cw) n/NAME d/DATE t/TIME`<br>e.g. `/create_workout n/Chest Day d/30/10/25 t/1430`                            |
+| **Add Exercise**          | `/add_exercise (ae) n/NAME r/REPS`<br>e.g. `/add_exercise n/Squat r/12`                                                        |
+| **Add Set**               | `/add_set (as) r/REPS`<br>e.g. `/add_set r/10`                                                                                 |
+| **End Workout**           | `/end_workout (ew) d/DATE t/TIME`<br>e.g. `/end_workout d/30/10/25 t/1500`                                                     |
+| **View Log**              | `/view_log (vl) [Optional Tags]`<br>e.g. `/view_log`<br>→ `vl pg/2`, `vl detailed/`, `vl m/10`, `vl ym/10/26`                  |
+| **Open Workout**          | `/open (o) INDEX`<br>e.g. `/open 1`                                                                                            |
+| **Delete Workout**        | `/delete_workout (dw) id/<INDEX> m/<MM>`<br>`/delete_workout (dw) id/<INDEX> ym/<MM>/<YY>`<br>e.g. `/delete_workout id/1 m/10` |
+| **Add Modality Tag**      | `/add_modality_tag (amot) m/MODALITY k/KEYWORD`<br>e.g. `/add_modality_tag m/CARDIO k/running`                                 |
+| **Add Muscle Tag**        | `/add_muscle_tag (amt) m/MUSCLE_GROUP k/KEYWORD`<br>e.g. `/add_muscle_tag m/LEGS k/lunges`                                     |
+| **Override Workout Tag**  | `/override_workout_tag (owt) id/INDEX newTag/TAG_NAME`<br>e.g. `/override_workout_tag id/1 newTag/strength`                    |
+| **Gym Where**             | `/gym_where (gw) n/EXERCISE`<br>e.g. `/gym_where n/squat`                                                                      |
+| **Gym Page**              | `/gym_page (gp) p/PAGE_OR_NAME`<br>e.g. `/gym_page p/1` or `/gym_page p/SRC Gym`                                               |
+| **Exit**                  | `/exit (e)`<br>Save all progress and exit the app                                                                              |
