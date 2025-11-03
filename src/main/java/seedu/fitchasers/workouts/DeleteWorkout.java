@@ -66,13 +66,15 @@ public class DeleteWorkout {
         }
 
         // If /view_log sorts, mirror the same sorting BEFORE using display index:
-        monthWorkouts.sort(Comparator.comparing(
-                Workout::getWorkoutEndDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ).thenComparing(
-                Workout::getWorkoutStartDateTime,
-                Comparator.nullsLast(Comparator.naturalOrder())
-        ));
+        monthWorkouts.sort(
+                Comparator.comparing(
+                        Workout::getWorkoutStartDateTime,
+                        Comparator.nullsLast(Comparator.reverseOrder())   // start: desc, nulls last
+                ).thenComparing(
+                        Workout::getWorkoutEndDateTime,
+                        Comparator.nullsLast(Comparator.reverseOrder())   // end: desc, nulls last
+                )
+        );  // ← NO .reversed()
 
         int displayIndex = parsedArgumentsForDelete.indexToDelete();
         if (displayIndex < 1 || displayIndex > monthWorkouts.size()) {

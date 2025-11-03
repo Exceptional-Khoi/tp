@@ -83,7 +83,10 @@ public class WorkoutManager {
     public void initWorkouts() {
         for (Workout workout : this.workouts) {
             while (workout.getWorkoutEndDateTime() == null) {
-                ui.showMessage("Looks like you forgot to end the previous workout, please enter it now!");
+                ui.showError("Looks like you forgot to end the previous workout, please enter it now!");
+                ui.showMessage("[IMPORTANT] You cannot continue using the app unless you enter it ;) "+
+                        "\n Tip: Enter '/end_workout' it will ask you if you want to use today's date" +
+                        "\n Else: Enter '/end_workout d/<DD/MM/YY> t/<HHMM>' e.g. ew d/03/11/25 t/1200" );
                 currentWorkout = workout;
                 endWorkout(ui.readCommand());
             }
@@ -878,7 +881,8 @@ public class WorkoutManager {
         if (dIdx != -1) {
             dateSlice = extractSlice(args, dIdx);
             if (!dateSlice.valueRaw.isEmpty() && Character.isWhitespace(dateSlice.valueRaw.charAt(0))) {
-                ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
+                ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25)." +
+                        " \n Tip: Single digit date needs a 0 infront! e.g 02/11/26");
                 ui.showMessage(usage);
                 return;
             }
@@ -910,7 +914,8 @@ public class WorkoutManager {
             try {
                 date = LocalDate.parse(dateStr, DATE_FMT);
             } catch (Exception ex) {
-                ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25).");
+                ui.showMessage("[Error] Invalid date. Use d/DD/MM/YY (e.g., d/23/10/25)." +
+                        " \nTip: Single digit date needs a 0 infront! e.g 02/11/26");
                 ui.showMessage(usage);
                 return;
             }

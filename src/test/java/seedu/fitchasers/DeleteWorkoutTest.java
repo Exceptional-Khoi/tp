@@ -27,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * JUnit 5 tests for DeleteWorkout without Mockito.
  * Uses simple in-memory fakes for UI, FileHandler, and WorkoutManager.
  */
+
+//@@author ZhongBaode
 class DeleteWorkoutTest {
 
     /** Fake UI that records messages and returns a configurable confirmation. */
@@ -80,7 +82,7 @@ class DeleteWorkoutTest {
         }
 
         @Override
-        public void saveMonthList(YearMonth ym, ArrayList list) throws IOException {
+        public void saveMonthList(YearMonth ym, ArrayList<Workout> list) throws IOException {
             ArrayList<Workout> copy = new ArrayList<>(list); // snapshot for assertions
             store.put(ym, copy);
             lastSave = new SaveCall(ym, copy);
@@ -100,10 +102,12 @@ class DeleteWorkoutTest {
 
         @Override
         public YearMonth getCurrentLoadedMonth() {
+
             return current;
         }
 
         void setCurrentLoadedMonth(YearMonth ym) {
+
             this.current = ym;
         }
 
@@ -167,11 +171,11 @@ class DeleteWorkoutTest {
         FakeFileHandler.SaveCall sc = fh.lastSave;
         assertEquals(ym, sc.ym);
         List<String> names = sc.listCopy.stream().map(Workout::getWorkoutName).toList();
-        assertEquals(List.of("A", "C"), names);
+        assertEquals(List.of("C", "A"), names);
         // In-memory update because deleting current month
         assertEquals(ym, fakeWorkoutManager.lastSetMonth);
         assertNotNull(fakeWorkoutManager.lastSetList);
-        assertEquals(List.of("A", "C"), fakeWorkoutManager.lastSetList.stream().map(Workout::getWorkoutName).toList());
+        assertEquals(List.of("C", "A"), fakeWorkoutManager.lastSetList.stream().map(Workout::getWorkoutName).toList());
 
         // UI showed details and success
         assertTrue(fakeUI.messages.stream().anyMatch(s -> s.startsWith("[DETAILS] ")));

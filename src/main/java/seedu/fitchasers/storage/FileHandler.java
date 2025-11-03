@@ -439,7 +439,13 @@ public class FileHandler {
     // ----------------- Username -----------------
 
     /**
-     * Saves the person's name to a text file for future sessions.
+     * Saves the user's name to a text file in the data directory.
+     * <p>
+     * This method ensures that the data directory exists before writing
+     * the username to {@code username.txt}.
+     *
+     * @param person The {@code Person} object containing the user's name.
+     * @throws IOException If an error occurs while creating or writing to the file.
      */
     public void saveUserName(Person person) throws IOException {
         ensureDataDir();
@@ -447,12 +453,31 @@ public class FileHandler {
         Files.writeString(filePath, person.getName());
     }
 
+    /**
+     * Saves the application's creation month to a text file in the data directory.
+     * <p>
+     * This method ensures that the data directory exists before writing
+     * the {@code YearMonth} value to {@code creationDate.txt}.
+     *
+     * @param yearMonth The {@code YearMonth} representing the application's creation date.
+     * @throws IOException If an error occurs while creating or writing to the file.
+     */
     public void saveCreationMonth(YearMonth yearMonth) throws IOException {
         ensureDataDir();
         Path filePath = DATA_DIRECTORY.resolve("creationDate.txt");
         Files.writeString(filePath, yearMonth.toString());
     }
 
+    /**
+     * Retrieves the application's creation month from the stored file.
+     * <p>
+     * Reads the {@code creationDate.txt} file and parses its contents as a {@code YearMonth}.
+     * If the file does not exist, {@code null} is returned. If the file is corrupted or
+     * cannot be parsed, an error message is shown and the current month is returned instead.
+     *
+     * @return The {@code YearMonth} representing the application's creation date, or {@code null} if not found.
+     * @throws IOException If an error occurs while reading the file.
+     */
     public YearMonth getCreationMonth() throws IOException {
         ensureDataDir();
         Path filePath = DATA_DIRECTORY.resolve("creationDate.txt");
@@ -469,8 +494,13 @@ public class FileHandler {
     }
 
     /**
-     * Loads the saved username from text file.
-     * Returns null if file doesn't exist.
+     * Loads the saved username from the data directory.
+     * <p>
+     * Reads the contents of {@code username.txt} and returns the trimmed username.
+     * If the file does not exist, {@code null} is returned.
+     *
+     * @return The saved username as a {@code String}, or {@code null} if the file is missing.
+     * @throws IOException If an error occurs while reading the file.
      */
     public String loadUserName() throws IOException {
         ensureDataDir();
