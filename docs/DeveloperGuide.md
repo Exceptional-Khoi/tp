@@ -116,7 +116,7 @@ The Architecture Diagram given above explains the high-level design of FitChaser
 Given below is a quick overview of main components and how they interact with each other.
 
 #### Main components of the architecture
-![Alt text](./diagrams/FitChasers_Architecture.jpg "Basic Architecture")
+![Alt text](./diagrams/Architecture_Diagram.png "Basic Architecture")
 FitChasers (consisting of classes FitChasers and Managers) is in charge of the app launch and shut down.
 At app launch, it initializes and loads the components and data in the correct sequence, and connects them up with each other.
 At shut down, it shuts down the other components and invokes cleanup methods where necessary.
@@ -134,7 +134,7 @@ The bulk of the app’s work is done by the following six components:
 #### How the architecture components interact with each other
 
 The Sequence Diagram below shows how the components interact with each other for the scenario where the user issues the command `/create_workout pushup`.
-![Alt text](./diagrams/Architectural_Sequence_Diagram_CW.png "Basic Architecture Sequence Diagram")
+![Alt text](./diagrams/Architecture_Sequence_Diagram.png "Basic Architecture Sequence Diagram")
 
 ## Product scope
 ### Target user profile
