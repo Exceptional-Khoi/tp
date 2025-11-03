@@ -257,11 +257,29 @@ public class UI {
                                                    e.g. /end_workout d/30/10/25 t/1500
         
         ~~~ WORKOUT LOG MANAGEMENT ~~~
-        /view_log (vl)                            - View your workout history
-        /open (o) INDEX                           - Open detailed view of a workout
+        /view_log (vl) [Optional Tags]             - View first page of your workout history
+                                                   e.g. /view_log (vl)
+                                                   
+        [OPTIONAL TAGS FOR /view_log]:
+        vl pg/[Number]                             - Select page number of workout
+                                                   e.g vl pg/2
+        
+        vl detailed/                               - Show page in detail [No argument needed]                  
+                                                   e.g. vl detailed/
+                                                   
+        vl m/[month from 1-12]                     -  Select specific month in current year 
+                                                   e.g vl m/10 [Current Year Oct]
+                                                   
+        ym/                                        - Select specific month in specific year
+                                                   e.g. vl ym/10/26 [Oct 2026]                                 
+                                 
+        /open (o) INDEX                           - Open detailed view of the current list of workout
                                                    e.g. /open 1
-        /delete_workout (dw) id/INDEX             - Delete a workout index
-                                                   e.g. /delete_workout id/8
+        
+        /delete_workout (dw) id/<INDEX> m/<MM>    - Delete a workout by index shown in viewlog
+        /delete_workout (dw) id/<INDEX> ym/<MM>/<YY>
+                                                   e.g. /del_workout id/1 m/10
+                                                   e.g. /del_workout id/2 ym/10/26
         
         ~~~ TAGGING SYSTEM ~~~
         /add_modality_tag (amot) m/MODALITY k/KEYWORD
@@ -288,24 +306,31 @@ public class UI {
 
     /**
      * Prompts for a yes/no confirmation from the user.
+     * Users can also type "/cancel" to abort the operation.
      *
      * @return {@code true} if confirmed (Y/Yes),
-     *         {@code false} otherwise
+     *         {@code false} if declined (N/No),
+     *         {@code null} if cancelled
      */
-    public boolean confirmationMessage() {
+    public Boolean confirmationMessage() {
         while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N) > ");
+            String ans = readInsideRightBubble("Confirm (Y/N or /cancel) > ");
             if (ans == null) {
                 return false;
             }
             String lower = ans.trim().toLowerCase();
+
             if (lower.equals("y") || lower.equals("yes")) {
                 return true;
             }
             if (lower.equals("n") || lower.equals("no")) {
                 return false;
             }
-            showError("Please answer Y or N (yes/no).");
+            if (lower.equals("/cancel")) {
+                showMessage("Action cancelled.");
+                return null;
+            }
+            showError("Please answer Y or N (yes/no), or type /cancel to abort.");
         }
     }
 
@@ -434,7 +459,7 @@ public class UI {
         return sb.toString();
     }
 
-    private String readInsideRightBubble(String prompt) {
+    public String readInsideRightBubble(String prompt) {
         int innerWidth = Math.max(1, (int) (CONSOLE_WIDTH * 3.0 / 5) - FRAME_OVERHEAD);
         int pad = clampNonNeg(CONSOLE_WIDTH - innerWidth - 6);
 

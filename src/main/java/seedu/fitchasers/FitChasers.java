@@ -1,7 +1,6 @@
 package seedu.fitchasers;
 
 import seedu.fitchasers.exceptions.FileNonexistent;
-import seedu.fitchasers.exceptions.InvalidArgumentInput;
 import seedu.fitchasers.ui.UI;
 import seedu.fitchasers.workouts.ViewLog;
 import seedu.fitchasers.gym.EquipmentDisplay;
@@ -47,7 +46,7 @@ public class FitChasers {
     private static WorkoutManager workoutManager;
     private static boolean isRunning = true;
     private static String command;
-    private static String argumentStr;
+    private static String argumentStr = "";
     private static String input;
     private static WeightManager weightManager;
     private static GoalWeightTracker goalTracker;
@@ -57,8 +56,9 @@ public class FitChasers {
         initVariables();
         ui.showGreeting();
         try {
-            viewLog.render(argumentStr);
-        } catch (IndexOutOfBoundsException | InvalidArgumentInput e) {
+            //viewLog.render(argumentStr);
+            System.out.println();
+        } catch (IndexOutOfBoundsException e) {
             ui.showError(e.getMessage());
         }
         workoutManager.initWorkouts();
@@ -189,7 +189,7 @@ public class FitChasers {
                 //@@author Kart04
                 case "/delete_workout":
                 case "dw":
-                    delMethod();
+                    workoutManager.deleteParser(argumentStr);
                     break;
                 //@@author
                 case "/exit":
@@ -202,7 +202,7 @@ public class FitChasers {
                     break;
                 }
             } catch (Exception e) {
-                ui.showError("Something went wrong in main: " + e.getMessage());
+                ui.showError(e.getMessage());
             }
         }
     }
@@ -218,10 +218,6 @@ public class FitChasers {
         isRunning = false;
     }
 
-    private static void delMethod() throws IOException, FileNonexistent {
-        workoutManager.handleDeleteWorkout(argumentStr);
-    }
-    //@@author Kart04
     private static void owtMethod() throws FileNonexistent, IOException {
         // Parse parameters
         String[] params = argumentStr.split("\\s+");
@@ -274,7 +270,7 @@ public class FitChasers {
 
             Set<String> autoTagsThatWillBeOverridden = tagger.suggest(workout);
             if (!autoTagsThatWillBeOverridden.isEmpty()) {
-                ui.showMessage("⚠️ WARNING: This will override auto generated tags: " + String.join(", ",
+                ui.showMessage("WARNING: This will override auto generated tags: " + String.join(", ",
                         autoTagsThatWillBeOverridden));
                 ui.showMessage("Continue with override? (y/n)");
 
@@ -552,7 +548,6 @@ public class FitChasers {
             ui.showError("Failed to save username: " + e.getMessage());
         }
     }
-    //@@author
 
     private static void initVariables() throws IOException, FileNonexistent {
         try {
@@ -571,6 +566,7 @@ public class FitChasers {
             person = new Person(userName);
             try {
                 fileHandler.saveUserName(person);
+                fileHandler.saveCreationMonth(YearMonth.now());
                 ui.showMessage("Your name has been saved.");
             } catch (IOException e) {
                 ui.showError("Failed to save username: " + e.getMessage());
