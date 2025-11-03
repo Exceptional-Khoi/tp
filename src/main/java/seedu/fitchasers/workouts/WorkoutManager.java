@@ -42,6 +42,7 @@ public class WorkoutManager {
             DateTimeFormatter.ofPattern("dd/MM/yy").withResolverStyle(ResolverStyle.SMART);
     private static final DateTimeFormatter TIME_FMT =
             DateTimeFormatter.ofPattern("HHmm").withResolverStyle(ResolverStyle.SMART);
+    protected YearMonth creationDate = null;
 
     private ArrayList<Workout> workouts = new ArrayList<>();
     private Workout currentWorkout = null;
@@ -56,7 +57,6 @@ public class WorkoutManager {
     private int afterNameIndex = 2;
     private LocalDate date = null;
     private LocalTime time = null;
-    protected YearMonth creationDate = null;
     private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
             .withResolverStyle(ResolverStyle.SMART);
     private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
