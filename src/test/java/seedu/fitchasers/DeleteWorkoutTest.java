@@ -106,17 +106,17 @@ class DeleteWorkoutTest {
 
     /* ---------------- Test fixtures ---------------- */
 
-    private FakeUI ui;
+    private FakeUI fakeUI;
     private FakeFileHandler fh;
     private FakeWorkoutManager fakeWorkoutManager;
     private DeleteWorkout sut; // System Under Test
 
     @BeforeEach
     void setup() throws IOException {
-        ui = new FakeUI();
+        fakeUI = new FakeUI();
         fh = new FakeFileHandler();
         fakeWorkoutManager = new FakeWorkoutManager(fh);
-        sut = new DeleteWorkout(ui, fh, fakeWorkoutManager);
+        sut = new DeleteWorkout(fakeUI, fh, fakeWorkoutManager);
     }
 
     private static Workout makeWorkout(String name,
@@ -142,7 +142,7 @@ class DeleteWorkoutTest {
                 makeWorkout("B", 2025,11,2,10,0,12,0),
                 makeWorkout("C", 2025,11,3, 9,0, 9,30)
         )));
-        ui.nextConfirm = true;
+        fakeUI.nextConfirm = true;
 
         // Delete display index 2 (after ascending sort by end/start, that points to "B")
         sut.execute("id/2");
@@ -160,8 +160,8 @@ class DeleteWorkoutTest {
         assertEquals(List.of("A", "C"), fakeWorkoutManager.lastSetList.stream().map(Workout::getWorkoutName).toList());
 //
 //        // UI showed details and success
-        assertTrue(ui.messages.stream().anyMatch(s -> s.startsWith("[DETAILS] ")));
-        assertTrue(ui.messages.stream().anyMatch(s -> s.contains("Deleted workout")));
+        assertTrue(fakeUI.messages.stream().anyMatch(s -> s.startsWith("[DETAILS] ")));
+        assertTrue(fakeUI.messages.stream().anyMatch(s -> s.contains("Deleted workout")));
     }
 
     @Test
@@ -172,7 +172,7 @@ class DeleteWorkoutTest {
         )));
 
         //Cancel deletion
-        ui.nextConfirm = false;
+        fakeUI.nextConfirm = false;
         sut.execute("id/1 m/11");
         assertNull(fakeWorkoutManager.lastSetMonth, "Should have been canceled so no lastSetMonth");
         // No save, no in-memory update
@@ -185,14 +185,14 @@ class DeleteWorkoutTest {
         fh.store.put(ym, new ArrayList<>(List.of(
                 makeWorkout("OnlyOne", 2025,10,1,10,0,11,0)
         )));
-        ui.nextConfirm = true; // shouldn’t be asked, but harmless
+        fakeUI.nextConfirm = true; // shouldn’t be asked, but harmless
 
         sut.execute("id/3 m/10");
 
         // No save
         assertNull(fh.lastSave);
         // Error shown
-        assertTrue(ui.messages.stream().anyMatch(s -> s.startsWith("Invalid workout ID")));
+        assertTrue(fakeUI.messages.stream().anyMatch(s -> s.startsWith("Invalid workout ID")));
         assertEquals(1, fh.store.get(ym).size());           // unchanged
         assertEquals("OnlyOne", fh.store.get(ym).get(0).getWorkoutName());
 
@@ -204,7 +204,7 @@ class DeleteWorkoutTest {
         // No data added -> empty
         sut.execute("id/1 m/10");
 
-        assertTrue(ui.messages.stream().anyMatch(s -> s.equals("No workouts found for 2025-10.")));
+        assertTrue(fakeUI.messages.stream().anyMatch(s -> s.equals("No workouts found for 2025-10.")));
         assertNull(fh.lastSave);
     }
 
@@ -216,7 +216,7 @@ class DeleteWorkoutTest {
         fh.store.put(target, new ArrayList<>(List.of(
                 makeWorkout("Target", 2025,10,1,10,0,10,30)
         )));
-        ui.nextConfirm = true;
+        fakeUI.nextConfirm = true;
 
         sut.execute("id/1 ym/10/25");
 
