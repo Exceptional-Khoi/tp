@@ -310,39 +310,37 @@ public class UI {
      * Users can also type "/cancel" to abort the operation.
      *
      * @return {@code true} if confirmed (Y/Yes),
-     *     {@code false} if declined (N/No),
-     *     {@code null} if cancelled
+     *         {@code false} if declined (N/No),
+     *         {@code null} if cancelled
      */
-
-    public Boolean confirmationMessageWithCancel(){
-        while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N, /help or /cancel) > ");
-            if (ans == null) {
-                return false;
-            }
-            String lower = ans.trim().toLowerCase();
-
-            if (lower.equals("y") || lower.equals("yes")) {
-                return true;
-            }
-            if (lower.equals("n") || lower.equals("no")) {
-                return false;
-            }
-            if (lower.equals("/help")) {
-                showHelp();
-                continue;
-            }
-            if(lower.equals("/cancel")) {
-                return null;
-            }
-            showError("Please answer Y or N (yes/no).Type /help for command list or /cancel to cancel." +
-                    " \n Tip: Type just keep typing No to exit :)");
-        }
+    public Boolean confirmationMessageWithCancel() {
+        return confirmLoop(true);
     }
 
+    /**
+     * Prompts for a yes/no confirmation from the user (no cancel option).
+     *
+     * @return {@code true} if confirmed (Y/Yes),
+     *         {@code false} if declined (N/No)
+     */
     public boolean confirmationMessage() {
+        Boolean result = confirmLoop(false);
+        return Boolean.TRUE.equals(result);
+    }
+
+    private Boolean confirmLoop(boolean allowCancel) {
+        String prompt = allowCancel
+                ? "Confirm (Y/N, /help or /cancel) > "
+                : "Confirm (Y/N or /help) > ";
+
+        String errorMsg = allowCancel
+                ? "Please answer Y or N (yes/no). Type /help for command list or /cancel to cancel."
+                : "Please answer Y or N (yes/no), or type /help for command list for formats.";
+
+        errorMsg += "\n Tip: Type just keep typing N (no) to exit :)";
+
         while (true) {
-            String ans = readInsideRightBubble("Confirm (Y/N or /help) > ");
+            String ans = readInsideRightBubble(prompt);
             if (ans == null) {
                 return false;
             }
@@ -358,8 +356,10 @@ public class UI {
                 showHelp();
                 continue;
             }
-            showError("Please answer Y or N (yes/no), or type /help for command list for formats." +
-                    " \n Tip: Type just keep typing No to exit :)");
+            if (allowCancel && lower.equals("/cancel")) {
+                return null;
+            }
+            showError(errorMsg);
         }
     }
 
