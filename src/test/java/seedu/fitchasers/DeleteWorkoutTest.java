@@ -80,7 +80,7 @@ class DeleteWorkoutTest {
         }
 
         @Override
-        public void saveMonthList(YearMonth ym, ArrayList list) throws IOException {
+        public void saveMonthList(YearMonth ym, ArrayList<Workout> list) throws IOException {
             ArrayList<Workout> copy = new ArrayList<>(list); // snapshot for assertions
             store.put(ym, copy);
             lastSave = new SaveCall(ym, copy);
