@@ -35,7 +35,7 @@
 /create_workout n/cardio mix d/20/11/25 t/0630
 /add_exercise n/jump rope r/5
 /add_exercise n/cycle r/20
-/end_workout d/20/10/25 t/0720
+/end_workout d/20/11/25 t/0720
 
 /create_workout n/yoga session d/20/11/25 t/2100
 /add_exercise n/sun salutation r/5
@@ -68,11 +68,11 @@
 /add_exercise n/climb r/10
 /end_workout d/24/10/25 t/1850
 
-/create_workout n/back day d/25/11/25 t/1730
+/create_workout n/run d/25/11/25 t/1730
 /add_exercise n/pull-ups r/10
 /add_exercise n/lat pulldown r/12
 /add_exercise n/seated row r/10
-/end_workout d/25/10/25 t/1845
+/end_workout d/25/11/25 t/1845
 
 /create_workout n/arm blast d/26/11/25 t/1600
 /add_exercise n/bicep curl r/12

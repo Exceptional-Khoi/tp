@@ -151,7 +151,8 @@ public class FileHandler {
         final String name = workout.getWorkoutName();
         final int duration = workout.getDuration();
         final LocalDateTime start = workout.getWorkoutStartDateTime();
-        final Set<String> tags = workout.getAllTags();
+        final Set<String> autoTags = workout.getAutoTags();
+        final Set<String> manualTags = workout.getManualTags();
         String endTime;
         final List<Exercise> exercises  = workout.getExercises();
         if( workout.getWorkoutEndDateTime() == null){
@@ -169,8 +170,14 @@ public class FileHandler {
         bw.newLine();
         bw.write("DurationMin: " + duration);
         bw.newLine();
-        bw.write("Tags: ");
-        for(String tag : tags){
+        bw.write("AutoTags: ");
+        for(String tag : autoTags){
+            bw.write(tag);
+            bw.write(',');
+        }
+        bw.newLine();
+        bw.write("ManualTags: ");
+        for(String tag : manualTags){
             bw.write(tag);
             bw.write(',');
         }
@@ -225,7 +232,9 @@ public class FileHandler {
         LocalDateTime start = null;
         LocalDateTime end = null;
         Integer duration = null;
-        Set<String> tags = new HashSet<>();
+        Set<String> autoTags = new HashSet<>();
+        Set<String> manualTags = new HashSet<>();
+
         List<SetLine> setLines = new ArrayList<>();
 
         boolean inSets = false;
@@ -279,8 +288,13 @@ public class FileHandler {
                 continue;
             }
 
-            if (line.startsWith("Tags:")) {
-                tags = parseTagList(line.substring("Tags:".length()).trim());
+            if (line.startsWith("AutoTags:")) {
+                autoTags = parseTagList(line.substring("AutoTags:".length()).trim());
+                continue;
+            }
+
+            if (line.startsWith("ManualTags:")) {
+                manualTags = parseTagList(line.substring("ManualTags:".length()).trim());
                 continue;
             }
 
@@ -311,7 +325,8 @@ public class FileHandler {
 
         // Instantiate Workout with parsed values.
         Workout w = new Workout(name, start, end); // e.g., ctor computes duration
-        w.setManualTags(tags); //#TODO edit
+        w.setAutoTags(autoTags);
+        w.setManualTags(manualTags);
         // Add sets
         for (SetLine s : setLines) {
             final String n = s.name == null ? "" : s.name;

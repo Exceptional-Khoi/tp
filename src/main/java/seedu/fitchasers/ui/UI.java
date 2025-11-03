@@ -255,6 +255,7 @@ public class UI {
                                                    e.g. /add_set r/10
         /end_workout (ew) d/DATE t/TIME           - End and save current workout
                                                    e.g. /end_workout d/30/10/25 t/1500
+                                                   e.g. /end_workout t/1500 (Will prompt current date)
         
         ~~~ WORKOUT LOG MANAGEMENT ~~~
         /view_log (vl) [Optional Tags]             - View first page of your workout history
