@@ -68,6 +68,16 @@ public class Workout {
     }
 
     /**
+     * Returns a defensive copy of the set of manual tags.
+     * Manual tags are those explicitly assigned or edited by the user.
+     *
+     * @return a new {@code Set<String>} containing the manual tags
+     */
+    public Set<String> getManualTags() {
+        return new LinkedHashSet<>(manualTags);
+    }
+
+    /**
      * Returns the set of auto tags.
      * Auto tags are those generated automatically based on workout content or keywords.
      *
