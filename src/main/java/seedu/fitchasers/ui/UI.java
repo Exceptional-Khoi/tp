@@ -54,7 +54,7 @@ public class UI {
      * Prompts the user to enter one or more indices for deletion.
      *
      * @return the trimmed input string containing indices,
-     * or {@code null} if no input is provided
+     *     or {@code null} if no input is provided
      */
     public String enterSelection() {
         String s = readInsideRightBubble("Enter the index(es) to be deleted > ");
@@ -151,11 +151,11 @@ public class UI {
      */
     public void showGreeting() {
         String[] purpleShades = {
-                "\u001B[38;5;93m",
-                "\u001B[38;5;129m",
-                "\u001B[38;5;135m",
-                "\u001B[38;5;141m",
-                "\u001B[38;5;147m"
+            "\u001B[38;5;93m",
+            "\u001B[38;5;129m",
+            "\u001B[38;5;135m",
+            "\u001B[38;5;141m",
+            "\u001B[38;5;147m"
         };
         System.out.println(purpleShades[0] +
                 " ▄▄▄▄▄▄   ▀      ▄      ▄▄▄  █                                       " + RESET);
@@ -310,8 +310,8 @@ public class UI {
      * Users can also type "/cancel" to abort the operation.
      *
      * @return {@code true} if confirmed (Y/Yes),
-     * {@code false} if declined (N/No),
-     * {@code null} if cancelled
+     *     {@code false} if declined (N/No),
+     *     {@code null} if cancelled
      */
     public Boolean confirmationMessage() {
         while (true) {
@@ -396,10 +396,10 @@ public class UI {
             return "th";
         }
         return switch (day % 10) {
-            case 1 -> "st";
-            case 2 -> "nd";
-            case 3 -> "rd";
-            default -> "th";
+        case 1 -> "st";
+        case 2 -> "nd";
+        case 3 -> "rd";
+        default -> "th";
         };
     }
 
