@@ -116,7 +116,7 @@ The Architecture Diagram given above explains the high-level design of FitChaser
 Given below is a quick overview of main components and how they interact with each other.
 
 #### Main components of the architecture
-![Alt text](./diagrams/FitChasers_Architecture.jpg "Basic Architecture")
+![Basic Architecture](./diagrams/FitChasers_Architecture.jpg "Basic Architecture")
 FitChasers (consisting of classes FitChasers and Managers) is in charge of the app launch and shut down.
 At app launch, it initializes and loads the components and data in the correct sequence, and connects them up with each other.
 At shut down, it shuts down the other components and invokes cleanup methods where necessary.
@@ -261,7 +261,7 @@ The `WeightManager` component handles all operations related to recording, viewi
 a user's weight and goal weight. It works together with the `Person` entity to maintain a complete
 history of weight entries.
 
-![Alt text](./diagrams/WeightManager_Class_Diagram.png "Basic Architecture")
+![Alt text](./diagrams/WeightManager_Class_Diagram.png "Weight Manager Class Diagram")
 
 ### Overview
 WeightManager handles:
@@ -833,13 +833,14 @@ Process:
 ### Sequence Diagram
 The following sequence diagram shows the interaction between components when a workout is created
 and tags are auto-generated:
-![Alt text](./diagrams/Sequence_Digram_for_tagging.png "Sequence Diagram for Tagging")
 ### Sequence Diagram for creating a workout
 ![Sequence diagram for creating a workout](./diagrams/SD_createw.png)
 ### Sequence Diagram for adding an exercise to current workout
 ![Sequence diagram for adding an exercise](./diagrams/SD_addex.png)
 ### Sequence Diagram for adding a set to the current exercise 
 ![Sequence diagram for adding a set](./diagrams/SD_addset.png)
+### Sequence Diagram for tagging of the current workout
+![Sequence diagram for tagging](./diagrams/Sequence_Diagram_for_tagging.png "Sequence Diagram for Tagging")
 ### Manual Tag Method
 #### Adding modality keywords
 Users can extend the `DefaultTagger`'s keyword dictionary using the `/add_modality_tag` command.

@@ -315,6 +315,7 @@ public class FitChasers {
             ui.showMessage("Usage: /override_workout_tag id/WORKOUT_ID newTag/NEW_TAG");
         }
     }
+    //@@author
 
     //@@author Exceptional-Khoi
     private static void gpMethod() {
@@ -437,6 +438,7 @@ public class FitChasers {
             ui.showMessage("Usage: /add_muscle_tag m/LEGS/ CHEST/... k/keyword");
         }
     }
+    //@@author
 
     //@@author Kart04
     private static void amotMethod() {
@@ -620,4 +622,6 @@ public class FitChasers {
         viewLog = new ViewLog(ui, workoutManager, fileHandler);
         goalTracker = new GoalWeightTracker();
     }
+    //@@author
 }
+
