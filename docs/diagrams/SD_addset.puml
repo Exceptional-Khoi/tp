@@ -1,48 +1,52 @@
 @startuml
-' --- Minimal consistent styling ---
+title FitChasers Add Set to Exercise - Sequence Diagram
+' --- Styling (kept minimal & consistent) ---
 skinparam sequenceParticipantType rectangle
 skinparam shadowing false
 skinparam responseMessageBelowArrow true
 hide footbox
 
-actor User
+actor    User
 participant ":UI" as UI
 participant ":FitChasers" as App
 participant ":WorkoutManager" as WM
-participant ":FileHandler" as FH
-participant ":Workout" as W
-participant ":Exercise" as E
+participant ":Exercise (current)" as E
 
 User -> UI : enterText()
 UI -> App : readCommand()
 App -> WM : addSet(command)
-activate WM
 
 alt noActiveWorkout
   WM -> UI : showMessage("No active workout. Use /create_workout first.")
 else activeWorkoutExists
-  alt invalidFormat
-    WM -> UI : showMessage("Missing information. Use: /add_set n/EXERCISE w/WEIGHT r/REPS")
-  else validFormat
-    WM -> WM : parseCommand(command)
-    alt exerciseNotFound
-      WM -> UI : showMessage("Exercise not found in current workout.")
-    else exerciseFound
-      alt invalidRepsOrWeight
-        WM -> UI : showMessage("Invalid input. Reps: 1–1000, Weight: 0–1000.")
-      else validInputs
-        WM -> E : addSet(weight, reps)
-        WM -> FH : saveMonthList(currentMonth, workouts)
-        WM -> UI : showMessage("Added set: " + weight + "kg × " + reps)
+  alt noCurrentExercise
+    WM -> UI : showMessage("No exercises yet. Add an exercise first with /add_exercise n/NAME r/REPS")
+  else hasCurrentExercise
+    alt argsMissing
+      WM -> UI : showMessage("Missing information. Use: /add_set r/REPS")
+      WM -> UI : showMessage("REPS: 1–1000")
+    else argsPresent
+      alt invalidTokenCount
+        WM -> UI : showMessage("Provide exactly one r/. Usage: /add_set r/REPS")
+      else strayFlagsDetected
+        WM -> UI : showMessage("Only r/ is allowed for this command. Usage: /add_set r/REPS")
+      else hasRToken
+        WM -> WM : extractReps(command)
+        alt spaceAfterR
+          WM -> UI : showMessage("Invalid reps. Use a whole number between 1 and 1000. Example: /add_set r/15")
+        else parseFailedOrOutOfRange
+          WM -> UI : showMessage("Invalid reps. Use a whole number between 1 and 1000. Example: /add_set r/15")
+        else trailingJunkAfterReps
+          WM -> UI : showMessage("Unexpected text after reps. Use exactly: /add_set r/REPS")
+        else validReps
+          WM -> E : addSet(reps)
+          WM -> UI : showMessage("Adding a new set to your exercise!")
+          WM -> UI : showMessage("Added set to exercise:\n" + toDetailedString())
+        end
       end
     end
   end
 end
 
-WM --> App : message
-deactivate WM
-
-App --> UI : message
 UI -> User : displayMessage()
-
 @enduml

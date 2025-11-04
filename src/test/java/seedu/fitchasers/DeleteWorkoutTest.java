@@ -227,15 +227,15 @@ class DeleteWorkoutTest {
 
     @Test
     void execute_differentCurrentMonth_noInMemoryUpdate() throws Exception {
-        YearMonth target = YearMonth.of(2025, 10); // ym/10/26 (strict MM/YY → 2026)
-        fakeWorkoutManager.setCurrentLoadedMonth(YearMonth.of(2026, 10)); // different than target
+        YearMonth target = YearMonth.of(2026, 10); // ym/10/26 (strict MM/YY → 2026)
+        fakeWorkoutManager.setCurrentLoadedMonth(YearMonth.of(2025, 10)); // different than target
 
         fh.store.put(target, new ArrayList<>(List.of(
-                makeWorkout("Target", 2025,10,1,10,0,10,30)
+                makeWorkout("Target", 2026,10,1,10,0,10,30)
         )));
         fakeUI.nextConfirm = true;
 
-        sut.execute("id/1 ym/10/25");
+        sut.execute("id/1 ym/10/26");
 
         // Saved in 2026-10
         assertNotNull(fh.lastSave);

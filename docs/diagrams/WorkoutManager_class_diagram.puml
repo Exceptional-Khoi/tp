@@ -1,5 +1,7 @@
 @startuml
 title FitChasers Workout Management System - Class Diagram
+
+skinparam linetype ortho
 skinparam shadowing false
 skinparam classAttributeIconSize 0
 skinparam ArrowColor #444

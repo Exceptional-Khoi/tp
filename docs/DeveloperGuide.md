@@ -59,22 +59,22 @@ Follow the steps in this guide precisely. Things may not work if you deviate at 
 2. If you plan to use IntelliJ IDEA (highly recommended):
    - Configure the JDK (Java 17): Follow the guide [se-edu/guides] IDEA: Configuring the JDK to ensure IntelliJ uses JDK 17.
    - Import as a Gradle project: Follow [se-edu/guides] IDEA: Importing a Gradle project to import this project into IDEA.
-
-    **Note:** Importing a Gradle project is slightly different from importing a normal Java project.
+   
+   **Note:** Importing a Gradle project is slightly different from importing a normal Java project.
 
 3. Verify the setup:
 
-- **Run the app:** Run the main class `seedu.fitchasers.FitChasers` and try a few commands:
-```
-/help
-/add_workout w/70.2 d/29/10/25
-/create_workout n/Push Day d/29/10/25 t/1830
-/exit (to exit and save)
-```
-- **Run the test:** Execute the test task to ensure all pass:
-```
-./gradlew test
-```
+    - **Run the app:** Run the main class `seedu.fitchasers.FitChasers` and try a few commands:
+    ```
+    /help
+    /add_workout w/70.2 d/29/10/25
+    /create_workout n/Push Day d/29/10/25 t/1830
+    /exit (to exit and save)
+    ```
+    - **Run the test:** Execute the test task to ensure all pass:
+    ```
+    ./gradlew test
+    ```
 
 ### Before writing code
 
@@ -142,7 +142,8 @@ The bulk of the app’s work is done by the following six components:
 
 #### How the architecture components interact with each other
 
-The Sequence Diagram below shows how the components interact with each other for the scenario where the user issues the command `/create_workout pushup`.
+The Sequence Diagram below shows how the components interact with each other for the scenario where the user issues the command `/create_workout pushup`
+
 ![Alt text](./diagrams/Architecture_Sequence_Diagram.png "Basic Architecture Sequence Diagram")
 
 ## Product scope
@@ -274,7 +275,12 @@ The `WeightManager` component handles all operations related to recording, viewi
 a user's weight and goal weight. It works together with the `Person` entity to maintain a complete
 history of weight entries.
 
-![Alt text](./diagrams/WeightManager_Class_Diagram.png "Basic Architecture")
+![Alt text](./diagrams/WeightManager_Class_Diagram.png)
+
+To illustrate how the components interact at runtime, the following **object diagram** 
+shows a concrete instance with two weight records linked to a `Person`, managed by a `WeightManager`
+
+![Alt text](./diagrams/WeightManager_Object_Diagram.png)
 
 ### Overview
 WeightManager handles:
@@ -296,7 +302,6 @@ The `GoalWeightTracker` component handles the user's target goal weight. It work
 * Comparing the current weight with the goal and showing progress
 * Persisting goal weight data
 * Validating input and handling invalid entries
-
 
 
 ## Glossary
@@ -459,11 +464,19 @@ Mainstream OS: Windows, Linux, Unix, macOS
 
 2. **Open a Workout**
     1. Prerequisite: Ensure at least one workout exists.
-    2. Test case: `/open 1`  
+    2. Test case: `/open id/1`  
        **Expected:** Shows detailed view with name, date, duration, exercises, and sets.
-    3. Test case: `/open 99`  
-       **Expected:** Error “Invalid workout index.”
-
+    3. Test case: `/open id/99`  
+       **Expected:** Error “Invalid workout index.” 
+   4.  Test case: `/open id/1 m/<Valid Month>`  
+       **Expected:** Shows detailed view with name, date, duration, exercises, and sets. 
+   5.  Test case: `/open id/1 m/<Invalid Month> `  
+       **Expected:** Month after m/ must be an integer 1..12.” 
+   6.  Test case: `/open id/1 ym/<Valid Month>/<Valid Year>` 
+       **Expected:** Shows detailed view with name, date, duration, exercises, and sets. 
+   7. Test case: `/open id/1 ym/<Invalid Month>/<Invalid Year> `  
+       **Expected:** Month after m/ must be an integer 1..12.”
+   
 3. **Delete a Workout**
     1. Test case: `/delete_workout id/1 m/11`  
        **Expected:** Confirmation prompt appears (“Are you sure? (y/n)”).  
@@ -471,9 +484,9 @@ Mainstream OS: Windows, Linux, Unix, macOS
     2. Test case: `/delete_workout id/10` (nonexistent index)  
        **Expected:** Error “Invalid workout ID: 10.”
 
-> **Additional tests**
-> - Delete using year+month: `/delete_workout id/2 ym/10/26` → Expected: confirms and deletes from Oct 2026.
-> - Missing `id/`: `/delete_workout m/11` → Expected: error prompting to include `id/`.
+    > **Additional tests**
+    > - Delete using year+month: `/delete_workout id/2 ym/10/26` → Expected: confirms and deletes from Oct 2026.
+    > - Missing `id/`: `/delete_workout m/11` → Expected: error prompting to include `id/`.
 
 <br>
 
@@ -494,10 +507,10 @@ Mainstream OS: Windows, Linux, Unix, macOS
     1. Test case: `/override_workout_tag id/1 newTag/recovery`  
        **Expected:** “Workout #1 tags replaced with [recovery].”
 
-> **Additional tests**
-> - Missing `newTag/`: `/override_workout_tag id/1` → Expected: error.
-> - Missing `id/`: `/override_workout_tag newTag/cardio` → Expected: error.
-> - Nonexistent workout: `/override_workout_tag id/999 newTag/cardio` → Expected: error (invalid id).
+    > **Additional tests**
+    > - Missing `newTag/`: `/override_workout_tag id/1` → Expected: error.
+    > - Missing `id/`: `/override_workout_tag newTag/cardio` → Expected: error.
+    > - Nonexistent workout: `/override_workout_tag id/999 newTag/cardio` → Expected: error (invalid id).
 
 <br>
 

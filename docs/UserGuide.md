@@ -318,17 +318,17 @@ Alternative: `vl`
 
 ### Opening a workout: `/open`
 Opens and displays detailed information about a specific workout by its index in the current system month's list.
-* Do note that you can ONLY open index from the system's month list, if the list do not exist, it will prompt no such file exist.
+Format: `/open id/<INDEX> [Optional Tags]`
 
-Format: `/open INDEX`
+Parameters:
+* `id/<INDEX> m/<MM>` - Open a workout by index shown in the view log for a specific month
+    * e.g. `/open id/1 m/10` → Open workout #1 from October (current year)
+    * e.g. `/open id/1 m/10`
 
-- `INDEX` is the number of the workout in the displayed list.
-- The index must be a positive integer `1, 2, 3 ...`
-
-Examples:
-- `/open 1 - Opens the first workout`
-- `/open 3 - Opens the third workout`
-
+* `id/<INDEX> ym/<MM>/<YY>` - Open a workout by index for a specific month and year
+    * e.g. `/open id/2 ym/10/26` → Open workout #2 from October 2026
+    * e.g. `/open id/2 ym/10/26`
+  
 Alternative: `o`
 
 ### Deleting Workouts: `/delete_workout`
@@ -401,7 +401,7 @@ and exercise names. You can customize keywords using /add_modality_tag and /add_
 | **Add Set**               | `/add_set (as) r/REPS`<br>e.g. `/add_set r/10`                                                                                 |
 | **End Workout**           | `/end_workout (ew) d/DATE t/TIME`<br>e.g. `/end_workout d/30/10/25 t/1500`                                                     |
 | **View Log**              | `/view_log (vl) [Optional Tags]`<br>e.g. `/view_log`<br>→ `vl pg/2`, `vl detailed/`, `vl m/10`, `vl ym/10/26`                  |
-| **Open Workout**          | `/open (o) INDEX`<br>e.g. `/open 1`                                                                                            |
+| **Open Workout**          | `/open (o) id/INDEX`<br>e.g. `/open id/1`                                                                                      |
 | **Delete Workout**        | `/delete_workout (dw) id/<INDEX> m/<MM>`<br>`/delete_workout (dw) id/<INDEX> ym/<MM>/<YY>`<br>e.g. `/delete_workout id/1 m/10` |
 | **Add Modality Tag**      | `/add_modality_tag (amot) m/MODALITY k/KEYWORD`<br>e.g. `/add_modality_tag m/CARDIO k/running`                                 |
 | **Add Muscle Tag**        | `/add_muscle_tag (amt) m/MUSCLE_GROUP k/KEYWORD`<br>e.g. `/add_muscle_tag m/LEGS k/lunges`                                     |

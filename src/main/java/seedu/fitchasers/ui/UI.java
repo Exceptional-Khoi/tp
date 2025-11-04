@@ -272,16 +272,18 @@ public class UI {
                 vl m/[month from 1-12]                     -  Select specific month in current year\s
                                                            e.g vl m/10 [Current Year Oct]
                \s
-                ym/                                        - Select specific month in specific year
+                vl ym/[Month/Year]                         - Select specific month in specific year
                                                            e.g. vl ym/10/26 [Oct 2026]                                \s
                \s
-                /open (o) INDEX                           - Open detailed view of the current list of workout
-                                                           e.g. /open 1
+                /open(o) id/<INDEX> m/<MM>                 - Open details of a workout by index
+                /open (o) id/<INDEX> ym/<MM>/<YY>
+                                                           e.g. /open id/1 m/10
+                                                           e.g. /open id/2 ym/03/26
                \s
                 /delete_workout (dw) id/<INDEX> m/<MM>    - Delete a workout by index shown in viewlog
                 /delete_workout (dw) id/<INDEX> ym/<MM>/<YY>
                                                            e.g. /del_workout id/1 m/10
-                                                           e.g. /del_workout id/2 ym/10/26
+                                                           e.g. /del_workout id/2 ym/02/26
                \s
                 ~~~ TAGGING SYSTEM ~~~
                 /add_modality_tag (amot) m/MODALITY k/KEYWORD
