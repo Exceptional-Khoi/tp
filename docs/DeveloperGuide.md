@@ -1,38 +1,47 @@
-# Developer Guide
-
 ## Table of Contents
 - [Acknowledgements](#acknowledgements)
-- [Design & Implementation](#design--implementation)
+- [Setting up and getting started](#setting-up-and-getting-started)
+    - [Setting up the project in your computer](#setting-up-the-project-in-your-computer)
+    - [Before writing code](#before-writing-code)
+- [Design & implementation](#design--implementation)
     - [Design](#design)
-    - [Main Components of the Architecture](#main-components-of-the-architecture)
-    - [How the Architecture Components Interact](#how-the-architecture-components-interact-with-each-other)
-- [Product Scope](#product-scope)
-    - [Target User Profile](#target-user-profile)
-    - [Value Proposition](#value-proposition)
+- [Product scope](#product-scope)
+    - [Target user profile](#target-user-profile)
+    - [Value proposition](#value-proposition)
 - [User Stories](#user-stories)
 - [Non-Functional Requirements](#non-functional-requirements)
-- [WorkoutManager Component](#workoutmanager-component)
+- [UI Component](#ui-component)
+    - [Structure of the UI component](#structure-of-the-ui-component)
+    - [Key classes](#key-classes)
+    - [Console layout](#console-layout)
+    - [Responsibilities](#responsibilities)
+- [WorkoutManager component](#workoutmanager-component)
+- [WeightManager Component](#weightmanager-component)
+- [GoalWeightTracker Component](#goalweighttracker-component)
 - [Glossary](#glossary)
-- [Instructions for Manual Testing](#instructions-for-manual-testing)
-    - [Help](#help)
-    - [Set Name](#set-name)
-    - [Create Workout](#create-workout)
-    - [Add Exercise](#add-exercise)
-    - [Add Set](#add-set)
-    - [End Workout](#end-workout)
-    - [View Log](#view-log)
-    - [Exit](#exit)
+- [Launch and Shutdown](#launch-and-shutdown)
+- [User Profile Commands](#user-profile-commands)
+- [Weight Tracking](#weight-tracking)
+- [Workout Creation and Logging](#workout-creation-and-logging)
+- [Viewing and Managing Workouts](#viewing-and-managing-workouts)
+- [Tagging System](#tagging-system)
+- [Gym Lookup Commands](#gym-lookup-commands)
+- [Data Persistence](#data-persistence)
+- [Invalid Commands](#invalid-commands)
+- [Graceful Error Handling](#graceful-error-handling)
+- [Exit and Restart Behavior](#exit-and-restart-behavior)
 - [Tagging and Categorization](#tagging-and-categorization)
     - [Design](#design-1)
-    - [Class Diagram](#class-diagram-for-tagging)
-    - [Sequence Diagram](#Sequence-Diagram)
+    - [Class Diagram for Tagging](#class-diagram-for-tagging)
     - [Implementation](#implementation)
+    - [Sequence Diagram](#sequence-diagram)
+    - [Sequence Diagram for creating a workout](#sequence-diagram-for-creating-a-workout)
+    - [Sequence Diagram for adding an exercise to current workout](#sequence-diagram-for-adding-an-exercise-to-current-workout)
+    - [Sequence Diagram for adding a set to the current exercise](#sequence-diagram-for-adding-a-set-to-the-current-exercise)
     - [Manual Tag Method](#manual-tag-method)
-    - [Important Design Decision](#important-design-decision)
     - [Design Consideration](#design-consideration)
     - [Future Enhancements](#future-enhancements)
 - [Notes](#notes)
-
 
 ## Acknowledgements
 
@@ -57,10 +66,10 @@ Follow the steps in this guide precisely. Things may not work if you deviate at 
 
 - **Run the app:** Run the main class `seedu.fitchasers.FitChasers` and try a few commands:
 ```
-h (or /help)
-aw w/70.2 d/29/10/25
-cw n/Push Day d/29/10/25 t/1830
-e (to exit and save)
+/help
+/add_workout w/70.2 d/29/10/25
+/create_workout n/Push Day d/29/10/25 t/1830
+/exit (to exit and save)
 ```
 - **Run the test:** Execute the test task to ensure all pass:
 ```
@@ -159,7 +168,7 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 | v1.0    | new user           | see a welcome message and list of commands                        | know how to start using the app                           |
 | v1.0    | user               | create a new workout with a date and time                         | plan and record my daily workouts                         |
 | v1.0    | user               | add exercises to a workout                                        | track what I am doing during my session                   |
-| v1.0    | user               | add sets and reps for each exercise                               | monitor my training volume and progress                   ||
+| v1.0    | user               | add sets and reps for each exercise                               | monitor my training volume and progress                   |
 | v1.0    | user               | end my workout and record its duration                            | know how long I trained for each session                  |
 | v1.0    | user               | view a log of past workouts                                       | review my training history easily                         |
 | v1.1    | frequent user      | record my weight by date                                          | monitor my weight progress over time                      |
@@ -575,13 +584,13 @@ The tagging system in FitChasers automatically categorizes workouts based on
 exercise modalities (e.g., cardio, strength) and muscle groups (e.g., legs, chest, back).
 This enables users to quickly identify workout types and track training patterns over time.
 
-### ("Class Diagram for Tagging")
+### Class Diagram for Tagging
 ![Alt text](./diagrams/Class_Diagram_for_tagging.png "Class Diagram for Tagging")
 
 Key Relationships:
 - Dependency: `WorkoutManager` depends on the `Tagger` interface for tag suggestion services
 - Composition: `WorkoutManager` owns and manages multiple `Workout` instances.
-- Aggregation: `Workout` contains `Exercise` objects (exercises can exist independently
+- Aggregation: `Workout` contains `Exercise` objects (exercises can exist independently)
 - Implementation: `DefaultTagger` implements the `Tagger` interface
 - Association: `DefaultTagger` uses Modality and `MuscleGroup` enums to organize keywords
 
@@ -605,12 +614,12 @@ Process:
 ### Sequence Diagram
 The following sequence diagram shows the interaction between components when a workout is created
 and tags are auto-generated:
-![Alt text](./diagrams/Sequence_Digram_for_tagging.png "Sequence Diagram for Tagging")
+![Alt text](./diagrams/Sequence_Diagram_for_tagging.png "Sequence Diagram for Tagging")
 ### Sequence Diagram for creating a workout
 ![Sequence diagram for creating a workout](./diagrams/SD_createw.png)
 ### Sequence Diagram for adding an exercise to current workout
 ![Sequence diagram for adding an exercise](./diagrams/SD_addex.png)
-### Sequence Diagram for adding a set to the current exercise 
+### Sequence Diagram for adding a set to the current exercise
 ![Sequence diagram for adding a set](./diagrams/SD_addset.png)
 ### Manual Tag Method
 #### Adding modality keywords
@@ -624,7 +633,7 @@ Example: `/add_modality_tag m/cardio k/jump_rope`
 4. Future workouts containing "jump_rope" in their name will automatically receive the `cardio` tag
 #### Overriding workout tags
 Users can manually override tags for a specific workout using the `/override_workout_tag` command:
-`/override_workout_tag id/3 newTag/strength
+`/override_workout_tag id/3 newTag/strength`
 1. WorkoutManager.overrideWorkoutTags(int workoutId, String newTag) is invoked with workoutId=3 and newTag="strength"
 2. The target workout is retrieved by ID (1-based index)
 3. A new Set<String> containing only "strength" is created
@@ -715,6 +724,7 @@ Implementation consideration:
 ## Notes
 
 - All parameters are required unless otherwise noted
-- Spacing is critical in parameter syntax (e.g., space before `r/`, no space after `r/`)
 - Invalid or malformed parameters return specific error messages with usage guidance
 - Y/N prompts are used when parameters are missing
+
+

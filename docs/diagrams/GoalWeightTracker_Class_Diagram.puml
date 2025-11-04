@@ -10,40 +10,34 @@ skinparam ClassBackgroundColor #FAFAFA
 hide circle
 hide stereotype
 
-package "seedu.fitchasers.user" {
-  class GoalWeightTracker {
-    -DF: DateTimeFormatter <<static>>
-    -ui: UI
-    -goalWeight: Double
-    -setDate: LocalDate
-    --
-    +GoalWeightTracker()
-    +handleSetGoal(input: String): void
-    +handleViewGoal(currentWeight: Double): void
-    -saveGoal(): void
-    -loadGoal(): void
-    +hasGoal(): boolean
-    +getGoalWeight(): double
-  }
+class GoalWeightTracker {
+-DF: DateTimeFormatter <<static>>
+-ui: UI
+-goalWeight: Double
+-setDate: LocalDate
+--
++GoalWeightTracker()
++handleSetGoal(input: String): void
++handleViewGoal(currentWeight: Double): void
+-saveGoal(): void
+-loadGoal(): void
++hasGoal(): boolean
++getGoalWeight(): double
 }
 
-package "seedu.fitchasers.ui" {
-  class UI {
-    -scanner: Scanner
-    --
-    +showMessage(message: String): void
-    +readInsideRightBubble(prompt: String): String
-  }
+class UI {
+-scanner: Scanner
+--
++showMessage(message: String): void
++readInsideRightBubble(prompt: String): String
 }
 
-package "seedu.fitchasers.storage" {
-  class FileHandler {
-    -DATA_DIRECTORY: Path <<static>>
-    -ui: UI
-    --
-    +saveGoal(goalWeight: double, setDate: LocalDate): void
-    +loadGoal(): Double[]
-  }
+class FileHandler {
+-DATA_DIRECTORY: Path <<static>>
+-ui: UI
+--
++saveGoal(goalWeight: double, setDate: LocalDate): void
++loadGoal(): Double[]
 }
 
 ' === Relationships ===

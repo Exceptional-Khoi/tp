@@ -1,4 +1,3 @@
-//@@author bennyy117
 @startuml
 title FitChasers Workout Management System - Class Diagram
 skinparam shadowing false
@@ -10,124 +9,111 @@ skinparam NoteBackgroundColor #E3F2FD
 skinparam NoteBorderColor #2196F3
 hide circle
 
-' ============== PACKAGES ==============
-package "seedu.fitchasers.workouts" {
-  class WorkoutManager {
-    -workouts: ArrayList<Workout>
-    -currentWorkout: Workout
-    -currentLoadedMonth: YearMonth
-    -creationDate: YearMonth
-    -workoutsByMonth: Map<YearMonth, ArrayList<Workout>>
-    -tagger: Tagger
-    -ui: UI
-    -fileHandler: FileHandler
-    --
-    +addWorkout(command: String): void
-    +addExercise(args: String): void
-    +addSet(args: String): void
-    +endWorkout(args: String): void
-    +overrideWorkoutTags(workout: Workout, newTag: String): void
-    +getWorkouts(): ArrayList<Workout>
-  }
-
-  class Workout {
-    -workoutName: String
-    -duration: int
-    -workoutStartDateTime: LocalDateTime
-    -workoutEndDateTime: LocalDateTime
-    -exercises: ArrayList<Exercise>
-    -currentExercise: Exercise
-    -manualTags: Set<String>
-    -autoTags: Set<String>
-    --
-    +addExercise(exercise: Exercise): void
-    +setManualTags(tags: Set<String>): void
-    +setAutoTags(tags: Set<String>): void
-    +getAllTags(): Set<String>
-    +calculateDuration(): int
-  }
-
-  class Exercise {
-    -name: String
-    -sets: ArrayList<Integer>
-    --
-    +addSet(reps: int): void
-    +getName(): String
-    +toDetailedString(): String
-  }
-
-  class ViewLog {
-    -workoutManager: WorkoutManager
-    -fileHandler: FileHandler
-    -ui: UI
-    -pageSize: int = 10
-    -lastFilteredListofWorkout: List<Workout>
-    --
-    +render(args: String): void
-    +openByIndex(index: int): void
-    +loadAndSortList(month: YearMonth): ArrayList<Workout>
-  }
+class WorkoutManager {
+-workouts: ArrayList<Workout>
+-currentWorkout: Workout
+-currentLoadedMonth: YearMonth
+-creationDate: YearMonth
+-workoutsByMonth: Map<YearMonth, ArrayList<Workout>>
+-tagger: Tagger
+-ui: UI
+-fileHandler: FileHandler
+--
++addWorkout(command: String): void
++addExercise(args: String): void
++addSet(args: String): void
++endWorkout(args: String): void
++overrideWorkoutTags(workout: Workout, newTag: String): void
++getWorkouts(): ArrayList<Workout>
 }
 
-' ============== PARSER PACKAGE ==============
-package "seedu.fitchasers.parser" {
-  class CommandParser <<interface>> {
-    +parse(raw: String, creationDate: YearMonth): T
-    {static} +validateMonth(m: int)
-    {static} +isInt(s: String): boolean
-    {static} +guard(cond: boolean, msg: String)
-    {static} +parseYearMonthTokenStrict(token: String, creationDate: YearMonth): YearMonth
-  }
+class Workout {
+-workoutName: String
+-duration: int
+-workoutStartDateTime: LocalDateTime
+-workoutEndDateTime: LocalDateTime
+-exercises: ArrayList<Exercise>
+-currentExercise: Exercise
+-manualTags: Set<String>
+-autoTags: Set<String>
+--
++addExercise(exercise: Exercise): void
++setManualTags(tags: Set<String>): void
++setAutoTags(tags: Set<String>): void
++getAllTags(): Set<String>
++calculateDuration(): int
 }
 
-package "seedu.fitchasers.parser.deleteworkout" {
-  class DeleteParser {
-    +parse(raw: String, creationDate: YearMonth): DeleteWorkoutArguments
-  }
-
-  record DeleteWorkoutArguments {
-    +indexToDelete: int
-    +yearMonth: YearMonth
-  }
-
-  class DeleteWorkout {
-    -ui: UI
-    -fileHandler: FileHandler
-    -workoutManager: WorkoutManager
-    --
-    +execute(args: DeleteWorkoutArguments): void
-  }
+class Exercise {
+-name: String
+-sets: ArrayList<Integer>
+--
++addSet(reps: int): void
++getName(): String
++toDetailedString(): String
 }
 
-package "seedu.fitchasers.tagger" {
-  class Tagger <<interface>> {
-    +suggest(w: Workout): Set<String>
-  }
-
-  class DefaultTagger {
-    -modalityKeywords: EnumMap<Modality, Set<String>>
-    -muscleKeywords: EnumMap<MuscleGroup, Set<String>>
-    --
-    +suggest(w: Workout): Set<String>
-  }
+class ViewLog {
+-workoutManager: WorkoutManager
+-fileHandler: FileHandler
+-ui: UI
+-pageSize: int = 10
+-lastFilteredListofWorkout: List<Workout>
+--
++render(args: String): void
++openByIndex(index: int): void
++loadAndSortList(month: YearMonth): ArrayList<Workout>
 }
 
-package "seedu.fitchasers.storage" {
-  class FileHandler {
-    -workoutDir: Path
-    -arrayByMonth: Map<YearMonth, ArrayList<Workout>>
-    --
-    +saveMonthList()
-    +loadMonthList()
-  }
+class CommandParser <<interface>> {
++parse(raw: String, creationDate: YearMonth): T
+{static} +validateMonth(m: int)
+{static} +isInt(s: String): boolean
+{static} +guard(cond: boolean, msg: String)
+{static} +parseYearMonthTokenStrict(token: String, creationDate: YearMonth): YearMonth
 }
 
-package "seedu.fitchasers.ui" {
-  class UI {
-    +showError()
-    +confirmationMessage(): boolean
-  }
+class DeleteParser {
++parse(raw: String, creationDate: YearMonth): DeleteWorkoutArguments
 }
+
+record DeleteWorkoutArguments {
++indexToDelete: int
++yearMonth: YearMonth
+}
+
+class DeleteWorkout {
+-ui: UI
+-fileHandler: FileHandler
+-workoutManager: WorkoutManager
+--
++execute(args: DeleteWorkoutArguments): void
+}
+
+class Tagger <<interface>> {
++suggest(w: Workout): Set<String>
+}
+
+class DefaultTagger {
+-modalityKeywords: EnumMap<Modality, Set<String>>
+-muscleKeywords: EnumMap<MuscleGroup, Set<String>>
+--
++suggest(w: Workout): Set<String>
+}
+
+class FileHandler {
+-workoutDir: Path
+-arrayByMonth: Map<YearMonth, ArrayList<Workout>>
+--
++saveMonthList()
++loadMonthList()
+}
+
+class UI {
++showError()
++confirmationMessage(): boolean
+}
+
 
 ' ============== RELATIONSHIPS ==============
 WorkoutManager o-- "0..*" Workout

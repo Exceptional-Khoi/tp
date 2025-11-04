@@ -1,8 +1,12 @@
 # Baode - Project Portfolio Page
 
+> **Module:** CS2113 — Team Project (tP)  
+> **Product:** FitChasers — CLI fitness tracker (chat-bubble UI, tagging, weight & goal tracking)
+
 ## Overview
-FitChasers is a desktop-based fitness tracking application that enables users to log, organize, and analyze their workout progress through a clean command-line interface.  
-It is written in Java and comprises around 4 kLoC of code with an emphasis on modular design, validation, and user experience.
+FitChasers is a console-based fitness tracking application designed to help users manage workouts, track weight progress and set personal fitness goals all through an intuitive chat-bubble style user interface.
+
+It provides a complete command-driven experience that integrates workout logging, goal tracking and tag-based categorization, enabling users to efficiently record, view and analyze their fitness journey.
 
 ---
 
@@ -64,6 +68,9 @@ Reviewed teammates’ sections to ensure accuracy and consistent format
 * Refactored codebase to ensure clear and efficient workflow for the team
 * Helped maintain the issue tracker and coordinated merges before milestone submissions.
 * Participated in team code reviews and ensured CI compliance across key branches.
+* Setting up the GitHub team org/repo
+* Release Management
+
 
 ---
 

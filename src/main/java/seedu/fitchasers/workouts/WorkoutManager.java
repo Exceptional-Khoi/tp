@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
-import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -50,13 +49,10 @@ public class WorkoutManager {
     private LocalDateTime workoutDateTime;
     private String workoutName;
     private YearMonth currentLoadedMonth;
-    private final Map<YearMonth, ArrayList<Workout>> workoutsByMonth;
     private final FileHandler fileHandler;
     private int afterNameIndex = 2;
     private LocalDate date = null;
     private LocalTime time = null;
-    private final DateTimeFormatter dateFmt = DateTimeFormatter.ofPattern("dd/MM/yy")
-            .withResolverStyle(ResolverStyle.SMART);
     private final DateTimeFormatter timeFmt = DateTimeFormatter.ofPattern("HHmm")
             .withResolverStyle(ResolverStyle.SMART);
 
@@ -74,7 +70,6 @@ public class WorkoutManager {
     public WorkoutManager(Tagger tagger, FileHandler fileHandler) throws IOException {
         this.tagger = tagger;
         this.fileHandler = fileHandler;
-        this.workoutsByMonth = fileHandler.getArrayByMonth();
         this.currentLoadedMonth = YearMonth.now();
         this.creationDate = fileHandler.getCreationMonth();
     }
@@ -242,7 +237,7 @@ public class WorkoutManager {
             ui.showMessage("Workout name is missing after n/. Example: n/Leg Day");
             throw new InvalidArgumentInput("");
         }
-        if (!isValidName(name)) {
+        if (isInvalidName(name)) {
             Character bad = findFirstIllegalNameChar(name);
             if (bad != null) {
                 String shown = (bad == '\\') ? "\\\\" : String.valueOf(bad);
@@ -287,7 +282,7 @@ public class WorkoutManager {
         }
 
         // No extra junk after time
-        if (!onlyWhitespaceAfter(s, timeSlice.endIndex)) {
+        if (hasNonWhitespaceAfter(s, timeSlice.endIndex)) {
             ui.showMessage("Unexpected text after time. Use exactly: /create_workout n/NAME d/DD/MM/YY t/HHmm");
             throw new InvalidArgumentInput("");
         }
@@ -390,7 +385,7 @@ public class WorkoutManager {
 
                 if (existingDate.equals(date) && existingTime.equals(time)) {
                     ui.showMessage("A workout already exists at this date and time ("
-                            + existingDate.format(dateFmt) + " " + existingTime.format(timeFmt) + "). " +
+                            + existingDate.format(DATE_FMT) + " " + existingTime.format(TIME_FMT) + "). " +
                             "Continue anyway? (Y/N)");
                     if (!ui.confirmationMessage()) {
                         ui.showMessage("Workout creation cancelled. Please pick a different time or date.");
@@ -613,7 +608,7 @@ public class WorkoutManager {
             ui.showMessage("Exercise name is missing after n/. Example: n/Bench Press");
             return;
         }
-        if (!isValidName(name)) {
+        if (isInvalidName(name)) {
             Character bad = findFirstIllegalNameChar(name);
             if (bad != null) {
                 String shown = (bad == '\\') ? "\\\\" : String.valueOf(bad);
@@ -642,7 +637,7 @@ public class WorkoutManager {
         }
 
         // No extra junk after reps
-        if (!onlyWhitespaceAfter(s, repsSlice.endIndex)) {
+        if (hasNonWhitespaceAfter(s, repsSlice.endIndex)) {
             ui.showMessage("Unexpected text after reps. Use exactly: /add_exercise n/NAME r/REPS");
             return;
         }
@@ -691,7 +686,7 @@ public class WorkoutManager {
             return;
         }
 
-        assert !(currentWorkout.getExercises().isEmpty() && currentExercise != null)
+        assert !(currentWorkout.getExercises().isEmpty())
                 : "Invariant violated: empty list but currentExercise not null";
 
         if (args == null || args.trim().isEmpty()) {
@@ -736,7 +731,7 @@ public class WorkoutManager {
         }
 
         // No extra junk after reps (e.g., "r/ 1 2", "r/12 extra")
-        if (!onlyWhitespaceAfter(s, repsSlice.endIndex)) {
+        if (hasNonWhitespaceAfter(s, repsSlice.endIndex)) {
             ui.showMessage("Unexpected text after reps. Use exactly: /add_set r/REPS");
             return;
         }
@@ -896,7 +891,7 @@ public class WorkoutManager {
 
         // trailing junk after the last provided token
         int lastEnd = (timeSlice != null) ? timeSlice.endIndex : (dateSlice != null ? dateSlice.endIndex : -1);
-        if (lastEnd != -1 && !onlyWhitespaceAfter(args, lastEnd)) {
+        if (lastEnd != -1 && hasNonWhitespaceAfter(args, lastEnd)) {
             ui.showMessage("Unexpected text after time/date. Use exactly: /end_workout d/DD/MM/YY t/HHmm");
             return;
         }
@@ -1150,4 +1145,13 @@ public class WorkoutManager {
         }
         return null;
     }
+
+    private static boolean isInvalidName(String name) {
+        return !isValidName(name);
+    }
+
+    private static boolean hasNonWhitespaceAfter(String s, int endIndex) {
+        return !onlyWhitespaceAfter(s, endIndex);
+    }
+
 }

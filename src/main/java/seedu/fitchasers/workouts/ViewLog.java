@@ -28,6 +28,7 @@ public class ViewLog {
     public static final int ARRAY_INDEX_OFFSET = 1;
     private static final Pattern INT = Pattern.compile("^-?\\d+$");
     private static UI ui = new UI();                         // your existing UI class
+    private static final int NAME_MAX = 22;
     private final WorkoutManager workoutManager;
     private final int pageSize = 10;
     private final FileHandler fileHandler;
@@ -151,7 +152,7 @@ public class ViewLog {
                         Workout::getWorkoutEndDateTime,
                         Comparator.nullsLast(Comparator.reverseOrder())   // end: desc, nulls last
                 )
-        ); // ← NO .reversed()
+        );
 
         this.lastFilteredListofWorkout = sorted;  // Store the sorted list
         return sorted;
@@ -172,7 +173,7 @@ public class ViewLog {
     private String renderCompactRow(int id, Workout w) {
         String startDate = formatDayMon(w.getWorkoutStartDateTime());
         String endDate = formatDayMon(w.getWorkoutEndDateTime());
-        String name = truncate(safe(w.getWorkoutName()), 22);
+        String name = truncate(safe(w.getWorkoutName()));
         String dur  = formatDuration(w.getDuration());
         return String.format("%-4d %-20s %-20s %-22s %-10s%n",
                 id, safe(startDate), safe(endDate), safe(name), safe(dur));
@@ -246,8 +247,8 @@ public class ViewLog {
         return s == null ? "" : s;
     }
 
-    private static String truncate(String s, int max) {
-        return s.length() <= max ? s : s.substring(0, Math.max(0, max - 1)) + "…"; //Used to shorten name description
+    private static String truncate(String s) {
+        return s.length() <= NAME_MAX ? s : s.substring(0, Math.max(0, NAME_MAX - 1)) + "…";
     }
 
     private static String formatDuration(int minutes) {
@@ -375,9 +376,8 @@ public class ViewLog {
                     throw new InvalidArgumentInput("Page specified more than once. Use a single pg/<N>.");
                 }
                 seenPg = true;
-                int p = readPositiveInt(t.substring(3), "Page after pg/ must be above 1!" +
+                page = readPositiveInt(t.substring(3), "Page after pg/ must be above 1!" +
                         " Also remember no space after pg/ :) e.g pg/2 ");
-                page = p;
                 continue;
             }
 

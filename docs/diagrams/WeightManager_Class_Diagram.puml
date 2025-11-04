@@ -9,70 +9,61 @@ skinparam ClassBackgroundColor #FAFAFA
 hide circle
 hide stereotype
 
-' ============== PACKAGE: seedu.fitchasers.user ==============
-package "seedu.fitchasers.user" {
-  class WeightManager {
-    -DATE_FORMAT: DateTimeFormatter <<static>>
-    -ui: UI
-    --
-    +WeightManager(person: Person)
-    +addWeight(command: String): void
-    +viewWeights(): void
-    -extractBetween(text: String, start: String, end: String): String
-    -extractAfter(text: String, start: String): String
-    +isValidWeight(weight: double): boolean
-  }
-
-  class Person {
-    -ui: UI
-    -weightHistory: ArrayList<WeightRecord>
-    --
-    +addWeightRecord(record: WeightRecord): void
-    +getWeightHistory(): List<WeightRecord>
-    +displayWeightHistory(): void
-    +getLatestWeight(): double
-    +getWeightHistorySize(): int
-    +removeLatestWeightRecord(): boolean
-    +hasWeightRecordOn(date: LocalDate): boolean
-    +updateWeightRecord(date: LocalDate, newWeight: double): void
-    +setWeightHistory(history: List<WeightRecord>): void
-    +displayWeightGraphWithDates(): void
-  }
-
-  class WeightRecord {
-    -weight: double
-    -date: LocalDate
-    --
-    +WeightRecord(weight: double, date: LocalDate)
-    +getWeight(): double
-    +setWeight(weight: double): void
-    +getDate(): LocalDate
-    +toString(): String
-  }
+class WeightManager {
+-DATE_FORMAT: DateTimeFormatter <<static>>
+-ui: UI
+--
++WeightManager(person: Person)
++addWeight(command: String): void
++viewWeights(): void
+-extractBetween(text: String, start: String, end: String): String
+-extractAfter(text: String, start: String): String
++isValidWeight(weight: double): boolean
 }
 
-' ============== PACKAGE: seedu.fitchasers.ui ==============
-package "seedu.fitchasers.ui" {
-  class UI {
-    -scanner: Scanner
-    --
-    +readCommand(): String
-    +showMessage(message: String): void
-    +confirmationMessageWithCancel(): Boolean
-    +readInsideRightBubble(prompt: String): String
-  }
+class Person {
+-ui: UI
+-weightHistory: ArrayList<WeightRecord>
+--
++addWeightRecord(record: WeightRecord): void
++getWeightHistory(): List<WeightRecord>
++displayWeightHistory(): void
++getLatestWeight(): double
++getWeightHistorySize(): int
++removeLatestWeightRecord(): boolean
++hasWeightRecordOn(date: LocalDate): boolean
++updateWeightRecord(date: LocalDate, newWeight: double): void
++setWeightHistory(history: List<WeightRecord>): void
++displayWeightGraphWithDates(): void
 }
 
-' ============== PACKAGE: seedu.fitchasers.storage ==============
-package "seedu.fitchasers.storage" {
-  class FileHandler {
-    -DATA_DIRECTORY: Path <<static>>
-    -ui: UI
-    --
-    +initIndex(): void
-    +saveWeightList(person: Person): void
-    +loadWeightList(person: Person): void
-  }
+class WeightRecord {
+-weight: double
+-date: LocalDate
+--
++WeightRecord(weight: double, date: LocalDate)
++getWeight(): double
++setWeight(weight: double): void
++getDate(): LocalDate
++toString(): String
+}
+
+class UI {
+-scanner: Scanner
+--
++readCommand(): String
++showMessage(message: String): void
++confirmationMessageWithCancel(): Boolean
++readInsideRightBubble(prompt: String): String
+}
+
+class FileHandler {
+-DATA_DIRECTORY: Path <<static>>
+-ui: UI
+--
++initIndex(): void
++saveWeightList(person: Person): void
++loadWeightList(person: Person): void
 }
 
 ' ============== RELATIONSHIPS ==============

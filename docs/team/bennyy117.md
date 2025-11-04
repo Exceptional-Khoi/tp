@@ -1,10 +1,12 @@
 # Nguyen Bich Loan - Project Portfolio Page
 
+> **Module:** CS2113 — Team Project (tP)  
+> **Product:** FitChasers — CLI fitness tracker (chat-bubble UI, tagging, weight & goal tracking)
+
 ## Overview
-FitChasers is a desktop fitness tracking application that empowers users to log workouts, monitor weight changes, 
-and set personal goals via an intuitive command-line interface.  
-It is written in Java with approximately 4 kLoC, emphasizing data privacy through local storage, 
-real-time validation, and visual progress feedback.
+FitChasers is a console-based fitness tracking application designed to help users manage workouts, track weight progress and set personal fitness goals all through an intuitive chat-bubble style user interface.
+
+It provides a complete command-driven experience that integrates workout logging, goal tracking and tag-based categorization, enabling users to efficiently record, view and analyze their fitness journey.
 
 ## Summary of Contributions
 **Code Contributed:** 
