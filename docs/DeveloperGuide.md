@@ -461,11 +461,19 @@ Mainstream OS: Windows, Linux, Unix, macOS
 
 2. **Open a Workout**
     1. Prerequisite: Ensure at least one workout exists.
-    2. Test case: `/open 1`  
+    2. Test case: `/open id/1`  
        **Expected:** Shows detailed view with name, date, duration, exercises, and sets.
-    3. Test case: `/open 99`  
-       **Expected:** Error “Invalid workout index.”
-
+    3. Test case: `/open id/99`  
+       **Expected:** Error “Invalid workout index.” 
+   4.  Test case: `/open id/1 m/<Valid Month>`  
+       **Expected:** Shows detailed view with name, date, duration, exercises, and sets. 
+   5.  Test case: `/open id/1 m/<Invalid Month> `  
+       **Expected:** Month after m/ must be an integer 1..12.” 
+   6.  Test case: `/open id/1 ym/<Valid Month>/<Valid Year>` 
+       **Expected:** Shows detailed view with name, date, duration, exercises, and sets. 
+   7. Test case: `/open id/1 ym/<Invalid Month>/<Invalid Year> `  
+       **Expected:** Month after m/ must be an integer 1..12.”
+   
 3. **Delete a Workout**
     1. Test case: `/delete_workout id/1 m/11`  
        **Expected:** Confirmation prompt appears (“Are you sure? (y/n)”).  

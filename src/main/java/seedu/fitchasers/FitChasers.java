@@ -212,7 +212,7 @@ public class FitChasers {
 
                 case "/open":
                 case "o":
-                    viewLog.openByIndex(Integer.parseInt(argumentStr));
+                    viewLog.openByIndex(argumentStr);
                     break;
 
                 case "/delete_workout":
