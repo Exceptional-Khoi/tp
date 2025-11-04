@@ -64,6 +64,9 @@ Reviewed teammates’ sections to ensure accuracy and consistent format
 * Refactored codebase to ensure clear and efficient workflow for the team
 * Helped maintain the issue tracker and coordinated merges before milestone submissions.
 * Participated in team code reviews and ensured CI compliance across key branches.
+* Setting up the GitHub team org/repo
+* Release Management
+
 
 ---
 
