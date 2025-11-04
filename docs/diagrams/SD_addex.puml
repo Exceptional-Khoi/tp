@@ -1,5 +1,5 @@
 @startuml
-
+title FitChasers Add Exercise - Sequence Diagram
 ' --- Styling (kept minimal & consistent) ---
 skinparam sequenceParticipantType rectangle
 skinparam shadowing false

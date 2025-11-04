@@ -1,4 +1,5 @@
 @startuml
+title FitChasers Create Workout - Sequence Diagram
 ' Rectangles + minimal chrome
 skinparam sequenceParticipantType rectangle
 skinparam shadowing false

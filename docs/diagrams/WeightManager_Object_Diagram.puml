@@ -1,0 +1,50 @@
+@startuml
+title FitChasers Weight Tracking System - Object Diagram
+skinparam shadowing false
+skinparam objectBorderColor #222
+skinparam objectBackgroundColor #FAFAFA
+skinparam ArrowColor #555
+skinparam ArrowThickness 1.2
+
+' ===================== OBJECTS =====================
+object "<u>ui : UI</u>" as ui {
+  scanner = Scanner(System.in)
+}
+
+object "<u>fileHandler : FileHandler</u>" as fileHandler {
+  dataDirectory = "data/"
+  ui = ui
+}
+
+object "<u>person1 : Person</u>" as person1 {
+  weightHistory = [record1, record2]
+}
+
+object "<u>record1 : WeightRecord</u>" as record1 {
+  weight = 60.5
+  date = 2025-10-01
+}
+
+object "<u>record2 : WeightRecord</u>" as record2 {
+  weight = 61.2
+  date = 2025-11-01
+}
+
+object "<u>weightManager : WeightManager</u>" as weightManager {
+  person = person1
+  ui = ui
+}
+
+' ===================== RELATIONSHIPS =====================
+weightManager --> person1
+weightManager --> ui
+weightManager ..> fileHandler
+
+person1 --> record1
+person1 --> record2
+person1 --> ui
+person1 ..> fileHandler
+
+fileHandler --> ui
+
+@enduml

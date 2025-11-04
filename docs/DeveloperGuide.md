@@ -261,7 +261,8 @@ The `WeightManager` component handles all operations related to recording, viewi
 a user's weight and goal weight. It works together with the `Person` entity to maintain a complete
 history of weight entries.
 
-![Alt text](./diagrams/WeightManager_Class_Diagram.png "Basic Architecture")
+![Alt text](./diagrams/WeightManager_Class_Diagram.png)
+![Alt text](./diagrams/WeightManager_Object_Diagram.png)
 
 ### Overview
 WeightManager handles:
