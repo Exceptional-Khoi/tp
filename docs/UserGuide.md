@@ -30,7 +30,8 @@ The system assumes a console width of approximately 150 characters, meaning each
 4. Open a command terminal, cd into the folder you put the jar file in, and use the java -jar 
    FitChasers.jar command to run the application.
 5. On first launch, you will be prompted to enter your name and initial weight.
-6. Type the command in the command box and press Enter to execute it. e.g. typing `/help` and pressing Enter 
+6. The program also offers a quick start guide when you first join the app
+7. Type the command in the command box and press Enter to execute it. e.g. typing `/help` and pressing Enter 
    will open the help window.
 
 ## Features
@@ -40,8 +41,9 @@ The system assumes a console width of approximately 150 characters, meaning each
 [//]: # (* Extraneous parameters for commands that do not take in parameters &#40;such as `/help`, `/exit`&#41; will be ignored.<br>)
 [//]: # (  e.g. if the command specifies help 123, it will be interpreted as help.)
 
-* Date format is `DD/MM/YY` (e.g., `30/10/25` for `October 30, 2025`). 
-* Time format is `HHMM` in 24-hour format (e.g., `1430` for `2:30 PM`).
+* Date format is `DD/MM/YY` (e.g., `30/10/25` for `October 30, 2025`, `01/10/25` for `October 1st, 2025`).
+  *     Do not the 0 infront of 01 in the date!
+* Time format is `HHMM` in 24-hour format (e.g., `1430` for `2:30 PM`, `0900` for `9:00 AM`).
 
 ### Viewing help: `/help`
 Shows a message explaining how to use FitChasers and all available commands.
@@ -139,13 +141,13 @@ Starts a new workout session.
 Format: `/create_workout n/WORKOUT_NAME d/DATE t/TIME`
 
 - `WORKOUT_NAME` is the name of your workout (e.g., "Chest Day", "Morning Run"). 
-  - Rules: Must contain only letters, numbers, spaces, underscores (_), or hyphens (-). Max 32 characters.
+  - Rules: Must contain only letters, numbers, spaces, underscores (_), or hyphens (-). Max 32 characters. Do not include '/' in the name
 - `DATE` is in `DD/MM/YY` format. Rules: Same as `DATE` parameter rules above.
 - `TIME` is in `HHMM` format (24-hour, e.g., `1430` for 2:30 PM).
 
 **Notes:** 
 - No Overlapping Workouts: You cannot start a new workout if its start time / end time falls within an already completed workout session on the same day. For example, if you have a workout logged from 08:00 to 09:30, you cannot create a new workout that starts at 09:00 on the same day. You can, however, create one that starts at 09:30.
-- FitChasers only operates for workout logs dated between the month of activation in 2025 and December 2099.
+- FitChasers only operates for workout logs dated between the month of activation, presumably in 2025 to December 2099.
 
 Example:
 
@@ -288,7 +290,7 @@ Examples:
 Alternative: `gp`
 
 ### Viewing workout log: `/view_log`
-  Displays a list of your workouts, typically for the current month.
+  Displays a list of your workouts, typically for the current month. Workout is displayed from latest date to earliest
 
 Format: `/view_log`
 
@@ -297,7 +299,7 @@ Parameters:
     * e.g. `/view_log pg/2` → View page 2 of the current month's workouts
 
 * `detailed/` - Show your workouts in detailed view (no argument needed)
-    * e.g. `/view_log detailed/` → Displays full exercise and set details
+    * e.g. `/view_log detailed/` → Displays full exercise name and duration and tags, without the details of sets. Use `/open id/<ID>` to see full details of the workout.  
 
 * `m/[month from 1–12]` - View workouts for a specific month in the current year
     * `MONTH` must be `1–12` (e.g., 10 for October)
@@ -315,7 +317,8 @@ When called without parameters, shows the current month's workouts (page 1) in s
 Alternative: `vl`
 
 ### Opening a workout: `/open`
-Opens and displays detailed information about a specific workout by its index in the current list.
+Opens and displays detailed information about a specific workout by its index in the current system month's list.
+* Do note that you can ONLY open index from the system's month list, if the list do not exist, it will prompt no such file exist.
 
 Format: `/open INDEX`
 
