@@ -28,10 +28,10 @@ public class ViewLog {
     public static final int ARRAY_INDEX_OFFSET = 1;
     private static final Pattern INT = Pattern.compile("^-?\\d+$");
     private static UI ui = new UI();                         // your existing UI class
+    private static final int NAME_MAX = 22;
     private final WorkoutManager workoutManager;
     private final int pageSize = 10;
     private final FileHandler fileHandler;
-    private static final int NAME_MAX = 22;
 
     // Keeps the last full, filtered & sorted list so `/open <n>` can work after rendering.
     private List<Workout> lastFilteredListofWorkout = List.of();
@@ -152,7 +152,7 @@ public class ViewLog {
                         Workout::getWorkoutEndDateTime,
                         Comparator.nullsLast(Comparator.reverseOrder())   // end: desc, nulls last
                 )
-        ); // ← NO .reversed()
+        );
 
         this.lastFilteredListofWorkout = sorted;  // Store the sorted list
         return sorted;

@@ -74,7 +74,7 @@ public class DeleteWorkout {
                         Workout::getWorkoutEndDateTime,
                         Comparator.nullsLast(Comparator.reverseOrder())   // end: desc, nulls last
                 )
-        );  // ← NO .reversed()
+        );
 
         int displayIndex = parsedArgumentsForDelete.indexToDelete();
         if (displayIndex < 1 || displayIndex > monthWorkouts.size()) {
