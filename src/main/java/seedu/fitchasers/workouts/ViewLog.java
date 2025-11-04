@@ -1,5 +1,7 @@
 package seedu.fitchasers.workouts;
 
+import seedu.fitchasers.parser.openworkout.deleteworkout.OpenWorkoutArguments;
+import seedu.fitchasers.parser.openworkout.deleteworkout.OpenWorkoutParser;
 import seedu.fitchasers.storage.FileHandler;
 import seedu.fitchasers.exceptions.FileNonexistent;
 import seedu.fitchasers.exceptions.InvalidArgumentInput;
@@ -204,11 +206,15 @@ public class ViewLog {
      * @throws InvalidArgumentInput if the index is out of bounds or invalid
      * @see #lastFilteredListofWorkout
      */
-    public void openByIndex(int oneBasedIndex) throws InvalidArgumentInput, FileNonexistent, IOException {
-        loadAndSortList(YearMonth.now());
-        int i = oneBasedIndex - ARRAY_INDEX_OFFSET;  // Convert to 0-based
+    public void openByIndex(String argument) throws InvalidArgumentInput, FileNonexistent, IOException {
+        OpenWorkoutArguments parsed =
+                new OpenWorkoutParser().parse(argument, workoutManager.getCurrentLoadedMonth());
+        YearMonth ym = parsed.yearMonth();
+        loadAndSortList(ym);
+        int i = parsed.indexToOpen() - ARRAY_INDEX_OFFSET;  // Convert to 0-based
         if (i < 0 || i >= workoutManager.getWorkoutSize()) {
-            throw new InvalidArgumentInput("The number you requested is out of bounds! Please try again.");
+            throw new InvalidArgumentInput("The number you requested is out of bounds! " +
+                    "\nPlease check view_log to see total number of open workouts.");
         }
         ui.displayDetailsOfWorkout(lastFilteredListofWorkout.get(i));
     }

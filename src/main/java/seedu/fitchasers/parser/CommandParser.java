@@ -52,12 +52,11 @@ public interface CommandParser<T> {
         }
 
         YearMonth yyyy = YearMonth.of(yy + 2000, mm); // Example policy: 00..99 -> 2000..2099
-        try {
-            if (creationDate.isBefore(yyyy) || yyyy.isAfter(YearMonth.of(2100, 12))) {
-                throw new InvalidArgumentInput("Year out of supported range.");
-            }
-        } catch (Exception e) {
-            throw new IOException("Oh no seems like your Creation Month File is corrupted, Please check it");
+        if (yyyy.isBefore(creationDate) || yyyy.isAfter(YearMonth.of(2100, 12))) {
+            throw new InvalidArgumentInput("Year out of supported range. :(  Either you keyed in a year, " +
+                    "\n before creation date, which might be using current month might if file is corrupted" +
+                    "\n Or you keyed in a date pass year 2099" +
+                    "\n Do check startup message for any warnings");
         }
         return yyyy;
     }
