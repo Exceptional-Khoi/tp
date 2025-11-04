@@ -16,35 +16,32 @@ hide circle
 ' ===== Types used by UI =====
 class Scanner
 
-package "seedu.fitchasers.workouts" {
-  class Exercise {
-    - name: String
-    - sets: ArrayList<Integer>
-    --
-    + addSet(reps: int): void
-    + getSets(): ArrayList<Integer>
-    + toString(): String
-  }
-
-  class Workout {
-    - workoutName: String
-    - duration: int
-    - exercises: ArrayList<Exercise>
-    --
-    + addExercise(exercise: Exercise): void
-    + getExercises(): ArrayList<Exercise>
-    + getWorkoutDateString(): String
-  }
+class Exercise {
+- name: String
+- sets: ArrayList<Integer>
+--
++ addSet(reps: int): void
++ getSets(): ArrayList<Integer>
++ toString(): String
 }
 
-package "seedu.fitchasers.user" {
-  class WeightManager {
-    - currentUser: Person
-    --
-    + addWeight(command: String): void
-    + viewWeights(): void
-    + isValidWeight(weight: double): boolean
-  }
+class Workout {
+- workoutName: String
+- duration: int
+- exercises: ArrayList<Exercise>
+--
++ addExercise(exercise: Exercise): void
++ getExercises(): ArrayList<Exercise>
++ getWorkoutDateString(): String
+}
+
+
+class WeightManager {
+- currentUser: Person
+--
++ addWeight(command: String): void
++ viewWeights(): void
++ isValidWeight(weight: double): boolean
 }
 
 ' ===== UI class (trimmed to essentials) =====

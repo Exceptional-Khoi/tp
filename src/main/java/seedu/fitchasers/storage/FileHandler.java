@@ -50,7 +50,7 @@ public class FileHandler {
     private final Set<YearMonth> onDiskMonths = new HashSet<>();
 
     /**
-     * Initilize index for lazy loading
+     * Initialize index for lazy loading
      *
      * @throws IOException if directory or file creation fails
      */
@@ -336,6 +336,12 @@ public class FileHandler {
         Workout w = new Workout(name, start, end); // e.g., ctor computes duration
         w.setAutoTags(autoTags);
         w.setManualTags(manualTags);
+
+        if (duration != null && duration >= 0 && w.getDuration() != duration) {
+            // Don’t fail hard; just warn or normalize if you prefer
+            ui.showError("Duration mismatch for workout \"" + name + "\": file=" + duration
+                    + " computed=" + w.getDuration());
+        }
         // Add sets
         // 1) Sort by name (case-insensitive), keeping null/blank names last.
         setLines.sort(Comparator.comparing((SetLine s) -> s.name() == null ? "" : s.name().toLowerCase()));
@@ -353,7 +359,7 @@ public class FileHandler {
                 continue;
             }
 
-            if (lastName != null && lastName.equalsIgnoreCase(exerciseName) && current != null) {
+            if (lastName != null && lastName.equalsIgnoreCase(exerciseName)) {
                 current.addSet(reps);
             } else {
                 // new exercise exerciseName → flush previous, start new

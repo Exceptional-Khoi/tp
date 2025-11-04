@@ -23,7 +23,7 @@ public class DeleteWorkout {
     private final UI ui;
     private final FileHandler fileHandler;
     private final WorkoutManager workoutManager;
-    private YearMonth currentLoadedMonth; // set this from your app when month context changes
+    private final YearMonth currentLoadedMonth; // set this from your app when month context changes
 
     /**
      * Constructs a {@code DeleteWorkout} instance with the specified dependencies.
