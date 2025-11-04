@@ -203,7 +203,7 @@ public class ViewLog {
      * Retrieves the workout from the cached rendered list and delegates to the UI
      * for display. The index must correspond to a previously rendered workout list.
      *
-     * @param oneBasedIndex the 1-based display index of the workout to open
+     * @param argument the 1-based display index of the workout to open
      * @throws InvalidArgumentInput if the index is out of bounds or invalid
      * @see #lastFilteredListofWorkout
      */
