@@ -1,62 +1,50 @@
 @startuml
-title FitChasers – Auto-Tagging on /create_workout
 
+' --- Styling (kept minimal & consistent) ---
+skinparam sequenceParticipantType rectangle
 skinparam shadowing false
-skinparam ParticipantPadding 10
-skinparam BoxPadding 6
-skinparam ArrowColor #444
-skinparam lifelineBorderColor #222
-skinparam sequenceMessageAlign center
+skinparam responseMessageBelowArrow true
 hide footbox
 
-actor User as U
-participant "FitChasers\n(main)" as FC
-participant "WorkoutManager" as WM
-participant "DefaultTagger" as DT
-participant "Workout" as W
-participant "UI" as UI
+' --- Optional: ẩn activation bar toàn cục ---
+skinparam sequence {
+  ParticipantBorderColor #222
+  LifeLineBorderColor #444
+  LifeLineBackgroundColor #FAFAFA
+  ActivationBarColor none
+  ActivationBarBorderColor none
+}
 
-== User triggers create_workout ==
-U -> FC: /create_workout n/NAME d/DD/MM/YY t/HHmm
+actor    User
+participant ":UI" as UI
+participant ":FitChasers" as App
+participant ":WorkoutManager" as WM
+participant ":DefaultTagger" as Tagger
+participant ":Workout" as W
+participant ":FileHandler" as FH
 
-FC -> WM: addWorkout(args)
-activate WM
+User -> UI : enterText()
+UI -> App : readCommand()
+App -> WM : addWorkout(command)
 
 note right of WM
-• Parse NAME/DATE/TIME (strict/non-strict)\n• Check duplicates / prompt for missing pieces\n• Confirm future dates/times
+• Parse name/date/time (strict or flexible)
+• Check duplicates or prompt for missing fields
+• Confirm if future date/time entered
 end note
 
-WM -> W: new Workout(name, startDateTime)
-activate W
-W --> WM: (instance)
-deactivate W
+WM -> W : new(name, startDateTime)
 
-== Tag suggestion ==
-WM -> DT: suggest(workout)
-activate DT
+WM -> Tagger : suggest(workout)
+Tagger -> W : getWorkoutName()
+Tagger -> Tagger : match modality keywords
+Tagger -> Tagger : match muscle-group keywords
+Tagger -> WM : tags
+WM -> W : setAutoTags(tags)
 
-DT -> W: getWorkoutName()
-activate W
-W --> DT: name (lowercased)
-deactivate W
+WM -> FH : saveMonthList(currentMonth, workouts)
+WM -> UI : showMessage("Tags generated for workout: " + tags)
+WM -> UI : showMessage("Added workout: " + name)
+UI -> User : displayMessage()
 
-group match keywords
-DT -> DT: match modality keywords\nDT -> DT: match muscle-group keywords
-end group
-
-DT --> WM: Set<String> tags
-deactivate DT
-
-WM -> W: setAutoTags(tags)
-activate W
-W --> WM: (ok)
-deactivate W
-
-== Persist & notify ==
-WM -> UI: showMessage("Tags generated for workout: " + tags)
-UI -> U: [left bubble] Tags generated for workout: [...]
-WM -> UI: showMessage("Added workout: " + name)
-UI -> U: [left bubble] Success
-
-deactivate WM
 @enduml
