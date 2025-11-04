@@ -1,12 +1,10 @@
 @startuml
-
-' --- Styling (kept minimal & consistent) ---
 skinparam sequenceParticipantType rectangle
 skinparam shadowing false
 skinparam responseMessageBelowArrow true
 hide footbox
 
-actor    User
+actor User
 participant ":UI" as UI
 participant ":FitChasers" as App
 participant ":WorkoutManager" as WM
@@ -17,6 +15,7 @@ participant ":Workout" as W
 User -> UI : enterText()
 UI -> App : readCommand()
 App -> WM : addExercise(command)
+activate WM
 
 alt noActiveWorkout
   WM -> UI : showMessage("No active workout. Use /create_workout first.")
@@ -40,5 +39,9 @@ else activeWorkoutExists
   end
 end
 
+WM --> App : result/status
+deactivate WM
+
+App --> UI : message
 UI -> User : displayMessage()
 @enduml

@@ -1,0 +1,45 @@
+@startuml
+title FitChasers Workout Manager System - Object Diagram
+
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 0
+skinparam class {
+  BackgroundColor #ffffff
+  BorderColor #888888
+}
+hide circle
+hide empty methods
+hide empty fields
+
+' === Objects ===
+object "<u>wm:WorkoutManager</u>" as WM {
+  creationDate = 2025-11
+  currentLoadedMonth = 2025-11
+  workouts = [w1, w2]
+  currentWorkout = w2
+}
+
+object "<u>ui:UI</u>" as UI
+object "<u>tagger:Tagger</u>" as TG
+object "<u>fh:FileHandler</u>" as FH
+
+object "<u>w1:Workout</u>" as W1 {
+  workoutName = "PushDay"
+  start = 03/11/25 1900
+  end = 03/11/25 2010
+}
+object "<u>w2:Workout</u>" as W2 {
+  workoutName = "Cardio"
+  start = 04/11/25 0730
+  end = null
+}
+
+' === Associations with navigability (solid lines with arrowheads) ===
+WM -- UI
+WM -- TG
+WM -- FH
+WM -- W1 : manages
+WM -- W2 : currentWorkout
+
+@enduml

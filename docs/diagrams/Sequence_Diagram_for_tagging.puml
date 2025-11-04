@@ -6,7 +6,6 @@ skinparam shadowing false
 skinparam responseMessageBelowArrow true
 hide footbox
 
-' --- Optional: ẩn activation bar toàn cục ---
 skinparam sequence {
   ParticipantBorderColor #222
   LifeLineBorderColor #444

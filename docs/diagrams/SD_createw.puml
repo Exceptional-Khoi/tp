@@ -16,24 +16,25 @@ participant ":Workout" as W
 User -> UI : enterText()
 UI -> App : readCommand()
 App -> WM : addWorkout(command)
+activate WM
 
 alt activeWorkoutExists
-  WM -> UI : showMessage("Active workout exists. Please end it.")
+  WM -> WM : setMessage("Active workout exists. Please end it.")
 else noActiveWorkout
   alt strictFormatDetected
     WM -> WM : formatInputForWorkoutStrict(command)
     alt inputInvalid
-      WM -> UI : showMessage(error)
+      WM -> WM : setMessage(error)
     else inputValid
-      WM -> UI : confirmationMessage()
-      alt confirmationMessage()==false
-        WM -> UI : showMessage("Cancelled")
+      WM -> WM : prepareConfirmation()
+      alt confirmation==false
+        WM -> WM : setMessage("Cancelled")
       else proceedStrict
         WM -> WM : checkDuplicateStart()
         alt duplicateFound
-          WM -> UI : confirmationMessage()
-          alt confirmationMessage()==false
-            WM -> UI : showMessage("Cancelled")
+          WM -> WM : prepareConfirmation()
+          alt confirmation==false
+            WM -> WM : setMessage("Cancelled")
           else proceedAfterDuplicate
           end
         end
@@ -41,25 +42,28 @@ else noActiveWorkout
     end
   else flexibleFormat
     WM -> WM : formatInputForWorkout(command)
-    WM -> UI : confirmationMessage()
-    alt confirmationMessage()==false
-      WM -> UI : showMessage("Cancelled")
+    WM -> WM : prepareConfirmation()
+    alt confirmation==false
+      WM -> WM : setMessage("Cancelled")
     else proceedFlexible
       WM -> WM : checkPastFutureDate()
       WM -> WM : checkDuplicateStart()
     end
   end
 
-WM -> FH : loadMonthList(targetMonth)
-WM -> WM : setWorkouts(list,targetMonth)
-WM -> W : new(name,startDateTime)
-WM -> Tagger : suggest(workout)
-WM -> W : setAutoTags(suggestedTags)
-WM -> FH : saveMonthList(currentMonth,workouts)
-WM -> UI : showMessage("Workout created")
+  ' --- Persist + tagging on success paths ---
+  WM -> FH : loadMonthList(targetMonth)
+  WM -> WM : setWorkouts(list, targetMonth)
+  WM -> W : new(name, startDateTime)
+  WM -> Tagger : suggest(workout)
+  WM -> W : setAutoTags(suggestedTags)
+  WM -> FH : saveMonthList(currentMonth, workouts)
+  WM -> WM : setMessage("Workout created")
+end
 
-' Deletion: lifeline ends exactly here (no calls to W afterwards)
-destroy W
+WM --> App : message
+deactivate WM
 
+App --> UI : message
 UI -> User : displayMessage()
 @enduml

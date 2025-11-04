@@ -253,6 +253,10 @@ The `WorkoutManager` component is responsible for managing all workout-related o
 workout creation, exercise tracking, and workout history management.
 
 ![Alt text](./diagrams/WorkoutManager_class_diagram.png "Basic Architecture")
+
+In addition to the class diagram, the following object diagram illustrates a snapshot of the `WorkoutManager` system at runtime, showing how key objects interact and maintain state during execution.
+![Alt text](./diagrams/WorkoutManager_object_diagram.png)
+
 ### Overview
 The `WorkoutManager` acts as the central controller for workout operations. It maintains a list of completed workouts 
 and tracks the current active workout session. 
@@ -448,10 +452,10 @@ Mainstream OS: Windows, Linux, Unix, macOS
     3. Test case: `/view_log detailed/`  
        **Expected:** Displays full exercise and time details.
 
-> **Additional tests**
-> - Pagination: `/view_log pg/2` → Expected: shows page 2 (or clear error if not available).
-> - Specific year+month: `/view_log ym/10/26` → Expected: October 2026.
-> - Invalid month/page: `/view_log m/13`, `/view_log pg/0` → Expected: validation errors.
+    > **Additional tests**
+    > - Pagination: `/view_log pg/2` → Expected: shows page 2 (or clear error if not available).
+    > - Specific year+month: `/view_log ym/10/26` → Expected: October 2026.
+    > - Invalid month/page: `/view_log m/13`, `/view_log pg/0` → Expected: validation errors.
 
 2. **Open a Workout**
     1. Prerequisite: Ensure at least one workout exists.
@@ -481,10 +485,10 @@ Mainstream OS: Windows, Linux, Unix, macOS
     2. Test case: `/add_muscle_tag m/CHEST k/pushups`  
        **Expected:** “Added keyword ‘pushups’ to muscle group CHEST.”
 
-> **Additional tests**
-> - Invalid modality: `/add_modality_tag m/YOGA k/sun_salute` → Expected: error (must be CARDIO/STRENGTH).
-> - Invalid/empty keyword: `/add_muscle_tag m/ARMS k/` → Expected: error (empty keyword).
-> - Invalid muscle group: `/add_muscle_tag m/NECK k/shrugs` → Expected: error (must be one of LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE).
+    > **Additional tests**
+    > - Invalid modality: `/add_modality_tag m/YOGA k/sun_salute` → Expected: error (must be CARDIO/STRENGTH).
+    > - Invalid/empty keyword: `/add_muscle_tag m/ARMS k/` → Expected: error (empty keyword).
+    > - Invalid muscle group: `/add_muscle_tag m/NECK k/shrugs` → Expected: error (must be one of LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE).
 
 2. **Override Workout Tag**
     1. Test case: `/override_workout_tag id/1 newTag/recovery`  
