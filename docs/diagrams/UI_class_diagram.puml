@@ -1,6 +1,7 @@
 @startuml
 title FitChasers UI - Class Diagram
 
+skinparam linetype ortho
 skinparam shadowing false
 skinparam classAttributeIconSize 0
 skinparam ArrowColor #444

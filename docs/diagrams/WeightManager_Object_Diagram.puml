@@ -1,22 +1,23 @@
 @startuml
 title FitChasers Weight Tracking System - Object Diagram
+
+skinparam linetype ortho
 skinparam shadowing false
 skinparam objectBorderColor #222
 skinparam objectBackgroundColor #FAFAFA
 skinparam ArrowColor #555
 skinparam ArrowThickness 1.2
 
-' ===================== OBJECTS =====================
-object "<u>ui : UI</u>" as ui {
-  scanner = Scanner(System.in)
-}
+hide empty method
+hide empty field
 
-object "<u>fileHandler : FileHandler</u>" as fileHandler {
-  dataDirectory = "data/"
-  ui = ui
-}
+' ===================== OBJECTS =====================
+object "<u>ui : UI</u>" as ui
+
+object "<u>fileHandler : FileHandler</u>" as fileHandler
 
 object "<u>person1 : Person</u>" as person1 {
+  ui = ui
   weightHistory = [record1, record2]
 }
 
@@ -31,20 +32,26 @@ object "<u>record2 : WeightRecord</u>" as record2 {
 }
 
 object "<u>weightManager : WeightManager</u>" as weightManager {
-  person = person1
   ui = ui
+  currentUser = person1
 }
 
-' ===================== RELATIONSHIPS =====================
-weightManager --> person1
-weightManager --> ui
-weightManager ..> fileHandler
+' ===================== RELATIONSHIPS - EXACTLY MATCH CLASS DIAGRAM =====================
 
-person1 --> record1
-person1 --> record2
-person1 --> ui
-person1 ..> fileHandler
+person1 -- record1
+person1 -- record2
 
-fileHandler --> ui
+weightManager -- person1
+
+weightManager -- ui
+
+person1 -- ui
+
+weightManager -- fileHandler
+
+person1 -- fileHandler
+
+weightManager -- record1
+weightManager -- record2
 
 @enduml
