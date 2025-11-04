@@ -7,7 +7,7 @@ It is written in Java with approximately 4 kLoC, emphasizing data privacy throug
 real-time validation, and visual progress feedback.
 
 ## Summary of Contributions
-**Code Contributed:**  
+**Code Contributed:** 
 [RepoSense link](https://nus-cs2113-ay2526s1.github.io/tp-dashboard/?search=bennyy117&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2025-09-19&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other)
 
 ### New Feature: Comprehensive Weight Logging & Progress Visualization
@@ -24,9 +24,10 @@ This feature delivers instant visual trends, catches input errors early, and ada
 - Graph intelligently samples data to fit console width while highlighting key trends.
 - Smart defaults and confirmations minimize typing errors.
 - Every change auto-saves reliably, protecting user progress.
+- 100% method coverage in `UITest` for UI logic.
 
 ### New Feature: Dynamic User Profile Management
-* Implemented `/rename` with strict format checks (1–30 chars, safe characters only).
+* Implemented `/rename` with strict format checks (1-30 chars, safe characters only).
 * Ensured name persistence across sessions and personalized all feedback.
 * Integrated name display in greetings, graphs, and history views.
 
@@ -34,9 +35,9 @@ This feature delivers instant visual trends, catches input errors early, and ada
 makes the app feel tailored and encouraging.
 
 ### Testing & Reliability
-* Crafted extensive tests for validation, edge cases, and output consistency.
-* Achieved high coverage in user-facing logic.
-* Added safeguards against invalid inputs and save failures.
+* Crafted extensive unit tests for validation, edge cases, and output consistency.
+* Achieved 100% method coverage and 95% line coverage in `UITest.java` using JUnit 5 and reflection testing.
+* Added safeguards against invalid inputs, EOF, and save failures.
 
 ## Documentation
 ### User Guide Contributions
@@ -50,7 +51,7 @@ makes the app feel tailored and encouraging.
     - WeightManager & GoalWeightTracker: Showed key associations, multiplicities, and persistence links.
     - WorkoutManager: Detailed workout-exercise-set relationships.
     - Tagging & UI: Streamlined interfaces and enums.
-
+* Added Object Diagram for `WeightManager`
 * Expanded Sections:
     - Design trade-offs for persistence strategies.
     - Future ideas: BMI trends and graph enhancements.
@@ -60,14 +61,27 @@ These improvements make the DG a clear, visual reference. Diagrams now render pe
 
 ## Team-Based Contributions
 * Led persistence refactoring for reliable, modular saves.
-* Helped in v1.0–v2.1 releases: milestones, changelogs, and merges.
+* Helped in v1.0-v2.1 releases: milestones, changelogs, and merges.
 * Resolved CI/storage issues in key PRs.
 
 ## Community
-* PRs Reviewed: #51, #62, #72, #117, #121, #124, #128, #145, #146, #159, #173, #175, #182, 
-#186, #191, #197, #198, #201, #204, #205, #257, #270
-* PRs Created: #52, #55, #66, #67, #68, #69, #89, #90, #120, #126, #138, #140, #141, #144, 
-#150, #157, #168, #169, #172, #174, #177, #181, #188, #190, #192, #194, #203, #207, #273, #280.
+**PRs Reviewed:** 
+[#51](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/51), [#62](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/62), [#72](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/72), [#117](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/117),
+[#121](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/121), [#124](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/124), [#128](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/128), [#145](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/145),
+[#146](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/146), [#159](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/159), [#173](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/173), [#175](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/175),
+[#182](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/182), [#186](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/186), [#191](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/191), [#197](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/197),
+[#198](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/198), [#201](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/201), [#204](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/204), [#205](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/205),
+[#257](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/257), [#270](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/270)
+
+**PRs Created:**
+[#52](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/52), [#55](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/55), [#66](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/66), [#67](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/67),
+[#68](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/68), [#69](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/69), [#89](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/89), [#90](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/90),
+[#120](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/120), [#126](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/126), [#138](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/138), [#140](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/140),
+[#141](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/141), [#144](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/144), [#150](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/150), [#157](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/157),
+[#168](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/168), [#169](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/169), [#172](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/172), [#174](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/174),
+[#177](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/177), [#181](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/181), [#188](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/188), [#190](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/190),
+[#192](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/192), [#194](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/194), [#203](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/203), [#207](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/207),
+[#273](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/273), [#280](https://github.com/AY2526S1-CS2113-W14-3/tp/pull/280)
 
 ## Tools
 * Adopted PlantUML for all diagrams.
@@ -76,5 +90,5 @@ These improvements make the DG a clear, visual reference. Diagrams now render pe
 ---
 **Impact Summary:**  
 My contributions elevated FitChasers into a motivational powerhouse. Weight visualization turns 
-numbers into stories—users see progress, stay consistent, and crush goals with confidence. 
+numbers into stories, users see progress, stay consistent, and crush goals with confidence. 
 Diagram overhauls ensure the project shines for future maintainers.
