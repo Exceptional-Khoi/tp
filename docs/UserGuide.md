@@ -11,6 +11,8 @@ track workouts, monitor weight progress, and achieve your fitness goals faster t
 FitChasers' chat-style interface is optimized for clear and readable text bubbles within the console window.  
 The system assumes a console width of approximately 150 characters, meaning each line of text can display up to 150 visible characters before wrapping automatically.
 
+![img.png](Photos/console.png)
+
 - This width defines how much text can appear in one line within chat bubbles.
 - Messages longer than this limit are automatically wrapped to the next line.
 - If your terminal window is narrower than 150 characters, the chat bubbles may wrap early or appear slightly misaligned.

@@ -1,5 +1,5 @@
 @startuml
-title GoalWeightTracker – Class Diagram
+title FitChasers Goal Weight Tracker - Class Diagram
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -11,28 +11,37 @@ hide circle
 hide stereotype
 
 class GoalWeightTracker {
-  -DF: DateTimeFormatter <<static>>
-  -ui: UI
-  -goalWeight: Double
-  -setDate: LocalDate
-  --
-  +GoalWeightTracker()
-  +handleSetGoal(input: String): void
-  +handleViewGoal(currentWeight: Double): void
-  -saveGoal(): void
-  -loadGoal(): void
-  +hasGoal(): boolean
-  +getGoalWeight(): double
+-DF: DateTimeFormatter <<static>>
+-ui: UI
+-goalWeight: Double
+-setDate: LocalDate
+--
++GoalWeightTracker()
++handleSetGoal(input: String): void
++handleViewGoal(currentWeight: Double): void
+-saveGoal(): void
+-loadGoal(): void
++hasGoal(): boolean
++getGoalWeight(): double
 }
 
-class UI
+class UI {
+-scanner: Scanner
+--
++showMessage(message: String): void
++readInsideRightBubble(prompt: String): String
+}
 
 class FileHandler {
-  +saveGoal(goalWeight: double, setDate: LocalDate): void
-  +loadGoal(): Double[]
+-DATA_DIRECTORY: Path <<static>>
+-ui: UI
+--
++saveGoal(goalWeight: double, setDate: LocalDate): void
++loadGoal(): Double[]
 }
 
-GoalWeightTracker --> UI : has a
-GoalWeightTracker ..> FileHandler : persists goal
+' === Relationships ===
+GoalWeightTracker --> UI
+GoalWeightTracker ..> FileHandler
 
 @enduml

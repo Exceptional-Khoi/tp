@@ -1,5 +1,5 @@
 @startuml
-title FitChasers – UI Class Diagram
+title FitChasers UI - Class Diagram
 
 skinparam shadowing false
 skinparam classAttributeIconSize 0
@@ -16,35 +16,32 @@ hide circle
 ' ===== Types used by UI =====
 class Scanner
 
-package "seedu.fitchasers.workouts" as pkg_workouts #DDDDFF {
-  class Exercise {
-    - name: String
-    - sets: ArrayList<Integer>
-    --
-    + addSet(reps: int): void
-    + getSets(): ArrayList<Integer>
-    + toString(): String
-  }
-
-  class Workout {
-    - workoutName: String
-    - duration: int
-    - exercises: ArrayList<Exercise>
-    --
-    + addExercise(exercise: Exercise): void
-    + getExercises(): ArrayList<Exercise>
-    + getWorkoutDateString(): String
-  }
+class Exercise {
+- name: String
+- sets: ArrayList<Integer>
+--
++ addSet(reps: int): void
++ getSets(): ArrayList<Integer>
++ toString(): String
 }
 
-package "seedu.fitchasers.user" as pkg_user #DDFFDD {
-  class WeightManager {
-    - currentUser: Person
-    --
-    + addWeight(command: String): void
-    + viewWeights(): void
-    + isValidWeight(weight: double): boolean
-  }
+class Workout {
+- workoutName: String
+- duration: int
+- exercises: ArrayList<Exercise>
+--
++ addExercise(exercise: Exercise): void
++ getExercises(): ArrayList<Exercise>
++ getWorkoutDateString(): String
+}
+
+
+class WeightManager {
+- currentUser: Person
+--
++ addWeight(command: String): void
++ viewWeights(): void
++ isValidWeight(weight: double): boolean
 }
 
 ' ===== UI class (trimmed to essentials) =====
@@ -62,9 +59,9 @@ class UI {
 
 ' ===== Relationships =====
 UI *-- Scanner
-UI ..> Workout : uses
-UI ..> Exercise : uses
-UI ..> WeightManager : uses
+UI ..> Workout
+UI ..> Exercise
+UI ..> WeightManager
 
-WeightManager ..> UI : uses
+WeightManager ..> UI
 @enduml

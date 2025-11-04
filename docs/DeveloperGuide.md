@@ -1,38 +1,47 @@
-# Developer Guide
-
 ## Table of Contents
 - [Acknowledgements](#acknowledgements)
-- [Design & Implementation](#design--implementation)
+- [Setting up and getting started](#setting-up-and-getting-started)
+    - [Setting up the project in your computer](#setting-up-the-project-in-your-computer)
+    - [Before writing code](#before-writing-code)
+- [Design & implementation](#design--implementation)
     - [Design](#design)
-    - [Main Components of the Architecture](#main-components-of-the-architecture)
-    - [How the Architecture Components Interact](#how-the-architecture-components-interact-with-each-other)
-- [Product Scope](#product-scope)
-    - [Target User Profile](#target-user-profile)
-    - [Value Proposition](#value-proposition)
+- [Product scope](#product-scope)
+    - [Target user profile](#target-user-profile)
+    - [Value proposition](#value-proposition)
 - [User Stories](#user-stories)
 - [Non-Functional Requirements](#non-functional-requirements)
-- [WorkoutManager Component](#workoutmanager-component)
+- [UI Component](#ui-component)
+    - [Structure of the UI component](#structure-of-the-ui-component)
+    - [Key classes](#key-classes)
+    - [Console layout](#console-layout)
+    - [Responsibilities](#responsibilities)
+- [WorkoutManager component](#workoutmanager-component)
+- [WeightManager Component](#weightmanager-component)
+- [GoalWeightTracker Component](#goalweighttracker-component)
 - [Glossary](#glossary)
-- [Instructions for Manual Testing](#instructions-for-manual-testing)
-    - [Help](#help)
-    - [Set Name](#set-name)
-    - [Create Workout](#create-workout)
-    - [Add Exercise](#add-exercise)
-    - [Add Set](#add-set)
-    - [End Workout](#end-workout)
-    - [View Log](#view-log)
-    - [Exit](#exit)
+- [Launch and Shutdown](#launch-and-shutdown)
+- [User Profile Commands](#user-profile-commands)
+- [Weight Tracking](#weight-tracking)
+- [Workout Creation and Logging](#workout-creation-and-logging)
+- [Viewing and Managing Workouts](#viewing-and-managing-workouts)
+- [Tagging System](#tagging-system)
+- [Gym Lookup Commands](#gym-lookup-commands)
+- [Data Persistence](#data-persistence)
+- [Invalid Commands](#invalid-commands)
+- [Graceful Error Handling](#graceful-error-handling)
+- [Exit and Restart Behavior](#exit-and-restart-behavior)
 - [Tagging and Categorization](#tagging-and-categorization)
     - [Design](#design-1)
-    - [Class Diagram](#class-diagram-for-tagging)
-    - [Sequence Diagram](#Sequence-Diagram)
+    - [Class Diagram for Tagging](#class-diagram-for-tagging)
     - [Implementation](#implementation)
+    - [Sequence Diagram](#sequence-diagram)
+    - [Sequence Diagram for creating a workout](#sequence-diagram-for-creating-a-workout)
+    - [Sequence Diagram for adding an exercise to current workout](#sequence-diagram-for-adding-an-exercise-to-current-workout)
+    - [Sequence Diagram for adding a set to the current exercise](#sequence-diagram-for-adding-a-set-to-the-current-exercise)
     - [Manual Tag Method](#manual-tag-method)
-    - [Important Design Decision](#important-design-decision)
     - [Design Consideration](#design-consideration)
     - [Future Enhancements](#future-enhancements)
 - [Notes](#notes)
-
 
 ## Acknowledgements
 
@@ -57,10 +66,10 @@ Follow the steps in this guide precisely. Things may not work if you deviate at 
 
 - **Run the app:** Run the main class `seedu.fitchasers.FitChasers` and try a few commands:
 ```
-h (or /help)
-aw w/70.2 d/29/10/25
-cw n/Push Day d/29/10/25 t/1830
-e (to exit and save)
+/help
+/add_workout w/70.2 d/29/10/25
+/create_workout n/Push Day d/29/10/25 t/1830
+/exit (to exit and save)
 ```
 - **Run the test:** Execute the test task to ensure all pass:
 ```
@@ -159,7 +168,7 @@ Overall, FitChasers empowers users to understand their progress and stay motivat
 | v1.0    | new user           | see a welcome message and list of commands                        | know how to start using the app                           |
 | v1.0    | user               | create a new workout with a date and time                         | plan and record my daily workouts                         |
 | v1.0    | user               | add exercises to a workout                                        | track what I am doing during my session                   |
-| v1.0    | user               | add sets and reps for each exercise                               | monitor my training volume and progress                   ||
+| v1.0    | user               | add sets and reps for each exercise                               | monitor my training volume and progress                   |
 | v1.0    | user               | end my workout and record its duration                            | know how long I trained for each session                  |
 | v1.0    | user               | view a log of past workouts                                       | review my training history easily                         |
 | v1.1    | frequent user      | record my weight by date                                          | monitor my weight progress over time                      |
@@ -320,480 +329,251 @@ Mainstream OS: Windows, Linux, Unix, macOS
 | **Workout**                  | A session of physical exercise consisting of various exercises and sets.                                               |
 
 # Instructions for manual testing
-1.  Initial launch 
-    1. Download the jar file and copy into an empty folder. 
+1.  Initial launch
+    1. Download the jar file and copy into an empty folder.
     2. Double-click the jar file Expected: Shows the GUI with a set of sample contacts. The window size may not be optimum.
 2. Saving window preferences
-   1. Resize the window to an optimum size. Move the window to a different location. Close the window.
-   2. Re-launch the app by double-clicking the jar file.<br>
-      Expected: The most recent window size and location is retained.
+    1. Resize the window to an optimum size. Move the window to a different location. Close the window.
+    2. Re-launch the app by double-clicking the jar file.<br>
+       Expected: The most recent window size and location is retained.
 3. Graceful shutdown with data save.
-   1.  Perform some actions (add, edit, or delete a workout). Close the app via the menu or window close button.
-   2. Re-launch the app.<br>
-      Expected: All changes are retained and displayed.
+    1.  Perform some actions (add, edit, or delete a workout). Close the app via the menu or window close button.
+    2. Re-launch the app.<br>
+       Expected: All changes are retained and displayed.
+
+> **Notes**
+> - Date format: `DD/MM/YY` (e.g., `03/11/25`)
+> - Time format: `HHMM` 24-hour (e.g., `0830`)
+> - Extraneous parameters for commands that do not take parameters are ignored (e.g., `/help 123` behaves like `/help`).
+
+<br>
+
+### Launch and Shutdown
+
+1. **Initial launch**
+    1. Download the latest `FitChasers.jar` file and copy it into an empty folder.
+    2. Open a terminal, navigate to the folder, and run:
+       ```
+       java -jar FitChasers.jar
+       ```
+       **Expected:** Displays welcome banner with the `{^o^} FitChasers` header and prompts for your name and initial weight.
+
+2. **Shutdown**
+    1. Test case: `/exit`  
+       **Expected:** Displays “Catch you next time, champ — don't ghost your gains!” and terminates gracefully.
+
+<br>
+
+### User Profile Commands
+
+1. **Change Display Name**
+    1. Test case: `/rename n/Nitin`  
+       **Expected:** Updates name to “Nitin” and shows confirmation message.
+    2. Test case: `/rename`  
+       **Expected:** Error “Missing prefix: n/NAME”.
+
+> **Additional tests**
+> - `/rename n/` or only spaces → Expected: error (empty/invalid name).
+> - Very long name (> 30 chars) → Expected: error (max length exceeded).
+
+<br>
+
+### Weight Tracking
+
+1. **Add Valid Weight Entry**
+    1. Test case: `/add_weight w/75 d/03/11/25`  
+       **Expected:** Displays “Added weight: 75.0 kg on 03/11/25”.
+    2. Test case: `/add_weight w/74.5`  
+       **Expected:** Uses today’s date by default.
+
+2. **Invalid Weight Input**
+    1. Test case: `/add_weight w/-10`  
+       **Expected:** Error “Weight must be between 20.0 and 500.0.”
+    2. Test case: `/add_weight w/abc`  
+       **Expected:** Error “Invalid number format for weight.”
+
+3. **View Weight Entries**
+    1. Test case: `/view_weight`  
+       **Expected:** Displays all logged weights in chronological order.
+
+4. **Set and View Goal Weight**
+    1. Test case: `/set_goal w/70.0`  
+       **Expected:** “Goal weight set to 70.0 kg. You are X kg away from your goal.”
+    2. Test case: `/view_goal`  
+       **Expected:** Shows goal weight, latest recorded weight, and progress bar.
+
+> **Additional tests**
+> - `/add_weight w/70 d/31/02/25` → Expected: invalid date error.
+> - Add the same date twice → Expected: second call updates (no duplicates).
+> - `/set_goal` or `/set_goal w/abc` → Expected: error (missing/invalid weight).
+
+<br>
+
+### Workout Creation and Logging
+
+1. **Start a New Workout**
+    1. Test case: `/create_workout n/Chest Day d/03/11/25 t/0800`  
+       **Expected:** “New workout started: Chest Day on 03/11/25 at 08:00.”
+    2. Test case: `/create_workout n/Leg Day d/03/11/25 t/0730` (overlaps previous)  
+       **Expected:** Error “Workout times overlap with existing session.”
+
+2. **Add Exercises and Sets**
+    1. Test case: `/add_exercise n/Bench Press r/12`  
+       **Expected:** “Added exercise: Bench Press [1 set] - 12 reps.”
+    2. Test case: `/add_set r/10`  
+       **Expected:** “Added Set 2: 10 reps.”
+    3. Test case: `/add_exercise`  
+       **Expected:** Error “Missing prefix: n/EXERCISE_NAME.”
+
+3. **End a Workout**
+    1. Test case: `/end_workout d/03/11/25 t/0900`  
+       **Expected:** Displays workout summary with total duration.
+    2. Test case: `/end_workout t/0700`  
+       **Expected:** Error “End time must be after start time.”
+
+> **Additional tests**
+> - `/create_workout n/Run d/03/11/25` (missing `t/`) → Expected: error.
+> - `/add_set r/10` when no exercise exists → Expected: error (add an exercise first).
+> - Attempt to end a workout when none is active → Expected: error.
+
+<br>
+
+### Viewing and Managing Workouts
+
+1. **View Log**
+    1. Test case: `/view_log`  
+       **Expected:** Lists all workouts in the current month with ID numbers.
+    2. Test case: `/view_log m/10`  
+       **Expected:** Displays all workouts from October of the current year.
+    3. Test case: `/view_log detailed/`  
+       **Expected:** Displays full exercise and time details.
+
+> **Additional tests**
+> - Pagination: `/view_log pg/2` → Expected: shows page 2 (or clear error if not available).
+> - Specific year+month: `/view_log ym/10/26` → Expected: October 2026.
+> - Invalid month/page: `/view_log m/13`, `/view_log pg/0` → Expected: validation errors.
 
-## Help
+2. **Open a Workout**
+    1. Prerequisite: Ensure at least one workout exists.
+    2. Test case: `/open 1`  
+       **Expected:** Shows detailed view with name, date, duration, exercises, and sets.
+    3. Test case: `/open 99`  
+       **Expected:** Error “Invalid workout index.”
 
-### Success Cases
+3. **Delete a Workout**
+    1. Test case: `/delete_workout id/1 m/11`  
+       **Expected:** Confirmation prompt appears (“Are you sure? (y/n)”).  
+       Typing `y` should show “Workout deleted successfully.”
+    2. Test case: `/delete_workout id/10` (nonexistent index)  
+       **Expected:** Error “Invalid workout ID: 10.”
 
-```
-/help → shows all commands
+> **Additional tests**
+> - Delete using year+month: `/delete_workout id/2 ym/10/26` → Expected: confirms and deletes from Oct 2026.
+> - Missing `id/`: `/delete_workout m/11` → Expected: error prompting to include `id/`.
 
-h     → shows all commands
-```
+<br>
 
-### Error Cases
+### Tagging System
 
-```
-(n/a)
-```
+1. **Add Custom Tags**
+    1. Test case: `/add_modality_tag m/CARDIO k/jump_rope`  
+       **Expected:** “Added keyword ‘jump_rope’ to modality CARDIO.”
+    2. Test case: `/add_muscle_tag m/CHEST k/pushups`  
+       **Expected:** “Added keyword ‘pushups’ to muscle group CHEST.”
 
-**Usage:** `/help` (alias: `h`)
+> **Additional tests**
+> - Invalid modality: `/add_modality_tag m/YOGA k/sun_salute` → Expected: error (must be CARDIO/STRENGTH).
+> - Invalid/empty keyword: `/add_muscle_tag m/ARMS k/` → Expected: error (empty keyword).
+> - Invalid muscle group: `/add_muscle_tag m/NECK k/shrugs` → Expected: error (must be one of LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE).
 
----
+2. **Override Workout Tag**
+    1. Test case: `/override_workout_tag id/1 newTag/recovery`  
+       **Expected:** “Workout #1 tags replaced with [recovery].”
 
-## Set Name
+> **Additional tests**
+> - Missing `newTag/`: `/override_workout_tag id/1` → Expected: error.
+> - Missing `id/`: `/override_workout_tag newTag/cardio` → Expected: error.
+> - Nonexistent workout: `/override_workout_tag id/999 newTag/cardio` → Expected: error (invalid id).
 
-### Success Cases
+<br>
 
-```
-/rename n/Nitin → success (name saved)
+### Gym Lookup Commands
 
-rn n/Ana        → success
-```
+1. **Find Gym by Exercise**
+    1. Test case: `/gym_where n/deadlift`  
+       **Expected:** Displays gym(s) that have deadlift equipment.
+    2. Test case: `/gym_where n/unknown_exercise`  
+       **Expected:** “No gym found with matching equipment.”
 
-### Error Cases
+2. **View Gym Equipment**
+    1. Test case: `/gym_page p/1`  
+       **Expected:** Lists equipment at the first gym (e.g., “SRC Gym”).
+    2. Test case: `/gym_page p/SRC Gym`  
+       **Expected:** Displays the same results as above.
 
-```
-/rename                 → error (missing n/)
-/rename n/              → error (empty name)
-/rename n/<31+ chars>   → error (name too long; max 30)
-```
+> **Additional tests**
+> - Missing parameter: `/gym_where` or `/gym_page` → Expected: error (missing required prefix).
+> - Out-of-range page: `/gym_page p/999` → Expected: error.
 
-**Usage:** `/rename n/<name>` (alias: `rn`)
+<br>
 
----
+### Data Persistence
 
-## Add Weight
+1. **Verify Auto-Save**
+    1. Add workouts, weight logs, and goals.
+    2. Exit with `/exit`.
+    3. Relaunch with `java -jar FitChasers.jar`.  
+       **Expected:** All data is restored exactly as before.
 
-### Success Cases
+2. **Missing Data Folder**
+    1. Delete the `/data` folder.
+    2. Relaunch the app.  
+       **Expected:** App recreates folder and starts with fresh data, no crash.
 
-```
-/add_weight w/70.5 d/23/10/25   → Weight successfully recorded
-aw w/70.5 d/23/10/25            → Weight successfully recorded
-/add_weight w/70.5              → Weight successfully recorded (date defaults to today)
-aw w/70.5                       → Weight successfully recorded (date defaults to today)
-```
+> **Additional tests**
+> - Create multiple workouts and weights across months, relaunch → Expected: correct month files are loaded.
 
-### Error Cases
+<br>
 
-```
-/add_weight w/invalid d/23/10/25     → Error: invalid weight value
-/add_weight w/70.5 d/invalid/date    → Error: invalid date format
-/add_weight w/ d/23/10/25            → Error: missing weight value
-/add_weight w/70.5 d/<future date>   → Error: date cannot be in the future
-```
+### Invalid Commands
 
-**Usage:** `/add_weight w/<weight> [d/<dd/MM/yy>]` (alias: `aw`)
+1. **Unknown Commands**
+    1. Test case: `/hello`  
+       **Expected:** “[Oops!] That's not a thing, bestie. Try /help or h for the real moves!”
 
+2. **Help Menu**
+    1. Test case: `/help`  
+       **Expected:** Displays complete command list, grouped by category.
 
----
+> **Additional tests**
+> - Typos: `/vie_log`, `/ad_weight` → Expected: unknown command guidance.
 
-## View Weight
+<br>
 
-### Success Cases
+### Graceful Error Handling
 
-```
-/view_weight   → Displays all recorded weights with dates and a simple progress graph
-vw             → Displays all recorded weights with dates and a simple progress graph
-```
+1. **Edge Case – Duplicate Dates**
+    1. Add weight twice for same date `/add_weight w/75 d/03/11/25`.  
+       **Expected:** Updates existing record instead of duplicating.
 
-### Error Cases
+2. **Edge Case – Overlapping Workouts**
+    1. Create one workout from 08:00–09:00 and another from 08:30–09:30.  
+       **Expected:** Prevents creation and shows overlap warning.
 
-```
-/view_weight or vw → "<name> has no weight records yet."  (if no weight entries exist)
-```
+> **Additional tests**
+> - Delete a workout already deleted in another run → Expected: “not found” style error, no crash.
 
-**Usage:** `/view_weight` (alias: `vw`)
+<br>
 
----
+### Exit and Restart Behavior
 
-## Set Goal Weight
+1. **Exit Normally**
+    1. Test case: `/exit`  
+       **Expected:** Application displays goodbye message and saves data.
 
-### Success Cases
-
-```
-/set_goal w/60    → success (sets goal weight to 60 kg)
-sg w/60           → success (sets goal weight to 60 kg)
-```
-
-### Error Cases
-
-```
-/set_goal w/       → error (missing weight value)
-/set_goal w/abc    → error (invalid weight; must be a number)
-/set_goal w/-5     → error (weight must be positive)
-```
-
-**Usage:** `/set_goal w/<target_weight>` (alias: `sg`)
-
----
-
-## View Goal Weight
-
-### Success Cases
-
-```
-/view_goal   → shows current goal weight, e.g., "Your goal weight is 60 kg"
-vg           → shows current goal weight, e.g., "Your goal weight is 60 kg"
-```
-
-### Error Cases
-
-```
-/view_goal   → if no goal set, outputs: "No goal weight set yet."
-vg           → if no goal set, outputs: "No goal weight set yet."
-```
-
-**Usage:** `/view_goal` (alias: `vg`)
-
----
-
-## Create Workout
-
-### Success Cases
-
-```
-/create_workout n/Push d/23/10/25 t/0700    → success (active workout created)
-
-cw n/Push d/23/10/25 t/0700                 → success (active workout created)
-```
-
-### Error Cases
-
-```
-/create_workout                          → error (missing n/)
-/create_workout n/                       → error (empty name)
-/create_workout n/Push d/23/10/25        → error (missing t/)
-/create_workout n/Push t/0700            → error (missing d/)
-/create_workout n/Push d/32/10/25 t/0700 → error (invalid date)
-/create_workout n/Push d/23/10/25 t/2460 → error (invalid time)
-
-[when a workout is already active]
-/create_workout n/Arms d/23/10/25 t/0900 → error (cannot create while another workout is active)
-```
-
-**Usage:** `/create_workout n/<name> d/<dd/MM/yy> t/<HHmm>` (alias: `cw`)
-
----
-
-## Add Exercise
-
-### Success Cases
-
-```
-/add_exercise n/PushUp r/12 → success (adds exercise to active workout)
-
-ae n/PushUp r/12            → success (adds exercise to active workout)
-```
-
-### Error Cases
-
-```
-/add_exercise                   → error (missing n/ and r/)
-/add_exercise n/PushUp          → error (missing r/)
-/add_exercise n/PushUpr/12      → error (needs space before r/)
-/add_exercise n/ r/12           → error (empty name)
-/add_exercise n/PushUp r/x12    → error (invalid reps)
-
-[no active workout]
-/add_exercise n/PushUp r/12     → error (no active workout)
-```
-
-**Usage:** `/add_exercise n/<exercise_name> r/<reps>` (alias: `ae`)
-
----
-
-## Add Set
-
-### Success Cases
-
-```
-/add_set r/15   → success (appends set to latest exercise)
-
-as r/15         → success (appends set to latest exercise)
-```
-
-### Error Cases
-
-```
-/add_set         → error (missing r/)
-/add_set r/      → error (missing reps)
-/add_set r/abc   → error (invalid reps)
-
-[no active workout]
-/add_set r/15    → error (no active workout)
-
-[no exercise yet in active workout]
-/add_set r/15    → error (no exercise to attach set)
-```
-
-**Usage:** `/add_set r/<reps>` (alias: `as`)
-
----
-
-## End Workout
-
-### Success Cases
-
-```
-/end_workout d/23/10/25 t/0830  → success (ends active workout)
-
-ew d/23/10/25 t/0830            → success (ends active workout)
-```
-
-### Error Cases
-
-```
-/end_workout                           → error (missing d/ and t/)
-/end_workout d/23/10/25                → error (missing t/)
-/end_workout t/0830                    → error (missing d/)
-/end_workout d/23/10/25 t/0700         → error (end time before start time)
-/end_workout d/32/10/25 t/0830         → error (invalid date)
-/end_workout d/23/10/25 t/2460         → error (invalid time)
-
-[no active workout]
-/end_workout d/23/10/25 t/0830         → error (no active workout)
-```
-
-**Usage:** `/end_workout d/<dd/MM/yy> t/<HHmm>` (alias: `ew`)
-
----
-
-## View Log
-
-### Success Cases
-
-```
-/view_log               → success (current month, page 1)
-
-/view_log -m 10         → success (Oct of current year, page 1)
-
-/view_log -m 10 2       → success (Oct, page 2)
-
-/view_log -ym 2024 10   → success (Oct 2024, page 1)
-
-/view_log -m 10 -d      → success (detailed view)
-```
-
-### Error Cases
-
-```
-/view_log -m x          → error (month must be 1..12)
-/view_log -ym 2024 x    → error (month must be 1..12)
-/view_log -ym yyyy mm p → error (page must be positive integer)
-/view_log -q            → error (unknown flag)
-/view_log -m 10 0       → error (page must be positive)
-```
-
-**Usage:**
-
-* `/view_log`
-* `/view_log -m <month 1..12> [page]`
-* `/view_log -ym <year> <month 1..12> [page]`
-* Optional `-d` for detailed view (alias: `vl`)
-
----
-
-## Open (Workout Details)
-
-### Success Cases
-
-```
-/view_log
-/open 1         → success (opens the 1st listed workout)
-```
-
-### Error Cases
-
-```
-/open           → error (missing index)
-/open abc       → error (index must be an integer)
-/open 999       → error (index out of bounds)
-```
-
-**Usage:** `/open <index>` (alias: `o`)
-
----
-
-## Delete Workout
-
-### Success Cases
-
-```
-/delete_workout id/2          → success (delete workout at index 2)
-```
-
-### Error Cases
-
-```
-/delete_workout             → error (missing target)
-/delete_workout id/0        → error (invalid index; must be > 0)
-/delete_workout id/-2       → error (invalid index; must be positive)
-```
-
-**Usage:**
-
-* `/delete_workout id/<INDEX>`
-  (aliases: `dw`)
-
----
-
-## Add Modality Tag
-
-### Success Cases
-
-```
-`/add_modality_tag m/CARDIO k/hiking`       → success (keyword added; workouts retagged)
-
-`amot m/CARDIO k/hiking`                    → success (keyword added; workouts retagged)
-
-`/add_modality_tag m/STRENGTH k/deadlift`   → success
-
-`amot m/STRENGTH k/deadlift`                → success
-```
-
-### Error Cases
-
-```
-/add_modality_tag                 → error (missing m/ and k/)
-/add_modality_tag m/CARDIO        → error (missing k/)
-/add_modality_tag k/hiking        → error (missing m/)
-/add_modality_tag m/XYZ k/run     → error (unknown modality)
-```
-
-**Usage:** `/add_modality_tag m/(CARDIO|STRENGTH) k/<keyword>` (alias: `amot`)
-
----
-
-## Add Muscle Tag
-
-### Success Cases
-
-```
-/add_muscle_tag m/LEGS k/lunges     → success (keyword added; workouts retagged)
-amt m/LEGS k/lunges                 → success (keyword added; workouts retagged)
-
-/add_muscle_tag m/CHEST k/bench     → success
-amt m/CHEST k/bench                 → success
-```
-
-### Error Cases
-
-```
-/add_muscle_tag                 → error (missing m/ and k/)
-/add_muscle_tag m/LEGS          → error (missing k/)
-/add_muscle_tag k/squat         → error (missing m/)
-/add_muscle_tag m/XYZ k/foo     → error (unknown muscle group)
-```
-
-**Usage:** `/add_muscle_tag m/<MUSCLE_GROUP> k/<keyword>` (alias: `amt`)
-
----
-
-## Override Workout Tag
-
-### Success Cases
-
-```
-/override_workout_tag id/1 newTag/LEG_DAY   → success (tag updated & saved)
-
-owt id/1 newTag/LEG_DAY                     → success (tag updated & saved)
-```
-
-### Error Cases
-
-```
-/override_workout_tag                    → error (missing id/ and newTag/)
-/override_workout_tag id/1               → error (missing newTag/)
-/override_workout_tag newTag/LEG_DAY     → error (missing id/)
-/override_workout_tag id/x newTag/Y      → error (invalid id)
-```
-
-**Usage:** `/override_workout_tag id/<WORKOUT_ID> newTag/<NEW_TAG>` (alias: `owt`)
-
----
-
-## Gym Where
-
-### Success Cases
-
-```
-/gym_where n/squat → success (lists gyms that support the exercise)
-
-gw n/bench         → success
-```
-
-### Error Cases
-
-```
-/gym_where           → error (missing n/)
-/gym_where n/        → error (empty exercise)
-/gym_where n/unknown → "Sorry, no gyms found for that exercise."
-```
-
-**Usage:** `/gym_where n/<exercise>` (alias: `gw`)
-
----
-
-## Gym Page
-
-### Success Cases
-
-```
-/gym_page p/1 → success (shows equipment table for gym #1)
-
-gp p/2        → success
-```
-
-### Error Cases
-
-```
-/gym_page        → error (missing p/)
-/gym_page p/     → error (missing page number)
-/gym_page p/abc  → error (page must be an integer)
-/gym_page p/0    → error (page must be ≥ 1)
-/gym_page p/999  → error (invalid page; out of range)
-```
-
-**Usage:** `/gym_page p/<page_number>` (alias: `gp`)
-
----
-
-## Exit
-
-### Success Cases
-
-```
-/exit → saves data and exits
-
-e     → saves data and exits
-```
-
-### Error Cases
-
-```
-(n/a; any I/O error is reported before exit)
-```
-
-**Usage:** `/exit` (alias: `e`)
-
----
-
-### Formats (for reference)
-
-* **Date:** `dd/MM/yy` (e.g., `23/10/25`)
-* **Time:** `HHmm` 24-hour (e.g., `0700`, `1830`)
+2. **Restart**
+    1. Relaunch the `.jar` file.  
+       **Expected:** Previous user profile, weights, and workouts appear automatically.
 
 ---
 
@@ -803,13 +583,13 @@ The tagging system in FitChasers automatically categorizes workouts based on
 exercise modalities (e.g., cardio, strength) and muscle groups (e.g., legs, chest, back).
 This enables users to quickly identify workout types and track training patterns over time.
 
-### ("Class Diagram for Tagging")
+### Class Diagram for Tagging
 ![Alt text](./diagrams/Class_Diagram_for_tagging.png "Class Diagram for Tagging")
 
 Key Relationships:
 - Dependency: `WorkoutManager` depends on the `Tagger` interface for tag suggestion services
 - Composition: `WorkoutManager` owns and manages multiple `Workout` instances.
-- Aggregation: `Workout` contains `Exercise` objects (exercises can exist independently
+- Aggregation: `Workout` contains `Exercise` objects (exercises can exist independently)
 - Implementation: `DefaultTagger` implements the `Tagger` interface
 - Association: `DefaultTagger` uses Modality and `MuscleGroup` enums to organize keywords
 
@@ -833,12 +613,12 @@ Process:
 ### Sequence Diagram
 The following sequence diagram shows the interaction between components when a workout is created
 and tags are auto-generated:
-![Alt text](./diagrams/Sequence_Digram_for_tagging.png "Sequence Diagram for Tagging")
+![Alt text](./diagrams/Sequence_Diagram_for_tagging.png "Sequence Diagram for Tagging")
 ### Sequence Diagram for creating a workout
 ![Sequence diagram for creating a workout](./diagrams/SD_createw.png)
 ### Sequence Diagram for adding an exercise to current workout
 ![Sequence diagram for adding an exercise](./diagrams/SD_addex.png)
-### Sequence Diagram for adding a set to the current exercise 
+### Sequence Diagram for adding a set to the current exercise
 ![Sequence diagram for adding a set](./diagrams/SD_addset.png)
 ### Manual Tag Method
 #### Adding modality keywords
@@ -852,7 +632,7 @@ Example: `/add_modality_tag m/cardio k/jump_rope`
 4. Future workouts containing "jump_rope" in their name will automatically receive the `cardio` tag
 #### Overriding workout tags
 Users can manually override tags for a specific workout using the `/override_workout_tag` command:
-`/override_workout_tag id/3 newTag/strength
+`/override_workout_tag id/3 newTag/strength`
 1. WorkoutManager.overrideWorkoutTags(int workoutId, String newTag) is invoked with workoutId=3 and newTag="strength"
 2. The target workout is retrieved by ID (1-based index)
 3. A new Set<String> containing only "strength" is created
@@ -943,6 +723,7 @@ Implementation consideration:
 ## Notes
 
 - All parameters are required unless otherwise noted
-- Spacing is critical in parameter syntax (e.g., space before `r/`, no space after `r/`)
 - Invalid or malformed parameters return specific error messages with usage guidance
 - Y/N prompts are used when parameters are missing
+
+

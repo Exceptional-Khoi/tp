@@ -1,88 +1,62 @@
-
 @startuml
-title FitChasers – Sequence Diagram for "/del_workout"
 
+' --- Styling (kept minimal & consistent) ---
+skinparam sequenceParticipantType rectangle
 skinparam shadowing false
 skinparam responseMessageBelowArrow true
-skinparam sequence {
-  ArrowColor #444
-  LifeLineBorderColor #444
-  LifeLineBackgroundColor #FAFAFA
-  ParticipantBorderColor #222
-  ParticipantBackgroundColor #F7F7F7
-  BoxBorderColor #AAA
-  BoxBackgroundColor #FFF
-  NoteBorderColor #AAA
-  NoteBackgroundColor #FFF
-}
+hide footbox
 
-actor User
-boundary UI as "UI"
-control FitChasers as "FitChasers (main loop)"
-control VL as "ViewLog"
-control WM as "WorkoutManager"
-database FH as "FileHandler"
+actor    User
+participant ":UI" as UI
+participant ":FitChasers" as App
+participant ":WorkoutManager" as WM
+participant ":DeleteParser" as DP
+participant ":FileHandler" as FH
+participant ":Workout" as W
 
-== User enters command ==
-User -> UI : enter "/del_workout m/10 "\n(or: "/del_workout Push Day")
-UI -> FitChasers : readCommand()
-activate FitChasers
+User -> UI : enterText()
+UI -> App : readCommand()
+App -> WM : deleteParser(command)
 
-FitChasers -> FitChasers : delMethod(args)
-activate WM #white
+WM -> DP : parse(args, currentMonth)
 
-alt Month + Index form: "m/<MM> id/<index>"
-  FitChasers -> VL : parseArgs(args)
-  VL --> FitChasers : {ym, extractedArg=index}
+alt parseError
+  WM -> UI : showError(errorWithUsage)
+else parsedOk
+  WM -> FH : loadMonthList(targetMonth)
 
-  ' load the month file and switch WM's working set
-  FitChasers -> FH : loadMonthList(ym)
-  FH --> FitChasers : workoutsForMonth
-  FitChasers -> WM : setWorkouts(workoutsForMonth, ym)
+  alt noWorkoutsForMonth
+    WM -> UI : showMessage("No workouts found for " + targetMonth + ".")
+    WM -> UI : showMessage("Use /view_log to check available months.")
+  else workoutsExist
+    WM -> WM : sortByStartDescThenEndDesc()
 
-  ' ask WM to delete by index
-  FitChasers -> WM : deleteWorkoutByIndex(index)
-  activate WM
-  alt Invalid index
-    WM -> UI : showMessage("Invalid workout index ...")
-    deactivate WM
-  else Valid index
-    WM -> UI : showMessage("You sure you want to delete this? (y/n)")
-    UI -> WM : confirmationMessage()
-    alt User confirms
-      WM -> WM : remove workout from list
-      WM -> FH : saveMonthList(currentLoadedMonth, workouts)
-      FH --> WM : ok
-      WM -> UI : showMessage("Deleted workout: <name>")
-    else User cancels
-      WM -> UI : showMessage("Okay, deletion aborted.")
+    alt invalidDisplayIndex
+      WM -> UI : showMessage("Invalid workout ID: X")
+      WM -> UI : showMessage("Please use a valid ID between 1 and N")
+      WM -> UI : showMessage("Tip: /view_log m/MM")
+    else validDisplayIndex
+      WM -> W : selectByDisplayIndex(index)
+      WM -> UI : showMessage("You are about to delete:")
+      WM -> UI : displayDetailsOfWorkout(workout)
+      WM -> UI : showMessage("Are you sure? (y/n)")
+      UI -> WM : confirmationMessage()
+
+      alt notConfirmed
+        WM -> UI : showMessage("Deletion cancelled.")
+      else confirmed
+        WM -> WM : removeFromList(index)
+        WM -> FH : saveMonthList(targetMonth, monthWorkouts)
+
+        alt targetMonth == currentLoadedMonth
+          WM -> WM : setWorkouts(monthWorkouts, targetMonth)
+        end
+
+        WM -> UI : showMessage("Deleted workout: " + deletedName)
+      end
     end
-    deactivate WM
   end
-
-else Name form: "/del_workout <name>"
-  FitChasers -> WM : deleteWorkout(name)
-  activate WM
-  alt Name found
-    WM -> UI : showMessage("Deleting <name> | <date> ? (Type Y to confirm)")
-    UI -> WM : confirmationMessage()
-    alt User confirms
-      WM -> WM : remove workout
-      WM -> FH : saveMonthList(currentLoadedMonth, workouts)
-      FH --> WM : ok
-      WM -> UI : showMessage("Workout deleted successfully!")
-    else User cancels
-      WM -> UI : showMessage("Okay, I didn't delete it.")
-    end
-  else Name not found
-    WM -> UI : showMessage("Workout not found: <name>")
-  end
-  deactivate WM
 end
 
-deactivate FitChasers
-
-' Optional: UI shows final status to User
-UI --> User : show deletion message
-
+UI -> User : displayMessage()
 @enduml
