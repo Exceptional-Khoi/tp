@@ -23,7 +23,7 @@ public class DeleteWorkout {
     private final UI ui;
     private final FileHandler fileHandler;
     private final WorkoutManager workoutManager;
-    private YearMonth currentLoadedMonth; // set this from your app when month context changes
+    private final YearMonth currentLoadedMonth; // set this from your app when month context changes
 
     /**
      * Constructs a {@code DeleteWorkout} instance with the specified dependencies.
@@ -74,7 +74,7 @@ public class DeleteWorkout {
                         Workout::getWorkoutEndDateTime,
                         Comparator.nullsLast(Comparator.reverseOrder())   // end: desc, nulls last
                 )
-        );  // ← NO .reversed()
+        );
 
         int displayIndex = parsedArgumentsForDelete.indexToDelete();
         if (displayIndex < 1 || displayIndex > monthWorkouts.size()) {
