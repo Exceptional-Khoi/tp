@@ -272,7 +272,7 @@ public class UI {
                 vl m/[month from 1-12]                     -  Select specific month in current year\s
                                                            e.g vl m/10 [Current Year Oct]
                \s
-                ym/                                        - Select specific month in specific year
+                vl ym/[Month/Year]                         - Select specific month in specific year
                                                            e.g. vl ym/10/26 [Oct 2026]                                \s
                \s
                 /open(o) id/<INDEX> m/<MM>                 - Open details of a workout by index
