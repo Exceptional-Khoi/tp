@@ -222,7 +222,7 @@ public class Person {
             int x = i * spacing;
             int yy = y[i];
             if (yy >= 0 && yy < height && x < width) {
-                grid[yy][x] = '\u25CF';
+                grid[yy][x] = 'O';
                 isWeightPoint[yy][x] = true;
             }
         }
@@ -234,7 +234,7 @@ public class Person {
 
         if (displayWeights.size() == 1) {
             double w = displayWeights.get(0);
-            System.out.printf("%6.1f | %s\u25CF%s\n", w, orange, reset);
+            System.out.printf("%6.1f | %sO%s\n", w, orange, reset);
             System.out.print("        ");
             for (int j = 0; j < displayDates.get(0).length(); j++) {
                 System.out.print('_');
@@ -251,7 +251,7 @@ public class Person {
             System.out.print(" ");
             for (int j = 0; j < width; j++) {
                 if (isWeightPoint[i][j]) {
-                    System.out.print(orange + "\u25CF" + reset);
+                    System.out.print(orange + "O" + reset);
                 } else {
                     System.out.print(grid[i][j]);
                 }

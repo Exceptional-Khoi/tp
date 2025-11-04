@@ -1,6 +1,7 @@
 @startuml
 title FitChasers Goal Weight Tracker - Class Diagram
 
+skinparam linetype ortho
 skinparam shadowing false
 skinparam classAttributeIconSize 0
 skinparam ArrowColor #444
@@ -33,7 +34,6 @@ class UI {
 }
 
 class FileHandler {
--DATA_DIRECTORY: Path <<static>>
 -ui: UI
 --
 +saveGoal(goalWeight: double, setDate: LocalDate): void

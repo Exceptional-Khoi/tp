@@ -1,5 +1,7 @@
 @startuml
 title FitChasers Weight Tracking System - Class Diagram
+
+skinparam linetype ortho
 skinparam shadowing false
 skinparam classAttributeIconSize 0
 skinparam ArrowColor #444
@@ -10,7 +12,6 @@ hide circle
 hide stereotype
 
 class WeightManager {
--DATE_FORMAT: DateTimeFormatter <<static>>
 -ui: UI
 --
 +WeightManager(person: Person)
@@ -58,7 +59,6 @@ class UI {
 }
 
 class FileHandler {
--DATA_DIRECTORY: Path <<static>>
 -ui: UI
 --
 +initIndex(): void
@@ -79,7 +79,6 @@ WeightManager ..> FileHandler
 Person ..> FileHandler
 
 ' Method calls
-WeightManager --> WeightRecord
-WeightManager ..> UI
+WeightManager ..> WeightRecord
 
 @enduml
