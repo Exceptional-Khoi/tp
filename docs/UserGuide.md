@@ -401,7 +401,7 @@ and exercise names. You can customize keywords using /add_modality_tag and /add_
 | **Add Set**               | `/add_set (as) r/REPS`<br>e.g. `/add_set r/10`                                                                                 |
 | **End Workout**           | `/end_workout (ew) d/DATE t/TIME`<br>e.g. `/end_workout d/30/10/25 t/1500`                                                     |
 | **View Log**              | `/view_log (vl) [Optional Tags]`<br>e.g. `/view_log`<br>→ `vl pg/2`, `vl detailed/`, `vl m/10`, `vl ym/10/26`                  |
-| **Open Workout**          | `/open (o) INDEX`<br>e.g. `/open 1`                                                                                            |
+| **Open Workout**          | `/open (o) id/INDEX`<br>e.g. `/open id/1`                                                                                      |
 | **Delete Workout**        | `/delete_workout (dw) id/<INDEX> m/<MM>`<br>`/delete_workout (dw) id/<INDEX> ym/<MM>/<YY>`<br>e.g. `/delete_workout id/1 m/10` |
 | **Add Modality Tag**      | `/add_modality_tag (amot) m/MODALITY k/KEYWORD`<br>e.g. `/add_modality_tag m/CARDIO k/running`                                 |
 | **Add Muscle Tag**        | `/add_muscle_tag (amt) m/MUSCLE_GROUP k/KEYWORD`<br>e.g. `/add_muscle_tag m/LEGS k/lunges`                                     |

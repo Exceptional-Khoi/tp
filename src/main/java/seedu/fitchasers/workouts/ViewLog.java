@@ -125,7 +125,7 @@ public class ViewLog {
             }
         }
 
-        buf.append("Tip: /view_log pg/2 (next pg of Current Month), /view_log m/10 (view October), /open <ID>.");
+        buf.append("Tip: /view_log pg/2 (next pg of Current Month), /view_log m/10 (view October), /open id/<ID>.");
         ui.showMessage(buf.toString());
     }
 
