@@ -13,8 +13,7 @@ It provides a complete command-driven experience that integrates workout logging
 ## Summary of Contributions
 
 **Code Contributed:**  
-[RepoSense link](https://nus-cs2113-ay2526s1.github.io/tp-dashboard/?search=nitin&sort=totalCommits%20dsc&sortWithin=totalCommits%20dsc&timeframe=commit&mergegroup=&groupSelect=groupByRepos&breakdown=true&checkedFileTypes=docs~functional-code~test-code~other&since=2025-09-19T00%3A00%3A00&filteredFileName=&tabOpen=true&tabType=zoom&zA=nitin19011&zR=AY2526S1-CS2113-W14-3%2Ftp%5Bmaster%5D&zACS=216.05790645879733&zS=2025-09-19T00%3A00%3A00&zFS=&zU=2025-11-03T23%3A59%3A59&zMG=false&zFTF=commit&zFGS=groupByRepos&zFR=false)
-
+[RepoSense link](https://nus-cs2113-ay2526s1.github.io/tp-dashboard/?search=zhongbaode&breakdown=true&sort=groupTitle%20dsc&sortWithin=title&since=2025-09-19T00%3A00%3A00&timeframe=commit&mergegroup=&groupSelect=groupByRepos&checkedFileTypes=docs~functional-code~test-code~other&filteredFileName=)
 
 ### Implemented /view_log commands
 * Added the ViewLog UI workflow to load monthly workout data, sort it chronologically, render paginated compact or detailed views, and keep context for /open interactions. Viewlog also enforces guarded argument parsing.
