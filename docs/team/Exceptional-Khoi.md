@@ -3,9 +3,9 @@
 > **Product:** FitChasers — CLI fitness tracker (chat-bubble UI, tagging, weight & goal tracking)
 
 ## Overview
-FitChasers is a console-based fitness tracking application designed to help users manage workouts, track weight progress, and set personal fitness goals — all through an intuitive chat-bubble style user interface.
+FitChasers is a console-based fitness tracking application designed to help users manage workouts, track weight progress and set personal fitness goals all through an intuitive chat-bubble style user interface.
 
-It provides a complete command-driven experience that integrates workout logging, goal tracking, and tag-based categorization, enabling users to efficiently record, view, and analyze their fitness journey.
+It provides a complete command-driven experience that integrates workout logging, goal tracking and tag-based categorization, enabling users to efficiently record, view and analyze their fitness journey.
 
 ## Summary of Contributions
 ### Code contributed
