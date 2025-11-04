@@ -318,17 +318,17 @@ Alternative: `vl`
 
 ### Opening a workout: `/open`
 Opens and displays detailed information about a specific workout by its index in the current system month's list.
-* Do note that you can ONLY open index from the system's month list, if the list do not exist, it will prompt no such file exist.
+Format: `/open id/<INDEX> [Optional Tags]`
 
-Format: `/open INDEX`
+Parameters:
+* `id/<INDEX> m/<MM>` - Open a workout by index shown in the view log for a specific month
+    * e.g. `/open id/1 m/10` → Open workout #1 from October (current year)
+    * e.g. `/open id/1 m/10`
 
-- `INDEX` is the number of the workout in the displayed list.
-- The index must be a positive integer `1, 2, 3 ...`
-
-Examples:
-- `/open 1 - Opens the first workout`
-- `/open 3 - Opens the third workout`
-
+* `id/<INDEX> ym/<MM>/<YY>` - Open a workout by index for a specific month and year
+    * e.g. `/open id/2 ym/10/26` → Open workout #2 from October 2026
+    * e.g. `/open id/2 ym/10/26`
+  
 Alternative: `o`
 
 ### Deleting Workouts: `/delete_workout`
