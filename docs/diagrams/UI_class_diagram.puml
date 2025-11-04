@@ -62,6 +62,4 @@ UI *-- Scanner
 UI ..> Workout
 UI ..> Exercise
 UI ..> WeightManager
-
-WeightManager ..> UI
 @enduml
