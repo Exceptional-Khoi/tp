@@ -300,7 +300,6 @@ The `GoalWeightTracker` component handles the user's target goal weight. It work
 * Validating input and handling invalid entries
 
 
-
 ## Glossary
 
 Mainstream OS: Windows, Linux, Unix, macOS
