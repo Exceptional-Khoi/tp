@@ -1,57 +1,158 @@
 # User Guide
 
 ## Introduction
-
-{Give a product intro}
+### FitChaser User Guide
+FitChaser is a desktop app for managing your fitness journey, optimized for use via a Command Line Interface (CLI) 
+while still having the benefits of a Graphical User Interface (GUI). If you can type fast, FitChaser can help you 
+track workouts, monitor weight progress, and achieve your fitness goals faster than traditional GUI apps.
 
 ## Quick Start
 
-{Give steps to get started quickly}
-
 1. Ensure that you have Java 17 or above installed.
-1. Down the latest version of `Duke` from [here](http://link.to/duke).
+1. Down the latest version of `Fitchaser` from [here](  ).
+3. Copy the file to the folder you want to use as the home folder for your FitChaser data.
+4. Open a command terminal, cd into the folder you put the jar file in, and use the java -jar 
+   fitchaser.jar command to run the application.
+5. On first launch, you will be prompted to enter your name and initial weight.
+6. Type the command in the command box and press Enter to execute it. e.g. typing `/help` and pressing Enter 
+   will open the help window.
 
-## Features 
+## Features
+<div markdown="block" class="alert alert-info">
+**:information_source: Notes about the command format:**<br>
 
-{Give detailed description of each feature}
+* Words in `UPPER_CASE` are the parameters to be supplied by the user.<br>
+  e.g. in `/create_workout n/NAME`, `NAME` is a parameter which can be used as `/create_workout n/Chest Day`.
+* Extraneous parameters for commands that do not take in parameters (such as `/help`, `/exit`) will be ignored.<br>
+  e.g. if the command specifies help 123, it will be interpreted as help.
+* Date format is `DD/MM/YY` (e.g., `30/10/25` for `October 30, 2025`). Time format is `HHMM` in 24-hour format 
+* (e.g., `1430` for `2:30 PM`).
+</div>
 
-### Adding a todo: `todo`
-Adds a new item to the list of todo items.
+### Viewing help : `help`
+Shows a message explaining how to use FitChaser and all available commands.
 
-Format: `todo n/TODO_NAME d/DEADLINE`
+Format: `/help`
+Alternative: `h`
 
-* The `DEADLINE` can be in a natural language format.
-* The `TODO_NAME` cannot contain punctuation.  
+### Setting your name : `rename`
+Sets or updates your name in FitChaser.
 
-Example of usage: 
+Format: `/rename n/NAME`
 
-`todo n/Write the rest of the User Guide d/next week`
+NAME can contain letters, numbers, spaces, underscores, and dashes (max 30 characters).
 
-`todo n/Refactor the User Guide to remove passive voice d/13/04/2020`
+Examples:
 
-### Tagging command guide
+`/rename n/John Doe`
 
-#### Adding Modality group keyword: `add_modality_tag`
+`/rename n/FitChaser_User-1`
+
+### Adding weight : `add_weight`
+Logs your weight on a specific date.
+
+Format: `/add_weight w/WEIGHT d/DATE`
+
+* WEIGHT is a numeric value (can be decimal, e.g., `75.5`).
+* DATE is in `DD/MM/YY` format.
+
+<div markdown="span" class="alert alert-primary">:bulb: **Tip:** You can log multiple weight entries for the 
+same date to track weight fluctuations throughout the day. </div>
+Example:
+
+* `/add_weight w/75 d/30/10/25`
+* `/add_weight w/74.5 d/28/10/25`
+
+Alternative: `aw`
+
+### Creating a workout : `create_workout`
+Starts a new workout session.
+
+Format: `/create_workout n/NAME d/DATE t/TIME`
+
+NAME is the name of your workout (e.g., "Chest Day", "Morning Run").
+
+DATE is in `DD/MM/YY` format.
+
+TIME is in `HHMM` format (24-hour, e.g., `1430` for 2:30 PM).
+
+<div markdown="span" class="alert alert-primary">:bulb: **Tip:** You can create multiple workouts on the same day with different times. </div>
+Examples:
+
+* `/create_workout n/Chest Day d/30/10/25 t/1430`
+
+* `/create_workout n/Cardio Session d/30/10/25`
+
+Alternative: `cw`
+
+### Adding an exercise : add_exercise
+Adds an exercise to your current workout session.
+
+Format: `/add_exercise n/NAME r/REPS`
+
+NAME is the exercise name.
+
+REPS is a comma-separated list of repetitions for each set (e.g., `15,15,12`).
+
+Examples:
+
+`/add_exercise n/Push Ups r/15,15,12`
+
+`/add_exercise n/Bench Press r/12,10,8`
+
+`/add_exercise n/Deadlift r/5`
+
+Alternative: `ae`
+
+### Adding a set : `add_set`
+Adds another set to the last exercise in your current workout.
+
+Format: `/add_set r/REPS`
+
+REPS is the number of repetitions for this set.
+
+Examples:
+
+`/add_set r/10`
+
+`/add_set r/12`
+
+Alternative: `as`
+
+### Ending a workout : `end_workout`
+Completes your current workout session and saves it.
+
+Format: `/end_workout d/DATE t/TIME`
+
+DATE is in `DD/MM/YY` format.
+
+TIME is in `HHMM` format.
+
+Examples:
+
+`/end_workout d/30/10/25 t/1500`
+
+Alternative: `ew`
+
+### Adding Modality group keyword: `add_modality_tag`
 Adds a new keyword to extend the automatic tagging system for workout modalities (cardio, strength).
 
 Format: `add_modality_tag m/MODALITY k/KEYWORD`
 * The `MODALITY` must be either `CARDIO` or `STRENGTH`.
 * The `KEYWORD` should be lowercase and represent an exercise type (e.g., "jump_rope", "pilates").
-* Once added, all future workouts containing this keyword will be auto-tagged with the corresponding modality.
-* Existing workouts will be retagged immediately.
+  
+Valid Modalities:
+
+`CARDIO` - For cardio exercises like running, swimming, cycling
+
+`STRENGTH` - For strength training exercises like lifting, pressing, squatting
 
 Example of usage:
 `add_modality_tag m/CARDIO k/jump_rope`
 
 `add_modality_tag m/STRENGTH k/pilates`
 
-Expected output:
-```
-🤖 FitChaser
-╭──────────────────────────────────────────────────────╮
-│ Added keyword jump_rope to modality CARDIO           │
-╰──────────────────────────────────────────────────────╯
-```
+Alternative: `amot`
 
 #### Adding Muscle Group Keywords: `add_muscle_tag`
 Adds a new keyword to extend the automatic tagging system for muscle groups (legs, chest, back, etc.).
@@ -59,21 +160,30 @@ Adds a new keyword to extend the automatic tagging system for muscle groups (leg
 Format: `add_muscle_tag m/MUSCLE_GROUP k/KEYWORD`
 * The `MUSCLE_GROUP` must be one of: `LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, CORE`.
 * The `KEYWORD` should be lowercase and represent an exercise targeting that muscle group (e.g., "lunges", "squats").
-* Once added, all future workouts containing this keyword will be auto-tagged with the corresponding muscle group.
-* Existing workouts will be retagged immediately.
+  
+Valid Muscle Groups:
+
+`LEGS` - Leg exercises like squats, lunges, leg presses
+
+`POSTERIOR_CHAIN` - Posterior chain exercises like deadlifts
+
+`CHEST` - Chest exercises like bench press, push-ups
+
+`BACK` - Back exercises like rows, pull-ups
+
+`SHOULDERS` - Shoulder exercises like overhead press
+
+`ARMS` - Arm exercises like curls, tricep extensions
+
+`CORE` - Core exercises like planks, abs work
 
 Example of usage:
 `add_muscle_tag m/LEGS k/lunges`
 `add_muscle_tag m/CHEST k/push_ups`
 
-Expected Output:
-```
-🤖 FitChaser
-╭──────────────────────────────────────────────────────╮
-│ Added keyword lunges to muscle group LEGS            │
-╰──────────────────────────────────────────────────────╯
-```
-#### Overriding Workout Tags: `override_workout_tag`
+Alternative: `amt`
+
+### Overriding Workout Tags: `override_workout_tag`
 Manually replaces the tags of a specific workout with a single new tag, clearing all auto-generated tags.
 
 Format: `override_workout_tag id/WORKOUT_ID newTag/TAG_NAME`
@@ -82,50 +192,73 @@ Format: `override_workout_tag id/WORKOUT_ID newTag/TAG_NAME`
 * The command clear both auto-generated and manual tags, replacing them with only the specified tag.
 * Changes are saved immediately to persistent storage.
 
-Example of usage:
-`override_workout_tag id/1 newTag/strength`
-`override_workout_tag id/3 newTag/recovery`
+Examples:
 
-Expected output:
-```
-🤖 FitChaser
-╭──────────────────────────────────────────────────────╮
-│ Saved 1 workouts for 2025-10.                        │
-│ Workout tags saved successfully.                     │
-╰──────────────────────────────────────────────────────╯
-```
-#### Understanding Workout tags
-Auto-Generated Tags vs. Manual Tags
-FitChasers uses two types of tags:
-* Auto-Generated Tags: Automatically assigned based on workout name keywords. These are suggested by the system.
-* Manual Tags: Tags you explicitly set using `/override_workout_tag` command. These take priority over auto-generated 
-  tags.
+`/override_workout_tag id/1 newTag/strength`
 
-Viewing Workout Tags:
-To see the tags assigned to a specific workout:
-1.  Enter `/view_log` to list all workouts
-2. Enter `/open [WORKOUT_ID]` to view detailed information including tags
-Example:
-```
-Enter command > /view_log
-Workouts (3 total) – Page 1/1
-ID  Date         Name              Duration
-1   Fri 24 Oct   run and swim     45m
-2   Fri 24 Oct   leg day          30m
-3   Fri 24 Oct   lunges session   25m
+`/override_workout_tag id/3 newTag/legs`
 
-Enter command > /open 1
-+------------------------------------------------------+
-│  Here you go bestie! These are the workout details!  │
-│                                                      │
-│  Name       : run and swim                           │
-│  Date       : Saturday 25th of October               │
-│  Duration   : 0m                                     │
-│  Tags       : cardio, back                           │
-│                                                      │
-│  Exercises  : (none added)                           │
-+------------------------------------------------------+
-```
+Alternative: `owt`
+
+### Finding gyms by exercise : `gym_where`
+Searches for nearby NUS gyms that have equipment for a specific exercise.
+
+Format: `/gym_where n/EXERCISE_NAME`
+
+EXERCISE_NAME is the exercise you want to do.
+
+Examples:
+
+`/gym_where n/deadlift`
+
+`/gym_where n/treadmill`
+
+Alternative: `gw`
+
+### Viewing gym equipment : `gym_page`
+Shows the available equipment at a specific NUS gym.
+
+Format: `/gym_page p/PAGE_NUMBER_OR_GYM_NAME`
+
+PAGE_NUMBER_OR_GYM_NAME can be a number (1-N) or a gym name.
+
+Examples:
+
+`/gym_page p/1` - Shows equipment at the first gym
+
+`/gym_page p/SRC Gym` - Shows equipment at SRC Gym
+
+Alternative: `gp`
+
+### Viewing workout log : `view_log`
+Displays a list of your workouts, typically for the current month.
+
+Format: `/view_log [MONTH]`
+
+MONTH is optional and in MM format.
+
+Examples:
+
+`/view_log` - Shows workouts for the current month
+
+Alternative: `vl`
+
+### Opening a workout : `open`
+Opens and displays detailed information about a specific workout by its index in the current list.
+
+Format: `/open INDEX`
+
+INDEX is the number of the workout in the displayed list.
+
+The index must be a positive integer `1, 2, 3 ...`
+
+Examples:
+
+`/open 1 - Opens the first workout`
+
+`/open 3 - Opens the third workout`
+
+Alternative: `o`
 
 ### Deleting Workouts: del_workout
 Deletes the specified workout(s) from your workout history.
@@ -140,16 +273,67 @@ Deletes the specified workout(s) from your workout history.
 * `view_log d/24/10/25` followed by `del_workout 1` deletes the 1st workout in the results of the filtered list.
 * `del_workout 1 3 5` deletes the 1st, 3rd, and 5th workouts from the currently displayed list.
 
+### Exiting the program : exit
+Exits FitChaser and saves all your data.
+
+Format: `/exit`
+
+Alternative: `e`
+
+### Saving the data
+FitChaser data is saved automatically after any command that changes the data. There is no need to save manually.
+
+Data is organized by month and stored in the data/ folder in your FitChaser home directory.
 
 
 ## FAQ
 
 **Q**: How do I transfer my data to another computer? 
 
-**A**: {your answer here}
+**A**: Install FitChaser on the other computer and copy the entire data/ folder from your current FitChaser home 
+directory to the new computer's FitChaser installation. The next time you run FitChaser, it will load all your 
+saved data.
+
+**Q**: What happens if I enter an invalid date format?
+
+**A**: FitChaser will display an error message and ask you to re-enter the command with the correct `DD/MM/YY`format.
+
+**Q**: Can I have multiple workouts on the same day?
+
+**A**: Yes! FitChaser allows you to create and save multiple workouts on the same date. You can even specify 
+different times for each workout.
+
+**Q**: How are tags automatically assigned?
+
+**A**: FitChaser uses keyword matching to automatically assign modality and muscle group tags based on your workout 
+and exercise names. You can customize keywords using /add_modality_tag and /add_muscle_tag commands.
+
+**Q**: What are the valid values for muscle groups?
+
+**A**: The valid muscle groups are: `LEGS, POSTERIOR_CHAIN, CHEST, BACK, SHOULDERS, ARMS, and CORE`.
+## Command Summary
 
 ## Command Summary
 
-{Give a 'cheat sheet' of commands here}
+Action | Format, Examples
+--------|------------------
+**Add Exercise** | `/add_exercise n/NAME r/REPS`<br> e.g., `/add_exercise n/Push Ups r/15,15,12`
+**Add Modality Tag** | `/add_modality_tag m/MODALITY k/KEYWORD`<br> e.g., `/add_modality_tag m/CARDIO k/running`
+**Add Muscle Tag** | `/add_muscle_tag m/MUSCLE_GROUP k/KEYWORD`<br> e.g., `/add_muscle_tag m/LEGS k/squat`
+**Add Set** | `/add_set r/REPS`<br> e.g., `/add_set r/10`
+**Add Weight** | `/add_weight w/WEIGHT d/DATE`<br> e.g., `/add_weight w/75 d/30/10/25`
+**Create Workout** | `/create_workout n/NAME d/DATE [t/TIME]`<br> e.g., `/create_workout n/Chest Day d/30/10/25 t/1430`
+**Delete Workout** | `/del_workout WORKOUT_NAME` or `/del_workout d/DATE`<br> e.g., `/del_workout Chest Day`
+**End Workout** | `/end_workout d/DATE t/TIME`<br> e.g., `/end_workout d/30/10/25 t/1500`
+**Exit** | `/exit` or `e`
+**Gym Page** | `/gym_page p/PAGE_OR_NAME`<br> e.g., `/gym_page p/1` or `/gym_page p/SRC Gym`
+**Gym Where** | `/gym_where n/EXERCISE`<br> e.g., `/gym_where n/deadlift`
+**Help** | `/help` or `h`
+**Open Workout** | `/open INDEX`<br> e.g., `/open 1`
+**Override Tag** | `/override_workout_tag id/ID newTag/TAG`<br> e.g., `/override_workout_tag id/1 newTag/strength`
+**Rename** | `/rename n/NAME`<br> e.g., `/rename n/John Doe`
+**Set Goal** | `/set_goal g/GOAL_WEIGHT`<br> e.g., `/set_goal g/70`
+**View Goal** | `/view_goal` or `vg`
+**View Log** | `/view_log [MONTH]`<br> e.g., `/view_log` or `/view_log 10`
+**View Weight** | `/view_weight` or `vw`
 
-* Add todo `todo n/TODO_NAME d/DEADLINE`

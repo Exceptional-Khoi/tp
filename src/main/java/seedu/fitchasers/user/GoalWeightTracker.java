@@ -86,7 +86,7 @@ public class GoalWeightTracker {
      * If there are no weight records yet, only the goal weight is shown.
      * </p>
      *
-     * @param currentWeight the user's most recent recorded weight (may be {@code null})
+     * @param currentWeight the user's most recent recorded weight (maybe {@code null})
      */
     public void handleViewGoal(Double currentWeight) {
         if (goalWeight == null) {
@@ -146,23 +146,5 @@ public class GoalWeightTracker {
         } catch (IOException e) {
             ui.showMessage("No previous goal weight found.");
         }
-    }
-
-    /**
-     * Checks if a goal weight has been set.
-     *
-     * @return {@code true} if a goal weight exists, {@code false} otherwise
-     */
-    public boolean hasGoal() {
-        return goalWeight != null;
-    }
-
-    /**
-     * Returns the current goal weight.
-     *
-     * @return the goal weight in kilograms, or {@code -1} if no goal has been set
-     */
-    public double getGoalWeight() {
-        return goalWeight != null ? goalWeight : -1;
     }
 }

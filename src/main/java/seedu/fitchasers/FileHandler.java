@@ -38,7 +38,7 @@ import java.util.Set;
  * <p>
  * Example:
  * WORKOUT | Chest Day | 45
- * EXERCISE | Push Ups | 15,15,12
+ * EXERCISE | Push-Ups | 15,15,12
  * EXERCISE | Bench Press | 12,10,8
  * END_WORKOUT
  */
@@ -52,7 +52,9 @@ public class FileHandler {
     private final Set<YearMonth> onDiskMonths = new HashSet<>();
 
     /**
-     * Initialize index for lazy loading.
+     * Initilize index for lazy loading
+     *
+     * @throws IOException if directory or file creation fails
      */
     public void initIndex() throws IOException, FileNonexistent {
         ensureDataDir();
